@@ -26,7 +26,7 @@ const usersSearchSchema = z.object({
   username: z.string().optional().catch(''),
 })
 
-export const Route = createFileRoute('/_authenticated/users/')({
+export const Route = createFileRoute('/admin/users/')({
   validateSearch: usersSearchSchema,
   component: Users,
 })

@@ -10,7 +10,7 @@ import { MaintenanceError } from '@/features/errors/maintenance-error'
 import { NotFoundError } from '@/features/errors/not-found-error'
 import { UnauthorisedError } from '@/features/errors/unauthorized-error'
 
-export const Route = createFileRoute('/_authenticated/errors/$error')({
+export const Route = createFileRoute('/admin/errors/$error')({
   component: RouteComponent,
 })
 

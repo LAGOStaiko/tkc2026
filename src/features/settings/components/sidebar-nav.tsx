@@ -22,7 +22,7 @@ type SidebarNavProps = React.HTMLAttributes<HTMLElement> & {
 export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const [val, setVal] = useState(pathname ?? '/settings')
+  const [val, setVal] = useState(pathname ?? '/admin/settings')
 
   const handleSelect = (e: string) => {
     setVal(e)
@@ -82,3 +82,4 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
     </>
   )
 }
+

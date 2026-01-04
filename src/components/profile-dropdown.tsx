@@ -40,21 +40,21 @@ export function ProfileDropdown() {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <Link to='/settings'>
+              <Link to='/admin/settings'>
                 Profile
-                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                <DropdownMenuShortcut>?�⌘P</DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to='/settings'>
+              <Link to='/admin/settings'>
                 Billing
-                <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                <DropdownMenuShortcut>?�B</DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to='/settings'>
+              <Link to='/admin/settings'>
                 Settings
-                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+                <DropdownMenuShortcut>?�S</DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>New Team</DropdownMenuItem>
@@ -63,7 +63,7 @@ export function ProfileDropdown() {
           <DropdownMenuItem variant='destructive' onClick={() => setOpen(true)}>
             Sign out
             <DropdownMenuShortcut className='text-current'>
-              ⇧⌘Q
+              ?�⌘Q
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -73,3 +73,4 @@ export function ProfileDropdown() {
     </>
   )
 }
+

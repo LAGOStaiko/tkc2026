@@ -12,27 +12,27 @@ import { SidebarNav } from './components/sidebar-nav'
 const sidebarNavItems = [
   {
     title: 'Profile',
-    href: '/settings',
+    href: '/admin/settings',
     icon: <UserCog size={18} />,
   },
   {
     title: 'Account',
-    href: '/settings/account',
+    href: '/admin/settings/account',
     icon: <Wrench size={18} />,
   },
   {
     title: 'Appearance',
-    href: '/settings/appearance',
+    href: '/admin/settings/appearance',
     icon: <Palette size={18} />,
   },
   {
     title: 'Notifications',
-    href: '/settings/notifications',
+    href: '/admin/settings/notifications',
     icon: <Bell size={18} />,
   },
   {
     title: 'Display',
-    href: '/settings/display',
+    href: '/admin/settings/display',
     icon: <Monitor size={18} />,
   },
 ]
@@ -72,3 +72,4 @@ export function Settings() {
     </>
   )
 }
+
