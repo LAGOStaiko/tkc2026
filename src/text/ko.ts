@@ -74,6 +74,7 @@ export const ko = {
   'home.consoleCardTitle': '\uCF58\uC194',
   'home.ctaApply': '\uB300\uD68C \uC2E0\uCCAD\uD558\uAE30',
   'home.details': '\uC790\uC138\uD788 \uBCF4\uAE30',
+  'home.heroTagline': '\uafc8\uc744 \ud604\uc2e4\ub85c, \ud604\uc2e4\uc744 \uae30\uc801\uc73c\ub85c.',
   'nav.apply': '\uB300\uD68C \uC2E0\uCCAD\uD558\uB7EC \uAC00\uAE30',
   'nav.arcade': '\uC544\uCF00\uC774\uB4DC',
   'nav.console': '\uCF58\uC194',

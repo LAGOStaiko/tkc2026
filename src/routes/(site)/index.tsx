@@ -36,8 +36,9 @@ function HomePage() {
   const heroBgType = (data?.heroBgType ?? '').toLowerCase()
   const heroBgUrl = data?.heroBgUrl
   const heroBgPosterUrl = data?.heroBgPosterUrl
-  const heroLogoUrl =
-    data?.logoUrl ?? '/branding/logo-tkc2026-playx4.webp'
+  const heroLogoUrl = data?.logoUrl ?? '/branding/logo-tkc2026-playx4.webp'
+  const heroLogoMobileUrl =
+    data?.logoUrl ?? '/branding/logo-tkc2026-playx4-256.webp'
   const statusMessage = isLoading
     ? t('site.loading')
     : isError
@@ -83,20 +84,25 @@ function HomePage() {
         )}
         <div className='absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/30' />
         <div className='relative z-10 px-6 py-16 sm:px-10 sm:py-20 lg:px-14'>
-          <div className='mx-auto flex max-w-3xl flex-col items-center gap-4 text-center'>
-            <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-              {t('meta.siteName')}
-            </p>
+          <div className='mx-auto flex max-w-3xl flex-col items-center gap-5 text-center sm:gap-6'>
             <h1 className='sr-only'>{eventName}</h1>
-            <img
-              src={heroLogoUrl}
-              alt='TKC2026'
-              className='h-24 w-auto object-contain sm:h-28 md:h-32 lg:h-36'
-            />
-            <p className='text-base text-muted-foreground sm:text-lg'>
+            <picture className='w-full max-w-[320px] sm:max-w-[420px] md:max-w-[480px] lg:max-w-[520px]'>
+              <source media='(max-width: 768px)' srcSet={heroLogoMobileUrl} />
+              <img
+                src={heroLogoUrl}
+                alt='TKC2026'
+                className='mx-auto h-auto w-full object-contain'
+                loading='eager'
+                decoding='async'
+              />
+            </picture>
+            <p className='font-serif text-lg text-foreground sm:text-xl md:text-2xl'>
+              {t('home.heroTagline')}
+            </p>
+            <p className='text-sm text-muted-foreground sm:text-base'>
               {catchphrase}
             </p>
-            <div className='mt-4'>
+            <div className='mt-2'>
               <Button asChild size='lg'>
                 <Link to='/apply'>{t('home.ctaApply')}</Link>
               </Button>

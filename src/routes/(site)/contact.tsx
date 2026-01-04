@@ -14,6 +14,7 @@ export const Route = createFileRoute('/(site)/contact')({
 type SiteData = {
   contactEmail?: string
   kakaoChannelUrl?: string
+  logoUrl?: string
 }
 
 type ContentSection = {

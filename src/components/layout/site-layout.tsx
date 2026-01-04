@@ -68,8 +68,8 @@ export function SiteLayout() {
   const href = useLocation({ select: (location) => location.href })
   const siteName = data?.name ?? data?.title ?? t('meta.siteName')
   const tagline = data?.catchphrase ?? data?.tagline ?? data?.slogan ?? ''
-  const siteLogoUrl =
-    data?.logoUrl ?? '/branding/logo-tkc2026-playx4.webp'
+  const siteLogoUrl = data?.logoUrl ?? '/branding/logo-tkc2026-playx4.webp'
+  const headerLogoUrl = '/branding/logo-tkc2026-playx4-128.webp'
   const partners = Array.isArray(data?.partners) ? data.partners : []
 
   return (
@@ -81,9 +81,13 @@ export function SiteLayout() {
             className='flex items-center gap-2 text-lg font-semibold tracking-tight'
           >
             <img
-              src={siteLogoUrl}
+              src={headerLogoUrl}
               alt='TKC2026'
               className='h-8 w-8 shrink-0 object-contain'
+              onError={(event) => {
+                event.currentTarget.onerror = null
+                event.currentTarget.src = siteLogoUrl
+              }}
             />
             <span>{siteName}</span>
           </Link>
@@ -161,8 +165,16 @@ export function SiteLayout() {
           {!isLoading && !isError && (
             <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
               <div className='space-y-1'>
-                <div className='text-sm font-semibold text-foreground'>
-                  {siteName}
+                <div className='flex items-center gap-2'>
+                  <img
+                    src={siteLogoUrl}
+                    alt='TKC2026'
+                    className='h-6 w-6 shrink-0 object-contain'
+                    loading='lazy'
+                  />
+                  <span className='text-sm font-semibold text-foreground'>
+                    {siteName}
+                  </span>
                 </div>
                 {tagline && <div>{tagline}</div>}
               </div>

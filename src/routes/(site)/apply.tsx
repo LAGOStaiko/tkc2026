@@ -26,6 +26,7 @@ export const Route = createFileRoute('/(site)/apply')({
 
 type SiteData = {
   applyOpen?: boolean
+  logoUrl?: string
 }
 
 type RegisterResponse = {
