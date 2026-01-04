@@ -18,6 +18,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useRegister, useSite } from '@/lib/api'
+import { t } from '@/text'
 
 export const Route = createFileRoute('/(site)/apply')({
   component: ApplyPage,
@@ -45,39 +46,49 @@ type RegisterPayload = {
   privacyAgree: boolean
 }
 
-const LABEL_CONSOLE = '\uCF58\uC194'
-const LABEL_ARCADE = '\uC544\uCF00\uC774\uB4DC'
-const LABEL_CLOSED = '\uC2E0\uCCAD \uB9C8\uAC10'
-const LABEL_REQUIRED_PRIVACY =
-  '\uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC774\uC6A9\uC5D0 \uB3D9\uC758\uD574\uC57C \uD569\uB2C8\uB2E4.'
-const LABEL_CONSENT_REQUIRED =
-  '\uBBF8\uC131\uB144\uC790\uB294 \uBCF4\uD638\uC790 \uB3D9\uC758\uC11C \uB9C1\uD06C\uAC00 \uD544\uC218\uC785\uB2C8\uB2E4.'
+const LABEL_CONSOLE = t('nav.console')
+const LABEL_ARCADE = t('nav.arcade')
+const LABEL_CLOSED = t('apply.closed')
+const validationMessages = {
+  divisionRequired: t('apply.validation.divisionRequired'),
+  nameRequired: t('apply.validation.nameRequired'),
+  phoneRequired: t('apply.validation.phoneRequired'),
+  emailRequired: t('apply.validation.emailRequired'),
+  emailInvalid: t('apply.validation.emailInvalid'),
+  nicknameRequired: t('apply.validation.nicknameRequired'),
+  cardNoRequired: t('apply.validation.cardNoRequired'),
+  consentRequired: t('apply.validation.consentRequired'),
+  privacyRequired: t('apply.validation.privacyRequired'),
+}
 
 const formSchema = z
   .object({
     division: z.enum(['console', 'arcade'], {
       error: (iss) =>
-        iss.input === undefined ? 'Please select a division.' : undefined,
+        iss.input === undefined ? validationMessages.divisionRequired : undefined,
     }),
-    name: z.string().min(1, 'Name is required.'),
-    phone: z.string().min(1, 'Phone is required.'),
-    email: z.email({
-      error: (iss) => (iss.input === '' ? 'Email is required.' : undefined),
-    }),
-    nickname: z.string().min(1, 'Nickname is required.'),
-    cardNo: z.string().min(1, 'Card number is required.'),
+    name: z.string().min(1, { message: validationMessages.nameRequired }),
+    phone: z.string().min(1, { message: validationMessages.phoneRequired }),
+    email: z
+      .string()
+      .min(1, { message: validationMessages.emailRequired })
+      .email({ message: validationMessages.emailInvalid }),
+    nickname: z
+      .string()
+      .min(1, { message: validationMessages.nicknameRequired }),
+    cardNo: z.string().min(1, { message: validationMessages.cardNoRequired }),
     dohirobaNo: z.string().optional(),
     spectator: z.boolean(),
     isMinor: z.boolean(),
     consentLink: z.string().optional(),
     privacyAgree: z
       .boolean()
-      .refine((value) => value, { message: LABEL_REQUIRED_PRIVACY }),
+      .refine((value) => value, { message: validationMessages.privacyRequired }),
   })
   .refine(
     (data) => !data.isMinor || Boolean(data.consentLink?.trim()),
     {
-      message: LABEL_CONSENT_REQUIRED,
+      message: validationMessages.consentRequired,
       path: ['consentLink'],
     }
   )
@@ -113,10 +124,11 @@ function ApplyPage() {
   const isSubmitting = registerMutation.isPending
   const isCompleted = receiptId !== null
   const isDisabled = isSubmitting || isCompleted
-  const submitError =
-    registerMutation.error instanceof Error
-      ? registerMutation.error.message
-      : null
+  const submitError = registerMutation.error ? t('apply.submitFailed') : null
+
+  React.useEffect(() => {
+    document.title = `${t('meta.siteName')} | ${t('apply.title')}`
+  }, [])
 
   const onSubmit = async (values: ApplyFormValues) => {
     const payload: RegisterPayload = {
@@ -145,30 +157,30 @@ function ApplyPage() {
     <div className='space-y-6'>
       <div className='space-y-2'>
         <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          TKC2026
+          {t('meta.siteName')}
         </p>
         <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>
-          Apply
+          {t('apply.title')}
         </h1>
         <p className='text-sm text-muted-foreground'>
-          Submit your registration details for the competition.
+          {t('apply.subtitle')}
         </p>
       </div>
 
       {isLoading && (
         <p className='text-sm text-muted-foreground'>
-          Checking application status...
+          {t('apply.loadingStatus')}
         </p>
       )}
       {isError && (
         <p className='text-sm text-destructive'>
-          Failed to load application status.
+          {t('apply.failedStatus')}
         </p>
       )}
 
       <Card>
         <CardHeader>
-          <CardTitle>Registration Form</CardTitle>
+          <CardTitle>{t('apply.formTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -182,7 +194,7 @@ function ApplyPage() {
                   name='division'
                   render={({ field }) => (
                     <FormItem className='space-y-3'>
-                      <FormLabel>Division</FormLabel>
+                      <FormLabel>{t('apply.field.division')}</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
@@ -218,9 +230,9 @@ function ApplyPage() {
                     name='name'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>{t('apply.field.name')}</FormLabel>
                         <FormControl>
-                          <Input placeholder='Player Name' {...field} />
+                          <Input placeholder={t('apply.placeholder.name')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -231,9 +243,12 @@ function ApplyPage() {
                     name='nickname'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nickname</FormLabel>
+                        <FormLabel>{t('apply.field.nickname')}</FormLabel>
                         <FormControl>
-                          <Input placeholder='TKC Player' {...field} />
+                          <Input
+                            placeholder={t('apply.placeholder.nickname')}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -247,9 +262,15 @@ function ApplyPage() {
                     name='phone'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone</FormLabel>
+                        <FormLabel>{t('apply.field.phone')}</FormLabel>
                         <FormControl>
-                          <Input placeholder='010-0000-0000' {...field} />
+                          <Input
+                            type='tel'
+                            inputMode='tel'
+                            autoComplete='tel'
+                            placeholder={t('apply.placeholder.phone')}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -260,11 +281,12 @@ function ApplyPage() {
                     name='email'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t('apply.field.email')}</FormLabel>
                         <FormControl>
                           <Input
                             type='email'
-                            placeholder='player@example.com'
+                            autoComplete='email'
+                            placeholder={t('apply.placeholder.email')}
                             {...field}
                           />
                         </FormControl>
@@ -280,9 +302,14 @@ function ApplyPage() {
                     name='cardNo'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Card Number</FormLabel>
+                        <FormLabel>{t('apply.field.cardNo')}</FormLabel>
                         <FormControl>
-                          <Input placeholder='CARD-000000' {...field} />
+                          <Input
+                            inputMode='numeric'
+                            autoComplete='off'
+                            placeholder={t('apply.placeholder.cardNo')}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -293,9 +320,14 @@ function ApplyPage() {
                     name='dohirobaNo'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Dohiroba No. (Optional)</FormLabel>
+                        <FormLabel>{t('apply.field.dohirobaNo')}</FormLabel>
                         <FormControl>
-                          <Input placeholder='Optional' {...field} />
+                          <Input
+                            inputMode='numeric'
+                            autoComplete='off'
+                            placeholder={t('apply.placeholder.dohirobaNo')}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -308,17 +340,20 @@ function ApplyPage() {
                     control={form.control}
                     name='spectator'
                     render={({ field }) => (
-                      <FormItem className='flex items-start gap-3 rounded-lg border p-4'>
+                      <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
                         <FormControl>
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className='mt-0.5 size-5'
                           />
                         </FormControl>
                         <div className='space-y-1 leading-none'>
-                          <FormLabel>Spectator</FormLabel>
+                          <FormLabel className='text-base'>
+                            {t('apply.field.spectator')}
+                          </FormLabel>
                           <FormDescription>
-                            Check if you will bring a spectator.
+                            {t('apply.field.spectatorHelp')}
                           </FormDescription>
                         </div>
                       </FormItem>
@@ -328,17 +363,20 @@ function ApplyPage() {
                     control={form.control}
                     name='isMinor'
                     render={({ field }) => (
-                      <FormItem className='flex items-start gap-3 rounded-lg border p-4'>
+                      <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
                         <FormControl>
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className='mt-0.5 size-5'
                           />
                         </FormControl>
                         <div className='space-y-1 leading-none'>
-                          <FormLabel>Minor</FormLabel>
+                          <FormLabel className='text-base'>
+                            {t('apply.field.isMinor')}
+                          </FormLabel>
                           <FormDescription>
-                            Parental consent is required.
+                            {t('apply.field.isMinorHelp')}
                           </FormDescription>
                         </div>
                       </FormItem>
@@ -348,20 +386,23 @@ function ApplyPage() {
                     control={form.control}
                     name='privacyAgree'
                     render={({ field }) => (
-                      <FormItem className='flex items-start gap-3 rounded-lg border p-4'>
+                      <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
                         <FormControl>
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className='mt-0.5 size-5'
                           />
                         </FormControl>
                         <div className='space-y-1 leading-none'>
-                          <FormLabel>Privacy Agreement</FormLabel>
+                          <FormLabel className='text-base'>
+                            {t('apply.field.privacy')}
+                          </FormLabel>
                           <FormDescription>
-                            You must agree to the privacy policy.
+                            {t('apply.field.privacyHelp')}
                           </FormDescription>
-                          <FormMessage />
                         </div>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -373,15 +414,12 @@ function ApplyPage() {
                     name='consentLink'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Consent Link</FormLabel>
+                        <FormLabel>{t('apply.field.consentLink')}</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder='https://...'
-                            {...field}
-                          />
+                          <Input placeholder={t('apply.placeholder.consentLink')} {...field} />
                         </FormControl>
                         <FormDescription>
-                          Required if the applicant is a minor.
+                          {t('apply.field.consentLinkHelp')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -395,16 +433,21 @@ function ApplyPage() {
               )}
 
               {isCompleted && (
-                <div className='rounded-lg border bg-muted/40 p-4'>
-                  <p className='text-sm text-muted-foreground'>Receipt ID</p>
-                  <p className='text-lg font-semibold'>
-                    {receiptId || 'N/A'}
+                <div className='rounded-lg border bg-muted/40 p-4 text-center sm:text-left'>
+                  <p className='text-sm font-semibold text-foreground'>
+                    {t('apply.completed')}
+                  </p>
+                  <p className='text-sm text-muted-foreground'>
+                    {t('apply.receiptId')}
+                  </p>
+                  <p className='text-2xl font-semibold break-all sm:text-xl'>
+                    {receiptId || t('common.none')}
                   </p>
                 </div>
               )}
 
-              <Button type='submit' disabled={isDisabled}>
-                {isSubmitting ? 'Submitting...' : 'Submit'}
+              <Button type='submit' disabled={isDisabled} className='w-full sm:w-auto'>
+                {isSubmitting ? t('apply.submitting') : t('apply.submit')}
               </Button>
             </form>
           </Form>

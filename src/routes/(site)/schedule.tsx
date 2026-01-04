@@ -1,8 +1,10 @@
+import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useSchedule } from '@/lib/api'
+import { t } from '@/text'
 
 export const Route = createFileRoute('/(site)/schedule')({
   component: SchedulePage,
@@ -33,12 +35,12 @@ const TAB_ALL = 'all'
 const TAB_CONSOLE = 'console'
 const TAB_ARCADE = 'arcade'
 
-const LABEL_ALL = '\uC804\uCCB4'
-const LABEL_CONSOLE = '\uCF58\uC194'
-const LABEL_ARCADE = '\uC544\uCF00\uC774\uB4DC'
-const LABEL_UPCOMING = '\uC608\uC815'
-const LABEL_LIVE = '\uC9C4\uD589 \uC911'
-const LABEL_DONE = '\uC644\uB8CC'
+const LABEL_ALL = t('schedule.tab.all')
+const LABEL_CONSOLE = t('schedule.tab.console')
+const LABEL_ARCADE = t('schedule.tab.arcade')
+const LABEL_UPCOMING = t('schedule.status.upcoming')
+const LABEL_LIVE = t('schedule.status.live')
+const LABEL_DONE = t('schedule.status.done')
 
 const getScheduleItems = (
   data: ScheduleData | ScheduleItem[] | undefined
@@ -96,14 +98,14 @@ const renderLocation = (item: ScheduleItem) =>
 function ScheduleList({ items }: { items: ScheduleItem[] }) {
   if (items.length === 0) {
     return (
-      <p className='text-sm text-muted-foreground'>No schedule items yet.</p>
+      <p className='text-sm text-muted-foreground'>{t('schedule.empty')}</p>
     )
   }
 
   return (
-    <div className='grid gap-4'>
+    <div className='grid gap-3 sm:gap-4'>
       {items.map((item, index) => {
-        const heading = item.title ?? `Schedule ${index + 1}`
+        const heading = item.title ?? `${t('schedule.itemFallback')} ${index + 1}`
         const badge = getStatusBadge(item.status)
         const dateText = renderDate(item)
         const location = renderLocation(item)
@@ -113,20 +115,29 @@ function ScheduleList({ items }: { items: ScheduleItem[] }) {
           <Card key={`${heading}-${index}`}>
             <CardHeader className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
               <div className='space-y-1'>
-                <CardTitle className='text-lg'>{heading}</CardTitle>
+                <CardTitle className='text-base sm:text-lg'>
+                  {heading}
+                </CardTitle>
                 {dateText && (
-                  <p className='text-sm text-muted-foreground'>{dateText}</p>
+                  <p className='text-xs text-muted-foreground sm:text-sm'>
+                    {dateText}
+                  </p>
                 )}
               </div>
               {badge && (
-                <Badge variant={badge.variant} className='shrink-0'>
+                <Badge
+                  variant={badge.variant}
+                  className='shrink-0 text-xs sm:text-sm'
+                >
                   {badge.label}
                 </Badge>
               )}
             </CardHeader>
-            <CardContent className='space-y-2 text-sm text-muted-foreground'>
-              {location && <div>{location}</div>}
-              {note && <div className='text-foreground/80'>{note}</div>}
+            <CardContent className='space-y-1 text-xs text-muted-foreground sm:space-y-2 sm:text-sm'>
+              {location && <div className='break-words'>{location}</div>}
+              {note && (
+                <div className='text-foreground/80 break-words'>{note}</div>
+              )}
             </CardContent>
           </Card>
         )
@@ -147,32 +158,42 @@ function SchedulePage() {
     (item) => normalizeDivision(item) === TAB_ARCADE
   )
 
+  useEffect(() => {
+    document.title = `${t('meta.siteName')} | ${t('schedule.title')}`
+  }, [])
+
   return (
     <div className='space-y-6'>
       <div className='space-y-2'>
         <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          TKC2026
+          {t('meta.siteName')}
         </p>
         <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>
-          Schedule
+          {t('schedule.title')}
         </h1>
         <p className='text-sm text-muted-foreground'>
-          Daily program and match details.
+          {t('schedule.subtitle')}
         </p>
       </div>
 
       {isLoading && (
-        <p className='text-sm text-muted-foreground'>Loading schedule...</p>
+        <p className='text-sm text-muted-foreground'>{t('schedule.loading')}</p>
       )}
       {isError && (
-        <p className='text-sm text-destructive'>Failed to load schedule.</p>
+        <p className='text-sm text-destructive'>{t('schedule.failed')}</p>
       )}
 
       <Tabs defaultValue={TAB_ALL}>
-        <TabsList>
-          <TabsTrigger value={TAB_ALL}>{LABEL_ALL}</TabsTrigger>
-          <TabsTrigger value={TAB_CONSOLE}>{LABEL_CONSOLE}</TabsTrigger>
-          <TabsTrigger value={TAB_ARCADE}>{LABEL_ARCADE}</TabsTrigger>
+        <TabsList className='w-full justify-start gap-2 overflow-x-auto'>
+          <TabsTrigger value={TAB_ALL} className='shrink-0'>
+            {LABEL_ALL}
+          </TabsTrigger>
+          <TabsTrigger value={TAB_CONSOLE} className='shrink-0'>
+            {LABEL_CONSOLE}
+          </TabsTrigger>
+          <TabsTrigger value={TAB_ARCADE} className='shrink-0'>
+            {LABEL_ARCADE}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value={TAB_ALL} className='mt-4'>
           <ScheduleList items={items} />

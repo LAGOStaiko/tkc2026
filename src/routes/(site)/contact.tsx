@@ -1,9 +1,11 @@
+import { useEffect } from 'react'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { createFileRoute } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useContent, useSite } from '@/lib/api'
+import { t } from '@/text'
 
 export const Route = createFileRoute('/(site)/contact')({
   component: ContactPage,
@@ -122,49 +124,57 @@ function ContactPage() {
 
   const hasContactInfo = Boolean(contactEmail || kakaoChannelUrl)
 
+  useEffect(() => {
+    document.title = `${t('meta.siteName')} | ${t('contact.title')}`
+  }, [])
+
   return (
     <div className='space-y-6'>
       <div className='space-y-2'>
         <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          TKC2026
+          {t('meta.siteName')}
         </p>
         <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>
-          Contact
+          {t('contact.title')}
         </h1>
         <p className='text-sm text-muted-foreground'>
-          Reach out to the organizers for questions or support.
+          {t('contact.subtitle')}
         </p>
       </div>
 
       {isSiteLoading && (
         <p className='text-sm text-muted-foreground'>
-          Loading contact information...
+          {t('contact.loadingInfo')}
         </p>
       )}
       {isSiteError && (
         <p className='text-sm text-destructive'>
-          Failed to load contact information.
+          {t('contact.failedInfo')}
         </p>
       )}
       {isContentLoading && (
-        <p className='text-sm text-muted-foreground'>Loading details...</p>
+        <p className='text-sm text-muted-foreground'>
+          {t('contact.loadingContent')}
+        </p>
       )}
       {isContentError && (
-        <p className='text-sm text-destructive'>Failed to load content.</p>
+        <p className='text-sm text-destructive'>
+          {t('contact.failedContent')}
+        </p>
       )}
 
       <Card>
         <CardHeader>
-          <CardTitle>Contact Channels</CardTitle>
+          <CardTitle>{t('contact.channelsTitle')}</CardTitle>
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='flex flex-col gap-3 sm:flex-row'>
             {emailHref ? (
               <Button asChild>
-                <a href={emailHref}>Send Email</a>
+                <a href={emailHref}>{t('contact.sendEmail')}</a>
               </Button>
             ) : (
-              <Button disabled>Send Email</Button>
+              <Button disabled>{t('contact.sendEmail')}</Button>
             )}
             {kakaoChannelUrl ? (
               <Button variant='outline' asChild>
@@ -173,28 +183,28 @@ function ContactPage() {
                   target='_blank'
                   rel='noreferrer'
                 >
-                  Open Kakao Channel
+                  {t('contact.openKakao')}
                 </a>
               </Button>
             ) : (
               <Button variant='outline' disabled>
-                Open Kakao Channel
+                {t('contact.openKakao')}
               </Button>
             )}
           </div>
           {contactEmail && (
             <p className='text-sm text-muted-foreground'>
-              Email: {contactEmail}
+              {t('contact.labelEmail')}: {contactEmail}
             </p>
           )}
           {kakaoChannelUrl && (
             <p className='text-sm text-muted-foreground'>
-              Kakao Channel: {kakaoChannelUrl}
+              {t('contact.labelKakao')}: {kakaoChannelUrl}
             </p>
           )}
           {!hasContactInfo && !isSiteLoading && !isSiteError && (
             <p className='text-sm text-muted-foreground'>
-              Contact details will be available soon.
+              {t('contact.noInfo')}
             </p>
           )}
         </CardContent>
@@ -203,7 +213,8 @@ function ContactPage() {
       <div className='space-y-6'>
         {sortedSections.map((section, index) => {
           const body = section.bodyMd ?? ''
-          const heading = section.title ?? `Section ${index + 1}`
+          const heading =
+            section.title ?? `${t('content.sectionFallback')} ${index + 1}`
 
           return (
             <Card key={`${heading}-${index}`}>
@@ -229,7 +240,7 @@ function ContactPage() {
         !isContentError &&
         sortedSections.length === 0 && (
           <p className='text-sm text-muted-foreground'>
-            No additional contact content is available.
+            {t('contact.noContent')}
           </p>
         )}
     </div>

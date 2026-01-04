@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useSite } from '@/lib/api'
+import { t } from '@/text'
 
 type SiteData = {
   eventName?: string
@@ -18,10 +20,8 @@ type SiteData = {
   heroBgPosterUrl?: string
 }
 
-const CTA_LABEL = '\uB300\uD68C \uC2E0\uCCAD\uD558\uAE30'
-const DETAILS_LABEL = '\uC790\uC138\uD788 \uBCF4\uAE30'
-const CONSOLE_LABEL = '\uCF58\uC194'
-const ARCADE_LABEL = '\uC544\uCF00\uC774\uB4DC'
+const MD_QUERY = '(min-width: 768px)'
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
 export const Route = createFileRoute('/(site)/')({
   component: HomePage,
@@ -29,19 +29,30 @@ export const Route = createFileRoute('/(site)/')({
 
 function HomePage() {
   const { data, isLoading, isError } = useSite<SiteData>()
-  const eventName = data?.eventName ?? 'TKC2026'
-  const catchphrase = data?.catchphrase ?? 'Official Taiko Competition'
+  const canPlayVideo = useHeroVideoEnabled()
+  const eventName = data?.eventName ?? t('meta.siteName')
+  const catchphrase = data?.catchphrase ?? t('home.catchphraseFallback')
   const heroBgType = (data?.heroBgType ?? '').toLowerCase()
   const heroBgUrl = data?.heroBgUrl
   const heroBgPosterUrl = data?.heroBgPosterUrl
   const statusMessage = isLoading
-    ? 'Loading site info...'
+    ? t('site.loading')
     : isError
-      ? 'Site info unavailable.'
+      ? t('site.loadFailed')
       : null
 
-  const showVideo = heroBgType === 'video' && !!heroBgUrl
-  const showImage = heroBgType === 'image' && !!heroBgUrl
+  React.useEffect(() => {
+    document.title = `${t('meta.siteName')} | ${t('nav.home')}`
+  }, [])
+
+  const isVideoType = heroBgType === 'video'
+  const isImageType = heroBgType === 'image'
+  const fallbackImageUrl = isImageType
+    ? heroBgUrl
+    : heroBgPosterUrl ?? heroBgUrl
+  const showVideo = isVideoType && !!heroBgUrl && canPlayVideo
+  const showImage =
+    !!fallbackImageUrl && (isImageType || (isVideoType && !canPlayVideo))
 
   return (
     <div className='space-y-10'>
@@ -56,6 +67,7 @@ function HomePage() {
             muted
             loop
             playsInline
+            preload='metadata'
             poster={heroBgPosterUrl}
             src={heroBgUrl}
           />
@@ -63,14 +75,14 @@ function HomePage() {
         {showImage && (
           <div
             className='absolute inset-0 bg-cover bg-center'
-            style={{ backgroundImage: `url(${heroBgUrl})` }}
+            style={{ backgroundImage: `url(${fallbackImageUrl})` }}
           />
         )}
         <div className='absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/30' />
         <div className='relative z-10 px-6 py-16 sm:px-10 sm:py-20 lg:px-14'>
           <div className='max-w-2xl space-y-4'>
             <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-              TKC2026
+              {t('meta.siteName')}
             </p>
             <h1 className='text-4xl font-bold tracking-tight sm:text-5xl'>
               {eventName}
@@ -81,7 +93,7 @@ function HomePage() {
           </div>
           <div className='mt-8'>
             <Button asChild size='lg'>
-              <Link to='/apply'>{CTA_LABEL}</Link>
+              <Link to='/apply'>{t('home.ctaApply')}</Link>
             </Button>
           </div>
         </div>
@@ -90,40 +102,98 @@ function HomePage() {
       <section className='grid gap-6 lg:grid-cols-2'>
         <Card>
           <CardHeader>
-            <CardTitle>{CONSOLE_LABEL}</CardTitle>
-            <CardDescription>Console division overview and rules.</CardDescription>
+            <CardTitle>{t('home.consoleCardTitle')}</CardTitle>
+            <CardDescription>{t('home.consoleCardSubtitle')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className='text-sm text-muted-foreground'>
-              Explore qualifying formats, scoring, and how to participate in the
-              console bracket.
+              {t('home.consoleCardBody')}
             </p>
           </CardContent>
           <CardFooter>
             <Button variant='outline' asChild>
-              <Link to='/console'>{DETAILS_LABEL}</Link>
+              <Link to='/console'>{t('home.details')}</Link>
             </Button>
           </CardFooter>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>{ARCADE_LABEL}</CardTitle>
-            <CardDescription>Arcade division preview and entry flow.</CardDescription>
+            <CardTitle>{t('home.arcadeCardTitle')}</CardTitle>
+            <CardDescription>{t('home.arcadeCardSubtitle')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className='text-sm text-muted-foreground'>
-              Find match schedules, machine info, and on-site participation
-              details for arcade play.
+              {t('home.arcadeCardBody')}
             </p>
           </CardContent>
           <CardFooter>
             <Button variant='outline' asChild>
-              <Link to='/arcade'>{DETAILS_LABEL}</Link>
+              <Link to='/arcade'>{t('home.details')}</Link>
             </Button>
           </CardFooter>
         </Card>
       </section>
     </div>
   )
+}
+
+function useHeroVideoEnabled() {
+  const [enabled, setEnabled] = React.useState(false)
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const mdQuery = window.matchMedia(MD_QUERY)
+    const motionQuery = window.matchMedia(REDUCED_MOTION_QUERY)
+
+    const update = () => {
+      setEnabled(mdQuery.matches && !motionQuery.matches)
+    }
+
+    const handleChange = (_event: MediaQueryListEvent) => {
+      update()
+    }
+
+    update()
+
+    type LegacyMediaQueryList = MediaQueryList & {
+      addListener?: (handler: (event: MediaQueryListEvent) => void) => void
+      removeListener?: (handler: (event: MediaQueryListEvent) => void) => void
+    }
+
+    const addListener = (
+      query: MediaQueryList,
+      handler: (event: MediaQueryListEvent) => void
+    ) => {
+      const legacyQuery = query as LegacyMediaQueryList
+      if (legacyQuery.addListener) {
+        legacyQuery.addListener(handler)
+      } else {
+        query.addEventListener('change', handler)
+      }
+    }
+
+    const removeListener = (
+      query: MediaQueryList,
+      handler: (event: MediaQueryListEvent) => void
+    ) => {
+      const legacyQuery = query as LegacyMediaQueryList
+      if (legacyQuery.removeListener) {
+        legacyQuery.removeListener(handler)
+      } else {
+        query.removeEventListener('change', handler)
+      }
+    }
+
+    addListener(mdQuery, handleChange)
+    addListener(motionQuery, handleChange)
+
+    return () => {
+      removeListener(mdQuery, handleChange)
+      removeListener(motionQuery, handleChange)
+    }
+  }, [])
+
+  return enabled
 }

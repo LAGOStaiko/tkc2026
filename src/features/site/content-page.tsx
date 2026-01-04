@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useContent } from '@/lib/api'
+import { t } from '@/text'
 
 type ContentSection = {
   order?: number | string
@@ -101,11 +103,15 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
     (left, right) => getOrder(left.order) - getOrder(right.order)
   )
 
+  useEffect(() => {
+    document.title = `${t('meta.siteName')} | ${title}`
+  }, [title])
+
   return (
     <div className='space-y-6'>
       <div className='space-y-2'>
         <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          TKC2026
+          {t('meta.siteName')}
         </p>
         <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>
           {title}
@@ -113,21 +119,22 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
       </div>
 
       {isLoading && (
-        <p className='text-sm text-muted-foreground'>Loading content...</p>
+        <p className='text-sm text-muted-foreground'>{t('content.loading')}</p>
       )}
       {isError && (
-        <p className='text-sm text-destructive'>Failed to load content.</p>
+        <p className='text-sm text-destructive'>{t('content.loadFailed')}</p>
       )}
 
       {!isLoading && !isError && sortedSections.length === 0 && (
-        <p className='text-sm text-muted-foreground'>No content available.</p>
+        <p className='text-sm text-muted-foreground'>{t('content.empty')}</p>
       )}
 
       <div className='space-y-6'>
         {sortedSections.map((section, index) => {
           const imageUrl = section.imageUrl
           const body = section.bodyMd ?? ''
-          const heading = section.title ?? `Section ${index + 1}`
+          const heading =
+            section.title ?? `${t('content.sectionFallback')} ${index + 1}`
 
           return (
             <Card key={`${heading}-${index}`}>
