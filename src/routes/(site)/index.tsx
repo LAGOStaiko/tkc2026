@@ -18,6 +18,7 @@ type SiteData = {
   heroBgType?: string
   heroBgUrl?: string
   heroBgPosterUrl?: string
+  logoUrl?: string
 }
 
 const MD_QUERY = '(min-width: 768px)'
@@ -35,6 +36,8 @@ function HomePage() {
   const heroBgType = (data?.heroBgType ?? '').toLowerCase()
   const heroBgUrl = data?.heroBgUrl
   const heroBgPosterUrl = data?.heroBgPosterUrl
+  const heroLogoUrl =
+    data?.logoUrl ?? '/branding/logo-tkc2026-playx4.webp'
   const statusMessage = isLoading
     ? t('site.loading')
     : isError
@@ -80,21 +83,24 @@ function HomePage() {
         )}
         <div className='absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/30' />
         <div className='relative z-10 px-6 py-16 sm:px-10 sm:py-20 lg:px-14'>
-          <div className='max-w-2xl space-y-4'>
+          <div className='mx-auto flex max-w-3xl flex-col items-center gap-4 text-center'>
             <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
               {t('meta.siteName')}
             </p>
-            <h1 className='text-4xl font-bold tracking-tight sm:text-5xl'>
-              {eventName}
-            </h1>
+            <h1 className='sr-only'>{eventName}</h1>
+            <img
+              src={heroLogoUrl}
+              alt='TKC2026'
+              className='h-24 w-auto object-contain sm:h-28 md:h-32 lg:h-36'
+            />
             <p className='text-base text-muted-foreground sm:text-lg'>
               {catchphrase}
             </p>
-          </div>
-          <div className='mt-8'>
-            <Button asChild size='lg'>
-              <Link to='/apply'>{t('home.ctaApply')}</Link>
-            </Button>
+            <div className='mt-4'>
+              <Button asChild size='lg'>
+                <Link to='/apply'>{t('home.ctaApply')}</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

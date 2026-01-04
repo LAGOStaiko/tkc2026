@@ -27,6 +27,7 @@ type SiteData = {
   catchphrase?: string
   tagline?: string
   slogan?: string
+  logoUrl?: string
   partners?: SitePartner[]
 }
 
@@ -67,14 +68,24 @@ export function SiteLayout() {
   const href = useLocation({ select: (location) => location.href })
   const siteName = data?.name ?? data?.title ?? t('meta.siteName')
   const tagline = data?.catchphrase ?? data?.tagline ?? data?.slogan ?? ''
+  const siteLogoUrl =
+    data?.logoUrl ?? '/branding/logo-tkc2026-playx4.webp'
   const partners = Array.isArray(data?.partners) ? data.partners : []
 
   return (
     <div className='min-h-svh bg-background text-foreground'>
       <header className='fixed inset-x-0 top-0 z-50 border-b bg-background/90 backdrop-blur'>
         <div className='mx-auto flex h-16 max-w-5xl items-center gap-4 px-4'>
-          <Link to='/' className='text-lg font-semibold tracking-tight'>
-            {siteName}
+          <Link
+            to='/'
+            className='flex items-center gap-2 text-lg font-semibold tracking-tight'
+          >
+            <img
+              src={siteLogoUrl}
+              alt='TKC2026'
+              className='h-8 w-8 shrink-0 object-contain'
+            />
+            <span>{siteName}</span>
           </Link>
           <nav className='hidden flex-1 items-center justify-end gap-2 overflow-x-auto text-xs sm:gap-3 sm:text-sm md:flex'>
             {navItems.map((item) => {
