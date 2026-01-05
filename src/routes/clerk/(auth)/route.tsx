@@ -29,7 +29,7 @@ function ClerkAuthLayout() {
               &ldquo; Lorem ipsum dolor sit amet consectetur adipisicing elit.
               Sint, magni debitis inventore asperiores velit! &rdquo;
             </p>
-            <footer className='text-sm'>John Doe</footer>
+            <span className='text-sm'>John Doe</span>
           </blockquote>
         </div>
       </div>

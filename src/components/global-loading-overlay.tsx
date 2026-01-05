@@ -2,55 +2,72 @@ import { useEffect, useRef, useState } from 'react'
 import { useIsMutating } from '@tanstack/react-query'
 import { useRouterState } from '@tanstack/react-router'
 
-const SHOW_DELAY_MS = 200
-const HIDE_DELAY_MS = 150
+const MIN_VISIBLE_MS = 350
 
 export function GlobalLoadingOverlay() {
   const routerStatus = useRouterState({ select: (state) => state.status })
+  const routerHref = useRouterState({ select: (state) => state.location.href })
   const isMutating = useIsMutating()
   const isBusy = routerStatus === 'pending' || isMutating > 0
   const [isVisible, setIsVisible] = useState(false)
-  const showTimerRef = useRef<number | null>(null)
+  const [lastShownAt, setLastShownAt] = useState(0)
   const hideTimerRef = useRef<number | null>(null)
+  const previousHrefRef = useRef<string | null>(null)
 
   useEffect(() => {
     return () => {
-      if (showTimerRef.current) {
-        window.clearTimeout(showTimerRef.current)
-      }
       if (hideTimerRef.current) {
         window.clearTimeout(hideTimerRef.current)
       }
     }
   }, [])
 
+  const showOverlay = (forceReset = false) => {
+    if (hideTimerRef.current) {
+      window.clearTimeout(hideTimerRef.current)
+      hideTimerRef.current = null
+    }
+    if (!isVisible || forceReset) {
+      const now = Date.now()
+      setLastShownAt(now)
+    }
+    if (!isVisible) {
+      setIsVisible(true)
+    }
+  }
+
+  useEffect(() => {
+    if (previousHrefRef.current === null) {
+      previousHrefRef.current = routerHref
+      return
+    }
+
+    if (previousHrefRef.current !== routerHref) {
+      previousHrefRef.current = routerHref
+      showOverlay(true)
+    }
+  }, [routerHref])
+
   useEffect(() => {
     if (isBusy) {
-      if (hideTimerRef.current) {
-        window.clearTimeout(hideTimerRef.current)
-        hideTimerRef.current = null
-      }
-      if (!isVisible && !showTimerRef.current) {
-        showTimerRef.current = window.setTimeout(() => {
-          showTimerRef.current = null
-          setIsVisible(true)
-        }, SHOW_DELAY_MS)
+      if (!isVisible) {
+        showOverlay()
       }
       return
     }
 
-    if (showTimerRef.current) {
-      window.clearTimeout(showTimerRef.current)
-      showTimerRef.current = null
-    }
+    if (!isVisible) return
 
-    if (isVisible && !hideTimerRef.current) {
+    const elapsed = Date.now() - lastShownAt
+    const remaining = Math.max(MIN_VISIBLE_MS - elapsed, 0)
+
+    if (!hideTimerRef.current) {
       hideTimerRef.current = window.setTimeout(() => {
         hideTimerRef.current = null
         setIsVisible(false)
-      }, HIDE_DELAY_MS)
+      }, remaining)
     }
-  }, [isBusy, isVisible])
+  }, [isBusy, isVisible, lastShownAt])
 
   const visibilityClass = isVisible
     ? 'opacity-100 pointer-events-auto'
