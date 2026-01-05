@@ -36,19 +36,36 @@ function HomePage() {
         <p className='text-sm text-muted-foreground'>{statusMessage}</p>
       )}
       <section className='relative overflow-hidden rounded-3xl border bg-black text-white'>
-        <img
-          src='/branding/hero-tkc2026.webp'
-          alt=''
-          className='absolute inset-0 h-full w-full object-contain'
-          loading='eager'
-          decoding='async'
-          fetchPriority='high'
-        />
-        <div className='absolute inset-0 bg-gradient-to-b from-black/0 via-black/25 to-black/70' />
-        <div className='relative z-10 flex min-h-[70vh] flex-col justify-end px-4 pb-10 pt-24 md:min-h-[78vh] md:pt-28 md:pb-14'>
+        <picture className='absolute inset-0'>
+          <source
+            media='(max-width: 768px)'
+            srcSet='/branding/hero-taikolabs-768.webp'
+          />
+          <source
+            media='(max-width: 1280px)'
+            srcSet='/branding/hero-taikolabs-1280.webp'
+          />
+          <img
+            src='/branding/hero-taikolabs-2048.webp'
+            alt=''
+            className='h-full w-full object-cover object-[50%_30%]'
+            loading='eager'
+            decoding='async'
+            fetchPriority='high'
+          />
+        </picture>
+        <div className='absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-black/75' />
+        <div className='relative z-10 flex min-h-[70vh] flex-col items-center justify-center px-4 pb-10 pt-24 text-center md:min-h-[72vh]'>
           <div className='mx-auto w-full max-w-[1100px] text-center'>
             <h1 className='sr-only'>{eventName}</h1>
-            <div className='mx-auto flex max-w-[92vw] flex-col items-center gap-4'>
+            <img
+              src='/branding/logo-tkc2026-playx4.webp'
+              alt='TKC2026'
+              className='h-auto w-[min(980px,92vw)] mix-blend-screen drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]'
+              loading='eager'
+              decoding='async'
+            />
+            <div className='mx-auto mt-6 flex w-full max-w-[640px] flex-col items-center gap-4 rounded-xl bg-black/35 px-6 py-5 backdrop-blur-sm'>
               <p className='break-keep font-serif text-xl text-white/90 drop-shadow-[0_8px_20px_rgba(0,0,0,0.65)] md:text-3xl'>
                 {heroTagline}
               </p>
