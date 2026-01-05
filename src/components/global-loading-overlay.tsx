@@ -87,11 +87,7 @@ export function GlobalLoadingOverlay() {
           loading='eager'
           decoding='async'
         />
-        <div
-          className='mt-4 h-1.5 w-full rounded-full bg-white/20 overflow-hidden'
-        >
-          <div className='h-full w-1/3 bg-white/85 animate-[tkcBar_1.2s_ease-in-out_infinite] transform-gpu will-change-transform motion-reduce:animate-none motion-reduce:w-2/3' />
-        </div>
+        <div className='tkc-loading-bar mt-4 w-full' />
       </div>
     </div>
   )

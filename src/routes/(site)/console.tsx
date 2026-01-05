@@ -1,14 +1,8 @@
 import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { ChevronDown } from 'lucide-react'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+import { TkcField, TkcRuleSheet } from '@/components/tkc-rule-sheet'
 import {
   FALLBACK_CONSOLE_SECTIONS,
   type ConsoleSection,
@@ -31,7 +25,22 @@ type ContentData = {
   content_sections?: ContentSection[]
 }
 
+type FieldBlock = {
+  label: string
+  body: string
+  badges?: string[]
+}
+
 const REQUIRED_KEYS: ConsoleSection['sectionKey'][] = [
+  'atAGlance',
+  'eligibility',
+  'stage1',
+  'stage2',
+  'finals',
+  'faq',
+]
+
+const SHEET_ORDER: ConsoleSection['sectionKey'][] = [
   'atAGlance',
   'eligibility',
   'stage1',
@@ -44,6 +53,8 @@ const fallbackMap = new Map(
   FALLBACK_CONSOLE_SECTIONS.map((section) => [section.sectionKey, section])
 )
 
+const BADGE_KEYWORDS = ['필수', '금지', '추후 공지'] as const
+
 const omitNode = <T extends { node?: unknown }>(props: T) => {
   const { node, ...rest } = props
   void node
@@ -53,25 +64,30 @@ const omitNode = <T extends { node?: unknown }>(props: T) => {
 const markdownComponents: Components = {
   h1: (props) => {
     const rest = omitNode(props)
-    return <h2 className='text-2xl font-semibold tracking-tight' {...rest} />
+    return <h3 className='text-lg font-semibold text-white' {...rest} />
   },
   h2: (props) => {
     const rest = omitNode(props)
-    return <h3 className='text-xl font-semibold tracking-tight' {...rest} />
+    return <h3 className='text-lg font-semibold text-white' {...rest} />
   },
   h3: (props) => {
     const rest = omitNode(props)
-    return <h4 className='text-lg font-semibold tracking-tight' {...rest} />
+    return <h4 className='text-base font-semibold text-white' {...rest} />
   },
   p: (props) => {
     const rest = omitNode(props)
-    return <p className='text-base leading-relaxed text-foreground/90' {...rest} />
+    return (
+      <p
+        className='text-sm leading-relaxed text-white/90 break-keep md:text-base'
+        {...rest}
+      />
+    )
   },
   a: (props) => {
     const rest = omitNode(props)
     return (
       <a
-        className='text-primary underline underline-offset-4 hover:text-primary/80'
+        className='text-sky-200 underline underline-offset-4 hover:text-sky-100'
         {...rest}
       />
     )
@@ -86,30 +102,37 @@ const markdownComponents: Components = {
   },
   li: (props) => {
     const rest = omitNode(props)
-    return <li className='text-base leading-relaxed text-foreground/90' {...rest} />
+    return (
+      <li
+        className='text-sm leading-relaxed text-white/90 break-keep md:text-base'
+        {...rest}
+      />
+    )
   },
   blockquote: (props) => {
     const rest = omitNode(props)
     return (
       <blockquote
-        className='border-l-4 border-muted pl-4 text-muted-foreground'
+        className='border-l-4 border-white/15 pl-4 text-white/70'
         {...rest}
       />
     )
   },
   code: (props) => {
     const rest = omitNode(props)
-    return <code className='rounded bg-muted px-1 py-0.5 text-sm' {...rest} />
+    return (
+      <code className='rounded bg-white/10 px-1 py-0.5 text-sm' {...rest} />
+    )
   },
   pre: (props) => {
     const rest = omitNode(props)
     return (
-      <pre
-        className='overflow-x-auto rounded-lg border bg-muted p-3 text-sm'
-        {...rest}
-      />
+      <pre className='overflow-x-auto rounded-lg border border-white/10 bg-white/5 p-3 text-sm'>
+        {rest.children}
+      </pre>
     )
   },
+  hr: () => <hr className='border-white/10' />,
 }
 
 function MarkdownBlock({ body }: { body: string }) {
@@ -122,30 +145,55 @@ function MarkdownBlock({ body }: { body: string }) {
   )
 }
 
-type AccordionSectionProps = {
-  title: string
-  body: string
-  defaultOpen?: boolean
+const extractBadges = (label: string, body: string) => {
+  const text = `${label} ${body}`
+  const badges = BADGE_KEYWORDS.filter((keyword) => text.includes(keyword))
+  return badges.length > 0 ? badges : undefined
 }
 
-function AccordionSection({
-  title,
-  body,
-  defaultOpen,
-}: AccordionSectionProps) {
-  return (
-    <Collapsible defaultOpen={defaultOpen} className='rounded-2xl border bg-card/60'>
-      <CollapsibleTrigger className='group flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold'>
-        <span>{title}</span>
-        <ChevronDown className='h-4 w-4 shrink-0 transition-transform group-data-[state=open]:rotate-180' />
-      </CollapsibleTrigger>
-      <CollapsibleContent className='CollapsibleContent'>
-        <div className='px-5 pb-6 pt-1'>
-          <MarkdownBlock body={body} />
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-  )
+const splitMarkdownSections = (body: string, fallbackLabel: string) => {
+  const lines = body.split(/\r?\n/)
+  const sections: FieldBlock[] = []
+  let currentLabel = ''
+  let buffer: string[] = []
+
+  const flush = () => {
+    const content = buffer.join('\n').trim()
+    if (!content && !currentLabel) return
+    const label = currentLabel || fallbackLabel
+    if (content) {
+      sections.push({
+        label,
+        body: content,
+        badges: extractBadges(label, content),
+      })
+    }
+    buffer = []
+  }
+
+  for (const line of lines) {
+    const match = line.match(/^#{2,3}\s+(.*)$/)
+    if (match) {
+      flush()
+      currentLabel = match[1].trim()
+      continue
+    }
+    buffer.push(line)
+  }
+
+  flush()
+
+  if (sections.length === 0 && body.trim()) {
+    return [
+      {
+        label: fallbackLabel,
+        body: body.trim(),
+        badges: extractBadges(fallbackLabel, body),
+      },
+    ]
+  }
+
+  return sections
 }
 
 function ConsolePage() {
@@ -196,14 +244,29 @@ function ConsolePage() {
     return new Map(sections.map((section) => [section.sectionKey, section]))
   }, [sections])
 
-  const atAGlance = sectionMap.get('atAGlance')
-  const eligibility = sectionMap.get('eligibility')
-  const stageSections = [
-    sectionMap.get('stage1'),
-    sectionMap.get('stage2'),
-    sectionMap.get('finals'),
-  ].filter((section): section is ConsoleSection => Boolean(section))
-  const faqSection = sectionMap.get('faq')
+  const sheetTitles: Record<ConsoleSection['sectionKey'], string> = {
+    atAGlance: t('console.sheet.overview'),
+    eligibility: t('console.sheet.eligibility'),
+    stage1: t('console.sheet.stage1'),
+    stage2: t('console.sheet.stage2'),
+    finals: t('console.sheet.finals'),
+    faq: t('console.sheet.faq'),
+  }
+
+  const sheetEntries = useMemo(() => {
+    return SHEET_ORDER.flatMap((key) => {
+      const section = sectionMap.get(key)
+      if (!section) return []
+      const fields = splitMarkdownSections(section.bodyMd, section.title)
+      return [
+        {
+          key,
+          title: sheetTitles[key],
+          fields,
+        },
+      ]
+    })
+  }, [sectionMap, sheetTitles])
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${title}`
@@ -222,48 +285,21 @@ function ConsolePage() {
         <p className='text-sm text-muted-foreground'>{statusMessage}</p>
       )}
 
-      <section className='grid gap-6 lg:grid-cols-2'>
-        {atAGlance && (
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-xl'>{atAGlance.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MarkdownBlock body={atAGlance.bodyMd} />
-            </CardContent>
-          </Card>
-        )}
-        {eligibility && (
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-xl'>{eligibility.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MarkdownBlock body={eligibility.bodyMd} />
-            </CardContent>
-          </Card>
-        )}
-      </section>
-
-      <section className='space-y-4'>
-        <h2 className='text-xl font-semibold'>{t('console.rulesTitle')}</h2>
-        <div className='space-y-3'>
-          {stageSections.map((section, index) => (
-            <AccordionSection
-              key={section.sectionKey}
-              title={section.title}
-              body={section.bodyMd}
-              defaultOpen={index === 0}
-            />
-          ))}
-        </div>
-      </section>
-
-      {faqSection && (
-        <section className='space-y-3'>
-          <AccordionSection title={faqSection.title} body={faqSection.bodyMd} />
-        </section>
-      )}
+      <div className='space-y-6 md:space-y-8'>
+        {sheetEntries.map((sheet) => (
+          <TkcRuleSheet key={sheet.key} title={sheet.title}>
+            {sheet.fields.map((field, index) => (
+              <TkcField
+                key={`${sheet.key}-${index}`}
+                label={field.label}
+                badges={field.badges}
+              >
+                <MarkdownBlock body={field.body} />
+              </TkcField>
+            ))}
+          </TkcRuleSheet>
+        ))}
+      </div>
     </div>
   )
 }
