@@ -15,14 +15,8 @@ import { t } from '@/text'
 type SiteData = {
   eventName?: string
   catchphrase?: string
-  heroBgType?: string
-  heroBgUrl?: string
-  heroBgPosterUrl?: string
   logoUrl?: string
 }
-
-const MD_QUERY = '(min-width: 768px)'
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
 export const Route = createFileRoute('/(site)/')({
   component: HomePage,
@@ -30,78 +24,51 @@ export const Route = createFileRoute('/(site)/')({
 
 function HomePage() {
   const { data, isLoading, isError } = useSite<SiteData>()
-  const canPlayVideo = useHeroVideoEnabled()
   const eventName = data?.eventName ?? t('meta.siteName')
   const catchphrase = data?.catchphrase ?? t('home.catchphraseFallback')
-  const heroBgType = (data?.heroBgType ?? '').toLowerCase()
-  const heroBgUrl = data?.heroBgUrl
-  const heroBgPosterUrl = data?.heroBgPosterUrl
-  const heroLogoUrl = data?.logoUrl ?? '/branding/logo-tkc2026-playx4.webp'
-  const heroLogoMobileUrl =
-    data?.logoUrl ?? '/branding/logo-tkc2026-playx4-256.webp'
+  const heroTagline = t('home.heroTagline')
   const statusMessage = isLoading
     ? t('site.loading')
     : isError
       ? t('site.loadFailed')
       : null
+  const showCatchphrase =
+    Boolean(catchphrase) && catchphrase !== heroTagline
 
   React.useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('nav.home')}`
   }, [])
-
-  const isVideoType = heroBgType === 'video'
-  const isImageType = heroBgType === 'image'
-  const fallbackImageUrl = isImageType
-    ? heroBgUrl
-    : heroBgPosterUrl ?? heroBgUrl
-  const showVideo = isVideoType && !!heroBgUrl && canPlayVideo
-  const showImage =
-    !!fallbackImageUrl && (isImageType || (isVideoType && !canPlayVideo))
 
   return (
     <div className='space-y-10'>
       {statusMessage && (
         <p className='text-sm text-muted-foreground'>{statusMessage}</p>
       )}
-      <section className='relative overflow-hidden rounded-3xl border bg-muted/30'>
-        {showVideo && (
-          <video
-            className='absolute inset-0 h-full w-full object-cover'
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload='metadata'
-            poster={heroBgPosterUrl}
-            src={heroBgUrl}
-          />
-        )}
-        {showImage && (
-          <div
-            className='absolute inset-0 bg-cover bg-center'
-            style={{ backgroundImage: `url(${fallbackImageUrl})` }}
-          />
-        )}
-        <div className='absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/30' />
+      <section className='relative overflow-hidden rounded-3xl border bg-gradient-to-b from-black via-neutral-950 to-black text-white'>
         <div className='relative z-10 px-6 py-16 sm:px-10 sm:py-20 lg:px-14'>
           <div className='mx-auto flex max-w-3xl flex-col items-center gap-5 text-center sm:gap-6'>
             <h1 className='sr-only'>{eventName}</h1>
-            <picture className='w-full max-w-[320px] sm:max-w-[420px] md:max-w-[480px] lg:max-w-[520px]'>
-              <source media='(max-width: 768px)' srcSet={heroLogoMobileUrl} />
+            <picture>
+              <source
+                media='(max-width: 768px)'
+                srcSet='/branding/logo-tkc2026-playx4-256.webp'
+              />
               <img
-                src={heroLogoUrl}
+                src='/branding/logo-tkc2026-playx4.webp'
                 alt='TKC2026'
-                className='mx-auto h-auto w-full object-contain'
+                className='mx-auto h-auto w-[min(640px,90vw)] object-contain'
                 loading='eager'
                 decoding='async'
               />
             </picture>
-            <p className='font-serif text-lg text-foreground sm:text-xl md:text-2xl'>
-              {t('home.heroTagline')}
+            <p className='font-serif text-lg text-white/80 sm:text-xl md:text-2xl'>
+              {heroTagline}
             </p>
-            <p className='text-sm text-muted-foreground sm:text-base'>
-              {catchphrase}
-            </p>
+            {showCatchphrase && (
+              <p className='text-sm text-white/70 sm:text-base'>
+                {catchphrase}
+              </p>
+            )}
             <div className='mt-2'>
               <Button asChild size='lg'>
                 <Link to='/apply'>{t('home.ctaApply')}</Link>
@@ -148,64 +115,4 @@ function HomePage() {
       </section>
     </div>
   )
-}
-
-function useHeroVideoEnabled() {
-  const [enabled, setEnabled] = React.useState(false)
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const mdQuery = window.matchMedia(MD_QUERY)
-    const motionQuery = window.matchMedia(REDUCED_MOTION_QUERY)
-
-    const update = () => {
-      setEnabled(mdQuery.matches && !motionQuery.matches)
-    }
-
-    const handleChange = (_event: MediaQueryListEvent) => {
-      update()
-    }
-
-    update()
-
-    type LegacyMediaQueryList = MediaQueryList & {
-      addListener?: (handler: (event: MediaQueryListEvent) => void) => void
-      removeListener?: (handler: (event: MediaQueryListEvent) => void) => void
-    }
-
-    const addListener = (
-      query: MediaQueryList,
-      handler: (event: MediaQueryListEvent) => void
-    ) => {
-      const legacyQuery = query as LegacyMediaQueryList
-      if (legacyQuery.addListener) {
-        legacyQuery.addListener(handler)
-      } else {
-        query.addEventListener('change', handler)
-      }
-    }
-
-    const removeListener = (
-      query: MediaQueryList,
-      handler: (event: MediaQueryListEvent) => void
-    ) => {
-      const legacyQuery = query as LegacyMediaQueryList
-      if (legacyQuery.removeListener) {
-        legacyQuery.removeListener(handler)
-      } else {
-        query.removeEventListener('change', handler)
-      }
-    }
-
-    addListener(mdQuery, handleChange)
-    addListener(motionQuery, handleChange)
-
-    return () => {
-      removeListener(mdQuery, handleChange)
-      removeListener(motionQuery, handleChange)
-    }
-  }, [])
-
-  return enabled
 }

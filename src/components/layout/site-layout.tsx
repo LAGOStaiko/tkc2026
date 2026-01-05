@@ -70,6 +70,9 @@ export function SiteLayout() {
   const tagline = data?.catchphrase ?? data?.tagline ?? data?.slogan ?? ''
   const siteLogoUrl = data?.logoUrl ?? '/branding/logo-tkc2026-playx4.webp'
   const headerLogoUrl = '/branding/logo-tkc2026-playx4-128.webp'
+  const headerLogoSrcSet = data?.logoUrl
+    ? `${headerLogoUrl} 1x, ${data.logoUrl} 2x`
+    : undefined
   const partners = Array.isArray(data?.partners) ? data.partners : []
 
   return (
@@ -82,6 +85,7 @@ export function SiteLayout() {
           >
             <img
               src={headerLogoUrl}
+              srcSet={headerLogoSrcSet}
               alt='TKC2026'
               className='h-8 w-8 shrink-0 object-contain'
               onError={(event) => {
