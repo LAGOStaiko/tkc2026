@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { useIsMutating } from '@tanstack/react-query'
 import { useRouterState } from '@tanstack/react-router'
 
@@ -7,6 +7,21 @@ const FADE_OUT_MS = 350
 
 type OverlayState = 'hidden' | 'visible' | 'exiting'
 
+const showListeners = new Set<() => void>()
+
+export const requestGlobalOverlayShow = () => {
+  showListeners.forEach((listener) => listener())
+}
+
+const useOverlayShowListener = (listener: () => void) => {
+  useLayoutEffect(() => {
+    showListeners.add(listener)
+    return () => {
+      showListeners.delete(listener)
+    }
+  }, [listener])
+}
+
 export function GlobalLoadingOverlay() {
   const routerStatus = useRouterState({ select: (state) => state.status })
   const routerHref = useRouterState({ select: (state) => state.location.href })
@@ -14,6 +29,7 @@ export function GlobalLoadingOverlay() {
   const isBusy = routerStatus === 'pending' || isMutating > 0
 
   const [overlayState, setOverlayState] = useState<OverlayState>('hidden')
+  const overlayStateRef = useRef<OverlayState>('hidden')
 
   const hideTimerRef = useRef<number | null>(null)
   const exitTimerRef = useRef<number | null>(null)
@@ -27,27 +43,33 @@ export function GlobalLoadingOverlay() {
     }
   }
 
-  const showOverlay = (forceReset = false) => {
+  const showOverlay = useCallback((forceReset = false) => {
     clearTimer(hideTimerRef)
     clearTimer(exitTimerRef)
 
-    if (forceReset || overlayState !== 'visible') {
+    if (forceReset || overlayStateRef.current !== 'visible') {
       startAtRef.current = Date.now()
     }
 
-    if (overlayState !== 'visible') {
+    if (overlayStateRef.current !== 'visible') {
       setOverlayState('visible')
     }
-  }
+  }, [])
 
-  useEffect(() => {
+  useOverlayShowListener(() => showOverlay(true))
+
+  useLayoutEffect(() => {
+    overlayStateRef.current = overlayState
+  }, [overlayState])
+
+  useLayoutEffect(() => {
     return () => {
       clearTimer(hideTimerRef)
       clearTimer(exitTimerRef)
     }
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (previousHrefRef.current === null) {
       previousHrefRef.current = routerHref
       return
@@ -57,9 +79,9 @@ export function GlobalLoadingOverlay() {
       previousHrefRef.current = routerHref
       showOverlay(true)
     }
-  }, [routerHref])
+  }, [routerHref, showOverlay])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isBusy) {
       showOverlay()
       return
@@ -82,7 +104,7 @@ export function GlobalLoadingOverlay() {
         setOverlayState('hidden')
       }, FADE_OUT_MS)
     }, remaining)
-  }, [isBusy, overlayState])
+  }, [isBusy, overlayState, showOverlay])
 
   const isVisible = overlayState === 'visible'
   const transitionClass = isVisible
@@ -96,16 +118,21 @@ export function GlobalLoadingOverlay() {
 
   return (
     <div
-      aria-hidden={!isVisible}
+      aria-hidden={overlayState === 'hidden'}
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-[opacity,backdrop-filter] transform-gpu will-change-[opacity,backdrop-filter] ${transitionClass} ${visibilityClass} ${blurClass} cursor-wait`}
     >
-      <img
-        src='/branding/logo-tkc2026-playx4.webp'
-        alt='TKC2026'
-        className='w-[min(240px,60vw)] animate-pulse object-contain motion-reduce:animate-none'
-        loading='eager'
-        decoding='async'
-      />
+      <div className='flex w-[clamp(260px,68vw,640px)] flex-col items-center gap-4 md:w-[clamp(460px,54vw,760px)]'>
+        <img
+          src='/branding/logo-tkc2026-playx4.webp'
+          alt='TKC2026'
+          className='w-full animate-pulse object-contain motion-reduce:animate-none'
+          loading='eager'
+          decoding='async'
+        />
+        <div className='w-full h-1.5 rounded-full bg-white/20 overflow-hidden'>
+          <div className='h-full w-1/3 bg-white/80 animate-[tkcBar_1.2s_ease-in-out_infinite] transform-gpu will-change-transform' />
+        </div>
+      </div>
     </div>
   )
 }

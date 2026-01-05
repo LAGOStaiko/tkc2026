@@ -85,3 +85,12 @@
     height: 0;
   }
 }
+
+@keyframes tkcBar {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
