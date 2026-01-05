@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type SyntheticEvent,
-} from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useIsMutating } from '@tanstack/react-query'
 import { useRouterState } from '@tanstack/react-router'
 
@@ -13,35 +7,16 @@ const FADE_OUT_MS = 350
 
 type OverlayState = 'hidden' | 'visible' | 'exiting'
 
-const showListeners = new Set<() => void>()
-
-export const requestGlobalOverlayShow = () => {
-  showListeners.forEach((listener) => listener())
-}
-
-const useOverlayShowListener = (listener: () => void) => {
-  useLayoutEffect(() => {
-    showListeners.add(listener)
-    return () => {
-      showListeners.delete(listener)
-    }
-  }, [listener])
-}
-
 export function GlobalLoadingOverlay() {
   const routerStatus = useRouterState({ select: (state) => state.status })
-  const routerHref = useRouterState({ select: (state) => state.location.href })
   const isMutating = useIsMutating()
-  const isBusy = routerStatus === 'pending' || isMutating > 0
+  const isNavigating = routerStatus === 'pending'
+  const shouldShow = isNavigating || isMutating > 0
 
   const [overlayState, setOverlayState] = useState<OverlayState>('hidden')
-  const overlayStateRef = useRef<OverlayState>('hidden')
-  const logoRef = useRef<HTMLImageElement | null>(null)
-  const [logoWidth, setLogoWidth] = useState(260)
 
   const hideTimerRef = useRef<number | null>(null)
   const exitTimerRef = useRef<number | null>(null)
-  const previousHrefRef = useRef<string | null>(null)
   const startAtRef = useRef(0)
 
   const clearTimer = (ref: { current: number | null }) => {
@@ -51,44 +26,6 @@ export function GlobalLoadingOverlay() {
     }
   }
 
-  const showOverlay = useCallback((forceReset = false) => {
-    clearTimer(hideTimerRef)
-    clearTimer(exitTimerRef)
-
-    if (forceReset || overlayStateRef.current !== 'visible') {
-      startAtRef.current = Date.now()
-    }
-
-    if (overlayStateRef.current !== 'visible') {
-      setOverlayState('visible')
-    }
-  }, [])
-
-  useOverlayShowListener(() => showOverlay(true))
-
-  useLayoutEffect(() => {
-    overlayStateRef.current = overlayState
-  }, [overlayState])
-
-  useLayoutEffect(() => {
-    const el = logoRef.current
-    if (!el) return
-
-    const updateWidth = () => {
-      setLogoWidth(el.clientWidth || 260)
-    }
-
-    updateWidth()
-
-    if (typeof ResizeObserver === 'undefined') return
-
-    const ro = new ResizeObserver(updateWidth)
-    ro.observe(el)
-    return () => {
-      ro.disconnect()
-    }
-  }, [])
-
   useLayoutEffect(() => {
     return () => {
       clearTimer(hideTimerRef)
@@ -97,20 +34,14 @@ export function GlobalLoadingOverlay() {
   }, [])
 
   useLayoutEffect(() => {
-    if (previousHrefRef.current === null) {
-      previousHrefRef.current = routerHref
-      return
-    }
+    if (shouldShow) {
+      clearTimer(hideTimerRef)
+      clearTimer(exitTimerRef)
 
-    if (previousHrefRef.current !== routerHref) {
-      previousHrefRef.current = routerHref
-      showOverlay(true)
-    }
-  }, [routerHref, showOverlay])
-
-  useLayoutEffect(() => {
-    if (isBusy) {
-      showOverlay()
+      if (overlayState !== 'visible') {
+        startAtRef.current = Date.now()
+        setOverlayState('visible')
+      }
       return
     }
 
@@ -131,7 +62,7 @@ export function GlobalLoadingOverlay() {
         setOverlayState('hidden')
       }, FADE_OUT_MS)
     }, remaining)
-  }, [isBusy, overlayState, showOverlay])
+  }, [overlayState, shouldShow])
 
   const isVisible = overlayState === 'visible'
   const transitionClass = isVisible
@@ -141,38 +72,25 @@ export function GlobalLoadingOverlay() {
     overlayState === 'hidden'
       ? 'pointer-events-none invisible'
       : 'pointer-events-auto visible'
-  const blurClass =
-    overlayState === 'hidden' ? 'backdrop-blur-0' : 'backdrop-blur-sm'
-  const handleLogoError = useCallback(
-    (event: SyntheticEvent<HTMLImageElement>) => {
-      const target = event.currentTarget
-      if (target.dataset.fallback === 'true') return
-      target.dataset.fallback = 'true'
-      target.src = '/branding/logo-tkc2026-playx4.webp'
-    },
-    []
-  )
+  const blurClass = 'backdrop-blur-sm'
 
   return (
     <div
       aria-hidden={overlayState === 'hidden'}
       className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black/55 transition-[opacity,backdrop-filter] transform-gpu will-change-[opacity,backdrop-filter] ${transitionClass} ${visibilityClass} ${blurClass} cursor-wait`}
     >
-      <div className='flex flex-col items-center gap-4'>
+      <div className='inline-flex flex-col items-center'>
         <img
-          ref={logoRef}
-          src='/branding/logo-tkc2026-playx4-256.webp'
+          src='/branding/logo-tkc2026-playx4.webp'
           alt='TKC2026'
-          className='h-16 w-auto animate-pulse object-contain motion-reduce:animate-none md:h-20'
+          className='h-16 w-auto object-contain motion-safe:animate-pulse md:h-20'
           loading='eager'
           decoding='async'
-          onError={handleLogoError}
         />
         <div
-          style={{ width: logoWidth }}
-          className='h-1.5 rounded-full bg-white/20 overflow-hidden'
+          className='mt-4 h-1.5 w-full rounded-full bg-white/20 overflow-hidden'
         >
-          <div className='h-full w-1/3 bg-white/85 animate-[tkcBar_1.2s_ease-in-out_infinite] transform-gpu will-change-transform motion-reduce:animate-none' />
+          <div className='h-full w-1/3 bg-white/85 animate-[tkcBar_1.2s_ease-in-out_infinite] transform-gpu will-change-transform motion-reduce:animate-none motion-reduce:w-2/3' />
         </div>
       </div>
     </div>
