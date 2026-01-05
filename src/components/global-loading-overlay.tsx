@@ -13,12 +13,12 @@ export function GlobalLoadingOverlay() {
 
   const [isMounted, setIsMounted] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
-  const [lastShownAt, setLastShownAt] = useState(0)
 
   const hideTimerRef = useRef<number | null>(null)
   const unmountTimerRef = useRef<number | null>(null)
   const pendingShowRef = useRef<number | null>(null)
   const previousHrefRef = useRef<string | null>(null)
+  const startAtRef = useRef(0)
 
   const clearTimer = (ref: { current: number | null }) => {
     if (ref.current !== null) {
@@ -40,7 +40,7 @@ export function GlobalLoadingOverlay() {
     clearAnimationFrame()
 
     if (forceReset || !isVisible) {
-      setLastShownAt(Date.now())
+      startAtRef.current = Date.now()
     }
 
     if (!isMounted) {
@@ -87,7 +87,7 @@ export function GlobalLoadingOverlay() {
 
     if (hideTimerRef.current) return
 
-    const elapsed = Date.now() - lastShownAt
+    const elapsed = Date.now() - startAtRef.current
     const remaining = Math.max(MIN_VISIBLE_MS - elapsed, 0)
 
     hideTimerRef.current = window.setTimeout(() => {
@@ -100,7 +100,7 @@ export function GlobalLoadingOverlay() {
         setIsMounted(false)
       }, FADE_OUT_MS)
     }, remaining)
-  }, [isBusy, isMounted, isVisible, lastShownAt])
+  }, [isBusy, isMounted, isVisible])
 
   if (!isMounted) return null
 
