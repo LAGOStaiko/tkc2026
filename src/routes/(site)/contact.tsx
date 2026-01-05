@@ -143,19 +143,9 @@ function ContactPage() {
         </p>
       </div>
 
-      {isSiteLoading && (
-        <p className='text-sm text-muted-foreground'>
-          {t('contact.loadingInfo')}
-        </p>
-      )}
       {isSiteError && (
         <p className='text-sm text-destructive'>
           {t('contact.failedInfo')}
-        </p>
-      )}
-      {isContentLoading && (
-        <p className='text-sm text-muted-foreground'>
-          {t('contact.loadingContent')}
         </p>
       )}
       {isContentError && (

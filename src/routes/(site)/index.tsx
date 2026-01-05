@@ -22,14 +22,10 @@ export const Route = createFileRoute('/(site)/')({
 })
 
 function HomePage() {
-  const { data, isLoading, isError } = useSite<SiteData>()
+  const { data, isError } = useSite<SiteData>()
   const eventName = data?.eventName ?? t('meta.siteName')
   const heroTagline = t('home.heroTagline')
-  const statusMessage = isLoading
-    ? t('site.loading')
-    : isError
-      ? t('site.loadFailed')
-      : null
+  const statusMessage = isError ? t('site.loadFailed') : null
 
   React.useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('nav.home')}`

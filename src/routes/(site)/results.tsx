@@ -195,7 +195,6 @@ function ResultsPage() {
         </p>
       </div>
 
-      {isLoading && <StatusMessage>{t('results.loading')}</StatusMessage>}
       {isError && (
         <StatusMessage variant='error'>{t('results.failed')}</StatusMessage>
       )}
@@ -210,7 +209,7 @@ function ResultsPage() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value={TAB_CONSOLE} className='mt-4 space-y-4'>
-          {consoleStages.length === 0 ? (
+          {isLoading ? null : consoleStages.length === 0 ? (
             <StatusMessage>{LABEL_EMPTY}</StatusMessage>
           ) : (
             consoleStages.map((stage, index) => (
@@ -219,7 +218,7 @@ function ResultsPage() {
           )}
         </TabsContent>
         <TabsContent value={TAB_ARCADE} className='mt-4 space-y-4'>
-          {arcadeStages.length === 0 ? (
+          {isLoading ? null : arcadeStages.length === 0 ? (
             <StatusMessage>{LABEL_EMPTY}</StatusMessage>
           ) : (
             arcadeStages.map((stage, index) => (

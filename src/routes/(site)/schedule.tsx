@@ -95,7 +95,17 @@ const renderDate = (item: ScheduleItem) => {
 const renderLocation = (item: ScheduleItem) =>
   item.location ? item.location : ''
 
-function ScheduleList({ items }: { items: ScheduleItem[] }) {
+function ScheduleList({
+  items,
+  isLoading,
+}: {
+  items: ScheduleItem[]
+  isLoading?: boolean
+}) {
+  if (isLoading) {
+    return null
+  }
+
   if (items.length === 0) {
     return (
       <p className='text-sm text-muted-foreground'>{t('schedule.empty')}</p>
@@ -176,9 +186,6 @@ function SchedulePage() {
         </p>
       </div>
 
-      {isLoading && (
-        <p className='text-sm text-muted-foreground'>{t('schedule.loading')}</p>
-      )}
       {isError && (
         <p className='text-sm text-destructive'>{t('schedule.failed')}</p>
       )}
@@ -196,13 +203,13 @@ function SchedulePage() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value={TAB_ALL} className='mt-4'>
-          <ScheduleList items={items} />
+          <ScheduleList items={items} isLoading={isLoading} />
         </TabsContent>
         <TabsContent value={TAB_CONSOLE} className='mt-4'>
-          <ScheduleList items={consoleItems} />
+          <ScheduleList items={consoleItems} isLoading={isLoading} />
         </TabsContent>
         <TabsContent value={TAB_ARCADE} className='mt-4'>
-          <ScheduleList items={arcadeItems} />
+          <ScheduleList items={arcadeItems} isLoading={isLoading} />
         </TabsContent>
       </Tabs>
     </div>

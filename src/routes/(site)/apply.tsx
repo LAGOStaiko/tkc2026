@@ -111,7 +111,7 @@ const defaultValues: ApplyFormValues = {
 }
 
 function ApplyPage() {
-  const { data, isLoading, isError } = useSite<SiteData>()
+  const { data, isError } = useSite<SiteData>()
   const applyOpen = data?.applyOpen
   const registerMutation = useRegister<RegisterResponse, RegisterPayload>()
   const [receiptId, setReceiptId] = React.useState<string | null>(null)
@@ -168,11 +168,6 @@ function ApplyPage() {
         </p>
       </div>
 
-      {isLoading && (
-        <p className='text-sm text-muted-foreground'>
-          {t('apply.loadingStatus')}
-        </p>
-      )}
       {isError && (
         <p className='text-sm text-destructive'>
           {t('apply.failedStatus')}
