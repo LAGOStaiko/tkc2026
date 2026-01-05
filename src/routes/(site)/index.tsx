@@ -14,7 +14,6 @@ import { t } from '@/text'
 
 type SiteData = {
   eventName?: string
-  logoUrl?: string
 }
 
 export const Route = createFileRoute('/(site)/')({
@@ -36,31 +35,37 @@ function HomePage() {
       {statusMessage && (
         <p className='text-sm text-muted-foreground'>{statusMessage}</p>
       )}
-      <section className='relative overflow-hidden rounded-3xl border bg-gradient-to-b from-black via-slate-950 to-black text-white'>
-        <div className='relative z-10 px-6 py-16 sm:px-10 sm:py-20 lg:px-14'>
-          <div className='mx-auto flex max-w-3xl flex-col items-center gap-5 text-center sm:gap-6'>
+      <section className='relative overflow-hidden rounded-3xl border text-white'>
+        <picture className='absolute inset-0' aria-hidden='true'>
+          <source
+            media='(max-width: 768px)'
+            srcSet='/branding/hero-taikolabs-768.webp'
+          />
+          <source
+            media='(max-width: 1280px)'
+            srcSet='/branding/hero-taikolabs-1280.webp'
+          />
+          <img
+            src='/branding/hero-taikolabs-2048.webp'
+            alt=''
+            className='h-full w-full object-cover object-[50%_35%]'
+            loading='eager'
+            decoding='async'
+            fetchPriority='high'
+          />
+        </picture>
+        <div className='absolute inset-0 bg-gradient-to-b from-black/30 via-black/45 to-black/80' />
+        <div className='relative z-10 flex min-h-[60vh] flex-col justify-end px-6 pb-16 pt-24 sm:min-h-[65vh] sm:px-10 sm:pb-20 md:min-h-[70vh] lg:px-14'>
+          <div className='mx-auto flex w-full max-w-3xl flex-col gap-6 text-center'>
             <h1 className='sr-only'>{eventName}</h1>
-            <picture>
-              <source
-                media='(max-width: 768px)'
-                srcSet='/branding/logo-tkc2026-playx4-256.webp'
-              />
-              <img
-                src='/branding/logo-tkc2026-playx4.webp'
-                alt='TKC2026'
-                className='mx-auto h-auto w-[min(640px,92vw)] object-contain'
-                loading='eager'
-                decoding='async'
-              />
-            </picture>
-            <p className='font-serif text-lg text-white/80 sm:text-xl md:text-2xl'>
+            <p className='font-serif text-2xl text-white/90 drop-shadow-[0_6px_18px_rgba(0,0,0,0.6)] sm:text-3xl md:text-4xl'>
               {heroTagline}
             </p>
-            <div className='mt-2'>
+            <div>
               <Button
                 asChild
                 size='lg'
-                className='bg-white text-black hover:bg-white/90'
+                className='bg-white text-black shadow-lg shadow-black/30 hover:bg-white/90'
               >
                 <Link to='/apply'>{t('home.ctaApply')}</Link>
               </Button>
