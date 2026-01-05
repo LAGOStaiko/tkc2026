@@ -58,6 +58,7 @@ export const ko = {
   'contact.sendEmail': '\uC774\uBA54\uC77C \uBCF4\uB0B4\uAE30',
   'contact.subtitle': '\uBB38\uC758 \uC0AC\uD56D\uC740 \uC544\uB798 \uCC44\uB110\uB85C \uC5F0\uB77D\uD574 \uC8FC\uC138\uC694.',
   'contact.title': '\uBB38\uC758',
+  'console.rulesTitle': '\uC608\uC120/\uACB0\uC120 \uADDC\uC815',
   'content.empty': '\uCF58\uD150\uCE20\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.',
   'content.loadFailed': '\uCF58\uD150\uCE20\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
   'content.loading': '\uCF58\uD150\uCE20\uB97C \uBD88\uB7EC\uC624\uB294 \uC911...',
