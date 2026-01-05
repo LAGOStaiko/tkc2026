@@ -64,6 +64,7 @@ export const ko = {
   'console.sheet.stage2': '2\uCC28 \uC608\uC120',
   'console.sheet.finals': '\uACB0\uC120',
   'console.sheet.faq': 'FAQ',
+  'console.tocTitle': '\uBAA9\uCC28',
   'console.rulesTitle': '\uC608\uC120/\uACB0\uC120 \uADDC\uC815',
   'content.empty': '\uCF58\uD150\uCE20\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.',
   'content.loadFailed': '\uCF58\uD150\uCE20\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',

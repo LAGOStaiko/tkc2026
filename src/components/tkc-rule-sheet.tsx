@@ -1,9 +1,12 @@
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
 type TkcRuleSheetProps = {
   title: string
   children: ReactNode
+  id?: string
+  className?: string
 }
 
 type TkcFieldProps = {
@@ -13,25 +16,32 @@ type TkcFieldProps = {
   badges?: string[]
 }
 
-export function TkcRuleSheet({ title, children }: TkcRuleSheetProps) {
+export function TkcRuleSheet({
+  title,
+  children,
+  id,
+  className,
+}: TkcRuleSheetProps) {
   return (
-    <section className='rounded-2xl border border-white/10 bg-white/[0.03] shadow-lg backdrop-blur-md'>
-      <div className='px-5 pt-5 md:px-7 md:pt-7'>
-        <div className='flex items-center gap-3'>
-          <span className='inline-block h-6 w-1 rounded-full bg-sky-400/80' />
-          <h2 className='text-xl font-semibold text-white md:text-2xl'>
-            {title}
-          </h2>
-        </div>
+    <section
+      id={id}
+      className={cn(
+        'rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-lg backdrop-blur-md md:p-8',
+        className
+      )}
+    >
+      <div className='flex items-center gap-3'>
+        <span className='inline-block h-6 w-1 rounded-full bg-sky-400/80' />
+        <h2 className='text-xl font-semibold text-white md:text-2xl'>{title}</h2>
       </div>
-      <div className='px-5 pb-5 md:px-7 md:pb-7'>{children}</div>
+      <div className='mt-5'>{children}</div>
     </section>
   )
 }
 
 export function TkcField({ label, children, note, badges }: TkcFieldProps) {
   return (
-    <div className='py-4'>
+    <div className='py-4 md:py-5'>
       <div className='flex items-center gap-3'>
         <div className='flex items-center gap-2'>
           <span className='whitespace-nowrap text-sm font-semibold text-sky-300 md:text-base'>
@@ -49,7 +59,7 @@ export function TkcField({ label, children, note, badges }: TkcFieldProps) {
         </div>
         <span className='flex-1 border-t border-dashed border-white/15' />
       </div>
-      <div className='mt-2 text-sm leading-relaxed text-white/90 break-keep md:text-base'>
+      <div className='mt-2 max-w-prose text-sm leading-relaxed text-white/90 break-keep md:text-base md:leading-7'>
         {children}
       </div>
       {note && (

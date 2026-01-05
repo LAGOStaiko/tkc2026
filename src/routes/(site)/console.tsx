@@ -49,6 +49,15 @@ const SHEET_ORDER: ConsoleSection['sectionKey'][] = [
   'faq',
 ]
 
+const SECTION_IDS: Record<ConsoleSection['sectionKey'], string> = {
+  atAGlance: 'console-at-a-glance',
+  eligibility: 'console-eligibility',
+  stage1: 'console-stage-1',
+  stage2: 'console-stage-2',
+  finals: 'console-finals',
+  faq: 'console-faq',
+}
+
 const fallbackMap = new Map(
   FALLBACK_CONSOLE_SECTIONS.map((section) => [section.sectionKey, section])
 )
@@ -78,7 +87,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <p
-        className='text-sm leading-relaxed text-white/90 break-keep md:text-base'
+        className='text-sm leading-relaxed text-white/90 break-keep md:text-base md:leading-7'
         {...rest}
       />
     )
@@ -104,7 +113,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <li
-        className='text-sm leading-relaxed text-white/90 break-keep md:text-base'
+        className='text-sm leading-relaxed text-white/90 break-keep md:text-base md:leading-7'
         {...rest}
       />
     )
@@ -253,6 +262,12 @@ function ConsolePage() {
     faq: t('console.sheet.faq'),
   }
 
+  const tocItems = SHEET_ORDER.map((key) => ({
+    key,
+    title: sheetTitles[key],
+    id: SECTION_IDS[key],
+  }))
+
   const sheetEntries = useMemo(() => {
     return SHEET_ORDER.flatMap((key) => {
       const section = sectionMap.get(key)
@@ -261,6 +276,7 @@ function ConsolePage() {
       return [
         {
           key,
+          id: SECTION_IDS[key],
           title: sheetTitles[key],
           fields,
         },
@@ -273,32 +289,67 @@ function ConsolePage() {
   }, [title])
 
   return (
-    <div className='space-y-10'>
-      <div className='space-y-2'>
-        <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          {t('meta.siteName')}
-        </p>
-        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>{title}</h1>
-      </div>
+    <div className='mx-auto max-w-6xl px-4 md:px-8'>
+      <div className='space-y-10 md:space-y-12'>
+        <div className='space-y-2'>
+          <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
+            {t('meta.siteName')}
+          </p>
+          <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>
+            {title}
+          </h1>
+        </div>
 
-      {statusMessage && (
-        <p className='text-sm text-muted-foreground'>{statusMessage}</p>
-      )}
+        {statusMessage && (
+          <p className='text-sm text-muted-foreground'>{statusMessage}</p>
+        )}
 
-      <div className='space-y-6 md:space-y-8'>
-        {sheetEntries.map((sheet) => (
-          <TkcRuleSheet key={sheet.key} title={sheet.title}>
-            {sheet.fields.map((field, index) => (
-              <TkcField
-                key={`${sheet.key}-${index}`}
-                label={field.label}
-                badges={field.badges}
+        <div className='lg:grid lg:grid-cols-[260px_1fr] lg:gap-10'>
+          <aside className='hidden lg:block'>
+            <div className='sticky top-24'>
+              <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-lg backdrop-blur-md'>
+                <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
+                  {t('console.tocTitle')}
+                </p>
+                <nav
+                  aria-label={t('console.tocTitle')}
+                  className='mt-4 flex flex-col gap-2 text-sm text-white/80'
+                >
+                  {tocItems.map((item) => (
+                    <a
+                      key={item.key}
+                      href={`#${item.id}`}
+                      className='rounded-lg px-2 py-1 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40'
+                    >
+                      {item.title}
+                    </a>
+                  ))}
+                </nav>
+              </div>
+            </div>
+          </aside>
+
+          <div className='space-y-10 md:space-y-12'>
+            {sheetEntries.map((sheet) => (
+              <TkcRuleSheet
+                key={sheet.key}
+                id={sheet.id}
+                className='scroll-mt-24'
+                title={sheet.title}
               >
-                <MarkdownBlock body={field.body} />
-              </TkcField>
+                {sheet.fields.map((field, index) => (
+                  <TkcField
+                    key={`${sheet.key}-${index}`}
+                    label={field.label}
+                    badges={field.badges}
+                  >
+                    <MarkdownBlock body={field.body} />
+                  </TkcField>
+                ))}
+              </TkcRuleSheet>
             ))}
-          </TkcRuleSheet>
-        ))}
+          </div>
+        </div>
       </div>
     </div>
   )
