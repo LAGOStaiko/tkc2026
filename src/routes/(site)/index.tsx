@@ -61,11 +61,11 @@ function HomePage() {
             <img
               src='/branding/logo-tkc2026-playx4.webp'
               alt='TKC2026'
-              className='h-auto w-[min(980px,92vw)] mix-blend-screen drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]'
+              className='w-[clamp(280px,72vw,720px)] h-auto max-h-[26vh] object-contain mix-blend-screen drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)] md:w-[clamp(520px,60vw,880px)] md:max-h-[30vh]'
               loading='eager'
               decoding='async'
             />
-            <div className='mx-auto mt-6 flex w-full max-w-[640px] flex-col items-center gap-4 rounded-xl bg-black/35 px-6 py-5 backdrop-blur-sm'>
+            <div className='mx-auto mt-4 flex w-full max-w-[640px] flex-col items-center gap-4 rounded-xl bg-black/35 px-6 py-5 backdrop-blur-sm md:mt-6'>
               <p className='break-keep font-serif text-xl text-white/90 drop-shadow-[0_8px_20px_rgba(0,0,0,0.65)] md:text-3xl'>
                 {heroTagline}
               </p>
