@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { format } from 'date-fns'
+import {
+  ConsoleBracket4,
+  type ConsoleBracketData,
+} from '@/components/console-bracket-4'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -43,6 +47,9 @@ type ResultStage = {
   status?: string
   updatedAt?: string
   division?: string
+  note?: string
+  meta?: string
+  extra?: string
   bracket?: unknown
   rows?: ResultRow[]
 }
@@ -75,11 +82,15 @@ const LABEL_DONE = t('results.status.done')
 const LABEL_EMPTY = t('results.empty')
 
 const LABEL_CONSOLE_GUIDE = t('results.console.guide')
+const LABEL_CONSOLE_DASHBOARD = t('results.console.dashboardTitle')
 const LABEL_CONSOLE_PRE1 = t('results.console.tab.pre1')
 const LABEL_CONSOLE_PRE2 = t('results.console.tab.pre2')
 const LABEL_CONSOLE_FINAL = t('results.console.tab.final')
+const LABEL_CONSOLE_QUICK_VIEW = t('results.console.quickView')
+const LABEL_CONSOLE_PREVIEW = t('results.console.previewTitle')
 const LABEL_CONSOLE_PRE1_SUMMARY = t('results.console.summary.pre1')
 const LABEL_CONSOLE_PRE2_SUMMARY = t('results.console.summary.pre2')
+const LABEL_CONSOLE_FINAL_SUMMARY = t('results.console.summary.final')
 const LABEL_CONSOLE_BRACKET = t('results.console.bracketPlaceholder')
 const LABEL_UPDATED_AT = t('results.console.updatedAt')
 const LABEL_CONTROLLER = t('results.console.column.controller')
@@ -123,6 +134,9 @@ const getLatestUpdatedAt = (stage?: ResultStage, rows?: ResultRow[]) => {
   return new Date(Math.max(...rowDates.map((date) => date.getTime())))
 }
 
+const formatUpdatedAt = (value: Date | null) =>
+  value ? format(value, 'yyyy-MM-dd HH:mm') : '-'
+
 const getStatusBadge = (status?: string) => {
   if (!status) return null
   const normalized = status.toLowerCase()
@@ -139,6 +153,49 @@ const getStatusBadge = (status?: string) => {
 }
 
 const getStages = (list?: ResultStage[]) => (Array.isArray(list) ? list : [])
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const parseBracketData = (value: unknown): ConsoleBracketData | null => {
+  if (!value) return null
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) return null
+    try {
+      return parseBracketData(JSON.parse(trimmed))
+    } catch {
+      return null
+    }
+  }
+  if (isRecord(value)) {
+    return value as ConsoleBracketData
+  }
+  return null
+}
+
+const getBracketData = (stage?: ResultStage) => {
+  if (!stage) return null
+  const direct = parseBracketData(stage.bracket)
+  if (direct) return direct
+  return parseBracketData(stage.note ?? stage.meta ?? stage.extra)
+}
+
+const hasBracketContent = (data?: ConsoleBracketData | null) => {
+  if (!data) return false
+  const matches = [data.semi1, data.semi2, data.final, data.third]
+  return matches.some((match) => {
+    if (!match) return false
+    return Boolean(
+      match.a ||
+        match.b ||
+        match.aEntry ||
+        match.bEntry ||
+        match.aScore !== undefined ||
+        match.bScore !== undefined
+    )
+  })
+}
 
 const isConsoleDivision = (value?: string) => {
   if (!value) return true
@@ -184,6 +241,22 @@ const sortRows = (rows: ResultRow[]) => {
     return rightScore - leftScore
   })
 }
+
+type PreviewRow = {
+  rank: number | string
+  name: string
+  score: number | string
+}
+
+const buildPreviewRows = (rows: ResultRow[], limit: number) =>
+  rows.slice(0, limit).map((row) => {
+    const entryId = extractEntryId(row.nickname, row.detail)
+    return {
+      rank: row.rank ?? '-',
+      name: formatNicknameWithEntryId(row.nickname, entryId),
+      score: row.score ?? '-',
+    }
+  })
 
 function StatusMessage({
   children,
@@ -294,6 +367,67 @@ function StageCard({ stage }: { stage: ResultStage }) {
   )
 }
 
+type ConsoleDashboardCardProps = {
+  title: string
+  summary: string
+  updatedAt: Date | null
+  previewRows: PreviewRow[]
+  onQuickView: () => void
+}
+
+function ConsoleDashboardCard({
+  title,
+  summary,
+  updatedAt,
+  previewRows,
+  onQuickView,
+}: ConsoleDashboardCardProps) {
+  return (
+    <Card>
+      <CardHeader className='space-y-2'>
+        <CardTitle className='text-lg'>{title}</CardTitle>
+        <p className='text-sm text-muted-foreground'>{summary}</p>
+      </CardHeader>
+      <CardContent className='space-y-4'>
+        <div className='flex items-center justify-between text-xs text-muted-foreground'>
+          <span>{LABEL_UPDATED_AT}</span>
+          <span>{formatUpdatedAt(updatedAt)}</span>
+        </div>
+        <Button variant='secondary' size='sm' onClick={onQuickView}>
+          {LABEL_CONSOLE_QUICK_VIEW}
+        </Button>
+        <div className='space-y-2'>
+          <p className='text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground'>
+            {LABEL_CONSOLE_PREVIEW}
+          </p>
+          {previewRows.length === 0 ? (
+            <p className='text-xs text-muted-foreground'>{LABEL_EMPTY}</p>
+          ) : (
+            <div className='space-y-2'>
+              {previewRows.map((row, index) => (
+                <div
+                  key={`${title}-preview-${index}`}
+                  className='flex items-center justify-between rounded-md border bg-muted/10 px-3 py-2 text-sm'
+                >
+                  <div className='flex min-w-0 items-center gap-2'>
+                    <span className='text-xs text-muted-foreground'>
+                      {row.rank}
+                    </span>
+                    <span className='truncate font-medium'>{row.name}</span>
+                  </div>
+                  <span className='text-xs text-muted-foreground'>
+                    {row.score}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 function ResultsPage() {
   const { data, isLoading, isError } = useResults<ResultsData>()
   const consoleStages = getStages(data?.console)
@@ -383,17 +517,37 @@ function ResultsPage() {
   const pre2Stage = consoleStageData[CONSOLE_TAB_PRE2]
   const finalStage = consoleStageData[CONSOLE_TAB_FINAL]
 
-  const pre1Rows = filterRows(sortRows(pre1Stage?.rows ?? []))
-  const pre2Rows = filterRows(sortRows(pre2Stage?.rows ?? []))
-  const finalRows = filterRows(sortRows(finalStage?.rows ?? [])).slice(0, 4)
+  const pre1Sorted = sortRows(pre1Stage?.rows ?? [])
+  const pre2Sorted = sortRows(pre2Stage?.rows ?? [])
+  const finalSorted = sortRows(finalStage?.rows ?? [])
+
+  const pre1Rows = filterRows(pre1Sorted)
+  const pre2Rows = filterRows(pre2Sorted)
+  const finalRows = filterRows(finalSorted).slice(0, 4)
+
+  const pre1Preview = buildPreviewRows(pre1Sorted, 5)
+  const pre2Preview = buildPreviewRows(pre2Sorted, 5)
+  const finalPreview = buildPreviewRows(finalSorted, 5)
 
   const pre1UpdatedAt = getLatestUpdatedAt(pre1Stage, pre1Stage?.rows ?? [])
   const pre2UpdatedAt = getLatestUpdatedAt(pre2Stage, pre2Stage?.rows ?? [])
   const finalUpdatedAt = getLatestUpdatedAt(finalStage, finalStage?.rows ?? [])
 
+  const finalBracket = useMemo(() => getBracketData(finalStage), [finalStage])
+  const hasFinalBracket = hasBracketContent(finalBracket)
+
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('results.title')}`
   }, [])
+
+  const handleQuickView = (tab: string) => {
+    setConsoleTab(tab)
+    if (typeof document === 'undefined') return
+    const anchor = document.getElementById('console-stage-tabs')
+    if (anchor) {
+      anchor.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
 
   return (
     <div className='space-y-6'>
@@ -422,246 +576,275 @@ function ResultsPage() {
             {LABEL_ARCADE}
           </TabsTrigger>
         </TabsList>
-        <TabsContent value={TAB_CONSOLE} className='mt-4 space-y-4'>
-          <Tabs value={consoleTab} onValueChange={setConsoleTab}>
-            <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-              <Button asChild variant='secondary' className='shrink-0'>
-                <Link to='/console'>{LABEL_CONSOLE_GUIDE}</Link>
-              </Button>
-              <TabsList className='no-scrollbar w-full justify-start gap-2 overflow-x-auto rounded-full bg-muted/40 p-1 md:w-auto md:overflow-visible'>
-                <TabsTrigger
-                  value={CONSOLE_TAB_PRE1}
-                  className='shrink-0 rounded-full px-4'
-                >
-                  {LABEL_CONSOLE_PRE1}
-                </TabsTrigger>
-                <TabsTrigger
-                  value={CONSOLE_TAB_PRE2}
-                  className='shrink-0 rounded-full px-4'
-                >
-                  {LABEL_CONSOLE_PRE2}
-                </TabsTrigger>
-                <TabsTrigger
-                  value={CONSOLE_TAB_FINAL}
-                  className='shrink-0 rounded-full px-4'
-                >
-                  {LABEL_CONSOLE_FINAL}
-                </TabsTrigger>
-              </TabsList>
+        <TabsContent value={TAB_CONSOLE} className='mt-4 space-y-6'>
+          <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+              <h2 className='text-xl font-semibold'>
+                {LABEL_CONSOLE_DASHBOARD}
+              </h2>
             </div>
-            <div className='max-w-sm'>
-              <Input
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder={LABEL_SEARCH}
+            <div className='grid gap-4 lg:grid-cols-3'>
+              <ConsoleDashboardCard
+                title={LABEL_CONSOLE_PRE1}
+                summary={LABEL_CONSOLE_PRE1_SUMMARY}
+                updatedAt={pre1UpdatedAt}
+                previewRows={pre1Preview}
+                onQuickView={() => handleQuickView(CONSOLE_TAB_PRE1)}
+              />
+              <ConsoleDashboardCard
+                title={LABEL_CONSOLE_PRE2}
+                summary={LABEL_CONSOLE_PRE2_SUMMARY}
+                updatedAt={pre2UpdatedAt}
+                previewRows={pre2Preview}
+                onQuickView={() => handleQuickView(CONSOLE_TAB_PRE2)}
+              />
+              <ConsoleDashboardCard
+                title={LABEL_CONSOLE_FINAL}
+                summary={LABEL_CONSOLE_FINAL_SUMMARY}
+                updatedAt={finalUpdatedAt}
+                previewRows={finalPreview}
+                onQuickView={() => handleQuickView(CONSOLE_TAB_FINAL)}
               />
             </div>
+          </div>
 
-            <TabsContent value={CONSOLE_TAB_PRE1} className='space-y-4'>
-              <p className='text-sm text-muted-foreground'>
-                {LABEL_CONSOLE_PRE1_SUMMARY}
-              </p>
-              {isLoading ? null : pre1Rows.length === 0 ? (
-                <StatusMessage>{LABEL_EMPTY}</StatusMessage>
-              ) : (
-                <div className='overflow-x-auto'>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className='w-[72px]'>
-                          {t('results.label.rank')}
-                        </TableHead>
-                        <TableHead>{t('results.label.nickname')}</TableHead>
-                        <TableHead className='w-[120px]'>
-                          {LABEL_CONTROLLER}
-                        </TableHead>
-                        <TableHead className='w-[120px]'>
-                          {t('results.label.score')}
-                        </TableHead>
-                        <TableHead>{LABEL_NOTE}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {pre1Rows.map((row, index) => {
-                        const entryId = extractEntryId(
-                          row.nickname,
-                          row.detail
-                        )
-                        const displayName = formatNicknameWithEntryId(
-                          row.nickname,
-                          entryId
-                        )
-                        const controller = extractController(row.detail) || '-'
-                        const rankValue = toNumber(row.rank)
-                        const isAdvance =
-                          typeof rankValue === 'number' && rankValue <= 16
+          <div id='console-stage-tabs'>
+            <Tabs value={consoleTab} onValueChange={setConsoleTab}>
+              <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
+                <Button asChild variant='secondary' className='shrink-0'>
+                  <Link to='/console'>{LABEL_CONSOLE_GUIDE}</Link>
+                </Button>
+                <TabsList className='no-scrollbar w-full justify-start gap-2 overflow-x-auto rounded-full bg-muted/40 p-1 md:w-auto md:overflow-visible'>
+                  <TabsTrigger
+                    value={CONSOLE_TAB_PRE1}
+                    className='shrink-0 rounded-full px-4'
+                  >
+                    {LABEL_CONSOLE_PRE1}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value={CONSOLE_TAB_PRE2}
+                    className='shrink-0 rounded-full px-4'
+                  >
+                    {LABEL_CONSOLE_PRE2}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value={CONSOLE_TAB_FINAL}
+                    className='shrink-0 rounded-full px-4'
+                  >
+                    {LABEL_CONSOLE_FINAL}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+              <div className='max-w-sm'>
+                <Input
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  placeholder={LABEL_SEARCH}
+                />
+              </div>
 
-                        return (
-                          <TableRow key={`pre1-${index}`}>
-                            <TableCell className='font-medium'>
-                              {row.rank ?? '-'}
-                            </TableCell>
-                            <TableCell>{displayName}</TableCell>
-                            <TableCell>{controller}</TableCell>
-                            <TableCell>{row.score ?? '-'}</TableCell>
-                            <TableCell>
-                              {isAdvance ? (
-                                <Badge variant='secondary'>
-                                  {LABEL_BADGE_PRE2}
-                                </Badge>
-                              ) : (
-                                '-'
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        )
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-              {pre1UpdatedAt && (
-                <p className='text-xs text-muted-foreground'>
-                  {LABEL_UPDATED_AT}:{' '}
-                  {format(pre1UpdatedAt, 'yyyy-MM-dd HH:mm')}
+              <TabsContent value={CONSOLE_TAB_PRE1} className='space-y-4'>
+                <p className='text-sm text-muted-foreground'>
+                  {LABEL_CONSOLE_PRE1_SUMMARY}
                 </p>
-              )}
-            </TabsContent>
+                {isLoading ? null : pre1Rows.length === 0 ? (
+                  <StatusMessage>{LABEL_EMPTY}</StatusMessage>
+                ) : (
+                  <div className='overflow-x-auto'>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className='w-[72px]'>
+                            {t('results.label.rank')}
+                          </TableHead>
+                          <TableHead>{t('results.label.nickname')}</TableHead>
+                          <TableHead className='w-[120px]'>
+                            {LABEL_CONTROLLER}
+                          </TableHead>
+                          <TableHead className='w-[120px]'>
+                            {t('results.label.score')}
+                          </TableHead>
+                          <TableHead>{LABEL_NOTE}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {pre1Rows.map((row, index) => {
+                          const entryId = extractEntryId(
+                            row.nickname,
+                            row.detail
+                          )
+                          const displayName = formatNicknameWithEntryId(
+                            row.nickname,
+                            entryId
+                          )
+                          const controller = extractController(row.detail) || '-'
+                          const rankValue = toNumber(row.rank)
+                          const isAdvance =
+                            typeof rankValue === 'number' && rankValue <= 16
 
-            <TabsContent value={CONSOLE_TAB_PRE2} className='space-y-4'>
-              <p className='text-sm text-muted-foreground'>
-                {LABEL_CONSOLE_PRE2_SUMMARY}
-              </p>
-              {isLoading ? null : pre2Rows.length === 0 ? (
-                <StatusMessage>{LABEL_EMPTY}</StatusMessage>
-              ) : (
-                <div className='overflow-x-auto'>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className='w-[72px]'>
-                          {t('results.label.rank')}
-                        </TableHead>
-                        <TableHead>{t('results.label.nickname')}</TableHead>
-                        <TableHead className='w-[120px]'>
-                          {LABEL_SONG1}
-                        </TableHead>
-                        <TableHead className='w-[120px]'>
-                          {LABEL_SONG2}
-                        </TableHead>
-                        <TableHead className='w-[140px]'>
-                          {LABEL_TOTAL}
-                        </TableHead>
-                        <TableHead>{LABEL_NOTE}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {pre2Rows.map((row, index) => {
-                        const entryId = extractEntryId(
-                          row.nickname,
-                          row.detail
-                        )
-                        const displayName = formatNicknameWithEntryId(
-                          row.nickname,
-                          entryId
-                        )
-                        const rankValue = toNumber(row.rank)
-                        const isAdvance =
-                          typeof rankValue === 'number' && rankValue <= 4
-                        const scores = extractS1S2(row.detail)
-                        const s1 = scores.s1 ?? '-'
-                        const s2 = scores.s2 ?? '-'
+                          return (
+                            <TableRow key={`pre1-${index}`}>
+                              <TableCell className='font-medium'>
+                                {row.rank ?? '-'}
+                              </TableCell>
+                              <TableCell>{displayName}</TableCell>
+                              <TableCell>{controller}</TableCell>
+                              <TableCell>{row.score ?? '-'}</TableCell>
+                              <TableCell>
+                                {isAdvance ? (
+                                  <Badge variant='secondary'>
+                                    {LABEL_BADGE_PRE2}
+                                  </Badge>
+                                ) : (
+                                  '-'
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+                {pre1UpdatedAt && (
+                  <p className='text-xs text-muted-foreground'>
+                    {LABEL_UPDATED_AT}: {formatUpdatedAt(pre1UpdatedAt)}
+                  </p>
+                )}
+              </TabsContent>
 
-                        return (
-                          <TableRow key={`pre2-${index}`}>
-                            <TableCell className='font-medium'>
-                              {row.rank ?? '-'}
-                            </TableCell>
-                            <TableCell>{displayName}</TableCell>
-                            <TableCell>{s1}</TableCell>
-                            <TableCell>{s2}</TableCell>
-                            <TableCell>{row.score ?? '-'}</TableCell>
-                            <TableCell>
-                              {isAdvance ? (
-                                <Badge variant='secondary'>
-                                  {LABEL_BADGE_FINAL}
-                                </Badge>
-                              ) : (
-                                '-'
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        )
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-              {pre2UpdatedAt && (
-                <p className='text-xs text-muted-foreground'>
-                  {LABEL_UPDATED_AT}:{' '}
-                  {format(pre2UpdatedAt, 'yyyy-MM-dd HH:mm')}
+              <TabsContent value={CONSOLE_TAB_PRE2} className='space-y-4'>
+                <p className='text-sm text-muted-foreground'>
+                  {LABEL_CONSOLE_PRE2_SUMMARY}
                 </p>
-              )}
-            </TabsContent>
+                {isLoading ? null : pre2Rows.length === 0 ? (
+                  <StatusMessage>{LABEL_EMPTY}</StatusMessage>
+                ) : (
+                  <div className='overflow-x-auto'>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className='w-[72px]'>
+                            {t('results.label.rank')}
+                          </TableHead>
+                          <TableHead>{t('results.label.nickname')}</TableHead>
+                          <TableHead className='w-[120px]'>
+                            {LABEL_SONG1}
+                          </TableHead>
+                          <TableHead className='w-[120px]'>
+                            {LABEL_SONG2}
+                          </TableHead>
+                          <TableHead className='w-[140px]'>
+                            {LABEL_TOTAL}
+                          </TableHead>
+                          <TableHead>{LABEL_NOTE}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {pre2Rows.map((row, index) => {
+                          const entryId = extractEntryId(
+                            row.nickname,
+                            row.detail
+                          )
+                          const displayName = formatNicknameWithEntryId(
+                            row.nickname,
+                            entryId
+                          )
+                          const rankValue = toNumber(row.rank)
+                          const isAdvance =
+                            typeof rankValue === 'number' && rankValue <= 4
+                          const scores = extractS1S2(row.detail)
+                          const s1 = scores.s1 ?? '-'
+                          const s2 = scores.s2 ?? '-'
 
-            <TabsContent value={CONSOLE_TAB_FINAL} className='space-y-4'>
-              {!finalStage?.bracket && (
-                <Card>
-                  <CardContent className='py-6 text-sm text-muted-foreground'>
+                          return (
+                            <TableRow key={`pre2-${index}`}>
+                              <TableCell className='font-medium'>
+                                {row.rank ?? '-'}
+                              </TableCell>
+                              <TableCell>{displayName}</TableCell>
+                              <TableCell>{s1}</TableCell>
+                              <TableCell>{s2}</TableCell>
+                              <TableCell>{row.score ?? '-'}</TableCell>
+                              <TableCell>
+                                {isAdvance ? (
+                                  <Badge variant='secondary'>
+                                    {LABEL_BADGE_FINAL}
+                                  </Badge>
+                                ) : (
+                                  '-'
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+                {pre2UpdatedAt && (
+                  <p className='text-xs text-muted-foreground'>
+                    {LABEL_UPDATED_AT}: {formatUpdatedAt(pre2UpdatedAt)}
+                  </p>
+                )}
+              </TabsContent>
+
+              <TabsContent value={CONSOLE_TAB_FINAL} className='space-y-4'>
+                <ConsoleBracket4 data={finalBracket} />
+                {!hasFinalBracket && (
+                  <p className='text-xs text-muted-foreground'>
                     {LABEL_CONSOLE_BRACKET}
-                  </CardContent>
-                </Card>
-              )}
-              {isLoading ? null : finalRows.length === 0 ? (
-                <StatusMessage>{LABEL_EMPTY}</StatusMessage>
-              ) : (
-                <div className='overflow-x-auto'>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className='w-[72px]'>
-                          {t('results.label.rank')}
-                        </TableHead>
-                        <TableHead>{t('results.label.nickname')}</TableHead>
-                        <TableHead className='w-[140px]'>
-                          {t('results.label.score')}
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {finalRows.map((row, index) => {
-                        const entryId = extractEntryId(
-                          row.nickname,
-                          row.detail
-                        )
-                        const displayName = formatNicknameWithEntryId(
-                          row.nickname,
-                          entryId
-                        )
+                  </p>
+                )}
+                {isLoading ? null : finalRows.length === 0 ? (
+                  <StatusMessage>{LABEL_EMPTY}</StatusMessage>
+                ) : (
+                  <div className='overflow-x-auto'>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className='w-[72px]'>
+                            {t('results.label.rank')}
+                          </TableHead>
+                          <TableHead>{t('results.label.nickname')}</TableHead>
+                          <TableHead className='w-[140px]'>
+                            {t('results.label.score')}
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {finalRows.map((row, index) => {
+                          const entryId = extractEntryId(
+                            row.nickname,
+                            row.detail
+                          )
+                          const displayName = formatNicknameWithEntryId(
+                            row.nickname,
+                            entryId
+                          )
 
-                        return (
-                          <TableRow key={`final-${index}`}>
-                            <TableCell className='font-medium'>
-                              {row.rank ?? '-'}
-                            </TableCell>
-                            <TableCell>{displayName}</TableCell>
-                            <TableCell>{row.score ?? '-'}</TableCell>
-                          </TableRow>
-                        )
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-              {finalUpdatedAt && (
-                <p className='text-xs text-muted-foreground'>
-                  {LABEL_UPDATED_AT}:{' '}
-                  {format(finalUpdatedAt, 'yyyy-MM-dd HH:mm')}
-                </p>
-              )}
-            </TabsContent>
-          </Tabs>
+                          return (
+                            <TableRow key={`final-${index}`}>
+                              <TableCell className='font-medium'>
+                                {row.rank ?? '-'}
+                              </TableCell>
+                              <TableCell>{displayName}</TableCell>
+                              <TableCell>{row.score ?? '-'}</TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+                {finalUpdatedAt && (
+                  <p className='text-xs text-muted-foreground'>
+                    {LABEL_UPDATED_AT}: {formatUpdatedAt(finalUpdatedAt)}
+                  </p>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
         </TabsContent>
 
         <TabsContent value={TAB_ARCADE} className='mt-4 space-y-4'>
