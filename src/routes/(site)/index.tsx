@@ -55,34 +55,33 @@ function HomePage() {
             fetchPriority='high'
           />
         </picture>
-        <div className='absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/70' />
-        <div className='absolute inset-0 bg-black/25' />
-        <div className='relative z-10 flex min-h-[70vh] flex-col items-center justify-center px-4 pb-10 pt-24 text-center md:min-h-[72vh]'>
-          <div className='relative z-10 flex w-full flex-col items-center text-center'>
-            <div className='mx-auto w-full max-w-[1100px] text-center'>
-              <h1 className='sr-only'>{eventName}</h1>
-              <div className='flex w-full justify-center'>
-                <img
-                  src='/branding/logo-tkc2026-playx4.webp'
-                  alt='TKC2026'
-                  className='block h-auto w-full max-w-[240px] object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)] md:max-w-[520px]'
-                  loading='eager'
-                  decoding='async'
-                />
-              </div>
-              <div className='mx-auto mt-4 flex w-full max-w-[640px] flex-col items-center gap-4 rounded-2xl border border-white/10 bg-black/35 px-6 py-5 backdrop-blur-md md:mt-6'>
-                <p className='tkc-serif break-keep text-xl text-white/90 drop-shadow-[0_8px_20px_rgba(0,0,0,0.65)] md:text-3xl'>
-                  {heroTagline}
-                </p>
-                <Button
-                  asChild
-                  size='lg'
-                  className='h-12 w-full bg-white px-6 text-black shadow-lg shadow-black/30 hover:bg-white/90 md:w-auto'
-                >
-                  <Link to='/apply'>{t('home.ctaApply')}</Link>
-                </Button>
-              </div>
+        <div className='absolute inset-0 bg-gradient-to-b from-black/35 via-black/15 to-black/45' />
+        <div className='absolute inset-0 bg-black/10' />
+        <div className='pointer-events-none absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/75 via-black/35 to-transparent md:h-[40%]' />
+        <div className='relative z-10 flex min-h-[70vh] flex-col items-center justify-between px-4 pb-12 pt-24 text-center md:min-h-[72vh] md:pb-16'>
+          <div className='mx-auto w-full max-w-[1100px] text-center'>
+            <h1 className='sr-only'>{eventName}</h1>
+            <div className='flex w-full justify-center'>
+              <img
+                src='/branding/logo-tkc2026-playx4.webp'
+                alt='TKC2026'
+                className='block h-auto w-full max-w-[240px] object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)] md:max-w-[520px]'
+                loading='eager'
+                decoding='async'
+              />
             </div>
+          </div>
+          <div className='mx-auto flex w-full max-w-[640px] flex-col items-center gap-4 text-center'>
+            <p className='tkc-serif break-keep text-xl text-white/95 drop-shadow-sm md:text-3xl'>
+              {heroTagline}
+            </p>
+            <Button
+              asChild
+              size='lg'
+              className='h-12 w-full bg-white px-6 text-black shadow-lg shadow-black/30 hover:bg-white/90 md:w-auto'
+            >
+              <Link to='/apply'>{t('home.ctaApply')}</Link>
+            </Button>
           </div>
         </div>
       </section>
