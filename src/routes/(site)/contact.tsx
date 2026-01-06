@@ -135,7 +135,7 @@ function ContactPage() {
         <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
           {t('meta.siteName')}
         </p>
-        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>
+        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl font-serif'>
           {t('contact.title')}
         </h1>
         <p className='text-sm text-muted-foreground'>

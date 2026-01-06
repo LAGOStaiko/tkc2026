@@ -113,7 +113,7 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
         <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
           {t('meta.siteName')}
         </p>
-        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>
+        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl font-serif'>
           {title}
         </h1>
       </div>
