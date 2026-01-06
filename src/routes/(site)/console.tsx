@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 import { TkcField, TkcRuleSheet } from '@/components/tkc-rule-sheet'
 import {
   FALLBACK_CONSOLE_SECTIONS,
@@ -289,19 +290,10 @@ function ConsolePage() {
   }, [title])
 
   return (
-    <div className='space-y-10 md:space-y-12'>
-      <div className='space-y-2'>
-        <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          {t('meta.siteName')}
-        </p>
-        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl font-serif'>
-          {title}
-        </h1>
-      </div>
+    <TkcSection>
+      <TkcPageHeader title={title} />
 
-      {statusMessage && (
-        <p className='text-sm text-muted-foreground'>{statusMessage}</p>
-      )}
+      {statusMessage && <p className='text-sm text-white/60'>{statusMessage}</p>}
 
       <div className='lg:grid lg:grid-cols-[260px_1fr] lg:gap-10'>
         <aside className='hidden lg:block'>
@@ -349,6 +341,6 @@ function ConsolePage() {
           ))}
         </div>
       </div>
-    </div>
+    </TkcSection>
   )
 }

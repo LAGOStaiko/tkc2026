@@ -3,8 +3,10 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
@@ -155,35 +157,22 @@ function ApplyPage() {
   }
 
   return (
-    <div className='space-y-6'>
-      <div className='space-y-2'>
-        <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          {t('meta.siteName')}
-        </p>
-        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl font-serif'>
-          {t('apply.title')}
-        </h1>
-        <p className='text-sm text-muted-foreground'>
-          {t('apply.subtitle')}
-        </p>
-      </div>
+    <TkcSection>
+      <TkcPageHeader title={t('apply.title')} subtitle={t('apply.subtitle')} />
 
       {isError && (
-        <p className='text-sm text-destructive'>
-          {t('apply.failedStatus')}
-        </p>
+        <p className='text-sm text-destructive'>{t('apply.failedStatus')}</p>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('apply.formTitle')}</CardTitle>
+      <GlassCard>
+        <CardHeader className='p-5 md:p-7'>
+          <CardTitle className='text-xl text-white md:text-2xl'>
+            {t('apply.formTitle')}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className='space-y-6'
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
               <fieldset disabled={isDisabled} className='space-y-6'>
                 <FormField
                   control={form.control}
@@ -201,11 +190,11 @@ function ApplyPage() {
                             <FormControl>
                               <RadioGroupItem value='console' />
                             </FormControl>
-                            <FormLabel className='font-normal'>
-                              {LABEL_CONSOLE}
-                            </FormLabel>
-                          </FormItem>
-                          <FormItem className='flex items-center gap-2 rounded-md border p-3'>
+                          <FormLabel className='font-normal'>
+                            {LABEL_CONSOLE}
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className='flex items-center gap-2 rounded-md border p-3'>
                             <FormControl>
                               <RadioGroupItem value='arcade' />
                             </FormControl>
@@ -215,7 +204,7 @@ function ApplyPage() {
                           </FormItem>
                         </RadioGroup>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className='text-xs text-white/60' />
                     </FormItem>
                   )}
                 />
@@ -230,7 +219,7 @@ function ApplyPage() {
                         <FormControl>
                           <Input placeholder={t('apply.placeholder.name')} {...field} />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className='text-xs text-white/60' />
                       </FormItem>
                     )}
                   />
@@ -246,7 +235,7 @@ function ApplyPage() {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className='text-xs text-white/60' />
                       </FormItem>
                     )}
                   />
@@ -268,7 +257,7 @@ function ApplyPage() {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className='text-xs text-white/60' />
                       </FormItem>
                     )}
                   />
@@ -286,7 +275,7 @@ function ApplyPage() {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className='text-xs text-white/60' />
                       </FormItem>
                     )}
                   />
@@ -307,7 +296,7 @@ function ApplyPage() {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className='text-xs text-white/60' />
                       </FormItem>
                     )}
                   />
@@ -325,7 +314,7 @@ function ApplyPage() {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className='text-xs text-white/60' />
                       </FormItem>
                     )}
                   />
@@ -335,10 +324,10 @@ function ApplyPage() {
                   <FormField
                     control={form.control}
                     name='spectator'
-                    render={({ field }) => (
-                      <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
-                        <FormControl>
-                          <Checkbox
+                  render={({ field }) => (
+                    <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
+                      <FormControl>
+                        <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             className='mt-0.5 size-5'
@@ -348,7 +337,7 @@ function ApplyPage() {
                           <FormLabel className='text-base'>
                             {t('apply.field.spectator')}
                           </FormLabel>
-                          <FormDescription>
+                          <FormDescription className='text-xs text-white/60'>
                             {t('apply.field.spectatorHelp')}
                           </FormDescription>
                         </div>
@@ -371,7 +360,7 @@ function ApplyPage() {
                           <FormLabel className='text-base'>
                             {t('apply.field.isMinor')}
                           </FormLabel>
-                          <FormDescription>
+                          <FormDescription className='text-xs text-white/60'>
                             {t('apply.field.isMinorHelp')}
                           </FormDescription>
                         </div>
@@ -394,11 +383,11 @@ function ApplyPage() {
                           <FormLabel className='text-base'>
                             {t('apply.field.privacy')}
                           </FormLabel>
-                          <FormDescription>
+                          <FormDescription className='text-xs text-white/60'>
                             {t('apply.field.privacyHelp')}
                           </FormDescription>
                         </div>
-                        <FormMessage />
+                        <FormMessage className='text-xs text-white/60' />
                       </FormItem>
                     )}
                   />
@@ -414,10 +403,10 @@ function ApplyPage() {
                         <FormControl>
                           <Input placeholder={t('apply.placeholder.consentLink')} {...field} />
                         </FormControl>
-                        <FormDescription>
+                        <FormDescription className='text-xs text-white/60'>
                           {t('apply.field.consentLinkHelp')}
                         </FormDescription>
-                        <FormMessage />
+                        <FormMessage className='text-xs text-white/60' />
                       </FormItem>
                     )}
                   />
@@ -429,11 +418,11 @@ function ApplyPage() {
               )}
 
               {isCompleted && (
-                <div className='rounded-lg border bg-muted/40 p-4 text-center sm:text-left'>
-                  <p className='text-sm font-semibold text-foreground'>
+                <div className='rounded-lg border border-white/10 bg-white/5 p-4 text-center sm:text-left'>
+                  <p className='text-sm font-semibold text-white'>
                     {t('apply.completed')}
                   </p>
-                  <p className='text-sm text-muted-foreground'>
+                  <p className='text-sm text-white/60'>
                     {t('apply.receiptId')}
                   </p>
                   <p className='text-2xl font-semibold break-all sm:text-xl'>
@@ -448,7 +437,7 @@ function ApplyPage() {
             </form>
           </Form>
         </CardContent>
-      </Card>
-    </div>
+      </GlassCard>
+    </TkcSection>
   )
 }

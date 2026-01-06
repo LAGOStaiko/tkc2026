@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { extractEntryId, formatNicknameWithEntryId } from '@/lib/results-console'
 import { cn } from '@/lib/utils'
 import { t } from '@/text'
@@ -42,14 +43,14 @@ function MatchSlot({ name, entry, score, winner, position }: SlotProps) {
   return (
     <div
       className={cn(
-        'flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-sm',
-        isWinner && 'border-sky-400/60 bg-sky-400/10'
+        'flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm',
+        isWinner && 'border-sky-400/60 bg-sky-400/15'
       )}
     >
       <span className={cn('min-w-0 flex-1 truncate', isWinner && 'text-white')}>
         {displayName}
       </span>
-      <span className={cn('ml-3 text-muted-foreground', isWinner && 'text-white/80')}>
+      <span className={cn('ml-3 text-white/60', isWinner && 'text-white/80')}>
         {displayScore}
       </span>
     </div>
@@ -67,8 +68,8 @@ function MatchPanel({
     match?.winner === 'a' || match?.winner === 'b' ? match.winner : undefined
 
   return (
-    <div className='rounded-xl border border-white/10 bg-white/[0.02] p-4'>
-      <p className='text-sm font-semibold text-foreground'>{title}</p>
+    <div className='rounded-xl border border-white/10 bg-white/5 p-4'>
+      <p className='text-sm font-semibold text-white'>{title}</p>
       <div className='mt-3 space-y-2'>
         <MatchSlot
           name={match?.a}
@@ -95,13 +96,13 @@ export function ConsoleBracket4({
   data?: ConsoleBracketData | null
 }) {
   return (
-    <Card className='border-white/10 bg-white/[0.03]'>
-      <CardHeader className='pb-3'>
-        <CardTitle className='text-lg'>
+    <GlassCard>
+      <CardHeader className='p-5 pb-3 md:p-7 md:pb-3'>
+        <CardTitle className='text-lg text-white'>
           {t('results.console.bracketTitle')}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
         <div className='grid gap-4 lg:grid-cols-2'>
           <div className='space-y-4'>
             <MatchPanel
@@ -125,6 +126,6 @@ export function ConsoleBracket4({
           </div>
         </div>
       </CardContent>
-    </Card>
+    </GlassCard>
   )
 }

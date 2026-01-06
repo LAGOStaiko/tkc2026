@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { TkcSection } from '@/components/tkc/layout'
 import { Button } from '@/components/ui/button'
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
@@ -31,11 +32,11 @@ function HomePage() {
   }, [])
 
   return (
-    <div className='space-y-10'>
+    <TkcSection>
       {statusMessage && (
-        <p className='text-sm text-muted-foreground'>{statusMessage}</p>
+        <p className='text-sm text-white/60'>{statusMessage}</p>
       )}
-      <section className='relative overflow-hidden rounded-3xl border bg-black text-white'>
+      <section className='relative overflow-hidden rounded-3xl border border-white/10 bg-black text-white'>
         <picture className='absolute inset-0'>
           <source
             media='(max-width: 768px)'
@@ -54,28 +55,29 @@ function HomePage() {
             fetchPriority='high'
           />
         </picture>
-        <div className='absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-black/75' />
+        <div className='absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/70' />
+        <div className='absolute inset-0 bg-black/25' />
         <div className='relative z-10 flex min-h-[70vh] flex-col items-center justify-center px-4 pb-10 pt-24 text-center md:min-h-[72vh]'>
-          <div className='relative z-10 w-full flex flex-col items-center text-center'>
+          <div className='relative z-10 flex w-full flex-col items-center text-center'>
             <div className='mx-auto w-full max-w-[1100px] text-center'>
               <h1 className='sr-only'>{eventName}</h1>
-              <div className='w-full flex justify-center'>
+              <div className='flex w-full justify-center'>
                 <img
                   src='/branding/logo-tkc2026-playx4.webp'
                   alt='TKC2026'
-                  className='block mx-auto self-center w-[clamp(280px,72vw,720px)] h-auto max-h-[26vh] object-contain mix-blend-screen drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)] md:w-[clamp(520px,60vw,880px)] md:max-h-[30vh]'
+                  className='block h-auto w-full max-w-[240px] object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)] md:max-w-[520px]'
                   loading='eager'
                   decoding='async'
                 />
               </div>
-              <div className='mx-auto mt-4 flex w-full max-w-[640px] flex-col items-center gap-4 rounded-xl bg-black/35 px-6 py-5 backdrop-blur-sm md:mt-6'>
-                <p className='break-keep font-serif text-xl text-white/90 drop-shadow-[0_8px_20px_rgba(0,0,0,0.65)] md:text-3xl'>
+              <div className='mx-auto mt-4 flex w-full max-w-[640px] flex-col items-center gap-4 rounded-2xl border border-white/10 bg-black/35 px-6 py-5 backdrop-blur-md md:mt-6'>
+                <p className='tkc-serif break-keep text-xl text-white/90 drop-shadow-[0_8px_20px_rgba(0,0,0,0.65)] md:text-3xl'>
                   {heroTagline}
                 </p>
                 <Button
                   asChild
                   size='lg'
-                  className='h-12 bg-white px-6 text-black shadow-lg shadow-black/30 hover:bg-white/90'
+                  className='h-12 w-full bg-white px-6 text-black shadow-lg shadow-black/30 hover:bg-white/90 md:w-auto'
                 >
                   <Link to='/apply'>{t('home.ctaApply')}</Link>
                 </Button>
@@ -86,7 +88,7 @@ function HomePage() {
       </section>
 
       <section className='grid gap-6 lg:grid-cols-2'>
-        <Card className='overflow-hidden'>
+        <GlassCard className='overflow-hidden'>
           <div className='relative aspect-video'>
             <img
               src='/branding/home-console-wonderful.webp'
@@ -99,23 +101,25 @@ function HomePage() {
             />
             <div className='absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent' />
           </div>
-          <CardHeader>
+          <CardHeader className='p-5 md:p-7'>
             <CardTitle>{t('home.consoleCardTitle')}</CardTitle>
-            <CardDescription>{t('home.consoleCardSubtitle')}</CardDescription>
+            <CardDescription className='text-white/60'>
+              {t('home.consoleCardSubtitle')}
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <p className='text-sm text-muted-foreground'>
+          <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
+            <p className='text-sm text-white/85 md:text-base'>
               {t('home.consoleCardBody')}
             </p>
           </CardContent>
-          <CardFooter>
+          <CardFooter className='p-5 pt-0 md:p-7 md:pt-0'>
             <Button variant='outline' asChild>
               <Link to='/console'>{t('home.details')}</Link>
             </Button>
           </CardFooter>
-        </Card>
+        </GlassCard>
 
-        <Card className='overflow-hidden'>
+        <GlassCard className='overflow-hidden'>
           <div className='relative aspect-video'>
             <img
               src='/branding/home-arcade-nijiiro.webp'
@@ -128,22 +132,24 @@ function HomePage() {
             />
             <div className='absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent' />
           </div>
-          <CardHeader>
+          <CardHeader className='p-5 md:p-7'>
             <CardTitle>{t('home.arcadeCardTitle')}</CardTitle>
-            <CardDescription>{t('home.arcadeCardSubtitle')}</CardDescription>
+            <CardDescription className='text-white/60'>
+              {t('home.arcadeCardSubtitle')}
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <p className='text-sm text-muted-foreground'>
+          <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
+            <p className='text-sm text-white/85 md:text-base'>
               {t('home.arcadeCardBody')}
             </p>
           </CardContent>
-          <CardFooter>
+          <CardFooter className='p-5 pt-0 md:p-7 md:pt-0'>
             <Button variant='outline' asChild>
               <Link to='/arcade'>{t('home.details')}</Link>
             </Button>
           </CardFooter>
-        </Card>
+        </GlassCard>
       </section>
-    </div>
+    </TkcSection>
   )
 }

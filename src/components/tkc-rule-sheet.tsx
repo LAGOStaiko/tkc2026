@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { GlassCard } from '@/components/tkc/glass-card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
@@ -23,10 +24,10 @@ export function TkcRuleSheet({
   className,
 }: TkcRuleSheetProps) {
   return (
-    <section
+    <GlassCard
       id={id}
       className={cn(
-        'rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-lg backdrop-blur-md md:p-8',
+        'p-5 md:p-7',
         className
       )}
     >
@@ -35,7 +36,7 @@ export function TkcRuleSheet({
         <h2 className='text-xl font-semibold text-white md:text-2xl'>{title}</h2>
       </div>
       <div className='mt-5'>{children}</div>
-    </section>
+    </GlassCard>
   )
 }
 
@@ -59,7 +60,7 @@ export function TkcField({ label, children, note, badges }: TkcFieldProps) {
         </div>
         <span className='flex-1 border-t border-dashed border-white/15' />
       </div>
-      <div className='mt-2 max-w-prose text-sm leading-relaxed text-white/90 break-keep md:text-base md:leading-7'>
+      <div className='mt-2 max-w-prose text-sm leading-relaxed text-white/85 break-keep md:text-base md:leading-7'>
         {children}
       </div>
       {note && (

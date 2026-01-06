@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { Menu } from 'lucide-react'
 import { useSite } from '@/lib/api'
+import { TkcContainer } from '@/components/tkc/layout'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -63,11 +64,11 @@ export function SiteLayout() {
       <header
         className='fixed inset-x-0 top-0 z-50 border-b bg-black/90 backdrop-blur'
         style={{
-          paddingLeft: 'env(safe-area-inset-left)',
-          paddingRight: 'env(safe-area-inset-right)',
+          paddingLeft: 'max(1rem, env(safe-area-inset-left))',
+          paddingRight: 'max(1rem, env(safe-area-inset-right))',
         }}
       >
-        <div className='mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 md:px-8'>
+        <TkcContainer className='flex h-14 items-center justify-between'>
           <Link to='/' className='flex items-center gap-3'>
             <img
               src={headerLogoUrl}
@@ -86,10 +87,12 @@ export function SiteLayout() {
               {navItems.map((item) => {
                 const isActive = checkIsActive(href, item, true)
                 const baseClass = item.emphasis
-                  ? 'whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-primary-foreground shadow-sm hover:bg-primary/90'
-                  : 'whitespace-nowrap text-muted-foreground hover:text-foreground'
+                  ? 'whitespace-nowrap rounded-full border border-sky-400/30 bg-sky-400/20 px-3 py-1.5 text-sky-100 shadow-sm transition hover:bg-sky-400/30'
+                  : 'whitespace-nowrap text-white/70 transition hover:text-white'
                 const activeClass =
-                  !item.emphasis && isActive ? 'text-foreground font-semibold' : ''
+                  !item.emphasis && isActive
+                    ? 'text-white underline underline-offset-8 decoration-sky-400/80'
+                    : ''
 
                 return (
                   <Link
@@ -122,11 +125,11 @@ export function SiteLayout() {
                   {navItems.map((item) => {
                     const isActive = checkIsActive(href, item, true)
                     const baseClass = item.emphasis
-                      ? 'rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground shadow-sm hover:bg-primary/90'
-                      : 'rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                      ? 'rounded-md border border-sky-400/30 bg-sky-400/20 px-3 py-2 text-sm text-sky-100 shadow-sm transition hover:bg-sky-400/30'
+                      : 'rounded-md px-3 py-2 text-sm text-white/70 transition hover:bg-white/10 hover:text-white'
                     const activeClass =
                       !item.emphasis && isActive
-                        ? 'bg-muted text-foreground font-semibold'
+                        ? 'bg-white/10 text-white font-semibold'
                         : ''
 
                     return (
@@ -145,13 +148,13 @@ export function SiteLayout() {
               </SheetContent>
             </Sheet>
           </div>
-        </div>
+        </TkcContainer>
       </header>
 
-      <main className='mx-auto flex w-full max-w-6xl flex-1 bg-black px-4 pt-16 pb-16 md:px-8 md:pb-20'>
-        <div className='w-full'>
+      <main className='flex w-full flex-1 bg-black pt-16 pb-16 md:pb-20'>
+        <TkcContainer className='w-full'>
           <Outlet />
-        </div>
+        </TkcContainer>
       </main>
     </div>
   )

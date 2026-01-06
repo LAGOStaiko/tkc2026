@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useSchedule } from '@/lib/api'
 import { t } from '@/text'
@@ -122,14 +124,14 @@ function ScheduleList({
         const note = item.note ?? ''
 
         return (
-          <Card key={`${heading}-${index}`}>
-            <CardHeader className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
+          <GlassCard key={`${heading}-${index}`}>
+            <CardHeader className='flex flex-col gap-2 p-5 md:p-7 sm:flex-row sm:items-start sm:justify-between'>
               <div className='space-y-1'>
-                <CardTitle className='text-base sm:text-lg'>
+                <CardTitle className='text-base text-white sm:text-lg'>
                   {heading}
                 </CardTitle>
                 {dateText && (
-                  <p className='text-xs text-muted-foreground sm:text-sm'>
+                  <p className='text-xs text-white/60 sm:text-sm'>
                     {dateText}
                   </p>
                 )}
@@ -143,13 +145,13 @@ function ScheduleList({
                 </Badge>
               )}
             </CardHeader>
-            <CardContent className='space-y-1 text-xs text-muted-foreground sm:space-y-2 sm:text-sm'>
+            <CardContent className='space-y-1 p-5 pt-0 text-xs text-white/60 sm:space-y-2 sm:text-sm md:p-7 md:pt-0'>
               {location && <div className='break-words'>{location}</div>}
               {note && (
-                <div className='text-foreground/80 break-words'>{note}</div>
+                <div className='text-white/85 break-words'>{note}</div>
               )}
             </CardContent>
-          </Card>
+          </GlassCard>
         )
       })}
     </div>
@@ -173,18 +175,8 @@ function SchedulePage() {
   }, [])
 
   return (
-    <div className='space-y-6'>
-      <div className='space-y-2'>
-        <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          {t('meta.siteName')}
-        </p>
-        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl font-serif'>
-          {t('schedule.title')}
-        </h1>
-        <p className='text-sm text-muted-foreground'>
-          {t('schedule.subtitle')}
-        </p>
-      </div>
+    <TkcSection>
+      <TkcPageHeader title={t('schedule.title')} subtitle={t('schedule.subtitle')} />
 
       {isError && (
         <p className='text-sm text-destructive'>{t('schedule.failed')}</p>
@@ -212,6 +204,6 @@ function SchedulePage() {
           <ScheduleList items={arcadeItems} isLoading={isLoading} />
         </TabsContent>
       </Tabs>
-    </div>
+    </TkcSection>
   )
 }

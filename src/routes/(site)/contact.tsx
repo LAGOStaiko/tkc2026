@@ -2,8 +2,10 @@ import { useEffect } from 'react'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { createFileRoute } from '@tanstack/react-router'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useContent, useSite } from '@/lib/api'
 import { t } from '@/text'
 
@@ -37,25 +39,36 @@ const omitNode = <T extends { node?: unknown }>(props: T) => {
 const markdownComponents: Components = {
   h1: (props) => {
     const rest = omitNode(props)
-    return <h2 className='text-2xl font-semibold tracking-tight' {...rest} />
+    return (
+      <h2 className='text-xl font-semibold text-white md:text-2xl' {...rest} />
+    )
   },
   h2: (props) => {
     const rest = omitNode(props)
-    return <h3 className='text-xl font-semibold tracking-tight' {...rest} />
+    return (
+      <h3 className='text-lg font-semibold text-white md:text-xl' {...rest} />
+    )
   },
   h3: (props) => {
     const rest = omitNode(props)
-    return <h4 className='text-lg font-semibold tracking-tight' {...rest} />
+    return (
+      <h4 className='text-base font-semibold text-white md:text-lg' {...rest} />
+    )
   },
   p: (props) => {
     const rest = omitNode(props)
-    return <p className='text-base leading-relaxed text-foreground/90' {...rest} />
+    return (
+      <p
+        className='text-sm leading-relaxed text-white/85 md:text-base'
+        {...rest}
+      />
+    )
   },
   a: (props) => {
     const rest = omitNode(props)
     return (
       <a
-        className='text-primary underline underline-offset-4 hover:text-primary/80'
+        className='text-sky-300 underline underline-offset-4 hover:text-sky-200'
         {...rest}
       />
     )
@@ -70,26 +83,33 @@ const markdownComponents: Components = {
   },
   li: (props) => {
     const rest = omitNode(props)
-    return <li className='text-base leading-relaxed text-foreground/90' {...rest} />
+    return (
+      <li
+        className='text-sm leading-relaxed text-white/85 md:text-base'
+        {...rest}
+      />
+    )
   },
   blockquote: (props) => {
     const rest = omitNode(props)
     return (
       <blockquote
-        className='border-l-4 border-muted pl-4 text-muted-foreground'
+        className='border-l-4 border-white/10 pl-4 text-white/60'
         {...rest}
       />
     )
   },
   code: (props) => {
     const rest = omitNode(props)
-    return <code className='rounded bg-muted px-1 py-0.5 text-sm' {...rest} />
+    return (
+      <code className='rounded bg-white/10 px-1 py-0.5 text-sm' {...rest} />
+    )
   },
   pre: (props) => {
     const rest = omitNode(props)
     return (
       <pre
-        className='overflow-x-auto rounded-lg border bg-muted p-3 text-sm'
+        className='overflow-x-auto rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-white/80'
         {...rest}
       />
     )
@@ -104,7 +124,6 @@ const getOrder = (value: unknown) => {
 function ContactPage() {
   const {
     data: siteData,
-    isLoading: isSiteLoading,
     isError: isSiteError,
   } = useSite<SiteData>()
   const {
@@ -123,97 +142,84 @@ function ContactPage() {
     (left, right) => getOrder(left.order) - getOrder(right.order)
   )
 
-  const hasContactInfo = Boolean(contactEmail || kakaoChannelUrl)
-
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('contact.title')}`
   }, [])
 
   return (
-    <div className='space-y-6'>
-      <div className='space-y-2'>
-        <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          {t('meta.siteName')}
-        </p>
-        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl font-serif'>
-          {t('contact.title')}
-        </h1>
-        <p className='text-sm text-muted-foreground'>
-          {t('contact.subtitle')}
-        </p>
-      </div>
+    <TkcSection>
+      <TkcPageHeader title={t('contact.title')} subtitle={t('contact.subtitle')} />
 
       {isSiteError && (
-        <p className='text-sm text-destructive'>
-          {t('contact.failedInfo')}
-        </p>
+        <p className='text-sm text-destructive'>{t('contact.failedInfo')}</p>
       )}
       {isContentError && (
-        <p className='text-sm text-destructive'>
-          {t('contact.failedContent')}
-        </p>
+        <p className='text-sm text-destructive'>{t('contact.failedContent')}</p>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('contact.channelsTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent className='space-y-4'>
-          <div className='flex flex-col gap-3 sm:flex-row'>
-            {emailHref ? (
-              <Button asChild>
-                <a href={emailHref}>{t('contact.sendEmail')}</a>
-              </Button>
-            ) : (
-              <Button disabled>{t('contact.sendEmail')}</Button>
-            )}
-            {kakaoChannelUrl ? (
-              <Button variant='outline' asChild>
-                <a
-                  href={kakaoChannelUrl}
-                  target='_blank'
-                  rel='noreferrer'
-                >
+      <div className='space-y-4'>
+        <h2 className='text-xl font-semibold text-white md:text-2xl'>
+          {t('contact.channelsTitle')}
+        </h2>
+        <div className='grid gap-4 md:grid-cols-2'>
+          <GlassCard className='p-5 md:p-7'>
+            <div className='space-y-3'>
+              <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
+                {t('contact.labelEmail')}
+              </p>
+              <p className='text-sm text-white/85 md:text-base'>
+                {contactEmail || t('contact.noInfo')}
+              </p>
+              {emailHref ? (
+                <Button asChild className='h-11 w-full'>
+                  <a href={emailHref}>{t('contact.sendEmail')}</a>
+                </Button>
+              ) : (
+                <Button disabled className='h-11 w-full'>
+                  {t('contact.sendEmail')}
+                </Button>
+              )}
+            </div>
+          </GlassCard>
+          <GlassCard className='p-5 md:p-7'>
+            <div className='space-y-3'>
+              <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
+                {t('contact.labelKakao')}
+              </p>
+              <p className='text-sm text-white/85 md:text-base'>
+                {kakaoChannelUrl || t('contact.noInfo')}
+              </p>
+              {kakaoChannelUrl ? (
+                <Button variant='outline' asChild className='h-11 w-full'>
+                  <a href={kakaoChannelUrl} target='_blank' rel='noreferrer'>
+                    {t('contact.openKakao')}
+                  </a>
+                </Button>
+              ) : (
+                <Button variant='outline' disabled className='h-11 w-full'>
                   {t('contact.openKakao')}
-                </a>
-              </Button>
-            ) : (
-              <Button variant='outline' disabled>
-                {t('contact.openKakao')}
-              </Button>
-            )}
-          </div>
-          {contactEmail && (
-            <p className='text-sm text-muted-foreground'>
-              {t('contact.labelEmail')}: {contactEmail}
-            </p>
-          )}
-          {kakaoChannelUrl && (
-            <p className='text-sm text-muted-foreground'>
-              {t('contact.labelKakao')}: {kakaoChannelUrl}
-            </p>
-          )}
-          {!hasContactInfo && !isSiteLoading && !isSiteError && (
-            <p className='text-sm text-muted-foreground'>
-              {t('contact.noInfo')}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+                </Button>
+              )}
+            </div>
+          </GlassCard>
+        </div>
+      </div>
 
-      <div className='space-y-6'>
+      <div className='space-y-10 md:space-y-14'>
         {sortedSections.map((section, index) => {
           const body = section.bodyMd ?? ''
           const heading =
             section.title ?? `${t('content.sectionFallback')} ${index + 1}`
 
           return (
-            <Card key={`${heading}-${index}`}>
-              <CardHeader>
-                <CardTitle className='text-xl'>{heading}</CardTitle>
+            <GlassCard key={`${heading}-${index}`}>
+              <CardHeader className='p-5 md:p-7'>
+                <CardTitle className='text-xl text-white md:text-2xl'>
+                  {heading}
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className='space-y-4'>
+              <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
+                <div className='space-y-4 max-w-prose'>
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={markdownComponents}
@@ -222,18 +228,14 @@ function ContactPage() {
                   </ReactMarkdown>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
           )
         })}
       </div>
 
-      {!isContentLoading &&
-        !isContentError &&
-        sortedSections.length === 0 && (
-          <p className='text-sm text-muted-foreground'>
-            {t('contact.noContent')}
-          </p>
-        )}
-    </div>
+      {!isContentLoading && !isContentError && sortedSections.length === 0 && (
+        <p className='text-sm text-white/60'>{t('contact.noContent')}</p>
+      )}
+    </TkcSection>
   )
 }

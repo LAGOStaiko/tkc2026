@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useContent } from '@/lib/api'
 import { t } from '@/text'
 
@@ -30,25 +32,36 @@ const omitNode = <T extends { node?: unknown }>(props: T) => {
 const markdownComponents: Components = {
   h1: (props) => {
     const rest = omitNode(props)
-    return <h2 className='text-2xl font-semibold tracking-tight' {...rest} />
+    return (
+      <h2 className='text-xl font-semibold text-white md:text-2xl' {...rest} />
+    )
   },
   h2: (props) => {
     const rest = omitNode(props)
-    return <h3 className='text-xl font-semibold tracking-tight' {...rest} />
+    return (
+      <h3 className='text-lg font-semibold text-white md:text-xl' {...rest} />
+    )
   },
   h3: (props) => {
     const rest = omitNode(props)
-    return <h4 className='text-lg font-semibold tracking-tight' {...rest} />
+    return (
+      <h4 className='text-base font-semibold text-white md:text-lg' {...rest} />
+    )
   },
   p: (props) => {
     const rest = omitNode(props)
-    return <p className='text-base leading-relaxed text-foreground/90' {...rest} />
+    return (
+      <p
+        className='text-sm leading-relaxed text-white/85 md:text-base'
+        {...rest}
+      />
+    )
   },
   a: (props) => {
     const rest = omitNode(props)
     return (
       <a
-        className='text-primary underline underline-offset-4 hover:text-primary/80'
+        className='text-sky-300 underline underline-offset-4 hover:text-sky-200'
         {...rest}
       />
     )
@@ -63,26 +76,33 @@ const markdownComponents: Components = {
   },
   li: (props) => {
     const rest = omitNode(props)
-    return <li className='text-base leading-relaxed text-foreground/90' {...rest} />
+    return (
+      <li
+        className='text-sm leading-relaxed text-white/85 md:text-base'
+        {...rest}
+      />
+    )
   },
   blockquote: (props) => {
     const rest = omitNode(props)
     return (
       <blockquote
-        className='border-l-4 border-muted pl-4 text-muted-foreground'
+        className='border-l-4 border-white/10 pl-4 text-white/60'
         {...rest}
       />
     )
   },
   code: (props) => {
     const rest = omitNode(props)
-    return <code className='rounded bg-muted px-1 py-0.5 text-sm' {...rest} />
+    return (
+      <code className='rounded bg-white/10 px-1 py-0.5 text-sm' {...rest} />
+    )
   },
   pre: (props) => {
     const rest = omitNode(props)
     return (
       <pre
-        className='overflow-x-auto rounded-lg border bg-muted p-3 text-sm'
+        className='overflow-x-auto rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-white/80'
         {...rest}
       />
     )
@@ -108,28 +128,17 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
   }, [title])
 
   return (
-    <div className='space-y-6'>
-      <div className='space-y-2'>
-        <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          {t('meta.siteName')}
-        </p>
-        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl font-serif'>
-          {title}
-        </h1>
-      </div>
+    <TkcSection>
+      <TkcPageHeader title={title} />
 
-      {isLoading && (
-        <p className='text-sm text-muted-foreground'>{t('content.loading')}</p>
-      )}
-      {isError && (
-        <p className='text-sm text-destructive'>{t('content.loadFailed')}</p>
-      )}
+      {isLoading && <p className='text-sm text-white/60'>{t('content.loading')}</p>}
+      {isError && <p className='text-sm text-destructive'>{t('content.loadFailed')}</p>}
 
       {!isLoading && !isError && sortedSections.length === 0 && (
-        <p className='text-sm text-muted-foreground'>{t('content.empty')}</p>
+        <p className='text-sm text-white/60'>{t('content.empty')}</p>
       )}
 
-      <div className='space-y-6'>
+      <div className='space-y-10 md:space-y-14'>
         {sortedSections.map((section, index) => {
           const imageUrl = section.imageUrl
           const body = section.bodyMd ?? ''
@@ -137,14 +146,16 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
             section.title ?? `${t('content.sectionFallback')} ${index + 1}`
 
           return (
-            <Card key={`${heading}-${index}`}>
-              <CardHeader>
-                <CardTitle className='text-xl'>{heading}</CardTitle>
+            <GlassCard key={`${heading}-${index}`}>
+              <CardHeader className='p-5 md:p-7'>
+                <CardTitle className='text-xl text-white md:text-2xl'>
+                  {heading}
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
                 {imageUrl ? (
                   <div className='grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:items-start'>
-                    <div className='space-y-4'>
+                    <div className='space-y-4 max-w-prose'>
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={markdownComponents}
@@ -152,7 +163,7 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
                         {body}
                       </ReactMarkdown>
                     </div>
-                    <div className='overflow-hidden rounded-2xl border bg-muted/30'>
+                    <div className='overflow-hidden rounded-2xl border border-white/10 bg-white/5'>
                       <img
                         src={imageUrl}
                         alt={heading}
@@ -162,7 +173,7 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
                     </div>
                   </div>
                 ) : (
-                  <div className='space-y-4'>
+                  <div className='space-y-4 max-w-prose'>
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={markdownComponents}
@@ -172,10 +183,10 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
                   </div>
                 )}
               </CardContent>
-            </Card>
+            </GlassCard>
           )
         })}
       </div>
-    </div>
+    </TkcSection>
   )
 }

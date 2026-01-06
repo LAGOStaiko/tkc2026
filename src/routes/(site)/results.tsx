@@ -5,9 +5,11 @@ import {
   ConsoleBracket4,
   type ConsoleBracketData,
 } from '@/components/console-bracket-4'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   Table,
@@ -265,11 +267,10 @@ function StatusMessage({
   children: React.ReactNode
   variant?: 'neutral' | 'error'
 }) {
-  const textClass =
-    variant === 'error' ? 'text-destructive' : 'text-muted-foreground'
+  const textClass = variant === 'error' ? 'text-destructive' : 'text-white/60'
 
   return (
-    <div className={`rounded-lg border bg-muted/30 p-4 text-sm ${textClass}`}>
+    <div className={`rounded-lg border border-white/10 bg-white/5 p-4 text-sm ${textClass}`}>
       {children}
     </div>
   )
@@ -282,21 +283,23 @@ function ResultRowCard({ row }: { row: ResultRow }) {
   const detail = row.detail ?? '-'
 
   return (
-    <div className='rounded-lg border bg-background p-3 shadow-xs'>
+    <div className='rounded-lg border border-white/10 bg-white/5 p-3 shadow-xs'>
       <div className='grid grid-cols-[72px_minmax(0,1fr)] gap-3'>
-        <div className='flex flex-col items-center justify-center rounded-md bg-muted/40 p-2 text-center'>
-          <div className='text-2xl font-semibold leading-none'>{rank}</div>
-          <div className='mt-1 text-[10px] uppercase tracking-wide text-muted-foreground'>
+        <div className='flex flex-col items-center justify-center rounded-md bg-white/10 p-2 text-center'>
+          <div className='text-2xl font-semibold leading-none text-white'>
+            {rank}
+          </div>
+          <div className='mt-1 text-[10px] uppercase tracking-wide text-white/60'>
             {t('results.label.rank')}
           </div>
         </div>
         <div className='space-y-1'>
-          <div className='text-base font-semibold'>{nickname}</div>
-          <div className='text-sm text-muted-foreground'>
+          <div className='text-base font-semibold text-white'>{nickname}</div>
+          <div className='text-sm text-white/60'>
             {t('results.scorePrefix')}
             {score}
           </div>
-          <div className='text-sm text-muted-foreground break-words'>
+          <div className='text-sm text-white/60 break-words'>
             {detail}
           </div>
         </div>
@@ -311,16 +314,16 @@ function StageCard({ stage }: { stage: ResultStage }) {
   const rows = Array.isArray(stage.rows) ? stage.rows : []
 
   return (
-    <Card>
-      <CardHeader className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-        <CardTitle className='text-lg'>{heading}</CardTitle>
+    <GlassCard>
+      <CardHeader className='flex flex-col gap-2 p-5 md:p-7 sm:flex-row sm:items-start sm:justify-between'>
+        <CardTitle className='text-lg text-white'>{heading}</CardTitle>
         {badge && (
           <Badge variant={badge.variant} className='shrink-0'>
             {badge.label}
           </Badge>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
         {rows.length === 0 ? (
           <StatusMessage>{LABEL_EMPTY}</StatusMessage>
         ) : (
@@ -363,7 +366,7 @@ function StageCard({ stage }: { stage: ResultStage }) {
           </>
         )}
       </CardContent>
-    </Card>
+    </GlassCard>
   )
 }
 
@@ -383,13 +386,13 @@ function ConsoleDashboardCard({
   onQuickView,
 }: ConsoleDashboardCardProps) {
   return (
-    <Card>
-      <CardHeader className='space-y-2'>
-        <CardTitle className='text-lg'>{title}</CardTitle>
-        <p className='text-sm text-muted-foreground'>{summary}</p>
+    <GlassCard>
+      <CardHeader className='space-y-2 p-5 md:p-7'>
+        <CardTitle className='text-lg text-white md:text-xl'>{title}</CardTitle>
+        <p className='text-sm text-white/60'>{summary}</p>
       </CardHeader>
-      <CardContent className='space-y-4'>
-        <div className='flex items-center justify-between text-xs text-muted-foreground'>
+      <CardContent className='space-y-4 p-5 pt-0 md:p-7 md:pt-0'>
+        <div className='flex items-center justify-between text-xs text-white/60'>
           <span>{LABEL_UPDATED_AT}</span>
           <span>{formatUpdatedAt(updatedAt)}</span>
         </div>
@@ -397,25 +400,25 @@ function ConsoleDashboardCard({
           {LABEL_CONSOLE_QUICK_VIEW}
         </Button>
         <div className='space-y-2'>
-          <p className='text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground'>
+          <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
             {LABEL_CONSOLE_PREVIEW}
           </p>
           {previewRows.length === 0 ? (
-            <p className='text-xs text-muted-foreground'>{LABEL_EMPTY}</p>
+            <p className='text-xs text-white/60'>{LABEL_EMPTY}</p>
           ) : (
             <div className='space-y-2'>
               {previewRows.map((row, index) => (
                 <div
                   key={`${title}-preview-${index}`}
-                  className='flex items-center justify-between rounded-md border bg-muted/10 px-3 py-2 text-sm'
+                  className='flex items-center justify-between rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm'
                 >
                   <div className='flex min-w-0 items-center gap-2'>
-                    <span className='text-xs text-muted-foreground'>
+                    <span className='text-xs text-white/60'>
                       {row.rank}
                     </span>
                     <span className='truncate font-medium'>{row.name}</span>
                   </div>
-                  <span className='text-xs text-muted-foreground'>
+                  <span className='text-xs text-white/60'>
                     {row.score}
                   </span>
                 </div>
@@ -424,7 +427,7 @@ function ConsoleDashboardCard({
           )}
         </div>
       </CardContent>
-    </Card>
+    </GlassCard>
   )
 }
 
@@ -550,18 +553,8 @@ function ResultsPage() {
   }
 
   return (
-    <div className='space-y-6'>
-      <div className='space-y-2'>
-        <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-          {t('meta.siteName')}
-        </p>
-        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl font-serif'>
-          {t('results.title')}
-        </h1>
-        <p className='text-sm text-muted-foreground'>
-          {t('results.subtitle')}
-        </p>
-      </div>
+    <TkcSection>
+      <TkcPageHeader title={t('results.title')} subtitle={t('results.subtitle')} />
 
       {isError && (
         <StatusMessage variant='error'>{t('results.failed')}</StatusMessage>
@@ -579,7 +572,7 @@ function ResultsPage() {
         <TabsContent value={TAB_CONSOLE} className='mt-4 space-y-6'>
           <div className='space-y-4'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-xl font-semibold'>
+              <h2 className='text-xl font-semibold text-white md:text-2xl'>
                 {LABEL_CONSOLE_DASHBOARD}
               </h2>
             </div>
@@ -644,7 +637,7 @@ function ResultsPage() {
               </div>
 
               <TabsContent value={CONSOLE_TAB_PRE1} className='space-y-4'>
-                <p className='text-sm text-muted-foreground'>
+                <p className='text-sm text-white/60'>
                   {LABEL_CONSOLE_PRE1_SUMMARY}
                 </p>
                 {isLoading ? null : pre1Rows.length === 0 ? (
@@ -707,14 +700,14 @@ function ResultsPage() {
                   </div>
                 )}
                 {pre1UpdatedAt && (
-                  <p className='text-xs text-muted-foreground'>
+                  <p className='text-xs text-white/60'>
                     {LABEL_UPDATED_AT}: {formatUpdatedAt(pre1UpdatedAt)}
                   </p>
                 )}
               </TabsContent>
 
               <TabsContent value={CONSOLE_TAB_PRE2} className='space-y-4'>
-                <p className='text-sm text-muted-foreground'>
+                <p className='text-sm text-white/60'>
                   {LABEL_CONSOLE_PRE2_SUMMARY}
                 </p>
                 {isLoading ? null : pre2Rows.length === 0 ? (
@@ -783,7 +776,7 @@ function ResultsPage() {
                   </div>
                 )}
                 {pre2UpdatedAt && (
-                  <p className='text-xs text-muted-foreground'>
+                  <p className='text-xs text-white/60'>
                     {LABEL_UPDATED_AT}: {formatUpdatedAt(pre2UpdatedAt)}
                   </p>
                 )}
@@ -792,9 +785,7 @@ function ResultsPage() {
               <TabsContent value={CONSOLE_TAB_FINAL} className='space-y-4'>
                 <ConsoleBracket4 data={finalBracket} />
                 {!hasFinalBracket && (
-                  <p className='text-xs text-muted-foreground'>
-                    {LABEL_CONSOLE_BRACKET}
-                  </p>
+                  <p className='text-xs text-white/60'>{LABEL_CONSOLE_BRACKET}</p>
                 )}
                 {isLoading ? null : finalRows.length === 0 ? (
                   <StatusMessage>{LABEL_EMPTY}</StatusMessage>
@@ -838,7 +829,7 @@ function ResultsPage() {
                   </div>
                 )}
                 {finalUpdatedAt && (
-                  <p className='text-xs text-muted-foreground'>
+                  <p className='text-xs text-white/60'>
                     {LABEL_UPDATED_AT}: {formatUpdatedAt(finalUpdatedAt)}
                   </p>
                 )}
@@ -857,6 +848,6 @@ function ResultsPage() {
           )}
         </TabsContent>
       </Tabs>
-    </div>
+    </TkcSection>
   )
 }
