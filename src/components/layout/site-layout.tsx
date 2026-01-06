@@ -60,12 +60,15 @@ export function SiteLayout() {
 
   return (
     <div className='dark min-h-svh bg-black text-foreground'>
-      <header className='fixed inset-x-0 top-0 z-50 border-b bg-black/90 backdrop-blur'>
-        <div className='mx-auto flex h-16 max-w-5xl items-center gap-4 px-4'>
-          <Link
-            to='/'
-            className='flex items-center gap-3'
-          >
+      <header
+        className='fixed inset-x-0 top-0 z-50 border-b bg-black/90 backdrop-blur'
+        style={{
+          paddingLeft: 'env(safe-area-inset-left)',
+          paddingRight: 'env(safe-area-inset-right)',
+        }}
+      >
+        <div className='mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 md:px-8'>
+          <Link to='/' className='flex items-center gap-3'>
             <img
               src={headerLogoUrl}
               srcSet={headerLogoSrcSet}
@@ -78,68 +81,74 @@ export function SiteLayout() {
             />
             <span className='sr-only'>{siteName}</span>
           </Link>
-          <nav className='hidden flex-1 items-center justify-end gap-2 overflow-x-auto text-xs sm:gap-3 sm:text-sm md:flex'>
-            {navItems.map((item) => {
-              const isActive = checkIsActive(href, item, true)
-              const baseClass = item.emphasis
-                ? 'whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-primary-foreground shadow-sm hover:bg-primary/90'
-                : 'whitespace-nowrap text-muted-foreground hover:text-foreground'
-              const activeClass = !item.emphasis && isActive ? 'text-foreground font-semibold' : ''
+          <div className='flex items-center gap-2'>
+            <nav className='hidden items-center gap-2 overflow-x-auto text-xs sm:gap-3 sm:text-sm md:flex'>
+              {navItems.map((item) => {
+                const isActive = checkIsActive(href, item, true)
+                const baseClass = item.emphasis
+                  ? 'whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-primary-foreground shadow-sm hover:bg-primary/90'
+                  : 'whitespace-nowrap text-muted-foreground hover:text-foreground'
+                const activeClass =
+                  !item.emphasis && isActive ? 'text-foreground font-semibold' : ''
 
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`${baseClass} ${activeClass}`.trim()}
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={`${baseClass} ${activeClass}`.trim()}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </nav>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant='outline'
+                  size='icon'
+                  className='md:hidden'
+                  aria-label={t('nav.openMenu')}
                 >
-                  {item.label}
-                </Link>
-              )
-            })}
-          </nav>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant='outline'
-                size='icon'
-                className='ms-auto md:hidden'
-                aria-label={t('nav.openMenu')}
-              >
-                <Menu className='size-4' />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side='right' className='p-0'>
-              <SheetHeader className='border-b'>
-                <SheetTitle>{t('nav.menuTitle')}</SheetTitle>
-              </SheetHeader>
-              <div className='flex flex-col gap-1 p-4'>
-                {navItems.map((item) => {
-                  const isActive = checkIsActive(href, item, true)
-                  const baseClass = item.emphasis
-                    ? 'rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground shadow-sm hover:bg-primary/90'
-                    : 'rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted/60 hover:text-foreground'
-                  const activeClass = !item.emphasis && isActive ? 'bg-muted text-foreground font-semibold' : ''
+                  <Menu className='size-4' />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side='right' className='p-0'>
+                <SheetHeader className='border-b'>
+                  <SheetTitle>{t('nav.menuTitle')}</SheetTitle>
+                </SheetHeader>
+                <div className='flex flex-col gap-1 p-4'>
+                  {navItems.map((item) => {
+                    const isActive = checkIsActive(href, item, true)
+                    const baseClass = item.emphasis
+                      ? 'rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground shadow-sm hover:bg-primary/90'
+                      : 'rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                    const activeClass =
+                      !item.emphasis && isActive
+                        ? 'bg-muted text-foreground font-semibold'
+                        : ''
 
-                  return (
-                    <SheetClose asChild key={item.to}>
-                      <Link
-                        to={item.to}
-                        aria-current={isActive ? 'page' : undefined}
-                        className={`${baseClass} ${activeClass}`.trim()}
-                      >
-                        {item.label}
-                      </Link>
-                    </SheetClose>
-                  )
-                })}
-              </div>
-            </SheetContent>
-          </Sheet>
+                    return (
+                      <SheetClose asChild key={item.to}>
+                        <Link
+                          to={item.to}
+                          aria-current={isActive ? 'page' : undefined}
+                          className={`${baseClass} ${activeClass}`.trim()}
+                        >
+                          {item.label}
+                        </Link>
+                      </SheetClose>
+                    )
+                  })}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
-      <main className='mx-auto flex w-full max-w-5xl flex-1 bg-black px-4 pt-20 pb-16 md:pb-20'>
+      <main className='mx-auto flex w-full max-w-6xl flex-1 bg-black px-4 pt-16 pb-16 md:px-8 md:pb-20'>
         <div className='w-full'>
           <Outlet />
         </div>

@@ -568,7 +568,7 @@ function ResultsPage() {
       )}
 
       <Tabs defaultValue={TAB_CONSOLE}>
-        <TabsList className='w-full justify-start gap-2 overflow-x-auto'>
+        <TabsList className='no-scrollbar w-full justify-start gap-2 overflow-x-auto whitespace-nowrap'>
           <TabsTrigger value={TAB_CONSOLE} className='shrink-0'>
             {LABEL_CONSOLE}
           </TabsTrigger>
@@ -614,22 +614,22 @@ function ResultsPage() {
                 <Button asChild variant='secondary' className='shrink-0'>
                   <Link to='/console'>{LABEL_CONSOLE_GUIDE}</Link>
                 </Button>
-                <TabsList className='no-scrollbar w-full justify-start gap-2 overflow-x-auto rounded-full bg-muted/40 p-1 md:w-auto md:overflow-visible'>
+                <TabsList className='no-scrollbar w-full justify-start gap-2 overflow-x-auto whitespace-nowrap rounded-full bg-muted/40 p-1 md:w-auto md:overflow-visible'>
                   <TabsTrigger
                     value={CONSOLE_TAB_PRE1}
-                    className='shrink-0 rounded-full px-4'
+                    className='shrink-0 flex-none rounded-full px-4'
                   >
                     {LABEL_CONSOLE_PRE1}
                   </TabsTrigger>
                   <TabsTrigger
                     value={CONSOLE_TAB_PRE2}
-                    className='shrink-0 rounded-full px-4'
+                    className='shrink-0 flex-none rounded-full px-4'
                   >
                     {LABEL_CONSOLE_PRE2}
                   </TabsTrigger>
                   <TabsTrigger
                     value={CONSOLE_TAB_FINAL}
-                    className='shrink-0 rounded-full px-4'
+                    className='shrink-0 flex-none rounded-full px-4'
                   >
                     {LABEL_CONSOLE_FINAL}
                   </TabsTrigger>
@@ -650,8 +650,8 @@ function ResultsPage() {
                 {isLoading ? null : pre1Rows.length === 0 ? (
                   <StatusMessage>{LABEL_EMPTY}</StatusMessage>
                 ) : (
-                  <div className='overflow-x-auto'>
-                    <Table>
+                  <div className='-mx-4 px-4 overflow-x-auto'>
+                    <Table className='min-w-[720px]'>
                       <TableHeader>
                         <TableRow>
                           <TableHead className='w-[72px]'>
@@ -720,8 +720,8 @@ function ResultsPage() {
                 {isLoading ? null : pre2Rows.length === 0 ? (
                   <StatusMessage>{LABEL_EMPTY}</StatusMessage>
                 ) : (
-                  <div className='overflow-x-auto'>
-                    <Table>
+                  <div className='-mx-4 px-4 overflow-x-auto'>
+                    <Table className='min-w-[720px]'>
                       <TableHeader>
                         <TableRow>
                           <TableHead className='w-[72px]'>
@@ -799,8 +799,8 @@ function ResultsPage() {
                 {isLoading ? null : finalRows.length === 0 ? (
                   <StatusMessage>{LABEL_EMPTY}</StatusMessage>
                 ) : (
-                  <div className='overflow-x-auto'>
-                    <Table>
+                  <div className='-mx-4 px-4 overflow-x-auto'>
+                    <Table className='min-w-[720px]'>
                       <TableHeader>
                         <TableRow>
                           <TableHead className='w-[72px]'>

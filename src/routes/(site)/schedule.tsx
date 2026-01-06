@@ -113,7 +113,7 @@ function ScheduleList({
   }
 
   return (
-    <div className='grid gap-3 sm:gap-4'>
+    <div className='grid gap-3 sm:gap-4 md:grid-cols-2'>
       {items.map((item, index) => {
         const heading = item.title ?? `${t('schedule.itemFallback')} ${index + 1}`
         const badge = getStatusBadge(item.status)
@@ -191,7 +191,7 @@ function SchedulePage() {
       )}
 
       <Tabs defaultValue={TAB_ALL}>
-        <TabsList className='w-full justify-start gap-2 overflow-x-auto'>
+        <TabsList className='no-scrollbar w-full justify-start gap-2 overflow-x-auto whitespace-nowrap'>
           <TabsTrigger value={TAB_ALL} className='shrink-0'>
             {LABEL_ALL}
           </TabsTrigger>

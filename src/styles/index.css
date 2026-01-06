@@ -12,9 +12,11 @@
   }
   html {
     @apply overflow-x-hidden;
+    overflow-x: clip;
   }
   body {
     @apply min-h-svh w-full bg-background text-foreground has-[div[data-variant='inset']]:bg-sidebar;
+    overflow-x: clip;
   }
 
   /* Override Radix scroll locking for sticky headers */

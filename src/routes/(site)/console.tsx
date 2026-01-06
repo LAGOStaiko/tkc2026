@@ -289,66 +289,64 @@ function ConsolePage() {
   }, [title])
 
   return (
-    <div className='mx-auto max-w-6xl px-4 md:px-8'>
-      <div className='space-y-10 md:space-y-12'>
-        <div className='space-y-2'>
-          <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
-            {t('meta.siteName')}
-          </p>
-          <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>
-            {title}
-          </h1>
-        </div>
+    <div className='space-y-10 md:space-y-12'>
+      <div className='space-y-2'>
+        <p className='text-xs uppercase tracking-[0.3em] text-muted-foreground'>
+          {t('meta.siteName')}
+        </p>
+        <h1 className='text-3xl font-bold tracking-tight sm:text-4xl'>
+          {title}
+        </h1>
+      </div>
 
-        {statusMessage && (
-          <p className='text-sm text-muted-foreground'>{statusMessage}</p>
-        )}
+      {statusMessage && (
+        <p className='text-sm text-muted-foreground'>{statusMessage}</p>
+      )}
 
-        <div className='lg:grid lg:grid-cols-[260px_1fr] lg:gap-10'>
-          <aside className='hidden lg:block'>
-            <div className='sticky top-24'>
-              <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-lg backdrop-blur-md'>
-                <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
-                  {t('console.tocTitle')}
-                </p>
-                <nav
-                  aria-label={t('console.tocTitle')}
-                  className='mt-4 flex flex-col gap-2 text-sm text-white/80'
-                >
-                  {tocItems.map((item) => (
-                    <a
-                      key={item.key}
-                      href={`#${item.id}`}
-                      className='rounded-lg px-2 py-1 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40'
-                    >
-                      {item.title}
-                    </a>
-                  ))}
-                </nav>
-              </div>
-            </div>
-          </aside>
-
-          <div className='space-y-10 md:space-y-12'>
-            {sheetEntries.map((sheet) => (
-              <TkcRuleSheet
-                key={sheet.key}
-                id={sheet.id}
-                className='scroll-mt-24'
-                title={sheet.title}
+      <div className='lg:grid lg:grid-cols-[260px_1fr] lg:gap-10'>
+        <aside className='hidden lg:block'>
+          <div className='sticky top-24'>
+            <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-lg backdrop-blur-md'>
+              <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
+                {t('console.tocTitle')}
+              </p>
+              <nav
+                aria-label={t('console.tocTitle')}
+                className='mt-4 flex flex-col gap-2 text-sm text-white/80'
               >
-                {sheet.fields.map((field, index) => (
-                  <TkcField
-                    key={`${sheet.key}-${index}`}
-                    label={field.label}
-                    badges={field.badges}
+                {tocItems.map((item) => (
+                  <a
+                    key={item.key}
+                    href={`#${item.id}`}
+                    className='rounded-lg px-2 py-1 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40'
                   >
-                    <MarkdownBlock body={field.body} />
-                  </TkcField>
+                    {item.title}
+                  </a>
                 ))}
-              </TkcRuleSheet>
-            ))}
+              </nav>
+            </div>
           </div>
+        </aside>
+
+        <div className='space-y-10 md:space-y-12'>
+          {sheetEntries.map((sheet) => (
+            <TkcRuleSheet
+              key={sheet.key}
+              id={sheet.id}
+              className='scroll-mt-24'
+              title={sheet.title}
+            >
+              {sheet.fields.map((field, index) => (
+                <TkcField
+                  key={`${sheet.key}-${index}`}
+                  label={field.label}
+                  badges={field.badges}
+                >
+                  <MarkdownBlock body={field.body} />
+                </TkcField>
+              ))}
+            </TkcRuleSheet>
+          ))}
         </div>
       </div>
     </div>

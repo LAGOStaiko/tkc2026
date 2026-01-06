@@ -195,7 +195,7 @@ function ApplyPage() {
                         <RadioGroup
                           onValueChange={field.onChange}
                           defaultValue={field.value}
-                          className='grid gap-3 sm:grid-cols-2'
+                          className='grid gap-3 md:grid-cols-2'
                         >
                           <FormItem className='flex items-center gap-2 rounded-md border p-3'>
                             <FormControl>
@@ -220,7 +220,7 @@ function ApplyPage() {
                   )}
                 />
 
-                <div className='grid gap-4 sm:grid-cols-2'>
+                <div className='grid gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
                     name='name'
@@ -252,7 +252,7 @@ function ApplyPage() {
                   />
                 </div>
 
-                <div className='grid gap-4 sm:grid-cols-2'>
+                <div className='grid gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
                     name='phone'
@@ -292,7 +292,7 @@ function ApplyPage() {
                   />
                 </div>
 
-                <div className='grid gap-4 sm:grid-cols-2'>
+                <div className='grid gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
                     name='cardNo'
