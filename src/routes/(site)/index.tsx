@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Gamepad2, Joystick, Play } from 'lucide-react'
 import { GlassCard } from '@/components/tkc/glass-card'
 import { TkcSection } from '@/components/tkc/layout'
 import { Button } from '@/components/ui/button'
@@ -16,34 +15,6 @@ import { t } from '@/text'
 
 type SiteData = {
   eventName?: string
-}
-
-type PartnerLogoProps = {
-  src: string
-  fallback: string
-}
-
-function PartnerLogo({ src, fallback }: PartnerLogoProps) {
-  const [isHidden, setIsHidden] = React.useState(false)
-
-  if (isHidden) {
-    return (
-      <span className='text-xs font-semibold tracking-[0.2em] text-white/60'>
-        {fallback}
-      </span>
-    )
-  }
-
-  return (
-    <img
-      src={src}
-      alt={fallback}
-      className='h-8 w-auto object-contain'
-      loading='lazy'
-      decoding='async'
-      onError={() => setIsHidden(true)}
-    />
-  )
 }
 
 export const Route = createFileRoute('/(site)/')({
@@ -64,11 +35,7 @@ function HomePage() {
     { label: t('nav.results'), to: '/results' },
     { label: t('nav.contact'), to: '/contact' },
   ]
-  const partnerLogos = [
-    { src: '/partners/andamiro.png', fallback: 'ANDAMIRO' },
-    { src: '/partners/bandainamco.png', fallback: 'BANDAI NAMCO' },
-    { src: '/partners/taikolabs.png', fallback: 'TAIKOLABS' },
-  ]
+  const partnerPlaceholders = ['A', 'B', 'C', 'D']
 
   React.useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('nav.home')}`
@@ -196,153 +163,172 @@ function HomePage() {
       </div>
 
       <div className='hidden md:block'>
-        <div className='mx-auto max-w-[1100px] space-y-10 px-6 py-10 text-white xl:max-w-[1200px]'>
-          <section className='relative overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(110deg,#ff2a1a_0%,#ff2a1a_45%,#111_80%)]'>
-            <div className='absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_55%)]' />
-            <div className='absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/50' />
-            <div className='relative z-10 flex min-h-[360px] flex-col justify-between gap-16 px-10 py-8'>
-              <div className='flex items-center justify-between gap-6'>
-                <div className='flex items-center gap-3'>
-                  {!headerLogoFailed ? (
-                    <img
-                      src='/branding/tkc-header-logo.png'
-                      alt='TKC2026'
-                      className='h-10 w-auto object-contain'
-                      onError={() => setHeaderLogoFailed(true)}
-                    />
-                  ) : (
-                    <span className='text-sm font-semibold tracking-[0.2em] text-white'>
-                      TKC2026
-                    </span>
-                  )}
-                </div>
-                <nav className='flex flex-1 items-center justify-center gap-6 text-sm text-white/80'>
-                  {desktopNavItems.map((item) => (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      className='whitespace-nowrap transition hover:text-white'
+        <div className='bg-neutral-950 text-white'>
+          <div className='mx-auto max-w-6xl px-6 py-10'>
+            <section className='relative h-[260px] overflow-hidden rounded-2xl border border-white/10 shadow-lg lg:h-[320px]'>
+              <img
+                src='/branding/home-hero.jpg'
+                alt=''
+                className='absolute inset-0 h-full w-full object-cover object-left'
+                loading='eager'
+                decoding='async'
+                fetchPriority='high'
+              />
+              <div className='absolute inset-0 bg-black/35' />
+              <div className='absolute inset-0 bg-gradient-to-r from-black/10 via-black/10 to-black/60' />
+              <div className='relative z-10 flex h-full flex-col justify-between p-6'>
+                <div className='flex items-center justify-between gap-6 rounded-xl bg-black/40 px-4 py-3 backdrop-blur-sm'>
+                  <Link to='/' className='flex items-center gap-3'>
+                    {!headerLogoFailed ? (
+                      <img
+                        src='/branding/tkc-logo.png'
+                        alt='TKC2026'
+                        className='h-8 w-auto object-contain'
+                        onError={() => setHeaderLogoFailed(true)}
+                      />
+                    ) : (
+                      <span className='text-sm font-semibold tracking-[0.2em] text-white'>
+                        TKC2026
+                      </span>
+                    )}
+                    <span className='sr-only'>{eventName}</span>
+                  </Link>
+                  <div className='flex items-center gap-4'>
+                    <nav className='flex items-center gap-4 text-sm text-white/80'>
+                      {desktopNavItems.map((item) => (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          className='whitespace-nowrap transition hover:text-white'
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </nav>
+                    <Button
+                      asChild
+                      size='lg'
+                      className='h-9 rounded-full bg-white px-5 text-black hover:bg-white/90'
                     >
-                      {item.label}
-                    </Link>
-                  ))}
-                </nav>
-                <Button
-                  asChild
-                  size='lg'
-                  className='h-10 rounded-full bg-white/95 px-6 text-black hover:bg-white'
-                >
-                  <Link to='/apply'>{t('nav.apply')}</Link>
-                </Button>
-              </div>
-              <div className='max-w-[520px] text-left'>
-                <h1 className='sr-only'>{eventName}</h1>
-                <p className='tkc-serif break-keep text-3xl text-white lg:text-4xl'>
-                  {heroTagline}
-                </p>
-                <p className='mt-3 text-sm text-white/70'>
-                  2026 \uD0DC\uACE0\uC758 \uB2EC\uC778 \uD50C\uB808\uC774 \uC5D1\uC2A4\uD3EC \uD1A0\uB108\uBA3C\uD2B8
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section className='grid grid-cols-2 gap-6'>
-            <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-6'>
-              <div className='flex items-start gap-4'>
-                <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-red-600'>
-                  <Gamepad2 className='h-6 w-6 text-white' />
+                      <Link to='/apply'>{t('nav.apply')}</Link>
+                    </Button>
+                  </div>
                 </div>
-                <div className='space-y-1'>
-                  <p className='text-lg font-semibold'>
-                    {t('home.consoleCardTitle')}
+                <div className='max-w-md'>
+                  <p className='tkc-serif text-2xl text-white lg:text-3xl'>
+                    {heroTagline}
                   </p>
+                </div>
+              </div>
+            </section>
+
+            <section className='mt-6 grid md:grid-cols-2 gap-4'>
+              <div className='rounded-xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10'>
+                <div className='flex items-start gap-4'>
+                  <div className='h-14 w-14 overflow-hidden rounded-md'>
+                    <img
+                      src='/branding/icon-console.png'
+                      alt=''
+                      className='h-full w-full object-cover'
+                    />
+                  </div>
+                  <div className='space-y-2'>
+                    <p className='text-lg font-semibold'>
+                      {t('home.consoleCardTitle')}
+                    </p>
+                    <p className='text-sm text-white/70'>
+                      {t('home.consoleCardSubtitle')}
+                    </p>
+                  </div>
+                </div>
+                <div className='mt-6 flex items-center gap-3'>
+                  <Button
+                    variant='outline'
+                    asChild
+                    className='border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
+                  >
+                    <Link to='/console'>{t('home.details')}</Link>
+                  </Button>
+                  <Button
+                    variant='outline'
+                    asChild
+                    className='border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
+                  >
+                    <Link to='/apply'>{t('home.ctaApply')}</Link>
+                  </Button>
+                </div>
+              </div>
+
+              <div className='rounded-xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10'>
+                <div className='flex items-start gap-4'>
+                  <div className='h-14 w-14 overflow-hidden rounded-md'>
+                    <img
+                      src='/branding/icon-arcade.png'
+                      alt=''
+                      className='h-full w-full object-cover'
+                    />
+                  </div>
+                  <div className='space-y-2'>
+                    <p className='text-lg font-semibold'>
+                      {t('home.arcadeCardTitle')}
+                    </p>
+                    <p className='text-sm text-white/70'>
+                      {t('home.arcadeCardSubtitle')}
+                    </p>
+                  </div>
+                </div>
+                <div className='mt-6 flex items-center gap-3'>
+                  <Button
+                    variant='outline'
+                    asChild
+                    className='border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
+                  >
+                    <Link to='/arcade'>{t('home.details')}</Link>
+                  </Button>
+                  <Button
+                    variant='outline'
+                    asChild
+                    className='border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
+                  >
+                    <Link to='/apply'>{t('home.ctaApply')}</Link>
+                  </Button>
+                </div>
+              </div>
+            </section>
+
+            <section className='mt-6 rounded-xl border border-white/10 bg-white/5 p-6 text-center'>
+              <p className='text-lg font-semibold'>
+                \uD50C\uB808\uC774 \uC5D1\uC2A4\uD3EC \uACB0\uC120 \uC548\uB0B4
+              </p>
+              <p className='mt-1 text-sm text-white/70'>
+                \uCD94\uD6C4 \uACF5\uC9C0\uB429\uB2C8\uB2E4.
+              </p>
+            </section>
+
+            <section className='mt-6'>
+              <div className='mx-auto max-w-4xl rounded-xl border border-white/10 bg-black/30 p-4'>
+                <div className='aspect-video rounded-lg bg-white/5 flex items-center justify-center'>
                   <p className='text-sm text-white/60'>
-                    {t('home.consoleCardSubtitle')}
+                    \uACB0\uC120 \uC624\uD504\uB2DD \uC601\uC0C1(\uCD94\uD6C4 \uACF5\uAC1C)
                   </p>
                 </div>
               </div>
-              <div className='mt-6 flex items-center gap-3'>
-                <Button
-                  variant='outline'
-                  asChild
-                  className='rounded-full border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
-                >
-                  <Link to='/console'>{t('home.details')}</Link>
-                </Button>
-                <Button
-                  variant='outline'
-                  asChild
-                  className='rounded-full border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
-                >
-                  <Link to='/apply'>{t('home.ctaApply')}</Link>
-                </Button>
-              </div>
-            </div>
+            </section>
 
-            <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-6'>
-              <div className='flex items-start gap-4'>
-                <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-red-600'>
-                  <Joystick className='h-6 w-6 text-white' />
-                </div>
-                <div className='space-y-1'>
-                  <p className='text-lg font-semibold'>
-                    {t('home.arcadeCardTitle')}
-                  </p>
-                  <p className='text-sm text-white/60'>
-                    {t('home.arcadeCardSubtitle')}
-                  </p>
-                </div>
+            <footer className='mt-6 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-6 py-4'>
+              <div className='flex items-center gap-4'>
+                {partnerPlaceholders.map((placeholder) => (
+                  <div
+                    key={placeholder}
+                    className='h-10 w-24 rounded-lg bg-white/10'
+                  />
+                ))}
               </div>
-              <div className='mt-6 flex items-center gap-3'>
-                <Button
-                  variant='outline'
-                  asChild
-                  className='rounded-full border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
-                >
-                  <Link to='/arcade'>{t('home.details')}</Link>
-                </Button>
-                <Button
-                  variant='outline'
-                  asChild
-                  className='rounded-full border-white/20 text-white/80 hover:bg-white/10 hover:text-white'
-                >
-                  <Link to='/apply'>{t('home.ctaApply')}</Link>
-                </Button>
-              </div>
-            </div>
-          </section>
-
-          <section className='rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-5 text-center'>
-            <p className='text-lg font-semibold'>
-              \uD50C\uB808\uC774 \uC5D1\uC2A4\uD3EC \uACB0\uC120 \uC548\uB0B4
-            </p>
-            <p className='mt-1 text-sm text-white/70'>
-              \uCD94\uD6C4 \uACF5\uC9C0\uB429\uB2C8\uB2E4.
-            </p>
-          </section>
-
-          <section className='aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black/40'>
-            <div className='flex h-full w-full flex-col items-center justify-center gap-3 text-white/60'>
-              <div className='flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/5'>
-                <Play className='h-5 w-5' />
-              </div>
-              <p className='text-sm'>\uC624\uD504\uB2DD \uC601\uC0C1(\uCD94\uD6C4 \uACF5\uAC1C)</p>
-            </div>
-          </section>
-
-          <footer className='flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4'>
-            <div className='flex items-center gap-6'>
-              {partnerLogos.map((logo) => (
-                <PartnerLogo
-                  key={logo.src}
-                  src={logo.src}
-                  fallback={logo.fallback}
-                />
-              ))}
-            </div>
-            <span className='text-xs text-white/50'>{t('footer.partners')}</span>
-          </footer>
+              <span className='text-xs text-white/60'>
+                2026 \uD0DC\uACE0\uC758 \uB2EC\uC778 \uD50C\uB808\uC774 \uC5D1\uC2A4\uD3EC \uD1A0\uB108\uBA3C\uD2B8
+              </span>
+            </footer>
+          </div>
         </div>
       </div>
     </TkcSection>
