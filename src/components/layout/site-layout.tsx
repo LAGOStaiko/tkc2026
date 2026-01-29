@@ -51,18 +51,26 @@ function checkIsActive(href: string, item: NavItem, mainNav = false) {
 
 export function SiteLayout() {
   const { data } = useSite<SiteData>()
-  const href = useLocation({ select: (location) => location.href })
+  const { href, pathname } = useLocation({
+    select: (location) => ({ href: location.href, pathname: location.pathname }),
+  })
   const siteName = data?.name ?? data?.title ?? t('meta.siteName')
   const headerLogoUrl = '/branding/logo-tkc2026-playx4-128.webp'
   const headerLogoFallback = '/branding/logo-tkc2026-playx4.webp'
   const headerLogoSrcSet = data?.logoUrl
     ? `${headerLogoUrl} 1x, ${data.logoUrl} 2x`
     : `${headerLogoUrl} 1x, ${headerLogoFallback} 2x`
+  const isHome = pathname === '/'
+  const headerClassName =
+    `fixed inset-x-0 top-0 z-50 border-b bg-black/90 backdrop-blur ${isHome ? 'md:hidden' : ''}`.trim()
+  const mainClassName =
+    `flex w-full flex-1 bg-black pt-16 pb-16 md:pb-20 ${isHome ? 'md:pt-0' : ''}`.trim()
+  const containerClassName = isHome ? 'md:max-w-none md:px-0' : undefined
 
   return (
     <div className='dark min-h-svh bg-black text-foreground'>
       <header
-        className='fixed inset-x-0 top-0 z-50 border-b bg-black/90 backdrop-blur'
+        className={headerClassName}
         style={{
           paddingLeft: 'max(1rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))',
@@ -151,8 +159,8 @@ export function SiteLayout() {
         </TkcContainer>
       </header>
 
-      <main className='flex w-full flex-1 bg-black pt-16 pb-16 md:pb-20'>
-        <TkcContainer className='w-full'>
+      <main className={mainClassName}>
+        <TkcContainer className={`w-full ${containerClassName ?? ''}`.trim()}>
           <Outlet />
         </TkcContainer>
       </main>
