@@ -51,26 +51,18 @@ function checkIsActive(href: string, item: NavItem, mainNav = false) {
 
 export function SiteLayout() {
   const { data } = useSite<SiteData>()
-  const { href, pathname } = useLocation({
-    select: (location) => ({ href: location.href, pathname: location.pathname }),
-  })
+  const href = useLocation({ select: (location) => location.href })
   const siteName = data?.name ?? data?.title ?? t('meta.siteName')
-  const headerLogoUrl = '/branding/logo-tkc2026-playx4-128.webp'
-  const headerLogoFallback = '/branding/logo-tkc2026-playx4.webp'
+  const headerLogoUrl = '/branding/v2/logo.png'
+  const headerLogoFallback = '/branding/v2/logo.png'
   const headerLogoSrcSet = data?.logoUrl
     ? `${headerLogoUrl} 1x, ${data.logoUrl} 2x`
     : `${headerLogoUrl} 1x, ${headerLogoFallback} 2x`
-  const isHome = pathname === '/'
-  const headerClassName =
-    `fixed inset-x-0 top-0 z-50 border-b bg-black/90 backdrop-blur ${isHome ? 'md:hidden' : ''}`.trim()
-  const mainClassName =
-    `flex w-full flex-1 bg-black pt-16 pb-16 md:pb-20 ${isHome ? 'md:pt-0' : ''}`.trim()
-  const containerClassName = isHome ? 'md:max-w-none md:px-0' : undefined
 
   return (
     <div className='dark min-h-svh bg-black text-foreground'>
       <header
-        className={headerClassName}
+        className='fixed inset-x-0 top-0 z-50 border-b bg-black/90 backdrop-blur'
         style={{
           paddingLeft: 'max(1rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))',
@@ -82,7 +74,7 @@ export function SiteLayout() {
               src={headerLogoUrl}
               srcSet={headerLogoSrcSet}
               alt='TKC2026'
-              className='h-10 w-10 shrink-0 object-contain md:h-12 md:w-12'
+              className='h-6 w-auto shrink-0 object-contain sm:h-7 md:h-8'
               onError={(event) => {
                 event.currentTarget.onerror = null
                 event.currentTarget.src = headerLogoFallback
@@ -159,8 +151,8 @@ export function SiteLayout() {
         </TkcContainer>
       </header>
 
-      <main className={mainClassName}>
-        <TkcContainer className={`w-full ${containerClassName ?? ''}`.trim()}>
+      <main className='flex w-full flex-1 bg-black pt-16 pb-16 md:pb-20'>
+        <TkcContainer className='w-full'>
           <Outlet />
         </TkcContainer>
       </main>
