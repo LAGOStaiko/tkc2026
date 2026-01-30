@@ -435,10 +435,14 @@ function ResultsPage() {
   const { data, isLoading, isError } = useResults<ResultsData>()
   const consoleStages = getStages(data?.console)
   const arcadeStages = getStages(data?.arcade)
-  const stageMetaList = Array.isArray(data?.results_stage)
-    ? data?.results_stage
-    : []
-  const stageRows = Array.isArray(data?.results_rows) ? data?.results_rows : []
+  const stageMetaList = useMemo(
+    () => (Array.isArray(data?.results_stage) ? data.results_stage : []),
+    [data]
+  )
+  const stageRows = useMemo(
+    () => (Array.isArray(data?.results_rows) ? data.results_rows : []),
+    [data]
+  )
 
   const [consoleTab, setConsoleTab] = useState(CONSOLE_TAB_PRE1)
   const [searchTerm, setSearchTerm] = useState('')

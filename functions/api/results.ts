@@ -1,5 +1,5 @@
 import { ok, serverError } from "../_lib/response";
-import { callGasJson, Env } from "../_lib/gas";
+import { callGasJson, type _Env } from "../_lib/gas";
 
 export const onRequestGet = async ({ env }) => {
   try {

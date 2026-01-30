@@ -16,7 +16,7 @@ export function TkcContainer({
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('mx-auto max-w-6xl px-4 md:px-8', className)}
+      className={cn('mx-auto max-w-6xl px-4 md:px-6', className)}
       {...props}
     />
   )

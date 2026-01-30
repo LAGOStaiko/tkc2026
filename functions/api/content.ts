@@ -1,5 +1,5 @@
 import { badRequest, ok, serverError } from "../_lib/response";
-import { callGasJson, Env } from "../_lib/gas";
+import { callGasJson, type _Env } from "../_lib/gas";
 
 const ALLOWED_PAGES = new Set(["home", "console", "arcade", "contact"]);
 

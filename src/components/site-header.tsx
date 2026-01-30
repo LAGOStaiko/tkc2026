@@ -51,13 +51,13 @@ export function SiteHeader() {
 
   return (
     <header
-      className='fixed inset-x-0 top-0 z-50 bg-transparent text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]'
+      className='absolute inset-x-0 top-0 z-20 bg-transparent text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]'
       style={{
         paddingLeft: 'max(1rem, env(safe-area-inset-left))',
         paddingRight: 'max(1rem, env(safe-area-inset-right))',
       }}
     >
-      <TkcContainer className='flex items-center justify-between py-3 md:py-4 px-6 md:px-8'>
+      <TkcContainer className='flex items-center justify-between py-3 md:py-4'>
         <Link to='/' className='flex items-center gap-3'>
           <img
             src={LOGO_SRC}

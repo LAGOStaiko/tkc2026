@@ -17,6 +17,7 @@ export function GlobalLoadingOverlay() {
 
   const hideTimerRef = useRef<number | null>(null)
   const exitTimerRef = useRef<number | null>(null)
+  const showFrameRef = useRef<number | null>(null)
   const startAtRef = useRef(0)
 
   const clearTimer = (ref: { current: number | null }) => {
@@ -26,10 +27,18 @@ export function GlobalLoadingOverlay() {
     }
   }
 
+  const clearFrame = (ref: { current: number | null }) => {
+    if (ref.current !== null) {
+      window.cancelAnimationFrame(ref.current)
+      ref.current = null
+    }
+  }
+
   useLayoutEffect(() => {
     return () => {
       clearTimer(hideTimerRef)
       clearTimer(exitTimerRef)
+      clearFrame(showFrameRef)
     }
   }, [])
 
@@ -37,13 +46,19 @@ export function GlobalLoadingOverlay() {
     if (shouldShow) {
       clearTimer(hideTimerRef)
       clearTimer(exitTimerRef)
+      clearFrame(showFrameRef)
 
       if (overlayState !== 'visible') {
         startAtRef.current = Date.now()
-        setOverlayState('visible')
+        showFrameRef.current = window.requestAnimationFrame(() => {
+          showFrameRef.current = null
+          setOverlayState('visible')
+        })
       }
       return
     }
+
+    clearFrame(showFrameRef)
 
     if (overlayState !== 'visible') return
 

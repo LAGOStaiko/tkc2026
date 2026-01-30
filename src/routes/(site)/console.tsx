@@ -67,6 +67,15 @@ const SECTION_IDS: Record<ConsoleSection['sectionKey'], string> = {
   faq: 'console-faq',
 }
 
+const SHEET_TITLES: Record<ConsoleSection['sectionKey'], string> = {
+  atAGlance: t('console.sheet.overview'),
+  eligibility: t('console.sheet.eligibility'),
+  stage1: t('console.sheet.stage1'),
+  stage2: t('console.sheet.stage2'),
+  finals: t('console.sheet.finals'),
+  faq: t('console.sheet.faq'),
+}
+
 const fallbackMap = new Map(
   FALLBACK_CONSOLE_SECTIONS.map((section) => [section.sectionKey, section])
 )
@@ -302,18 +311,9 @@ function ConsolePage() {
     return new Map(sections.map((section) => [section.sectionKey, section]))
   }, [sections])
 
-  const sheetTitles: Record<ConsoleSection['sectionKey'], string> = {
-    atAGlance: t('console.sheet.overview'),
-    eligibility: t('console.sheet.eligibility'),
-    stage1: t('console.sheet.stage1'),
-    stage2: t('console.sheet.stage2'),
-    finals: t('console.sheet.finals'),
-    faq: t('console.sheet.faq'),
-  }
-
   const tocItems = SHEET_ORDER.map((key) => ({
     key,
-    title: sheetTitles[key],
+    title: SHEET_TITLES[key],
     id: SECTION_IDS[key],
   }))
 
@@ -326,12 +326,12 @@ function ConsolePage() {
         {
           key,
           id: SECTION_IDS[key],
-          title: sheetTitles[key],
+          title: SHEET_TITLES[key],
           fields,
         },
       ]
     })
-  }, [sectionMap, sheetTitles])
+  }, [sectionMap])
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${title}`

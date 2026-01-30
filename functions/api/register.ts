@@ -1,60 +1,71 @@
+import { z } from "zod";
 import { badRequest, ok, serverError } from "../_lib/response";
-import { callGasJson, Env } from "../_lib/gas";
+import { callGasJson, type _Env } from "../_lib/gas";
 
-type Division = "console" | "arcade";
+const trimString = (value: unknown) => {
+  if (typeof value === "string") return value.trim();
+  if (value === null || value === undefined) return "";
+  return String(value).trim();
+};
 
-function isEmail(s: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
-}
-
-function asBool(v: any): boolean {
-  if (typeof v === "boolean") return v;
-  if (typeof v === "string") return ["true", "1", "yes", "y", "TRUE"].includes(v.trim());
-  if (typeof v === "number") return v !== 0;
+const parseBoolean = (value: unknown) => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    return ["true", "1", "yes", "y"].includes(value.trim().toLowerCase());
+  }
+  if (typeof value === "number") return value !== 0;
   return false;
-}
+};
+
+const registerSchema = z
+  .object({
+    division: z.preprocess(
+      (value) => (typeof value === "string" ? value.trim() : value),
+      z.enum(["console", "arcade"])
+    ),
+    name: z.preprocess(trimString, z.string().min(1, "name is required")),
+    phone: z.preprocess(trimString, z.string().min(1, "phone is required")),
+    email: z.preprocess(trimString, z.string().email("valid email is required")),
+    nickname: z.preprocess(trimString, z.string().min(1, "nickname is required")),
+    cardNo: z.preprocess(trimString, z.string().min(1, "cardNo is required")),
+    dohirobaNo: z.preprocess(trimString, z.string().optional()),
+    spectator: z.preprocess(parseBoolean, z.boolean()),
+    isMinor: z.preprocess(parseBoolean, z.boolean()),
+    consentLink: z.preprocess(trimString, z.string().optional()),
+    privacyAgree: z
+      .preprocess(parseBoolean, z.boolean())
+      .refine((value) => value === true, {
+        message: "privacyAgree must be true",
+      }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isMinor && !data.consentLink?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["consentLink"],
+        message: "consentLink is required when isMinor=true",
+      });
+    }
+  });
+
+type RegisterPayload = z.infer<typeof registerSchema>;
 
 export const onRequestPost = async ({ env, request }) => {
   try {
-    const body = await request.json().catch(() => null) as any;
-    if (!body || typeof body !== "object") return badRequest("Invalid JSON body");
+    const body = (await request.json().catch(() => null)) as unknown;
+    if (!body) return badRequest("Invalid JSON body");
 
-    const division = String(body.division || "").trim() as Division;
-    const name = String(body.name || "").trim();
-    const phone = String(body.phone || "").trim();
-    const email = String(body.email || "").trim();
-    const nickname = String(body.nickname || "").trim();
-    const cardNo = String(body.cardNo || "").trim();
-    const dohirobaNo = String(body.dohirobaNo || "").trim();
-    const spectator = asBool(body.spectator);
-    const isMinor = asBool(body.isMinor);
-    const consentLink = String(body.consentLink || "").trim();
-    const privacyAgree = asBool(body.privacyAgree);
-
-    if (division !== "console" && division !== "arcade") return badRequest("division must be console or arcade");
-    if (!name) return badRequest("name is required");
-    if (!phone) return badRequest("phone is required");
-    if (!email || !isEmail(email)) return badRequest("valid email is required");
-    if (!nickname) return badRequest("nickname is required");
-    if (!cardNo) return badRequest("cardNo is required");
-    if (!privacyAgree) return badRequest("privacyAgree must be true");
-
-    if (isMinor && !consentLink) {
-      return badRequest("consentLink is required when isMinor=true");
+    const parsed = registerSchema.safeParse(body);
+    if (!parsed.success) {
+      const message =
+        parsed.error.issues[0]?.message ?? "Invalid request payload";
+      return badRequest(message);
     }
 
-    const payload = {
-      division,
-      name,
-      phone,
-      email,
-      nickname,
-      cardNo,
-      dohirobaNo,
-      spectator,
-      isMinor,
-      consentLink,
-      privacyAgree,
+    const payload: RegisterPayload = {
+      ...parsed.data,
+      dohirobaNo: parsed.data.dohirobaNo ?? "",
+      consentLink: parsed.data.consentLink ?? "",
     };
 
     const gas = await callGasJson(env, "register", {}, payload);

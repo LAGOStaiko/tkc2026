@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { z } from 'zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
 import { GlassCard } from '@/components/tkc/glass-card'
@@ -123,7 +123,7 @@ function ApplyPage() {
     defaultValues,
   })
 
-  const isMinor = form.watch('isMinor')
+  const isMinor = useWatch({ control: form.control, name: 'isMinor' }) ?? false
   const isSubmitting = registerMutation.isPending
   const isCompleted = receiptId !== null
   const isDisabled = isSubmitting || isCompleted

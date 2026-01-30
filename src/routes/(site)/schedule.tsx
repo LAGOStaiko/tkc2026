@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 import {
   ScheduleLane,
-  type ScheduleItem as ScheduleLaneItem,
+  type ScheduleItem as LaneItem,
 } from '@/components/schedule/schedule-lane'
 import { useSchedule } from '@/lib/api'
 import { t } from '@/text'
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/(site)/schedule')({
 
 type ApiScheduleItem = {
   id?: string | number
-  order?: number
+  order?: number | string
   division?: string
   title?: string
   startDate?: string
@@ -52,10 +52,50 @@ const getScheduleItems = (
 const normalizeDivision = (item: ApiScheduleItem) =>
   (item.division ?? '').toLowerCase().trim()
 
+const getOrderValue = (item: ApiScheduleItem) => {
+  if (typeof item.order === 'number') return item.order
+  if (typeof item.order === 'string') {
+    const parsed = Number(item.order)
+    if (!Number.isNaN(parsed)) return parsed
+  }
+  return Number.POSITIVE_INFINITY
+}
+
 const sortByOrder = (items: ApiScheduleItem[]) =>
   items
-    .slice()
-    .sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER))
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => {
+      const orderDiff = getOrderValue(a.item) - getOrderValue(b.item)
+      return orderDiff !== 0 ? orderDiff : a.index - b.index
+    })
+    .map(({ item }) => item)
+
+const splitArcadeTitle = (title: string) => {
+  const patterns = [
+    /(1\s*차)\s*\/\s*(2\s*차)/,
+    /(3\s*차)\s*\/\s*(4\s*차)/,
+  ]
+
+  for (const pattern of patterns) {
+    const match = title.match(pattern)
+    if (!match) continue
+    const [full, first, second] = match
+    return [title.replace(full, first), title.replace(full, second)]
+  }
+
+  return null
+}
+
+const expandArcadeItems = (items: ApiScheduleItem[]) =>
+  items.flatMap((item) => {
+    if (normalizeDivision(item) !== 'arcade') return [item]
+    if (!item.title) return [item]
+
+    const splitTitles = splitArcadeTitle(item.title)
+    if (!splitTitles) return [item]
+
+    return splitTitles.map((title) => ({ ...item, title }))
+  })
 
 const formatMmDd = (value?: string) => {
   if (!value) return null
@@ -94,18 +134,29 @@ const resolveDateParts = (item: ApiScheduleItem) => {
   return { main: '추후', sub: '공지' }
 }
 
+const normalizeStatus = (status?: string) => status?.toLowerCase().trim() ?? ''
+
+const isLive = (item: ApiScheduleItem) => {
+  const status = normalizeStatus(item.status)
+  return status.includes('live') || status.includes('진행')
+}
+
+const isOpen = (item: ApiScheduleItem) => {
+  const status = normalizeStatus(item.status)
+  return status.includes('open') || status.includes('접수')
+}
+
 const getStatusLabel = (status?: string) => {
-  if (!status) return undefined
-  const normalized = status.toLowerCase()
-  if (normalized.includes('upcoming') || normalized.includes('예정')) {
-    return t('schedule.status.upcoming')
-  }
+  const normalized = normalizeStatus(status)
+  if (!normalized) return undefined
+  if (normalized.includes('live') || normalized.includes('진행')) return '진행중'
+  if (normalized.includes('open') || normalized.includes('접수')) return '접수중'
   if (
-    normalized.includes('live') ||
-    normalized.includes('open') ||
-    normalized.includes('진행')
+    normalized.includes('ready') ||
+    normalized.includes('upcoming') ||
+    normalized.includes('예정')
   ) {
-    return t('schedule.status.live')
+    return '예정'
   }
   if (
     normalized.includes('done') ||
@@ -113,32 +164,23 @@ const getStatusLabel = (status?: string) => {
     normalized.includes('종료') ||
     normalized.includes('완료')
   ) {
-    return t('schedule.status.done')
+    return '종료'
   }
   return status
 }
 
-const isUpcomingItem = (item: ApiScheduleItem) => {
-  const status = item.status ?? ''
-  const normalized = status.toLowerCase()
-  return (
-    normalized.includes('upcoming') ||
-    normalized.includes('예정') ||
-    normalized.includes('ready')
-  )
-}
-
 const pickFeatured = (items: ApiScheduleItem[]) => {
-  const upcoming = items.find(
-    (item) => Boolean(item.dateText) && isUpcomingItem(item)
-  )
-  return upcoming ?? items[0]
+  const live = items.find((item) => isLive(item))
+  if (live) return live
+  const open = items.find((item) => isOpen(item))
+  if (open) return open
+  return items[0]
 }
 
 const toLaneItems = (
   items: ApiScheduleItem[],
   featuredItem: ApiScheduleItem | undefined
-): ScheduleLaneItem[] =>
+): LaneItem[] =>
   items.map((item, index) => {
     const dateParts = resolveDateParts(item)
     const title = item.title ?? `${t('schedule.itemFallback')} ${index + 1}`
@@ -154,30 +196,43 @@ const toLaneItems = (
     }
   })
 
-const renderFinalDate = (item: ApiScheduleItem) => {
-  if (item.dateText) return item.dateText
-  const startSource = item.startDate ?? item.start
-  const endSource = item.endDate ?? item.end
-  if (startSource && endSource && startSource !== endSource) {
-    return `${startSource} ~ ${endSource}`
-  }
-  return startSource ?? endSource ?? ''
+const renderFinalMeta = (item: ApiScheduleItem | undefined) => {
+  if (!item) return '추후 공지됩니다.'
+
+  const dateText = item.dateText
+    ? item.dateText
+    : (() => {
+        const startSource = item.startDate ?? item.start
+        const endSource = item.endDate ?? item.end
+        if (startSource && endSource && startSource !== endSource) {
+          return `${startSource} ~ ${endSource}`
+        }
+        return startSource ?? endSource ?? ''
+      })()
+
+  const pieces = [dateText, item.location, item.note].filter(Boolean)
+  return pieces.length > 0 ? pieces.join(' · ') : '추후 공지됩니다.'
 }
 
 function SchedulePage() {
   const { data, isLoading, isError } = useSchedule<
     ScheduleData | ApiScheduleItem[]
   >()
-  const items = getScheduleItems(data)
+  const rawItems = getScheduleItems(data)
+  const expandedItems = expandArcadeItems(rawItems)
 
   const consoleItems = sortByOrder(
-    items.filter((item) => normalizeDivision(item) === 'console')
+    expandedItems.filter((item) => normalizeDivision(item) === 'console')
   )
   const arcadeItems = sortByOrder(
-    items.filter((item) => normalizeDivision(item) === 'arcade')
+    expandedItems.filter((item) => normalizeDivision(item) === 'arcade')
   )
   const allItems = sortByOrder(
-    items.filter((item) => normalizeDivision(item) === 'all')
+    expandedItems.filter((item) => {
+      const division = normalizeDivision(item)
+      const id = String(item.id ?? '').toLowerCase()
+      return division === 'all' || division === 'final' || id === 'final'
+    })
   )
 
   const featuredConsole = pickFeatured(consoleItems)
@@ -188,8 +243,7 @@ function SchedulePage() {
 
   const finalItem = allItems[0]
   const finalTitle = finalItem?.title ?? '플레이엑스포 결선 토너먼트'
-  const finalDate = finalItem ? renderFinalDate(finalItem) : ''
-  const finalMeta = [finalDate, finalItem?.location].filter(Boolean).join(' · ')
+  const finalMeta = renderFinalMeta(finalItem)
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('schedule.title')}`
@@ -206,7 +260,7 @@ function SchedulePage() {
         <p className='text-sm text-destructive'>{t('schedule.failed')}</p>
       )}
 
-      {isLoading && items.length === 0 ? (
+      {isLoading && expandedItems.length === 0 ? (
         <p className='text-sm text-white/60'>{t('schedule.loading')}</p>
       ) : null}
 
@@ -227,9 +281,7 @@ function SchedulePage() {
 
       <section className='rounded-3xl bg-white/5 p-6 text-center ring-1 ring-white/10'>
         <div className='text-lg font-semibold text-white'>{finalTitle}</div>
-        <p className='mt-2 text-sm text-white/70'>
-          {finalMeta || '추후 공지됩니다.'}
-        </p>
+        <p className='mt-2 text-sm text-white/70'>{finalMeta}</p>
       </section>
     </TkcSection>
   )
