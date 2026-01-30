@@ -51,7 +51,7 @@ export function SiteHeader() {
 
   return (
     <header
-      className='absolute inset-x-0 top-0 z-20 bg-transparent text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]'
+      className='fixed inset-x-0 top-0 z-50 bg-transparent text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]'
       style={{
         paddingLeft: 'max(1rem, env(safe-area-inset-left))',
         paddingRight: 'max(1rem, env(safe-area-inset-right))',
