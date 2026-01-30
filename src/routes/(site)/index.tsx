@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { useSite } from '@/lib/api'
+import { PublicHeader } from '@/components/layout/site-layout'
 import { TkcContainer } from '@/components/tkc/layout'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -44,7 +45,8 @@ function HomePage() {
   return (
     <TkcContainer className="space-y-6 md:space-y-8">
       {/* HERO */}
-      <section className="overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-[0_10px_40px_rgba(0,0,0,0.45)]">
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-[0_10px_40px_rgba(0,0,0,0.45)]">
+        <PublicHeader variant="hero" />
         <div className="relative h-[220px] sm:h-[260px] md:h-[340px] lg:h-[380px]">
           <img
             src={ASSETS.hero}
