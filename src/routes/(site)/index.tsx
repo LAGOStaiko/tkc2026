@@ -15,6 +15,8 @@ const ASSETS = {
   consoleIcon: '/branding/v2/icon-console.png',
   arcadeIcon: '/branding/v2/icon-arcade.png',
 }
+const HOME_YOUTUBE_ID = '6UkPLBMEruQ'
+const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
 
 type SiteData = {
   partners?: Partner[]
@@ -58,13 +60,13 @@ function HomePage() {
         <ModeCard
           iconSrc={ASSETS.consoleIcon}
           title="콘솔"
-          description="【동더! 월드 페스티벌】로 진행하는 대회입니다."
+          description="?�동?? ?�드 ?�스?�벌?�로 진행?�는 ?�?�입?�다."
           detailTo="/console"
         />
         <ModeCard
           iconSrc={ASSETS.arcadeIcon}
-          title="아케이드"
-          description="【태고의 달인 니지이로 ver.】로 진행하는 대회입니다."
+          title="?��??�드"
+          description="?�태고의 ?�인 ?��??�로 ver.?�로 진행?�는 ?�?�입?�다."
           detailTo="/arcade"
         />
       </section>
@@ -72,16 +74,24 @@ function HomePage() {
       {/* PLAYX4 FINAL INFO */}
       <section className="rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-center shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:px-8 md:py-8">
         <div className="text-lg font-semibold text-white/90 md:text-xl">
-          플레이 엑스포 결선 안내
+          ?�레???�스??결선 ?�내
         </div>
-        <div className="mt-1 text-sm text-white/60">추후 공개됩니다.</div>
+        <div className="mt-1 text-sm text-white/60">추후 공개?�니??</div>
       </section>
 
-      {/* VIDEO PLACEHOLDER */}
-      <section className="rounded-2xl border border-white/10 bg-white/5 p-3 shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-4">
-        <div className="aspect-video w-full overflow-hidden rounded-xl bg-black/40">
-          <div className="flex h-full w-full items-center justify-center px-4 text-center text-sm leading-relaxed text-white/60">
-            영상은 추후 공개됩니다.
+      {/* VIDEO */}
+      <section className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-5">
+        <div className="mx-auto w-full max-w-[960px]">
+          <div className="aspect-video overflow-hidden rounded-xl border border-white/10 bg-black">
+            <iframe
+              className="h-full w-full"
+              src={HOME_YOUTUBE_EMBED}
+              title="TKC2026 Opening Movie"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
           </div>
         </div>
       </section>
@@ -135,7 +145,7 @@ function HomePage() {
           </div>
 
           <div className="text-xs text-white/50">
-            © {new Date().getFullYear()} 태고의 달인 플레이 엑스포 토너먼트
+            © {new Date().getFullYear()} ?�고???�인 ?�레???�스???�너먼트
           </div>
         </div>
       </section>
@@ -157,7 +167,7 @@ function ModeCard({
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-6">
       <div className="flex items-start gap-4">
-        {/* icon block (시안의 빨간 네모) */}
+        {/* icon block (?�안??빨간 ?�모) */}
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#ff2a00]">
           <img
             src={iconSrc}
@@ -178,7 +188,7 @@ function ModeCard({
         </div>
       </div>
 
-      {/* buttons: 모바일 full-width 스택, sm 이상 row */}
+      {/* buttons: 모바??full-width ?�택, sm ?�상 row */}
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         <Button
           asChild
@@ -188,7 +198,7 @@ function ModeCard({
             'hover:bg-white/10 hover:text-white sm:w-auto'
           )}
         >
-          <Link to={detailTo}>자세히 보기</Link>
+          <Link to={detailTo}>?�세??보기</Link>
         </Button>
 
         <Button
@@ -199,9 +209,10 @@ function ModeCard({
             'hover:bg-white/10 hover:text-white sm:w-auto'
           )}
         >
-          <Link to="/apply">대회 신청하기</Link>
+          <Link to="/apply">?�???�청?�기</Link>
         </Button>
       </div>
     </div>
   )
 }
+
