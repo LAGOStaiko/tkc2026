@@ -1,7 +1,10 @@
 ﻿import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
-import { cn } from '@/lib/utils'
+import {
+  ScheduleLane,
+  type ScheduleItem as ScheduleLaneItem,
+} from '@/components/schedule/schedule-lane'
 import { useSchedule } from '@/lib/api'
 import { t } from '@/text'
 
@@ -9,47 +12,34 @@ export const Route = createFileRoute('/(site)/schedule')({
   component: SchedulePage,
 })
 
-type ScheduleItem = {
+type ApiScheduleItem = {
   id?: string | number
+  order?: number
+  division?: string
   title?: string
-  start?: string
-  end?: string
+  startDate?: string
+  endDate?: string
   dateText?: string
   location?: string
-  note?: string
   status?: string
-  state?: string
-  division?: string
-  category?: string
-  type?: string
-  track?: string
+  note?: string
+  start?: string
+  end?: string
 }
 
 type ScheduleData = {
-  schedule?: ScheduleItem[]
-  items?: ScheduleItem[]
-  events?: ScheduleItem[]
+  schedule?: ApiScheduleItem[]
+  items?: ApiScheduleItem[]
+  events?: ApiScheduleItem[]
 }
 
-type DivisionKey = 'console' | 'arcade' | 'final'
-
-const DIV_CONSOLE: DivisionKey = 'console'
-const DIV_ARCADE: DivisionKey = 'arcade'
-const DIV_FINAL: DivisionKey = 'final'
-
-const LABEL_CONSOLE = t('schedule.tab.console')
-const LABEL_ARCADE = t('schedule.tab.arcade')
-const LABEL_UPCOMING = t('schedule.status.upcoming')
-const LABEL_LIVE = t('schedule.status.live')
-const LABEL_DONE = t('schedule.status.done')
-
 const ASSETS = {
-  consoleIcon: '/branding/v2/icon-console.png',
-  arcadeIcon: '/branding/v2/icon-arcade.png',
+  consoleIcon: '/branding/console-icon.png',
+  arcadeIcon: '/branding/arcade-icon.png',
 }
 
 const getScheduleItems = (
-  data: ScheduleData | ScheduleItem[] | undefined
+  data: ScheduleData | ApiScheduleItem[] | undefined
 ) => {
   if (!data) return []
   if (Array.isArray(data)) return data
@@ -59,45 +49,63 @@ const getScheduleItems = (
   return []
 }
 
-const resolveDivision = (item: ScheduleItem): DivisionKey | null => {
-  const raw = [
-    item.division,
-    item.category,
-    item.type,
-    item.track,
-    item.title,
-    item.note,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase()
+const normalizeDivision = (item: ApiScheduleItem) =>
+  (item.division ?? '').toLowerCase().trim()
 
-  if (!raw) return null
-  if (raw.includes('final') || raw.includes('playx4') || raw.includes('결선')) {
-    return DIV_FINAL
+const sortByOrder = (items: ApiScheduleItem[]) =>
+  items
+    .slice()
+    .sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER))
+
+const formatMmDd = (value?: string) => {
+  if (!value) return null
+  const isoMatch = value.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  if (isoMatch) {
+    const [, , mm, dd] = isoMatch
+    return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
   }
-  if (raw.includes('console') || raw.includes('콘솔')) {
-    return DIV_CONSOLE
-  }
-  if (raw.includes('arcade') || raw.includes('아케이드')) {
-    return DIV_ARCADE
+  const shortMatch = value.match(/(\d{1,2})[.\-/](\d{1,2})/)
+  if (shortMatch) {
+    const [, mm, dd] = shortMatch
+    return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
   }
   return null
 }
 
-const normalizeStatusLabel = (item: ScheduleItem) => {
-  const raw = item.status ?? item.state ?? ''
-  if (!raw) return null
-  const normalized = raw.toLowerCase()
+const resolveDateParts = (item: ApiScheduleItem) => {
+  if (item.dateText) {
+    const main = formatMmDd(item.dateText)
+    if (main) return { main, sub: undefined }
+    return { main: item.dateText, sub: undefined }
+  }
+
+  const startSource = item.startDate ?? item.start
+  const endSource = item.endDate ?? item.end
+  const start = formatMmDd(startSource)
+  const end = formatMmDd(endSource)
+
+  if (start && end) {
+    if (start !== end) return { main: start, sub: `~${end}` }
+    return { main: start, sub: undefined }
+  }
+  if (start) return { main: start, sub: undefined }
+  if (end) return { main: end, sub: undefined }
+
+  return { main: '추후', sub: '공지' }
+}
+
+const getStatusLabel = (status?: string) => {
+  if (!status) return undefined
+  const normalized = status.toLowerCase()
   if (normalized.includes('upcoming') || normalized.includes('예정')) {
-    return LABEL_UPCOMING
+    return t('schedule.status.upcoming')
   }
   if (
-    normalized.includes('open') ||
     normalized.includes('live') ||
+    normalized.includes('open') ||
     normalized.includes('진행')
   ) {
-    return LABEL_LIVE
+    return t('schedule.status.live')
   }
   if (
     normalized.includes('done') ||
@@ -105,213 +113,83 @@ const normalizeStatusLabel = (item: ScheduleItem) => {
     normalized.includes('종료') ||
     normalized.includes('완료')
   ) {
-    return LABEL_DONE
+    return t('schedule.status.done')
   }
-  return raw
+  return status
 }
 
-const getDateSource = (item: ScheduleItem) =>
-  (item.dateText ?? item.start ?? item.end ?? '').trim()
-
-const formatDateBadge = (item: ScheduleItem) => {
-  const raw = getDateSource(item)
-  if (!raw) return '--.--'
-  const firstChunk = raw.split(' ')[0].split('~')[0].trim()
-  const isoMatch = firstChunk.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
-  if (isoMatch) {
-    const [, , mm, dd] = isoMatch
-    return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
-  }
-  const slashMatch = firstChunk.match(/(\d{1,2})[.\-/](\d{1,2})/)
-  if (slashMatch) {
-    const [, mm, dd] = slashMatch
-    return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
-  }
-  const koMatch = firstChunk.match(/(\d{1,2})\s*월\s*(\d{1,2})/)
-  if (koMatch) {
-    const [, mm, dd] = koMatch
-    return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
-  }
-  return firstChunk
-}
-
-const renderRangeText = (item: ScheduleItem) => {
-  if (item.start && item.end) return `${item.start} ~ ${item.end}`
-  return item.start ?? item.end ?? item.dateText ?? ''
-}
-
-const resolveSubText = (item: ScheduleItem) =>
-  item.note ?? item.location ?? renderRangeText(item)
-
-const toDateValue = (item: ScheduleItem) => {
-  const raw = getDateSource(item)
-  if (!raw) return Number.POSITIVE_INFINITY
-  const parsed = Date.parse(raw)
-  if (!Number.isNaN(parsed)) return parsed
-  const isoMatch = raw.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
-  if (isoMatch) {
-    const [, yyyy, mm, dd] = isoMatch
-    return new Date(
-      Number(yyyy),
-      Number(mm) - 1,
-      Number(dd)
-    ).getTime()
-  }
-  const shortMatch = raw.match(/(\d{1,2})[.\-/](\d{1,2})/)
-  if (shortMatch) {
-    const nowYear = new Date().getFullYear()
-    const [, mm, dd] = shortMatch
-    return new Date(nowYear, Number(mm) - 1, Number(dd)).getTime()
-  }
-  const koMatch = raw.match(/(\d{1,2})\s*월\s*(\d{1,2})/)
-  if (koMatch) {
-    const nowYear = new Date().getFullYear()
-    const [, mm, dd] = koMatch
-    return new Date(nowYear, Number(mm) - 1, Number(dd)).getTime()
-  }
-  return Number.POSITIVE_INFINITY
-}
-
-const sortScheduleItems = (items: ScheduleItem[]) =>
-  items
-    .slice()
-    .sort((a, b) => toDateValue(a) - toDateValue(b))
-
-function ScheduleItemCard({
-  item,
-  isFeatured,
-  fallbackIndex,
-}: {
-  item: ScheduleItem
-  isFeatured?: boolean
-  fallbackIndex: number
-}) {
-  const heading = item.title ?? `${t('schedule.itemFallback')} ${fallbackIndex}`
-  const dateBadge = formatDateBadge(item)
-  const subText = resolveSubText(item)
-  const statusLabel = normalizeStatusLabel(item)
-
+const isUpcomingItem = (item: ApiScheduleItem) => {
+  const status = item.status ?? ''
+  const normalized = status.toLowerCase()
   return (
-    <div
-      className={cn(
-        'flex items-start gap-4 rounded-2xl px-5 py-4 shadow-[0_18px_35px_rgba(0,0,0,0.25)]',
-        isFeatured ? 'bg-[#ff2a2a] text-white' : 'bg-white text-black'
-      )}
-    >
-      <div className='text-lg font-extrabold tabular-nums'>{dateBadge}</div>
-      <div className='flex min-w-0 flex-1 items-start justify-between gap-3'>
-        <div className='min-w-0'>
-          <div className='font-bold break-keep whitespace-pre-wrap'>
-            {heading}
-          </div>
-          {subText ? (
-            <div
-              className={cn(
-                'mt-1 text-sm opacity-80 break-keep whitespace-pre-wrap',
-                isFeatured ? 'text-white/90' : 'text-black/70'
-              )}
-            >
-              {subText}
-            </div>
-          ) : null}
-        </div>
-        {statusLabel ? (
-          <span
-            className={cn(
-              'shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold',
-              isFeatured ? 'bg-white/20 text-white' : 'bg-black/10 text-black/70'
-            )}
-          >
-            {statusLabel}
-          </span>
-        ) : null}
-      </div>
-    </div>
+    normalized.includes('upcoming') ||
+    normalized.includes('예정') ||
+    normalized.includes('ready')
   )
 }
 
-function ScheduleLane({
-  title,
-  description,
-  iconSrc,
-  items,
-  isLoading,
-}: {
-  title: string
-  description: string
-  iconSrc: string
-  items: ScheduleItem[]
-  isLoading?: boolean
-}) {
-  const ordered = sortScheduleItems(items)
-
-  return (
-    <section className='rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]'>
-      <div className='flex items-center gap-3'>
-        <div className='grid h-12 w-12 place-items-center rounded-xl bg-white/10'>
-          <img
-            src={iconSrc}
-            alt=''
-            className='h-7 w-7 object-contain'
-            loading='lazy'
-            draggable={false}
-          />
-        </div>
-        <div>
-          <div className='text-lg font-semibold text-white'>{title}</div>
-          <p className='text-sm text-white/70'>{description}</p>
-        </div>
-      </div>
-
-      <div className='mt-5 space-y-3'>
-        {isLoading ? (
-          <p className='text-sm text-white/60'>{t('schedule.loading')}</p>
-        ) : ordered.length === 0 ? (
-          <p className='text-sm text-white/60'>{t('schedule.empty')}</p>
-        ) : (
-          ordered.map((item, index) => (
-            <ScheduleItemCard
-              key={item.id ?? `${title}-${index}`}
-              item={item}
-              isFeatured={index === 0}
-              fallbackIndex={index + 1}
-            />
-          ))
-        )}
-      </div>
-    </section>
+const pickFeatured = (items: ApiScheduleItem[]) => {
+  const upcoming = items.find(
+    (item) => Boolean(item.dateText) && isUpcomingItem(item)
   )
+  return upcoming ?? items[0]
+}
+
+const toLaneItems = (
+  items: ApiScheduleItem[],
+  featuredItem: ApiScheduleItem | undefined
+): ScheduleLaneItem[] =>
+  items.map((item, index) => {
+    const dateParts = resolveDateParts(item)
+    const title = item.title ?? `${t('schedule.itemFallback')} ${index + 1}`
+    return {
+      id: item.id ?? item.order ?? `${title}-${index}`,
+      dateMain: dateParts.main,
+      dateSub: dateParts.sub,
+      title,
+      meta1: item.location,
+      meta2: item.note,
+      statusLabel: getStatusLabel(item.status),
+      featured: item === featuredItem,
+    }
+  })
+
+const renderFinalDate = (item: ApiScheduleItem) => {
+  if (item.dateText) return item.dateText
+  const startSource = item.startDate ?? item.start
+  const endSource = item.endDate ?? item.end
+  if (startSource && endSource && startSource !== endSource) {
+    return `${startSource} ~ ${endSource}`
+  }
+  return startSource ?? endSource ?? ''
 }
 
 function SchedulePage() {
   const { data, isLoading, isError } = useSchedule<
-    ScheduleData | ScheduleItem[]
+    ScheduleData | ApiScheduleItem[]
   >()
   const items = getScheduleItems(data)
 
-  const consoleItems = items.filter(
-    (item) => resolveDivision(item) === DIV_CONSOLE
+  const consoleItems = sortByOrder(
+    items.filter((item) => normalizeDivision(item) === 'console')
   )
-  const arcadeItems = items.filter(
-    (item) => resolveDivision(item) === DIV_ARCADE
+  const arcadeItems = sortByOrder(
+    items.filter((item) => normalizeDivision(item) === 'arcade')
   )
-  const finalItems = items.filter(
-    (item) => resolveDivision(item) === DIV_FINAL
+  const allItems = sortByOrder(
+    items.filter((item) => normalizeDivision(item) === 'all')
   )
-  const finalItem = sortScheduleItems(finalItems)[0]
 
-  const finalSubtitle = finalItem
-    ? (() => {
-        const base = renderRangeText(finalItem)
-        const location = finalItem.location ?? finalItem.note ?? ''
-        const pieces = [base, location].filter(Boolean)
-        const includesPlayX4 =
-          pieces.join(' ').toLowerCase().includes('playx4') ||
-          pieces.join(' ').includes('플레이')
-        if (!includesPlayX4) pieces.push('PlayX4')
-        return pieces.join(' · ')
-      })()
-    : '추후 공개됩니다.'
+  const featuredConsole = pickFeatured(consoleItems)
+  const featuredArcade = pickFeatured(arcadeItems)
+
+  const consoleLaneItems = toLaneItems(consoleItems, featuredConsole)
+  const arcadeLaneItems = toLaneItems(arcadeItems, featuredArcade)
+
+  const finalItem = allItems[0]
+  const finalTitle = finalItem?.title ?? '플레이엑스포 결선 토너먼트'
+  const finalDate = finalItem ? renderFinalDate(finalItem) : ''
+  const finalMeta = [finalDate, finalItem?.location].filter(Boolean).join(' · ')
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('schedule.title')}`
@@ -328,29 +206,29 @@ function SchedulePage() {
         <p className='text-sm text-destructive'>{t('schedule.failed')}</p>
       )}
 
-      <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+      {isLoading && items.length === 0 ? (
+        <p className='text-sm text-white/60'>{t('schedule.loading')}</p>
+      ) : null}
+
+      <div className='grid gap-6 lg:grid-cols-2'>
         <ScheduleLane
-          title={LABEL_CONSOLE}
-          description='콘솔 대회 일정을 확인하세요.'
           iconSrc={ASSETS.consoleIcon}
-          items={consoleItems}
-          isLoading={isLoading}
+          title='콘솔'
+          desc='콘솔 일정 및 경기 정보를 확인하세요.'
+          items={consoleLaneItems}
         />
         <ScheduleLane
-          title={LABEL_ARCADE}
-          description='아케이드 대회 일정을 확인하세요.'
           iconSrc={ASSETS.arcadeIcon}
-          items={arcadeItems}
-          isLoading={isLoading}
+          title='아케이드'
+          desc='아케이드 일정 및 경기 정보를 확인하세요.'
+          items={arcadeLaneItems}
         />
       </div>
 
-      <section className='mt-6 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.35)]'>
-        <div className='text-lg font-semibold text-white'>
-          플레이엑스포 결선 토너먼트
-        </div>
-        <p className='mt-2 text-sm text-white/70 break-keep whitespace-pre-wrap'>
-          {finalSubtitle}
+      <section className='rounded-3xl bg-white/5 p-6 text-center ring-1 ring-white/10'>
+        <div className='text-lg font-semibold text-white'>{finalTitle}</div>
+        <p className='mt-2 text-sm text-white/70'>
+          {finalMeta || '추후 공지됩니다.'}
         </p>
       </section>
     </TkcSection>
