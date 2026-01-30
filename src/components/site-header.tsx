@@ -1,7 +1,7 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { Menu } from 'lucide-react'
 import { useSite } from '@/lib/api'
-import { TkcContainer } from '@/components/tkc/layout'
+import { SiteContainer } from '@/components/site/site-container'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -57,7 +57,7 @@ export function SiteHeader() {
         paddingRight: 'max(1rem, env(safe-area-inset-right))',
       }}
     >
-      <TkcContainer className='flex items-center justify-between py-3 md:py-4'>
+      <SiteContainer className='flex items-center justify-between gap-4 py-3 md:py-4'>
         <Link to='/' className='flex items-center gap-3'>
           <img
             src={LOGO_SRC}
@@ -136,7 +136,7 @@ export function SiteHeader() {
             </SheetContent>
           </Sheet>
         </div>
-      </TkcContainer>
+      </SiteContainer>
     </header>
   )
 }
