@@ -17,16 +17,27 @@ const ASSETS = {
 }
 
 type SiteData = {
-  partners?: string[]
+  partners?: Partner[]
+}
+
+type Partner = {
+  order?: number
+  name: string
+  logoUrl?: string
+  href?: string
 }
 
 function HomePage() {
   const { data: site } = useSite<SiteData>()
 
-  const partners =
+  const partners: Partner[] =
     site?.partners?.length
       ? site.partners
-      : ['ANDAMIRO', 'BANDAI NAMCO', 'TAIKO LABS']
+      : [
+          { order: 10, name: 'ANDAMIRO' },
+          { order: 20, name: 'BANDAI NAMCO' },
+          { order: 30, name: 'TAIKO LABS' },
+        ]
 
   return (
     <TkcContainer className="space-y-6 md:space-y-8">
@@ -91,9 +102,39 @@ function HomePage() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold tracking-wide text-white/65 md:justify-end">
-            {partners.map((p) => (
-              <span key={p}>{p}</span>
-            ))}
+            {partners
+              .slice()
+              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+              .map((p) => {
+                const key = p.order ?? p.name
+                const hasLogo = !!p.logoUrl && p.logoUrl.trim().length > 0
+                const hasHref = !!p.href && p.href.trim().length > 0
+
+                const node = hasLogo ? (
+                  <img
+                    src={p.logoUrl}
+                    alt={p.name}
+                    className="h-5 w-auto opacity-90"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span>{p.name}</span>
+                )
+
+                return hasHref ? (
+                  <a
+                    key={key}
+                    href={p.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-white"
+                  >
+                    {node}
+                  </a>
+                ) : (
+                  <span key={key}>{node}</span>
+                )
+              })}
           </div>
 
           <div className="text-xs text-white/50">
