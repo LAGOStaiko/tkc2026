@@ -50,9 +50,6 @@ function HomePage() {
             className="h-full w-full object-cover object-left"
             loading="eager"
           />
-          {/* 시안처럼 가장자리 은은하게 눌러주는 비네팅 */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/45" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
         </div>
       </section>
 

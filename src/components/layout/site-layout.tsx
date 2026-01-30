@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from '@tanstack/react-router'
+import { Link, Outlet, useLocation, useRouterState } from '@tanstack/react-router'
 import { Menu } from 'lucide-react'
 import { useSite } from '@/lib/api'
 import { TkcContainer } from '@/components/tkc/layout'
@@ -52,23 +52,31 @@ function checkIsActive(href: string, item: NavItem, mainNav = false) {
 export function SiteLayout() {
   const { data } = useSite<SiteData>()
   const href = useLocation({ select: (location) => location.href })
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
   const siteName = data?.name ?? data?.title ?? t('meta.siteName')
   const headerLogoUrl = '/branding/v2/logo.png'
   const headerLogoFallback = '/branding/v2/logo.png'
   const headerLogoSrcSet = data?.logoUrl
     ? `${headerLogoUrl} 1x, ${data.logoUrl} 2x`
     : `${headerLogoUrl} 1x, ${headerLogoFallback} 2x`
+  const isHome = pathname === '/'
 
   return (
     <div className='dark min-h-svh bg-black text-foreground'>
       <header
-        className='fixed inset-x-0 top-0 z-50 border-b bg-black/90 backdrop-blur'
+        className={
+          isHome
+            ? 'absolute inset-x-0 top-0 z-50 bg-transparent text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'
+            : 'fixed inset-x-0 top-0 z-50 border-b bg-black/90 backdrop-blur'
+        }
         style={{
           paddingLeft: 'max(1rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))',
         }}
       >
-        <TkcContainer className='flex h-14 items-center justify-between'>
+        <TkcContainer className='flex h-14 items-center justify-between px-6 md:px-6'>
           <Link to='/' className='flex items-center gap-3'>
             <img
               src={headerLogoUrl}
@@ -87,8 +95,12 @@ export function SiteLayout() {
               {navItems.map((item) => {
                 const isActive = checkIsActive(href, item, true)
                 const baseClass = item.emphasis
-                  ? 'whitespace-nowrap rounded-full border border-sky-400/30 bg-sky-400/20 px-3 py-1.5 text-sky-100 shadow-sm transition hover:bg-sky-400/30'
-                  : 'whitespace-nowrap text-white/70 transition hover:text-white'
+                  ? isHome
+                    ? 'whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-black shadow-sm transition hover:bg-white/90'
+                    : 'whitespace-nowrap rounded-full border border-sky-400/30 bg-sky-400/20 px-3 py-1.5 text-sky-100 shadow-sm transition hover:bg-sky-400/30'
+                  : isHome
+                    ? 'whitespace-nowrap text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] transition hover:text-white'
+                    : 'whitespace-nowrap text-white/70 transition hover:text-white'
                 const activeClass =
                   !item.emphasis && isActive
                     ? 'text-white underline underline-offset-8 decoration-sky-400/80'
@@ -151,7 +163,9 @@ export function SiteLayout() {
         </TkcContainer>
       </header>
 
-      <main className='flex w-full flex-1 bg-black pt-16 pb-16 md:pb-20'>
+      <main
+        className={`flex w-full flex-1 bg-black pb-16 md:pb-20 ${isHome ? 'pt-0' : 'pt-16'}`}
+      >
         <TkcContainer className='w-full'>
           <Outlet />
         </TkcContainer>
