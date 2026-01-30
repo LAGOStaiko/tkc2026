@@ -1,0 +1,142 @@
+import { Link, useRouterState } from '@tanstack/react-router'
+import { Menu } from 'lucide-react'
+import { useSite } from '@/lib/api'
+import { TkcContainer } from '@/components/tkc/layout'
+import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
+import { cn } from '@/lib/utils'
+import { t } from '@/text'
+
+type SiteData = {
+  name?: string
+  title?: string
+}
+
+type NavItem = {
+  label: string
+  to: string
+  emphasis?: boolean
+}
+
+const navItems: NavItem[] = [
+  { label: t('nav.home'), to: '/' },
+  { label: t('nav.console'), to: '/console' },
+  { label: t('nav.arcade'), to: '/arcade' },
+  { label: t('nav.schedule'), to: '/schedule' },
+  { label: t('nav.results'), to: '/results' },
+  { label: t('nav.apply'), to: '/apply', emphasis: true },
+  { label: t('nav.contact'), to: '/contact' },
+]
+
+const LOGO_SRC = '/branding/logo-transparent.png'
+
+function isActivePath(pathname: string, item: NavItem) {
+  if (item.to === '/') return pathname === '/'
+  return pathname === item.to || pathname.startsWith(`${item.to}/`)
+}
+
+export function SiteHeader() {
+  const { data } = useSite<SiteData>()
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
+  const siteName = data?.name ?? data?.title ?? t('meta.siteName')
+
+  return (
+    <header
+      className='fixed inset-x-0 top-0 z-50 bg-transparent text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]'
+      style={{
+        paddingLeft: 'max(1rem, env(safe-area-inset-left))',
+        paddingRight: 'max(1rem, env(safe-area-inset-right))',
+      }}
+    >
+      <TkcContainer className='flex items-center justify-between py-3 md:py-4 px-6 md:px-8'>
+        <Link to='/' className='flex items-center gap-3'>
+          <img
+            src={LOGO_SRC}
+            alt='TKC2026'
+            className='h-8 md:h-10 w-auto object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)]'
+            loading='eager'
+            draggable={false}
+          />
+          <span className='sr-only'>{siteName}</span>
+        </Link>
+
+        <div className='flex items-center gap-2'>
+          <nav className='hidden items-center gap-5 text-sm font-medium tracking-tight md:flex'>
+            {navItems.map((item) => {
+              const isActive = isActivePath(pathname, item)
+              const baseClass = item.emphasis
+                ? 'inline-flex h-8 items-center rounded-full bg-white/90 px-3 text-xs font-semibold text-black transition hover:bg-white'
+                : 'whitespace-nowrap text-white/85 transition hover:text-white'
+              const activeClass =
+                !item.emphasis && isActive
+                  ? 'text-white underline underline-offset-8 decoration-white/60'
+                  : ''
+
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={cn(baseClass, activeClass)}
+                >
+                  {item.label}
+                </Link>
+              )
+            })}
+          </nav>
+
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant='outline'
+                size='icon'
+                className='border-white/30 text-white/90 hover:bg-white/10 hover:text-white md:hidden'
+                aria-label={t('nav.openMenu')}
+              >
+                <Menu className='size-4' />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side='right' className='p-0'>
+              <SheetHeader className='border-b'>
+                <SheetTitle>{t('nav.menuTitle')}</SheetTitle>
+              </SheetHeader>
+              <div className='flex flex-col gap-1 p-4'>
+                {navItems.map((item) => {
+                  const isActive = isActivePath(pathname, item)
+                  const baseClass = item.emphasis
+                    ? 'rounded-full bg-white/90 px-3 py-2 text-center text-sm font-semibold text-black transition hover:bg-white'
+                    : 'rounded-md px-3 py-2 text-sm text-white/80 transition hover:bg-white/10 hover:text-white'
+                  const activeClass =
+                    !item.emphasis && isActive
+                      ? 'bg-white/10 text-white font-semibold'
+                      : ''
+
+                  return (
+                    <SheetClose asChild key={item.to}>
+                      <Link
+                        to={item.to}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={cn(baseClass, activeClass)}
+                      >
+                        {item.label}
+                      </Link>
+                    </SheetClose>
+                  )
+                })}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </TkcContainer>
+    </header>
+  )
+}
