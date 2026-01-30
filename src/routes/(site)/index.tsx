@@ -1,10 +1,8 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+﻿import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { useSite } from '@/lib/api'
 import { PublicHeader } from '@/components/layout/site-layout'
 import { TkcContainer } from '@/components/tkc/layout'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/(site)/')({
   component: HomePage,
@@ -19,15 +17,15 @@ const ASSETS = {
 const HOME_YOUTUBE_ID = '6UkPLBMEruQ'
 const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
 
-type SiteData = {
-  partners?: Partner[]
-}
-
 type Partner = {
   order?: number
   name: string
   logoUrl?: string
   href?: string
+}
+
+type SiteData = {
+  partners?: Partner[]
 }
 
 function HomePage() {
@@ -62,13 +60,13 @@ function HomePage() {
         <ModeCard
           iconSrc={ASSETS.consoleIcon}
           title="콘솔"
-          description="?�동?? ?�드 ?�스?�벌?�로 진행?�는 ?�?�입?�다."
+          description="동더! 원더풀 페스티벌로 진행하는 대회입니다."
           detailTo="/console"
         />
         <ModeCard
           iconSrc={ASSETS.arcadeIcon}
-          title="?��??�드"
-          description="?�태고의 ?�인 ?��??�로 ver.?�로 진행?�는 ?�?�입?�다."
+          title="아케이드"
+          description="태고의 달인 니지이로 ver.로 진행하는 대회입니다."
           detailTo="/arcade"
         />
       </section>
@@ -76,9 +74,9 @@ function HomePage() {
       {/* PLAYX4 FINAL INFO */}
       <section className="rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-center shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:px-8 md:py-8">
         <div className="text-lg font-semibold text-white/90 md:text-xl">
-          ?�레???�스??결선 ?�내
+          플레이 엑스포 결선 안내
         </div>
-        <div className="mt-1 text-sm text-white/60">추후 공개?�니??</div>
+        <div className="mt-1 text-sm text-white/60">추후 공개됩니다.</div>
       </section>
 
       {/* VIDEO */}
@@ -147,7 +145,7 @@ function HomePage() {
           </div>
 
           <div className="text-xs text-white/50">
-            © {new Date().getFullYear()} ?�고???�인 ?�레???�스???�너먼트
+            © {new Date().getFullYear()} 태고의 달인 플레이 엑스포 토너먼트
           </div>
         </div>
       </section>
@@ -167,54 +165,42 @@ function ModeCard({
   detailTo: '/console' | '/arcade'
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-6">
+    <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.35)] flex flex-col">
       <div className="flex items-start gap-4">
-        {/* icon block (?�안??빨간 ?�모) */}
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#ff2a00]">
+        {/* icon block (시안의 빨간 네모) */}
+        <div className="h-12 w-12 rounded-xl bg-[#ff2d00] grid place-items-center">
           <img
             src={iconSrc}
             alt=""
-            className="h-7 w-7"
+            className="h-7 w-7 object-contain"
             loading="lazy"
             draggable={false}
           />
         </div>
 
         <div className="min-w-0">
-          <div className="text-lg font-semibold text-white md:text-xl">
-            {title}
-          </div>
-          <p className="mt-1 text-sm leading-relaxed text-white/65">
+          <h3 className="text-lg font-bold text-white">{title}</h3>
+          <p className="mt-1 text-sm text-white/70 break-keep">
             {description}
           </p>
         </div>
       </div>
 
-      {/* buttons: 모바??full-width ?�택, sm ?�상 row */}
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-        <Button
-          asChild
-          variant="outline"
-          className={cn(
-            'w-full rounded-full border-white/15 bg-transparent text-white/80',
-            'hover:bg-white/10 hover:text-white sm:w-auto'
-          )}
+      {/* buttons: 모바일 full-width 스택, sm 이상 row */}
+      <div className="mt-auto pt-5 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <Link
+          className="h-10 rounded-full border border-white/15 bg-white/5 text-white text-sm grid place-items-center hover:bg-white/10"
+          to={detailTo}
         >
-          <Link to={detailTo}>?�세??보기</Link>
-        </Button>
-
-        <Button
-          asChild
-          variant="outline"
-          className={cn(
-            'w-full rounded-full border-white/15 bg-white/5 text-white/85',
-            'hover:bg-white/10 hover:text-white sm:w-auto'
-          )}
+          자세히 보기
+        </Link>
+        <Link
+          className="h-10 rounded-full border border-white/15 bg-white/5 text-white text-sm grid place-items-center hover:bg-white/10"
+          to="/apply"
         >
-          <Link to="/apply">?�???�청?�기</Link>
-        </Button>
+          대회 신청하기
+        </Link>
       </div>
     </div>
   )
 }
-

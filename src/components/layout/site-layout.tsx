@@ -86,7 +86,7 @@ export function PublicHeader({ variant = 'default' }: PublicHeaderProps) {
             src={headerLogoUrl}
             srcSet={headerLogoSrcSet}
             alt='TKC2026'
-            className='h-6 w-auto shrink-0 object-contain sm:h-7 md:h-8'
+            className='h-8 md:h-10 w-auto object-contain mix-blend-screen drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]'
             onError={(event) => {
               event.currentTarget.onerror = null
               event.currentTarget.src = headerLogoFallback
