@@ -40,9 +40,6 @@ export function TkcPageHeader({
 }: TkcPageHeaderProps) {
   return (
     <div className={cn('space-y-2', className)}>
-      <p className='text-xs tracking-[0.3em] text-white/60 uppercase'>
-        {t('meta.siteName')}
-      </p>
       <h1
         className={cn(
           'text-3xl font-bold tracking-tight md:text-5xl',
