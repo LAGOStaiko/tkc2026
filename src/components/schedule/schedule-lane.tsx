@@ -88,7 +88,7 @@ export function ScheduleEventCard({
     >
       <div
         className={cn(
-          'flex w-20 flex-col items-center justify-center border-r px-2 py-3 text-center',
+          'flex w-20 flex-col items-center justify-center border-r px-2 py-[18px] text-center',
           isFeatured ? 'border-white/20' : 'border-slate-200'
         )}
       >
@@ -97,7 +97,7 @@ export function ScheduleEventCard({
           <div className='mt-1 text-xs opacity-80'>{dateSub}</div>
         ) : null}
       </div>
-      <div className='flex min-w-0 flex-1 items-start justify-between gap-3 px-4 py-3'>
+      <div className='flex min-w-0 flex-1 items-start justify-between gap-3 px-4 py-[18px]'>
         <div className='min-w-0'>
           <div className='font-bold break-keep'>{title}</div>
           {meta1 ? (
