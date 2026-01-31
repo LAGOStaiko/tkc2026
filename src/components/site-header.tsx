@@ -1,7 +1,8 @@
 import { Link, useRouterState } from '@tanstack/react-router'
+import { t } from '@/text'
 import { Menu } from 'lucide-react'
 import { useSite } from '@/lib/api'
-import { SiteContainer } from '@/components/site/site-container'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -11,8 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { cn } from '@/lib/utils'
-import { t } from '@/text'
+import { SiteContainer } from '@/components/site/site-container'
 
 type SiteData = {
   name?: string
@@ -59,7 +59,7 @@ export function SiteHeader() {
           <img
             src={LOGO_SRC}
             alt='TKC2026'
-            className='h-8 md:h-10 w-auto object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)]'
+            className='h-8 w-auto object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)] md:h-10'
             loading='eager'
             draggable={false}
           />

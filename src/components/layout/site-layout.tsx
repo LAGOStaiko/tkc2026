@@ -4,11 +4,11 @@ import { SiteContainer } from '@/components/site/site-container'
 
 export function SiteLayout() {
   return (
-    <div className='dark min-h-svh bg-black text-foreground overflow-x-hidden'>
+    <div className='dark min-h-svh overflow-x-hidden bg-black text-foreground'>
       <div className='relative'>
         <SiteHeader />
 
-        <main className='flex w-full flex-1 bg-black pb-16 pt-16 md:pb-20'>
+        <main className='flex w-full flex-1 bg-black pt-16 pb-16 md:pb-20'>
           <SiteContainer className='w-full'>
             <Outlet />
           </SiteContainer>

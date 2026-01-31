@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
-import { toast } from 'sonner'
 import { t } from '@/text'
+import { toast } from 'sonner'
 
 export function handleServerError(error: unknown) {
   // eslint-disable-next-line no-console

@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { useNavigate, useRouter } from '@tanstack/react-router'
+import { t } from '@/text'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { t } from '@/text'
 
 type GeneralErrorProps = React.HTMLAttributes<HTMLDivElement> & {
   minimal?: boolean
@@ -43,4 +43,3 @@ export function GeneralError({
     </div>
   )
 }
-

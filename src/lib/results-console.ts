@@ -21,10 +21,7 @@ export function extractEntryId(
   return undefined
 }
 
-export function formatNicknameWithEntryId(
-  nickname?: string,
-  entryId?: string
-) {
+export function formatNicknameWithEntryId(nickname?: string, entryId?: string) {
   const name = nickname?.trim()
   if (!name && entryId) return entryId
   if (!name) return '-'

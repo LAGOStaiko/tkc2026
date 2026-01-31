@@ -35,7 +35,7 @@ export function ScheduleLane({
   items,
 }: ScheduleLaneProps) {
   return (
-    <section className='rounded-3xl bg-white/5 p-6 ring-1 ring-white/10 shadow-lg'>
+    <section className='rounded-3xl bg-white/5 p-6 shadow-lg ring-1 ring-white/10'>
       <div className='flex flex-col items-center text-center'>
         <div className='grid h-12 w-12 place-items-center rounded-xl bg-[#ff2a2a]'>
           <img

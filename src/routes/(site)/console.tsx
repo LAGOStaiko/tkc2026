@@ -1,9 +1,13 @@
 import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import {
+  FALLBACK_CONSOLE_SECTIONS,
+  type ConsoleSection,
+} from '@/content/console-guide'
+import { t } from '@/text'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
-import { TkcField, TkcRuleSheet } from '@/components/tkc-rule-sheet'
+import { useContent } from '@/lib/api'
 import {
   Table,
   TableBody,
@@ -12,12 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  FALLBACK_CONSOLE_SECTIONS,
-  type ConsoleSection,
-} from '@/content/console-guide'
-import { useContent } from '@/lib/api'
-import { t } from '@/text'
+import { TkcField, TkcRuleSheet } from '@/components/tkc-rule-sheet'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/console')({
   component: ConsolePage,
@@ -105,7 +105,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <p
-        className='text-sm leading-relaxed text-white/90 break-keep md:text-base md:leading-7'
+        className='text-sm leading-relaxed break-keep text-white/90 md:text-base md:leading-7'
         {...rest}
       />
     )
@@ -131,7 +131,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <li
-        className='text-sm leading-relaxed text-white/90 break-keep md:text-base md:leading-7'
+        className='text-sm leading-relaxed break-keep text-white/90 md:text-base md:leading-7'
         {...rest}
       />
     )
@@ -162,7 +162,7 @@ const markdownComponents: Components = {
   table: (props) => {
     const rest = omitNode(props)
     return (
-      <div className='-mx-4 px-4 overflow-x-auto'>
+      <div className='-mx-4 overflow-x-auto px-4'>
         <Table className='min-w-[560px] text-sm md:text-base'>
           {rest.children}
         </Table>
@@ -185,7 +185,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <TableHead
-        className='border-white/10 px-3 py-2 text-xs font-semibold text-white/70 whitespace-normal md:text-sm'
+        className='border-white/10 px-3 py-2 text-xs font-semibold whitespace-normal text-white/70 md:text-sm'
         {...rest}
       />
     )
@@ -194,7 +194,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <TableCell
-        className='border-white/10 px-3 py-2 text-sm text-white/85 align-top whitespace-normal md:text-base'
+        className='border-white/10 px-3 py-2 align-top text-sm whitespace-normal text-white/85 md:text-base'
         {...rest}
       />
     )
@@ -205,7 +205,10 @@ const markdownComponents: Components = {
 function MarkdownBlock({ body }: { body: string }) {
   return (
     <div className='space-y-4'>
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={markdownComponents}
+      >
         {body}
       </ReactMarkdown>
     </div>
@@ -341,13 +344,15 @@ function ConsolePage() {
     <TkcSection>
       <TkcPageHeader title={title} />
 
-      {statusMessage && <p className='text-sm text-white/60'>{statusMessage}</p>}
+      {statusMessage && (
+        <p className='text-sm text-white/60'>{statusMessage}</p>
+      )}
 
       <div className='lg:grid lg:grid-cols-[260px_1fr] lg:gap-10'>
         <aside className='hidden lg:block'>
           <div className='sticky top-24'>
             <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-lg backdrop-blur-md'>
-              <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
+              <p className='text-xs font-semibold tracking-[0.24em] text-white/60 uppercase'>
                 {t('console.tocTitle')}
               </p>
               <nav
@@ -358,7 +363,7 @@ function ConsolePage() {
                   <a
                     key={item.key}
                     href={`#${item.id}`}
-                    className='rounded-lg px-2 py-1 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40'
+                    className='rounded-lg px-2 py-1 transition hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none'
                   >
                     {item.title}
                   </a>

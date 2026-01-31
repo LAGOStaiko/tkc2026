@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
+import { createFileRoute } from '@tanstack/react-router'
+import { t } from '@/text'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { createFileRoute } from '@tanstack/react-router'
-import { GlassCard } from '@/components/tkc/glass-card'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { useContent, useSite } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useContent, useSite } from '@/lib/api'
-import { t } from '@/text'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/contact')({
   component: ContactPage,
@@ -122,10 +122,7 @@ const getOrder = (value: unknown) => {
 }
 
 function ContactPage() {
-  const {
-    data: siteData,
-    isError: isSiteError,
-  } = useSite<SiteData>()
+  const { data: siteData, isError: isSiteError } = useSite<SiteData>()
   const {
     data: contentData,
     isLoading: isContentLoading,
@@ -148,7 +145,10 @@ function ContactPage() {
 
   return (
     <TkcSection>
-      <TkcPageHeader title={t('contact.title')} subtitle={t('contact.subtitle')} />
+      <TkcPageHeader
+        title={t('contact.title')}
+        subtitle={t('contact.subtitle')}
+      />
 
       {isSiteError && (
         <p className='text-sm text-destructive'>{t('contact.failedInfo')}</p>
@@ -164,7 +164,7 @@ function ContactPage() {
         <div className='grid gap-4 md:grid-cols-2'>
           <GlassCard className='p-5 md:p-7'>
             <div className='space-y-3'>
-              <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
+              <p className='text-xs font-semibold tracking-[0.24em] text-white/60 uppercase'>
                 {t('contact.labelEmail')}
               </p>
               <p className='text-sm text-white/85 md:text-base'>
@@ -183,7 +183,7 @@ function ContactPage() {
           </GlassCard>
           <GlassCard className='p-5 md:p-7'>
             <div className='space-y-3'>
-              <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
+              <p className='text-xs font-semibold tracking-[0.24em] text-white/60 uppercase'>
                 {t('contact.labelKakao')}
               </p>
               <p className='text-sm text-white/85 md:text-base'>
@@ -219,7 +219,7 @@ function ContactPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
-                <div className='space-y-4 max-w-prose'>
+                <div className='max-w-prose space-y-4'>
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={markdownComponents}

@@ -61,8 +61,11 @@
 }
 
 @theme inline {
-  --tkc-font-sans: 'Pretendard Variable', 'Pretendard', system-ui, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  --tkc-font-serif: 'Noto Serif KR', 'Nanum Myeongjo', 'AppleMyungjo', 'Batang', serif;
+  --tkc-font-sans:
+    'Pretendard Variable', 'Pretendard', system-ui, -apple-system, 'Segoe UI',
+    'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --tkc-font-serif:
+    'Noto Serif KR', 'Nanum Myeongjo', 'AppleMyungjo', 'Batang', serif;
   --font-sans: var(--tkc-font-sans);
   --font-serif: var(--tkc-font-serif);
   --font-pretendard: var(--tkc-font-sans);

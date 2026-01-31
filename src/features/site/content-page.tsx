@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
+import { t } from '@/text'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { useContent } from '@/lib/api'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { GlassCard } from '@/components/tkc/glass-card'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useContent } from '@/lib/api'
-import { t } from '@/text'
 
 type ContentSection = {
   order?: number | string
@@ -131,8 +131,12 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
     <TkcSection>
       <TkcPageHeader title={title} />
 
-      {isLoading && <p className='text-sm text-white/60'>{t('content.loading')}</p>}
-      {isError && <p className='text-sm text-destructive'>{t('content.loadFailed')}</p>}
+      {isLoading && (
+        <p className='text-sm text-white/60'>{t('content.loading')}</p>
+      )}
+      {isError && (
+        <p className='text-sm text-destructive'>{t('content.loadFailed')}</p>
+      )}
 
       {!isLoading && !isError && sortedSections.length === 0 && (
         <p className='text-sm text-white/60'>{t('content.empty')}</p>
@@ -155,7 +159,7 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
               <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
                 {imageUrl ? (
                   <div className='grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:items-start'>
-                    <div className='space-y-4 max-w-prose'>
+                    <div className='max-w-prose space-y-4'>
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={markdownComponents}
@@ -173,7 +177,7 @@ export function SiteContentPage({ page, title }: SiteContentPageProps) {
                     </div>
                   </div>
                 ) : (
-                  <div className='space-y-4 max-w-prose'>
+                  <div className='max-w-prose space-y-4'>
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={markdownComponents}

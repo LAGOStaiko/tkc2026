@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate, useRouter } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
 import { t } from '@/text'
+import { Button } from '@/components/ui/button'
 
 export function UnauthorisedError() {
   const navigate = useNavigate()
@@ -31,4 +31,3 @@ export function UnauthorisedError() {
     </div>
   )
 }
-

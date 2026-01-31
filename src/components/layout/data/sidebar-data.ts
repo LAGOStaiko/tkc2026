@@ -203,4 +203,3 @@ export const sidebarData: SidebarData = {
     },
   ],
 }
-

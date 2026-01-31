@@ -1,8 +1,11 @@
-import { GlassCard } from '@/components/tkc/glass-card'
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { extractEntryId, formatNicknameWithEntryId } from '@/lib/results-console'
-import { cn } from '@/lib/utils'
 import { t } from '@/text'
+import {
+  extractEntryId,
+  formatNicknameWithEntryId,
+} from '@/lib/results-console'
+import { cn } from '@/lib/utils'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { GlassCard } from '@/components/tkc/glass-card'
 
 export type ConsoleBracketMatch = {
   a?: string

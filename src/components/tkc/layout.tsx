@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react'
-import { cn } from '@/lib/utils'
 import { t } from '@/text'
+import { cn } from '@/lib/utils'
 
 type TkcPageHeaderProps = {
   title: string
@@ -40,7 +40,7 @@ export function TkcPageHeader({
 }: TkcPageHeaderProps) {
   return (
     <div className={cn('space-y-2', className)}>
-      <p className='text-xs uppercase tracking-[0.3em] text-white/60'>
+      <p className='text-xs tracking-[0.3em] text-white/60 uppercase'>
         {t('meta.siteName')}
       </p>
       <h1
@@ -52,7 +52,12 @@ export function TkcPageHeader({
         {title}
       </h1>
       {subtitle ? (
-        <p className={cn('text-sm text-white/60 md:text-base', subtitleClassName)}>
+        <p
+          className={cn(
+            'text-sm text-white/60 md:text-base',
+            subtitleClassName
+          )}
+        >
           {subtitle}
         </p>
       ) : null}

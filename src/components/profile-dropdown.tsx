@@ -42,19 +42,19 @@ export function ProfileDropdown() {
             <DropdownMenuItem asChild>
               <Link to='/admin/settings'>
                 Profile
-                <DropdownMenuShortcut>?§âŒ˜P</DropdownMenuShortcut>
+                <DropdownMenuShortcut>?ï¿½âŒ˜P</DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to='/admin/settings'>
                 Billing
-                <DropdownMenuShortcut>?˜B</DropdownMenuShortcut>
+                <DropdownMenuShortcut>?ï¿½B</DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to='/admin/settings'>
                 Settings
-                <DropdownMenuShortcut>?˜S</DropdownMenuShortcut>
+                <DropdownMenuShortcut>?ï¿½S</DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>New Team</DropdownMenuItem>
@@ -63,7 +63,7 @@ export function ProfileDropdown() {
           <DropdownMenuItem variant='destructive' onClick={() => setOpen(true)}>
             Sign out
             <DropdownMenuShortcut className='text-current'>
-              ?§âŒ˜Q
+              ?ï¿½âŒ˜Q
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -73,4 +73,3 @@ export function ProfileDropdown() {
     </>
   )
 }
-

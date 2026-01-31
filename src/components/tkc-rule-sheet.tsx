@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { GlassCard } from '@/components/tkc/glass-card'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import { GlassCard } from '@/components/tkc/glass-card'
 
 type TkcRuleSheetProps = {
   title: string
@@ -24,16 +24,12 @@ export function TkcRuleSheet({
   className,
 }: TkcRuleSheetProps) {
   return (
-    <GlassCard
-      id={id}
-      className={cn(
-        'p-5 md:p-7',
-        className
-      )}
-    >
+    <GlassCard id={id} className={cn('p-5 md:p-7', className)}>
       <div className='flex items-center gap-3'>
         <span className='inline-block h-6 w-1 rounded-full bg-sky-400/80' />
-        <h2 className='text-xl font-semibold text-white md:text-2xl'>{title}</h2>
+        <h2 className='text-xl font-semibold text-white md:text-2xl'>
+          {title}
+        </h2>
       </div>
       <div className='mt-5'>{children}</div>
     </GlassCard>
@@ -45,7 +41,7 @@ export function TkcField({ label, children, note, badges }: TkcFieldProps) {
     <div className='py-4 md:py-5'>
       <div className='flex items-center gap-3'>
         <div className='flex items-center gap-2'>
-          <span className='whitespace-nowrap text-sm font-semibold text-sky-300 md:text-base'>
+          <span className='text-sm font-semibold whitespace-nowrap text-sky-300 md:text-base'>
             {label}
           </span>
           {badges?.map((badge) => (
@@ -60,11 +56,11 @@ export function TkcField({ label, children, note, badges }: TkcFieldProps) {
         </div>
         <span className='flex-1 border-t border-dashed border-white/15' />
       </div>
-      <div className='mt-2 max-w-prose text-sm leading-relaxed text-white/85 break-keep md:text-base md:leading-7'>
+      <div className='mt-2 max-w-prose text-sm leading-relaxed break-keep text-white/85 md:text-base md:leading-7'>
         {children}
       </div>
       {note && (
-        <p className='mt-2 text-xs leading-relaxed text-white/60 break-keep'>
+        <p className='mt-2 text-xs leading-relaxed break-keep text-white/60'>
           {note}
         </p>
       )}

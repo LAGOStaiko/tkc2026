@@ -18,10 +18,7 @@ async function parseResponse<T>(
   }
 }
 
-async function apiRequest<T>(
-  path: string,
-  init: RequestInit
-): Promise<T> {
+async function apiRequest<T>(path: string, init: RequestInit): Promise<T> {
   const headers = new Headers(init.headers)
   if (!headers.has('Accept')) {
     headers.set('Accept', 'application/json')

@@ -1,5 +1,11 @@
 export type ConsoleSection = {
-  sectionKey: 'atAGlance' | 'eligibility' | 'stage1' | 'stage2' | 'finals' | 'faq'
+  sectionKey:
+    | 'atAGlance'
+    | 'eligibility'
+    | 'stage1'
+    | 'stage2'
+    | 'finals'
+    | 'faq'
   order: number
   title: string
   bodyMd: string

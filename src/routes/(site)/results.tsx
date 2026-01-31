@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, createFileRoute } from '@tanstack/react-router'
 import { format } from 'date-fns'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { t } from '@/text'
+import { useResults } from '@/lib/api'
 import {
-  ConsoleBracket4,
-  type ConsoleBracketData,
-} from '@/components/console-bracket-4'
-import { GlassCard } from '@/components/tkc/glass-card'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+  extractController,
+  extractEntryId,
+  extractS1S2,
+  formatNicknameWithEntryId,
+} from '@/lib/results-console'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,14 +22,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useResults } from '@/lib/api'
 import {
-  extractController,
-  extractEntryId,
-  extractS1S2,
-  formatNicknameWithEntryId,
-} from '@/lib/results-console'
-import { t } from '@/text'
+  ConsoleBracket4,
+  type ConsoleBracketData,
+} from '@/components/console-bracket-4'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/results')({
   component: ResultsPage,
@@ -190,11 +190,11 @@ const hasBracketContent = (data?: ConsoleBracketData | null) => {
     if (!match) return false
     return Boolean(
       match.a ||
-        match.b ||
-        match.aEntry ||
-        match.bEntry ||
-        match.aScore !== undefined ||
-        match.bScore !== undefined
+      match.b ||
+      match.aEntry ||
+      match.bEntry ||
+      match.aScore !== undefined ||
+      match.bScore !== undefined
     )
   })
 }
@@ -270,7 +270,9 @@ function StatusMessage({
   const textClass = variant === 'error' ? 'text-destructive' : 'text-white/60'
 
   return (
-    <div className={`rounded-lg border border-white/10 bg-white/5 p-4 text-sm ${textClass}`}>
+    <div
+      className={`rounded-lg border border-white/10 bg-white/5 p-4 text-sm ${textClass}`}
+    >
       {children}
     </div>
   )
@@ -286,10 +288,10 @@ function ResultRowCard({ row }: { row: ResultRow }) {
     <div className='rounded-lg border border-white/10 bg-white/5 p-3 shadow-xs'>
       <div className='grid grid-cols-[72px_minmax(0,1fr)] gap-3'>
         <div className='flex flex-col items-center justify-center rounded-md bg-white/10 p-2 text-center'>
-          <div className='text-2xl font-semibold leading-none text-white'>
+          <div className='text-2xl leading-none font-semibold text-white'>
             {rank}
           </div>
-          <div className='mt-1 text-[10px] uppercase tracking-wide text-white/60'>
+          <div className='mt-1 text-[10px] tracking-wide text-white/60 uppercase'>
             {t('results.label.rank')}
           </div>
         </div>
@@ -299,9 +301,7 @@ function ResultRowCard({ row }: { row: ResultRow }) {
             {t('results.scorePrefix')}
             {score}
           </div>
-          <div className='text-sm text-white/60 break-words'>
-            {detail}
-          </div>
+          <div className='text-sm break-words text-white/60'>{detail}</div>
         </div>
       </div>
     </div>
@@ -315,7 +315,7 @@ function StageCard({ stage }: { stage: ResultStage }) {
 
   return (
     <GlassCard>
-      <CardHeader className='flex flex-col gap-2 p-5 md:p-7 sm:flex-row sm:items-start sm:justify-between'>
+      <CardHeader className='flex flex-col gap-2 p-5 sm:flex-row sm:items-start sm:justify-between md:p-7'>
         <CardTitle className='text-lg text-white'>{heading}</CardTitle>
         {badge && (
           <Badge variant={badge.variant} className='shrink-0'>
@@ -400,7 +400,7 @@ function ConsoleDashboardCard({
           {LABEL_CONSOLE_QUICK_VIEW}
         </Button>
         <div className='space-y-2'>
-          <p className='text-xs font-semibold uppercase tracking-[0.24em] text-white/60'>
+          <p className='text-xs font-semibold tracking-[0.24em] text-white/60 uppercase'>
             {LABEL_CONSOLE_PREVIEW}
           </p>
           {previewRows.length === 0 ? (
@@ -413,14 +413,10 @@ function ConsoleDashboardCard({
                   className='flex items-center justify-between rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm'
                 >
                   <div className='flex min-w-0 items-center gap-2'>
-                    <span className='text-xs text-white/60'>
-                      {row.rank}
-                    </span>
+                    <span className='text-xs text-white/60'>{row.rank}</span>
                     <span className='truncate font-medium'>{row.name}</span>
                   </div>
-                  <span className='text-xs text-white/60'>
-                    {row.score}
-                  </span>
+                  <span className='text-xs text-white/60'>{row.score}</span>
                 </div>
               ))}
             </div>
@@ -487,8 +483,7 @@ function ResultsPage() {
       (acc, [tabKey, stageKey]) => {
         const meta = stagesByKey.get(stageKey) ?? legacyStageByKey.get(stageKey)
         const rows =
-          rowsByKey[stageKey] ??
-          (Array.isArray(meta?.rows) ? meta?.rows : [])
+          rowsByKey[stageKey] ?? (Array.isArray(meta?.rows) ? meta?.rows : [])
 
         acc[tabKey] = {
           stageKey,
@@ -513,9 +508,7 @@ function ResultsPage() {
     if (!normalizedQuery) return rows
     return rows.filter((row) => {
       const entryId = extractEntryId(row.nickname, row.detail)
-      const target = normalizeSearch(
-        `${row.nickname ?? ''} ${entryId ?? ''}`
-      )
+      const target = normalizeSearch(`${row.nickname ?? ''} ${entryId ?? ''}`)
       return target.includes(normalizedQuery)
     })
   }
@@ -558,7 +551,10 @@ function ResultsPage() {
 
   return (
     <TkcSection>
-      <TkcPageHeader title={t('results.title')} subtitle={t('results.subtitle')} />
+      <TkcPageHeader
+        title={t('results.title')}
+        subtitle={t('results.subtitle')}
+      />
 
       {isError && (
         <StatusMessage variant='error'>{t('results.failed')}</StatusMessage>
@@ -611,22 +607,22 @@ function ResultsPage() {
                 <Button asChild variant='secondary' className='shrink-0'>
                   <Link to='/console'>{LABEL_CONSOLE_GUIDE}</Link>
                 </Button>
-                <TabsList className='no-scrollbar w-full justify-start gap-2 overflow-x-auto whitespace-nowrap rounded-full bg-muted/40 p-1 md:w-auto md:overflow-visible'>
+                <TabsList className='no-scrollbar w-full justify-start gap-2 overflow-x-auto rounded-full bg-muted/40 p-1 whitespace-nowrap md:w-auto md:overflow-visible'>
                   <TabsTrigger
                     value={CONSOLE_TAB_PRE1}
-                    className='shrink-0 flex-none rounded-full px-4'
+                    className='flex-none shrink-0 rounded-full px-4'
                   >
                     {LABEL_CONSOLE_PRE1}
                   </TabsTrigger>
                   <TabsTrigger
                     value={CONSOLE_TAB_PRE2}
-                    className='shrink-0 flex-none rounded-full px-4'
+                    className='flex-none shrink-0 rounded-full px-4'
                   >
                     {LABEL_CONSOLE_PRE2}
                   </TabsTrigger>
                   <TabsTrigger
                     value={CONSOLE_TAB_FINAL}
-                    className='shrink-0 flex-none rounded-full px-4'
+                    className='flex-none shrink-0 rounded-full px-4'
                   >
                     {LABEL_CONSOLE_FINAL}
                   </TabsTrigger>
@@ -647,7 +643,7 @@ function ResultsPage() {
                 {isLoading ? null : pre1Rows.length === 0 ? (
                   <StatusMessage>{LABEL_EMPTY}</StatusMessage>
                 ) : (
-                  <div className='-mx-4 px-4 overflow-x-auto'>
+                  <div className='-mx-4 overflow-x-auto px-4'>
                     <Table className='min-w-[720px]'>
                       <TableHeader>
                         <TableRow>
@@ -674,7 +670,8 @@ function ResultsPage() {
                             row.nickname,
                             entryId
                           )
-                          const controller = extractController(row.detail) || '-'
+                          const controller =
+                            extractController(row.detail) || '-'
                           const rankValue = toNumber(row.rank)
                           const isAdvance =
                             typeof rankValue === 'number' && rankValue <= 16
@@ -717,7 +714,7 @@ function ResultsPage() {
                 {isLoading ? null : pre2Rows.length === 0 ? (
                   <StatusMessage>{LABEL_EMPTY}</StatusMessage>
                 ) : (
-                  <div className='-mx-4 px-4 overflow-x-auto'>
+                  <div className='-mx-4 overflow-x-auto px-4'>
                     <Table className='min-w-[720px]'>
                       <TableHeader>
                         <TableRow>
@@ -789,12 +786,14 @@ function ResultsPage() {
               <TabsContent value={CONSOLE_TAB_FINAL} className='space-y-4'>
                 <ConsoleBracket4 data={finalBracket} />
                 {!hasFinalBracket && (
-                  <p className='text-xs text-white/60'>{LABEL_CONSOLE_BRACKET}</p>
+                  <p className='text-xs text-white/60'>
+                    {LABEL_CONSOLE_BRACKET}
+                  </p>
                 )}
                 {isLoading ? null : finalRows.length === 0 ? (
                   <StatusMessage>{LABEL_EMPTY}</StatusMessage>
                 ) : (
-                  <div className='-mx-4 px-4 overflow-x-auto'>
+                  <div className='-mx-4 overflow-x-auto px-4'>
                     <Table className='min-w-[720px]'>
                       <TableHeader>
                         <TableRow>

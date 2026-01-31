@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SiteContentPage } from '@/features/site/content-page'
 import { t } from '@/text'
+import { SiteContentPage } from '@/features/site/content-page'
 
 export const Route = createFileRoute('/(site)/arcade')({
   component: ArcadePage,

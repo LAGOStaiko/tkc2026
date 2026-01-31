@@ -1,12 +1,12 @@
 ﻿import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { t } from '@/text'
+import { useSchedule } from '@/lib/api'
 import {
   ScheduleLane,
   type ScheduleItem as LaneItem,
 } from '@/components/schedule/schedule-lane'
-import { useSchedule } from '@/lib/api'
-import { t } from '@/text'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/schedule')({
   component: SchedulePage,
@@ -71,10 +71,7 @@ const sortByOrder = (items: ApiScheduleItem[]) =>
     .map(({ item }) => item)
 
 const splitArcadeTitle = (title: string) => {
-  const patterns = [
-    /(1\s*차)\s*\/\s*(2\s*차)/,
-    /(3\s*차)\s*\/\s*(4\s*차)/,
-  ]
+  const patterns = [/(1\s*차)\s*\/\s*(2\s*차)/, /(3\s*차)\s*\/\s*(4\s*차)/]
 
   for (const pattern of patterns) {
     const match = title.match(pattern)
@@ -149,8 +146,10 @@ const isOpen = (item: ApiScheduleItem) => {
 const getStatusLabel = (status?: string) => {
   const normalized = normalizeStatus(status)
   if (!normalized) return undefined
-  if (normalized.includes('live') || normalized.includes('진행')) return '진행중'
-  if (normalized.includes('open') || normalized.includes('접수')) return '접수중'
+  if (normalized.includes('live') || normalized.includes('진행'))
+    return '진행중'
+  if (normalized.includes('open') || normalized.includes('접수'))
+    return '접수중'
   if (
     normalized.includes('ready') ||
     normalized.includes('upcoming') ||

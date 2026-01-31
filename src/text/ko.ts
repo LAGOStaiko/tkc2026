@@ -1,23 +1,30 @@
 export const ko = {
   'apply.closed': '\uC2E0\uCCAD \uB9C8\uAC10',
-  'apply.failedStatus': '\uC2E0\uCCAD \uC0C1\uD0DC\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
+  'apply.failedStatus':
+    '\uC2E0\uCCAD \uC0C1\uD0DC\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
   'apply.field.cardNo': '\uCE74\uB4DC \uBC88\uD638',
   'apply.field.consentLink': '\uBD80\uBAA8 \uB3D9\uC758\uC11C \uB9C1\uD06C',
-  'apply.field.consentLinkHelp': '\uBBF8\uC131\uB144\uC790\uB294 \uB3D9\uC758\uC11C \uB9C1\uD06C\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4.',
+  'apply.field.consentLinkHelp':
+    '\uBBF8\uC131\uB144\uC790\uB294 \uB3D9\uC758\uC11C \uB9C1\uD06C\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4.',
   'apply.field.division': '\uBD80\uBB38',
-  'apply.field.dohirobaNo': '\uB3D9\uB354\uD788\uB85C\uBC14 \uBC88\uD638(\uC120\uD0DD)',
+  'apply.field.dohirobaNo':
+    '\uB3D9\uB354\uD788\uB85C\uBC14 \uBC88\uD638(\uC120\uD0DD)',
   'apply.field.email': '\uC774\uBA54\uC77C',
   'apply.field.isMinor': '\uBBF8\uC131\uB144\uC790 \uC5EC\uBD80',
-  'apply.field.isMinorHelp': '\uBBF8\uC131\uB144\uC790\uB294 \uBCF4\uD638\uC790 \uB3D9\uC758\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4.',
+  'apply.field.isMinorHelp':
+    '\uBBF8\uC131\uB144\uC790\uB294 \uBCF4\uD638\uC790 \uB3D9\uC758\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4.',
   'apply.field.name': '\uC774\uB984',
   'apply.field.nickname': '\uB3D9\uB354\uB124\uC784',
   'apply.field.phone': '\uC804\uD654\uBC88\uD638',
   'apply.field.privacy': '\uAC1C\uC778\uC815\uBCF4 \uB3D9\uC758',
-  'apply.field.privacyHelp': '\uAC1C\uC778\uC815\uBCF4 \uCC98\uB9AC\uBC29\uCE68\uC5D0 \uB3D9\uC758\uD574 \uC8FC\uC138\uC694.',
+  'apply.field.privacyHelp':
+    '\uAC1C\uC778\uC815\uBCF4 \uCC98\uB9AC\uBC29\uCE68\uC5D0 \uB3D9\uC758\uD574 \uC8FC\uC138\uC694.',
   'apply.field.spectator': '\uC9C1\uAD00 \uCC38\uC5EC',
-  'apply.field.spectatorHelp': '\uAD00\uB78C\uAC1D \uB3D9\uBC18 \uC2DC \uC120\uD0DD',
+  'apply.field.spectatorHelp':
+    '\uAD00\uB78C\uAC1D \uB3D9\uBC18 \uC2DC \uC120\uD0DD',
   'apply.formTitle': '\uB300\uD68C \uC2E0\uCCAD\uC11C',
-  'apply.loadingStatus': '\uC2E0\uCCAD \uC0C1\uD0DC\uB97C \uD655\uC778\uD558\uB294 \uC911...',
+  'apply.loadingStatus':
+    '\uC2E0\uCCAD \uC0C1\uD0DC\uB97C \uD655\uC778\uD558\uB294 \uC911...',
   'apply.placeholder.cardNo': '\uC608: CARD-000000',
   'apply.placeholder.consentLink': '\uC608: https://...',
   'apply.placeholder.dohirobaNo': '\uC120\uD0DD \uC785\uB825',
@@ -28,35 +35,55 @@ export const ko = {
   'apply.receiptId': '\uC811\uC218 \uBC88\uD638',
   'apply.submit': '\uC2E0\uCCAD\uD558\uAE30',
   'apply.submitting': '\uC2E0\uCCAD \uC911...',
-  'apply.subtitle': '\uB300\uD68C \uCC38\uAC00 \uC2E0\uCCAD \uC815\uBCF4\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
+  'apply.subtitle':
+    '\uB300\uD68C \uCC38\uAC00 \uC2E0\uCCAD \uC815\uBCF4\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
   'apply.title': '\uB300\uD68C \uC2E0\uCCAD',
-  'apply.completed': '\uC2E0\uCCAD\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
-  'apply.submitFailed': '\uC2E0\uCCAD\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.cardNoRequired': '\uCE74\uB4DC \uBC88\uD638\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.consentRequired': '\uBBF8\uC131\uB144\uC790\uB294 \uB3D9\uC758\uC11C \uB9C1\uD06C\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4.',
-  'apply.validation.divisionRequired': '\uBD80\uBB38\uC744 \uC120\uD0DD\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.emailRequired': '\uC774\uBA54\uC77C\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.nameRequired': '\uC774\uB984\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.nicknameRequired': '\uB3D9\uB354\uB124\uC784\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.phoneRequired': '\uC804\uD654\uBC88\uD638\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.privacyRequired': '\uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC774\uC6A9\uC5D0 \uB3D9\uC758\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.emailInvalid': '\uC62C\uBC14\uB978 \uC774\uBA54\uC77C \uD615\uC2DD\uC774 \uC544\uB2D9\uB2C8\uB2E4.',
+  'apply.completed':
+    '\uC2E0\uCCAD\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
+  'apply.submitFailed':
+    '\uC2E0\uCCAD\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.',
+  'apply.validation.cardNoRequired':
+    '\uCE74\uB4DC \uBC88\uD638\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
+  'apply.validation.consentRequired':
+    '\uBBF8\uC131\uB144\uC790\uB294 \uB3D9\uC758\uC11C \uB9C1\uD06C\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4.',
+  'apply.validation.divisionRequired':
+    '\uBD80\uBB38\uC744 \uC120\uD0DD\uD574 \uC8FC\uC138\uC694.',
+  'apply.validation.emailRequired':
+    '\uC774\uBA54\uC77C\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
+  'apply.validation.nameRequired':
+    '\uC774\uB984\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
+  'apply.validation.nicknameRequired':
+    '\uB3D9\uB354\uB124\uC784\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
+  'apply.validation.phoneRequired':
+    '\uC804\uD654\uBC88\uD638\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
+  'apply.validation.privacyRequired':
+    '\uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC774\uC6A9\uC5D0 \uB3D9\uC758\uD574 \uC8FC\uC138\uC694.',
+  'apply.validation.emailInvalid':
+    '\uC62C\uBC14\uB978 \uC774\uBA54\uC77C \uD615\uC2DD\uC774 \uC544\uB2D9\uB2C8\uB2E4.',
   'common.close': '\uB2EB\uAE30',
-  'common.loadFailed': '\uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
+  'common.loadFailed':
+    '\uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
   'common.loading': '\uBD88\uB7EC\uC624\uB294 \uC911...',
   'common.none': '\uC5C6\uC74C',
   'contact.channelsTitle': '\uBB38\uC758 \uCC44\uB110',
-  'contact.failedContent': '\uB0B4\uC6A9\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
-  'contact.failedInfo': '\uBB38\uC758 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
+  'contact.failedContent':
+    '\uB0B4\uC6A9\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
+  'contact.failedInfo':
+    '\uBB38\uC758 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
   'contact.labelEmail': '\uC774\uBA54\uC77C',
   'contact.labelKakao': '\uCE74\uCE74\uC624 \uCC44\uB110',
-  'contact.loadingContent': '\uB0B4\uC6A9\uC744 \uBD88\uB7EC\uC624\uB294 \uC911...',
-  'contact.loadingInfo': '\uBB38\uC758 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911...',
-  'contact.noContent': '\uCD94\uAC00 \uBB38\uC758 \uB0B4\uC6A9\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  'contact.noInfo': '\uBB38\uC758 \uC815\uBCF4\uB294 \uC900\uBE44 \uC911\uC785\uB2C8\uB2E4.',
+  'contact.loadingContent':
+    '\uB0B4\uC6A9\uC744 \uBD88\uB7EC\uC624\uB294 \uC911...',
+  'contact.loadingInfo':
+    '\uBB38\uC758 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911...',
+  'contact.noContent':
+    '\uCD94\uAC00 \uBB38\uC758 \uB0B4\uC6A9\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.',
+  'contact.noInfo':
+    '\uBB38\uC758 \uC815\uBCF4\uB294 \uC900\uBE44 \uC911\uC785\uB2C8\uB2E4.',
   'contact.openKakao': '\uCE74\uCE74\uC624 \uCC44\uB110 \uC5F4\uAE30',
   'contact.sendEmail': '\uC774\uBA54\uC77C \uBCF4\uB0B4\uAE30',
-  'contact.subtitle': '\uBB38\uC758 \uC0AC\uD56D\uC740 \uC544\uB798 \uCC44\uB110\uB85C \uC5F0\uB77D\uD574 \uC8FC\uC138\uC694.',
+  'contact.subtitle':
+    '\uBB38\uC758 \uC0AC\uD56D\uC740 \uC544\uB798 \uCC44\uB110\uB85C \uC5F0\uB77D\uD574 \uC8FC\uC138\uC694.',
   'contact.title': '\uBB38\uC758',
   'console.sheet.overview': '\uC9C4\uD589 \uAC1C\uC694',
   'console.sheet.eligibility': '\uACF5\uD1B5 \uADDC\uC815',
@@ -67,23 +94,30 @@ export const ko = {
   'console.tocTitle': '\uBAA9\uCC28',
   'console.rulesTitle': '\uC608\uC120/\uACB0\uC120 \uADDC\uC815',
   'content.empty': '\uCF58\uD150\uCE20\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  'content.loadFailed': '\uCF58\uD150\uCE20\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
-  'content.loading': '\uCF58\uD150\uCE20\uB97C \uBD88\uB7EC\uC624\uB294 \uC911...',
+  'content.loadFailed':
+    '\uCF58\uD150\uCE20\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
+  'content.loading':
+    '\uCF58\uD150\uCE20\uB97C \uBD88\uB7EC\uC624\uB294 \uC911...',
   'content.sectionFallback': '\uC139\uC158',
   'footer.noneListed': '\uC5C6\uC74C',
   'footer.partners': '\uD611\uB825\uC0AC',
   'footer.partnerFallback': '\uD611\uB825\uC0AC',
-  'home.arcadeCardBody': '\uACBD\uAE30 \uC77C\uC815, \uAE30\uAE30 \uC815\uBCF4, \uD604\uC7A5 \uCC38\uAC00 \uC548\uB0B4\uB97C \uD655\uC778\uD558\uC138\uC694.',
-  'home.arcadeCardSubtitle': '\uC544\uCF00\uC774\uB4DC \uBD80\uBB38 \uBBF8\uB9AC\uBCF4\uAE30 \uBC0F \uCC38\uAC00 \uD750\uB984',
+  'home.arcadeCardBody':
+    '\uACBD\uAE30 \uC77C\uC815, \uAE30\uAE30 \uC815\uBCF4, \uD604\uC7A5 \uCC38\uAC00 \uC548\uB0B4\uB97C \uD655\uC778\uD558\uC138\uC694.',
+  'home.arcadeCardSubtitle':
+    '\uC544\uCF00\uC774\uB4DC \uBD80\uBB38 \uBBF8\uB9AC\uBCF4\uAE30 \uBC0F \uCC38\uAC00 \uD750\uB984',
   'home.arcadeCardTitle': '\uC544\uCF00\uC774\uB4DC',
   'home.catchphraseFallback': '\uACF5\uC2DD \uD0C0\uC774\uCF54 \uB300\uD68C',
-  'home.consoleCardBody': '\uC608\uC120 \uBC29\uC2DD, \uC810\uC218 \uC9D1\uACC4, \uCC38\uC5EC \uBC29\uBC95\uC744 \uD655\uC778\uD558\uC138\uC694.',
-  'home.consoleCardSubtitle': '\uCF58\uC194 \uBD80\uBB38 \uC548\uB0B4 \uBC0F \uADDC\uC815',
+  'home.consoleCardBody':
+    '\uC608\uC120 \uBC29\uC2DD, \uC810\uC218 \uC9D1\uACC4, \uCC38\uC5EC \uBC29\uBC95\uC744 \uD655\uC778\uD558\uC138\uC694.',
+  'home.consoleCardSubtitle':
+    '\uCF58\uC194 \uBD80\uBB38 \uC548\uB0B4 \uBC0F \uADDC\uC815',
   'home.consoleCardTitle': '\uCF58\uC194',
   'home.ctaApply': '\uB300\uD68C \uC2E0\uCCAD\uD558\uAE30',
   'home.details': '\uC790\uC138\uD788 \uBCF4\uAE30',
   'home.heroEventLine': 'Taiko Korea Championship 2026',
-  'home.heroTagline': '\uafc8\uc744 \ud604\uc2e4\ub85c, \ud604\uc2e4\uc744 \uae30\uc801\uc73c\ub85c.',
+  'home.heroTagline':
+    '\uafc8\uc744 \ud604\uc2e4\ub85c, \ud604\uc2e4\uc744 \uae30\uc801\uc73c\ub85c.',
   'nav.apply': '\uB300\uD68C \uC2E0\uCCAD\uD558\uB7EC \uAC00\uAE30',
   'nav.arcade': '\uC544\uCF00\uC774\uB4DC',
   'nav.console': '\uCF58\uC194',
@@ -94,7 +128,8 @@ export const ko = {
   'nav.results': '\uC21C\uC704 \uBC0F \uACB0\uACFC',
   'nav.schedule': '\uC77C\uC815',
   'results.empty': '\uACB0\uACFC\uAC00 \uC544\uC9C1 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  'results.failed': '\uACB0\uACFC\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
+  'results.failed':
+    '\uACB0\uACFC\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
   'results.label.detail': '\uC0C1\uC138',
   'results.label.nickname': '\uB2C9\uB124\uC784',
   'results.label.rank': '\uC21C\uC704',
@@ -105,7 +140,8 @@ export const ko = {
   'results.status.done': '\uC644\uB8CC',
   'results.status.live': '\uC9C4\uD589 \uC911',
   'results.status.ready': '\uC5C5\uB370\uC774\uD2B8 \uC608\uC815',
-  'results.subtitle': '\uBD80\uBB38\uBCC4 \uC2A4\uD14C\uC774\uC9C0 \uACB0\uACFC\uC785\uB2C8\uB2E4.',
+  'results.subtitle':
+    '\uBD80\uBB38\uBCC4 \uC2A4\uD14C\uC774\uC9C0 \uACB0\uACFC\uC785\uB2C8\uB2E4.',
   'results.tab.arcade': '\uC544\uCF00\uC774\uB4DC',
   'results.tab.console': '\uCF58\uC194',
   'results.title': '\uACB0\uACFC',
@@ -116,10 +152,14 @@ export const ko = {
   'results.console.tab.final': '\uACB0\uC120',
   'results.console.quickView': '\uBC14\uB85C \uBCF4\uAE30',
   'results.console.previewTitle': 'TOP 5 \uBBF8\uB9AC\uBCF4\uAE30',
-  'results.console.summary.pre1': '\uC9C4\uCD9C \uCEF7: \uC0C1\uC704 16\uBA85 2\uCC28 \uC608\uC120 \uC9C4\uCD9C',
-  'results.console.summary.pre2': '\uACB0\uC120 \uC9C4\uCD9C: \uC0C1\uC704 4\uBA85',
-  'results.console.summary.final': '\uACB0\uC120: \uCD5C\uC885 4\uC778 \uC21C\uC704',
-  'results.console.bracketPlaceholder': '\uBE0C\uB77C\uCF13\uC740 \uACB0\uC120 \uC9C4\uD589 \uD6C4 \uACF5\uAC1C\uB429\uB2C8\uB2E4.',
+  'results.console.summary.pre1':
+    '\uC9C4\uCD9C \uCEF7: \uC0C1\uC704 16\uBA85 2\uCC28 \uC608\uC120 \uC9C4\uCD9C',
+  'results.console.summary.pre2':
+    '\uACB0\uC120 \uC9C4\uCD9C: \uC0C1\uC704 4\uBA85',
+  'results.console.summary.final':
+    '\uACB0\uC120: \uCD5C\uC885 4\uC778 \uC21C\uC704',
+  'results.console.bracketPlaceholder':
+    '\uBE0C\uB77C\uCF13\uC740 \uACB0\uC120 \uC9C4\uD589 \uD6C4 \uACF5\uAC1C\uB429\uB2C8\uB2E4.',
   'results.console.bracketTitle': '\uACB0\uC120 \uBE0C\uB77C\uCF13',
   'results.console.bracket.semi1': '\uC900\uACB0\uC2B9 1',
   'results.console.bracket.semi2': '\uC900\uACB0\uC2B9 2',
@@ -134,40 +174,60 @@ export const ko = {
   'results.console.column.total': '\uD569\uC0B0 \uC810\uC218',
   'results.console.badge.pre2': '2\uCC28 \uC9C4\uCD9C',
   'results.console.badge.final': '\uACB0\uC120 \uC9C4\uCD9C',
-  'results.console.searchPlaceholder': '\uB2C9\uB124\uC784 \uB610\uB294 Entry ID \uAC80\uC0C9',
+  'results.console.searchPlaceholder':
+    '\uB2C9\uB124\uC784 \uB610\uB294 Entry ID \uAC80\uC0C9',
   'schedule.empty': '\uC544\uC9C1 \uC77C\uC815\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  'schedule.failed': '\uC77C\uC815\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
+  'schedule.failed':
+    '\uC77C\uC815\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
   'schedule.itemFallback': '\uC77C\uC815',
   'schedule.loading': '\uC77C\uC815\uC744 \uBD88\uB7EC\uC624\uB294 \uC911...',
   'schedule.status.done': '\uC644\uB8CC',
   'schedule.status.live': '\uC9C4\uD589 \uC911',
   'schedule.status.upcoming': '\uC608\uC815',
-  'schedule.subtitle': '\uC77C\uC815 \uBC0F \uACBD\uAE30 \uC815\uBCF4\uB97C \uD655\uC778\uD558\uC138\uC694.',
+  'schedule.subtitle':
+    '\uC77C\uC815 \uBC0F \uACBD\uAE30 \uC815\uBCF4\uB97C \uD655\uC778\uD558\uC138\uC694.',
   'schedule.tab.all': '\uC804\uCCB4',
   'schedule.tab.arcade': '\uC544\uCF00\uC774\uB4DC',
   'schedule.tab.console': '\uCF58\uC194',
   'schedule.title': '\uC77C\uC815',
   'meta.siteName': 'TKC2026',
-  'site.loading': '\uC0AC\uC774\uD2B8 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911...',
-  'site.loadFailed': '\uC0AC\uC774\uD2B8 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
-  'toast.contentNotFound': '\uCF58\uD150\uCE20\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  'toast.contentNotModified': '\uCF58\uD150\uCE20\uAC00 \uBCC0\uACBD\uB418\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4.',
-  'toast.generalError': '\uBB38\uC81C\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.',
-  'toast.internalServerError': '\uC11C\uBC84 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.',
-  'toast.sessionExpired': '\uC138\uC158\uC774 \uB9CC\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
+  'site.loading':
+    '\uC0AC\uC774\uD2B8 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911...',
+  'site.loadFailed':
+    '\uC0AC\uC774\uD2B8 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
+  'toast.contentNotFound':
+    '\uCF58\uD150\uCE20\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.',
+  'toast.contentNotModified':
+    '\uCF58\uD150\uCE20\uAC00 \uBCC0\uACBD\uB418\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4.',
+  'toast.generalError':
+    '\uBB38\uC81C\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.',
+  'toast.internalServerError':
+    '\uC11C\uBC84 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.',
+  'toast.sessionExpired':
+    '\uC138\uC158\uC774 \uB9CC\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
   'error.action.goBack': '\uB4A4\uB85C \uAC00\uAE30',
   'error.action.backToHome': '\uD648\uC73C\uB85C',
   'error.action.learnMore': '\uC790\uC138\uD788 \uBCF4\uAE30',
-  'error.general.title': '\uBB38\uC81C\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.',
-  'error.general.description': '\uC77C\uC2DC\uC801\uC778 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4. \uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.',
-  'error.notFound.title': '\uD398\uC774\uC9C0\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  'error.notFound.description': '\uC694\uCCAD\uD55C \uD398\uC774\uC9C0\uAC00 \uC5C6\uAC70\uB098 \uC0AD\uC81C\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
-  'error.unauthorized.title': '\uC778\uC99D\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.',
-  'error.unauthorized.description': '\uD574\uB2F9 \uB9AC\uC18C\uC2A4\uB97C \uC774\uC6A9\uD558\uB824\uBA74 \uB85C\uADF8\uC778\uD574 \uC8FC\uC138\uC694.',
-  'error.forbidden.title': '\uC811\uADFC \uAD8C\uD55C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  'error.forbidden.description': '\uC774 \uB9AC\uC18C\uC2A4\uC5D0 \uB300\uD55C \uAD8C\uD55C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  'error.maintenance.title': '\uC11C\uBE44\uC2A4 \uC810\uAC80 \uC911\uC785\uB2C8\uB2E4.',
-  'error.maintenance.description': '\uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uC774\uC6A9\uD574 \uC8FC\uC138\uC694.',
+  'error.general.title':
+    '\uBB38\uC81C\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.',
+  'error.general.description':
+    '\uC77C\uC2DC\uC801\uC778 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4. \uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.',
+  'error.notFound.title':
+    '\uD398\uC774\uC9C0\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.',
+  'error.notFound.description':
+    '\uC694\uCCAD\uD55C \uD398\uC774\uC9C0\uAC00 \uC5C6\uAC70\uB098 \uC0AD\uC81C\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
+  'error.unauthorized.title':
+    '\uC778\uC99D\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.',
+  'error.unauthorized.description':
+    '\uD574\uB2F9 \uB9AC\uC18C\uC2A4\uB97C \uC774\uC6A9\uD558\uB824\uBA74 \uB85C\uADF8\uC778\uD574 \uC8FC\uC138\uC694.',
+  'error.forbidden.title':
+    '\uC811\uADFC \uAD8C\uD55C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.',
+  'error.forbidden.description':
+    '\uC774 \uB9AC\uC18C\uC2A4\uC5D0 \uB300\uD55C \uAD8C\uD55C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.',
+  'error.maintenance.title':
+    '\uC11C\uBE44\uC2A4 \uC810\uAC80 \uC911\uC785\uB2C8\uB2E4.',
+  'error.maintenance.description':
+    '\uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uC774\uC6A9\uD574 \uC8FC\uC138\uC694.',
 } as const
 
 export type TextKey = keyof typeof ko

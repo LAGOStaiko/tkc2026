@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
 import { t } from '@/text'
+import { Button } from '@/components/ui/button'
 
 export function MaintenanceError() {
   useEffect(() => {

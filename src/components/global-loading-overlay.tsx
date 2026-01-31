@@ -92,7 +92,7 @@ export function GlobalLoadingOverlay() {
   return (
     <div
       aria-hidden={overlayState === 'hidden'}
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black/55 transition-[opacity,backdrop-filter] transform-gpu will-change-[opacity,backdrop-filter] ${transitionClass} ${visibilityClass} ${blurClass} cursor-wait`}
+      className={`fixed inset-0 z-[9999] flex transform-gpu items-center justify-center bg-black/55 transition-[opacity,backdrop-filter] will-change-[opacity,backdrop-filter] ${transitionClass} ${visibilityClass} ${blurClass} cursor-wait`}
     >
       <div className='inline-flex flex-col items-center'>
         <img

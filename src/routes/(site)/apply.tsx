@@ -3,8 +3,8 @@ import { z } from 'zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
-import { GlassCard } from '@/components/tkc/glass-card'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { t } from '@/text'
+import { useRegister, useSite } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -19,8 +19,8 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { useRegister, useSite } from '@/lib/api'
-import { t } from '@/text'
+import { GlassCard } from '@/components/tkc/glass-card'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/apply')({
   component: ApplyPage,
@@ -68,7 +68,9 @@ const formSchema = z
   .object({
     division: z.enum(['console', 'arcade'], {
       error: (iss) =>
-        iss.input === undefined ? validationMessages.divisionRequired : undefined,
+        iss.input === undefined
+          ? validationMessages.divisionRequired
+          : undefined,
     }),
     name: z.string().min(1, { message: validationMessages.nameRequired }),
     phone: z.string().min(1, { message: validationMessages.phoneRequired }),
@@ -84,17 +86,14 @@ const formSchema = z
     spectator: z.boolean(),
     isMinor: z.boolean(),
     consentLink: z.string().optional(),
-    privacyAgree: z
-      .boolean()
-      .refine((value) => value, { message: validationMessages.privacyRequired }),
+    privacyAgree: z.boolean().refine((value) => value, {
+      message: validationMessages.privacyRequired,
+    }),
   })
-  .refine(
-    (data) => !data.isMinor || Boolean(data.consentLink?.trim()),
-    {
-      message: validationMessages.consentRequired,
-      path: ['consentLink'],
-    }
-  )
+  .refine((data) => !data.isMinor || Boolean(data.consentLink?.trim()), {
+    message: validationMessages.consentRequired,
+    path: ['consentLink'],
+  })
 
 type ApplyFormValues = z.infer<typeof formSchema>
 
@@ -190,11 +189,11 @@ function ApplyPage() {
                             <FormControl>
                               <RadioGroupItem value='console' />
                             </FormControl>
-                          <FormLabel className='font-normal'>
-                            {LABEL_CONSOLE}
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className='flex items-center gap-2 rounded-md border p-3'>
+                            <FormLabel className='font-normal'>
+                              {LABEL_CONSOLE}
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className='flex items-center gap-2 rounded-md border p-3'>
                             <FormControl>
                               <RadioGroupItem value='arcade' />
                             </FormControl>
@@ -217,7 +216,10 @@ function ApplyPage() {
                       <FormItem>
                         <FormLabel>{t('apply.field.name')}</FormLabel>
                         <FormControl>
-                          <Input placeholder={t('apply.placeholder.name')} {...field} />
+                          <Input
+                            placeholder={t('apply.placeholder.name')}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage className='text-xs text-white/60' />
                       </FormItem>
@@ -324,10 +326,10 @@ function ApplyPage() {
                   <FormField
                     control={form.control}
                     name='spectator'
-                  render={({ field }) => (
-                    <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
-                      <FormControl>
-                        <Checkbox
+                    render={({ field }) => (
+                      <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
+                        <FormControl>
+                          <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             className='mt-0.5 size-5'
@@ -401,7 +403,10 @@ function ApplyPage() {
                       <FormItem>
                         <FormLabel>{t('apply.field.consentLink')}</FormLabel>
                         <FormControl>
-                          <Input placeholder={t('apply.placeholder.consentLink')} {...field} />
+                          <Input
+                            placeholder={t('apply.placeholder.consentLink')}
+                            {...field}
+                          />
                         </FormControl>
                         <FormDescription className='text-xs text-white/60'>
                           {t('apply.field.consentLinkHelp')}
@@ -431,7 +436,11 @@ function ApplyPage() {
                 </div>
               )}
 
-              <Button type='submit' disabled={isDisabled} className='w-full sm:w-auto'>
+              <Button
+                type='submit'
+                disabled={isDisabled}
+                className='w-full sm:w-auto'
+              >
                 {isSubmitting ? t('apply.submitting') : t('apply.submit')}
               </Button>
             </form>

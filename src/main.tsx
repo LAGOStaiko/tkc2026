@@ -7,10 +7,10 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { t } from '@/text'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
-import { t } from '@/text'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
@@ -51,18 +51,18 @@ const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({
     onError: (error) => {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            toast.error(t('toast.sessionExpired'))
-            useAuthStore.getState().auth.reset()
-            const redirect = `${router.history.location.href}`
-            router.navigate({ to: '/sign-in', search: { redirect } })
-          }
-          if (error.response?.status === 500) {
-            toast.error(t('toast.internalServerError'))
-            // Only navigate to error page in production to avoid disrupting HMR in development
-            if (import.meta.env.PROD) {
-              router.navigate({ to: '/500' })
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          toast.error(t('toast.sessionExpired'))
+          useAuthStore.getState().auth.reset()
+          const redirect = `${router.history.location.href}`
+          router.navigate({ to: '/sign-in', search: { redirect } })
+        }
+        if (error.response?.status === 500) {
+          toast.error(t('toast.internalServerError'))
+          // Only navigate to error page in production to avoid disrupting HMR in development
+          if (import.meta.env.PROD) {
+            router.navigate({ to: '/500' })
           }
         }
         if (error.response?.status === 403) {
