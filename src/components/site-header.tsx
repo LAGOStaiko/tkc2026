@@ -57,7 +57,7 @@ export function SiteHeader() {
         // Force the site header to stay pinned to the viewport top on every page.
         id='site-header'
         data-site-header
-        className='!fixed inset-x-0 top-0 z-50 h-16 bg-transparent text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]'
+        className='dark !fixed inset-x-0 top-0 z-50 h-16 bg-transparent text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]'
       >
         <SiteContainer className='flex h-16 items-center justify-between gap-4'>
           <Link to='/' className='flex items-center gap-3'>
@@ -101,15 +101,17 @@ export function SiteHeader() {
                 <Button
                   variant='outline'
                   size='icon'
-                  className='border-white/30 text-white/90 hover:bg-white/10 hover:text-white md:hidden'
+                  className='border-white/30 bg-transparent text-white/90 hover:bg-white/10 hover:text-white md:hidden'
                   aria-label={t('nav.openMenu')}
                 >
                   <Menu className='size-4' />
                 </Button>
               </SheetTrigger>
-              <SheetContent side='right' className='p-0'>
-                <SheetHeader className='border-b'>
-                  <SheetTitle>{t('nav.menuTitle')}</SheetTitle>
+              <SheetContent side='right' className='bg-black p-0 text-white'>
+                <SheetHeader className='border-b border-white/10'>
+                  <SheetTitle className='text-white/90'>
+                    {t('nav.menuTitle')}
+                  </SheetTitle>
                 </SheetHeader>
                 <div className='flex flex-col gap-1 p-4'>
                   {navItems.map((item) => {
