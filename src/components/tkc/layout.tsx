@@ -1,5 +1,4 @@
 import type { HTMLAttributes } from 'react'
-import { t } from '@/text'
 import { cn } from '@/lib/utils'
 
 type TkcPageHeaderProps = {
