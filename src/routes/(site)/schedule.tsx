@@ -219,7 +219,9 @@ const getFeaturedSet = (items: ApiScheduleItem[]) => {
 
   const today = startOfDay(new Date())
   const decorated = items.map((item, index) => {
-    const { start, end } = getDateRange(item)
+    const { start: rangeStart, end: rangeEnd } = getDateRange(item)
+    const start = rangeStart ?? rangeEnd
+    const end = rangeEnd ?? rangeStart
     return {
       item,
       index,
@@ -239,13 +241,16 @@ const getFeaturedSet = (items: ApiScheduleItem[]) => {
 
   if (liveItems.length > 0) return new Set(liveItems)
 
-  const upcoming = decorated
-    .filter(({ start }) => start && start >= today)
-    .sort((a, b) => {
-      const dateDiff = a.start!.getTime() - b.start!.getTime()
-      if (dateDiff !== 0) return dateDiff
-      return getOrderValue(a.item) - getOrderValue(b.item)
-    })
+  const isUpcoming = (
+    entry: (typeof decorated)[number]
+  ): entry is (typeof decorated)[number] & { start: Date } =>
+    Boolean(entry.start && entry.start >= today)
+
+  const upcoming = decorated.filter(isUpcoming).sort((a, b) => {
+    const dateDiff = a.start.getTime() - b.start.getTime()
+    if (dateDiff !== 0) return dateDiff
+    return getOrderValue(a.item) - getOrderValue(b.item)
+  })
 
   if (upcoming.length > 0) return new Set([upcoming[0].item])
 
