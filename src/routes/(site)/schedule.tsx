@@ -234,8 +234,10 @@ const getFeaturedSet = (items: ApiScheduleItem[]) => {
   const liveItems = decorated
     .filter(({ item, start, end }) => {
       const liveByStatus = isLive(item)
-      const liveByDate = Boolean(start && end) && start <= today && today <= end
-      return liveByStatus || liveByDate
+      if (start && end) {
+        return liveByStatus || (start <= today && today <= end)
+      }
+      return liveByStatus
     })
     .map(({ item }) => item)
 
