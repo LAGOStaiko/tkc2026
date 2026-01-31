@@ -55,6 +55,8 @@ export function SiteHeader() {
     () => (
       <header
         // Force the site header to stay pinned to the viewport top on every page.
+        id='site-header'
+        data-site-header
         className='!fixed inset-x-0 top-0 z-50 h-16 bg-transparent text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]'
       >
         <SiteContainer className='flex h-16 items-center justify-between gap-4'>

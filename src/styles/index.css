@@ -22,6 +22,13 @@
     overflow-x: clip;
   }
 
+  /* Ensure site header stays fixed even if upstream styles override it. */
+  #site-header {
+    position: fixed !important;
+    inset: 0 auto auto 0;
+    width: 100%;
+  }
+
   .tkc-serif {
     font-family: var(--tkc-font-serif);
   }
