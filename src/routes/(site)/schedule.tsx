@@ -109,6 +109,52 @@ const formatMmDd = (value?: string) => {
   return null
 }
 
+const parseDateValue = (value?: string) => {
+  if (!value) return null
+  const isoMatch = value.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  if (isoMatch) {
+    const [, yyyy, mm, dd] = isoMatch
+    return new Date(Number(yyyy), Number(mm) - 1, Number(dd))
+  }
+  const monthDayMatch = value.match(/(\d{1,2})[.\-/](\d{1,2})/)
+  if (monthDayMatch) {
+    const [, mm, dd] = monthDayMatch
+    const year = new Date().getFullYear()
+    return new Date(year, Number(mm) - 1, Number(dd))
+  }
+  const koreanMatch = value.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/)
+  if (koreanMatch) {
+    const [, mm, dd] = koreanMatch
+    const year = new Date().getFullYear()
+    return new Date(year, Number(mm) - 1, Number(dd))
+  }
+  return null
+}
+
+const parseDateRangeFromText = (value?: string) => {
+  if (!value) return { start: null, end: null }
+  const matches =
+    value.match(/(\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2}|\d{1,2}[.\-/]\d{1,2})/g) ?? []
+  const [first, second] = matches
+  const start = parseDateValue(first)
+  const end = parseDateValue(second)
+  return { start, end }
+}
+
+const startOfDay = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate())
+
+const getDateRange = (item: ApiScheduleItem) => {
+  const startSource = item.startDate ?? item.start
+  const endSource = item.endDate ?? item.end
+  const textRange = parseDateRangeFromText(item.dateText)
+
+  const start = parseDateValue(startSource) ?? textRange.start
+  const end = parseDateValue(endSource) ?? textRange.end
+
+  return { start, end }
+}
+
 const resolveDateParts = (item: ApiScheduleItem) => {
   if (item.dateText) {
     const main = formatMmDd(item.dateText)
@@ -168,17 +214,54 @@ const getStatusLabel = (status?: string) => {
   return status
 }
 
-const pickFeatured = (items: ApiScheduleItem[]) => {
-  const live = items.find((item) => isLive(item))
-  if (live) return live
-  const open = items.find((item) => isOpen(item))
-  if (open) return open
-  return items[0]
+const getFeaturedSet = (items: ApiScheduleItem[]) => {
+  if (items.length === 0) return new Set<ApiScheduleItem>()
+
+  const today = startOfDay(new Date())
+  const decorated = items.map((item, index) => {
+    const { start, end } = getDateRange(item)
+    return {
+      item,
+      index,
+      start,
+      end,
+      hasDate: Boolean(start || end),
+    }
+  })
+
+  const liveItems = decorated
+    .filter(({ item, start, end }) => {
+      const liveByStatus = isLive(item)
+      const liveByDate = Boolean(start && end) && start <= today && today <= end
+      return liveByStatus || liveByDate
+    })
+    .map(({ item }) => item)
+
+  if (liveItems.length > 0) return new Set(liveItems)
+
+  const upcoming = decorated
+    .filter(({ start }) => start && start >= today)
+    .sort((a, b) => {
+      const dateDiff = a.start!.getTime() - b.start!.getTime()
+      if (dateDiff !== 0) return dateDiff
+      return getOrderValue(a.item) - getOrderValue(b.item)
+    })
+
+  if (upcoming.length > 0) return new Set([upcoming[0].item])
+
+  const hasAnyDate = decorated.some(({ hasDate }) => hasDate)
+  if (hasAnyDate) return new Set<ApiScheduleItem>()
+
+  const liveFallback = items.find((item) => isLive(item))
+  if (liveFallback) return new Set([liveFallback])
+  const openFallback = items.find((item) => isOpen(item))
+  if (openFallback) return new Set([openFallback])
+  return new Set([items[0]])
 }
 
 const toLaneItems = (
   items: ApiScheduleItem[],
-  featuredItem: ApiScheduleItem | undefined
+  featuredSet: Set<ApiScheduleItem>
 ): LaneItem[] =>
   items.map((item, index) => {
     const dateParts = resolveDateParts(item)
@@ -191,7 +274,7 @@ const toLaneItems = (
       meta1: item.location,
       meta2: item.note,
       statusLabel: getStatusLabel(item.status),
-      featured: item === featuredItem,
+      featured: featuredSet.has(item),
     }
   })
 
@@ -234,8 +317,8 @@ function SchedulePage() {
     })
   )
 
-  const featuredConsole = pickFeatured(consoleItems)
-  const featuredArcade = pickFeatured(arcadeItems)
+  const featuredConsole = getFeaturedSet(consoleItems)
+  const featuredArcade = getFeaturedSet(arcadeItems)
 
   const consoleLaneItems = toLaneItems(consoleItems, featuredConsole)
   const arcadeLaneItems = toLaneItems(arcadeItems, featuredArcade)
