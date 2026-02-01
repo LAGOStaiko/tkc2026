@@ -51,7 +51,20 @@ const getScheduleItems = (
 
 const normalizeDivision = (item: ApiScheduleItem) => {
   const division = (item.division ?? '').toLowerCase().trim()
-  if (division) return division
+  if (division) {
+    if (division.includes('console') || division.includes('콘솔'))
+      return 'console'
+    if (division.includes('arcade') || division.includes('아케이드'))
+      return 'arcade'
+    if (
+      division.includes('all') ||
+      division.includes('final') ||
+      division.includes('결선')
+    ) {
+      return 'all'
+    }
+    return division
+  }
   const title = (item.title ?? '').toLowerCase()
   if (!title) return ''
   if (title.includes('console') || title.includes('콘솔')) return 'console'
