@@ -28,9 +28,12 @@ type ApiScheduleItem = {
 }
 
 type ScheduleData = {
-  schedule?: ApiScheduleItem[]
-  items?: ApiScheduleItem[]
-  events?: ApiScheduleItem[]
+  schedule?: unknown[]
+  items?: unknown[]
+  events?: unknown[]
+  headers?: unknown[]
+  rows?: unknown[]
+  values?: unknown[]
 }
 
 const ASSETS = {
@@ -38,14 +41,62 @@ const ASSETS = {
   arcadeIcon: '/branding/arcade-icon.png',
 }
 
-const getScheduleItems = (
-  data: ScheduleData | ApiScheduleItem[] | undefined
-) => {
+const normalizeKey = (value: string) =>
+  value.replace(/\uFEFF/g, '').trim().replace(/\s+/g, '')
+
+const arrayToRecord = (headers: unknown[], row: unknown[]) => {
+  const record: Record<string, unknown> = {}
+  headers.forEach((header, index) => {
+    const key =
+      typeof header === 'string' && header.trim().length > 0
+        ? header
+        : `col_${index}`
+    record[key] = row[index]
+  })
+  return record
+}
+
+const looksLikeHeader = (headers: unknown[]) => {
+  const normalized = headers.map((value) =>
+    normalizeKey(String(value ?? '')).toLowerCase()
+  )
+  const candidates = [
+    'division',
+    '날짜',
+    '일자',
+    '예선이름',
+    '예선이름',
+    '장소',
+    '진행여부',
+  ]
+  return normalized.some((value) => candidates.includes(value))
+}
+
+const getScheduleItems = (data: ScheduleData | unknown[] | undefined) => {
   if (!data) return []
-  if (Array.isArray(data)) return data
+  if (Array.isArray(data)) {
+    if (data.length > 0 && Array.isArray(data[0])) {
+      const headerRow = data[0] as unknown[]
+      if (looksLikeHeader(headerRow)) {
+        return (data as unknown[]).slice(1).map((row) => {
+          return Array.isArray(row)
+            ? arrayToRecord(headerRow, row)
+            : row
+        })
+      }
+    }
+    return data
+  }
   if (Array.isArray(data.schedule)) return data.schedule
   if (Array.isArray(data.items)) return data.items
   if (Array.isArray(data.events)) return data.events
+  if (Array.isArray(data.rows) && Array.isArray(data.headers)) {
+    const headerRow = data.headers
+    return data.rows.map((row) => {
+      return Array.isArray(row) ? arrayToRecord(headerRow, row) : row
+    })
+  }
+  if (Array.isArray(data.values)) return data.values
   return []
 }
 
@@ -81,8 +132,13 @@ const normalizeDivision = (item: ApiScheduleItem) => {
 }
 
 const readString = (record: Record<string, unknown>, keys: string[]) => {
+  const normalizedMap = new Map<string, unknown>()
+  Object.entries(record).forEach(([key, value]) => {
+    normalizedMap.set(normalizeKey(key).toLowerCase(), value)
+  })
+
   for (const key of keys) {
-    const value = record[key]
+    const value = normalizedMap.get(normalizeKey(key).toLowerCase())
     if (typeof value === 'string' && value.trim().length > 0) {
       return value.trim()
     }
@@ -93,21 +149,52 @@ const readString = (record: Record<string, unknown>, keys: string[]) => {
   return undefined
 }
 
-const normalizeItem = (item: ApiScheduleItem): ApiScheduleItem => {
-  const record = item as Record<string, unknown>
+const normalizeItem = (item: unknown): ApiScheduleItem => {
+  if (Array.isArray(item)) {
+    const [division, dateText, title, location, status, note] = item
+    return {
+      division:
+        typeof division === 'string' || typeof division === 'number'
+          ? String(division)
+          : undefined,
+      dateText:
+        typeof dateText === 'string' || typeof dateText === 'number'
+          ? String(dateText)
+          : undefined,
+      title:
+        typeof title === 'string' || typeof title === 'number'
+          ? String(title)
+          : undefined,
+      location:
+        typeof location === 'string' || typeof location === 'number'
+          ? String(location)
+          : undefined,
+      status:
+        typeof status === 'string' || typeof status === 'number'
+          ? String(status)
+          : undefined,
+      note:
+        typeof note === 'string' || typeof note === 'number'
+          ? String(note)
+          : undefined,
+    }
+  }
+
+  const base = (item ?? {}) as ApiScheduleItem
+  const record = base as Record<string, unknown>
   const dateText =
-    item.dateText ??
+    base.dateText ??
     readString(record, ['dateText', 'date', '날짜', '일자'])
   const title =
-    item.title ??
+    base.title ??
     readString(record, ['title', 'name', '예선 이름', '예선이름', '행사명'])
   const location =
-    item.location ?? readString(record, ['location', 'place', '장소'])
+    base.location ?? readString(record, ['location', 'place', '장소'])
   const status =
-    item.status ??
+    base.status ??
     readString(record, ['status', 'state', '진행 여부', '진행여부'])
   const note =
-    item.note ??
+    base.note ??
     readString(record, [
       'note',
       'memo',
@@ -120,14 +207,14 @@ const normalizeItem = (item: ApiScheduleItem): ApiScheduleItem => {
       'map',
     ])
   const division =
-    item.division ??
+    base.division ??
     readString(record, ['division', '구분', '종목', 'type'])
   const order =
-    item.order ?? readString(record, ['order', '순서', '정렬', '번호'])
-  const id = item.id ?? readString(record, ['id', 'ID', '식별자'])
+    base.order ?? readString(record, ['order', '순서', '정렬', '번호'])
+  const id = base.id ?? readString(record, ['id', 'ID', '식별자'])
 
   return {
-    ...item,
+    ...(base as ApiScheduleItem),
     id,
     order,
     division,
