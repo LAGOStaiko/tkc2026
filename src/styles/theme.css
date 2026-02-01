@@ -62,9 +62,8 @@
 
 @theme inline {
   --tkc-font-sans:
-    'Apple SD Gothic Neo', 'AppleSDGothicNeo', 'Pretendard Variable',
-    'Pretendard', system-ui, -apple-system, 'Segoe UI', 'Malgun Gothic',
-    sans-serif;
+    'Pretendard Variable', 'Pretendard', 'Noto Sans KR', system-ui,
+    -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
   --tkc-font-serif:
     'Noto Serif KR', 'Nanum Myeongjo', 'AppleMyungjo', 'Batang', serif;
   --font-sans: var(--tkc-font-sans);
