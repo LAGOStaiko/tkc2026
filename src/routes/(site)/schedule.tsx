@@ -49,8 +49,82 @@ const getScheduleItems = (
   return []
 }
 
-const normalizeDivision = (item: ApiScheduleItem) =>
-  (item.division ?? '').toLowerCase().trim()
+const normalizeDivision = (item: ApiScheduleItem) => {
+  const division = (item.division ?? '').toLowerCase().trim()
+  if (division) return division
+  const title = (item.title ?? '').toLowerCase()
+  if (!title) return ''
+  if (title.includes('console') || title.includes('콘솔')) return 'console'
+  if (title.includes('arcade') || title.includes('아케이드')) return 'arcade'
+  if (
+    title.includes('final') ||
+    title.includes('결선') ||
+    title.includes('playx') ||
+    title.includes('플레이엑스포')
+  ) {
+    return 'all'
+  }
+  return ''
+}
+
+const readString = (record: Record<string, unknown>, keys: string[]) => {
+  for (const key of keys) {
+    const value = record[key]
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value.trim()
+    }
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value)
+    }
+  }
+  return undefined
+}
+
+const normalizeItem = (item: ApiScheduleItem): ApiScheduleItem => {
+  const record = item as Record<string, unknown>
+  const dateText =
+    item.dateText ??
+    readString(record, ['dateText', 'date', '날짜', '일자'])
+  const title =
+    item.title ??
+    readString(record, ['title', 'name', '예선 이름', '예선이름', '행사명'])
+  const location =
+    item.location ?? readString(record, ['location', 'place', '장소'])
+  const status =
+    item.status ??
+    readString(record, ['status', 'state', '진행 여부', '진행여부'])
+  const note =
+    item.note ??
+    readString(record, [
+      'note',
+      'memo',
+      '비고',
+      '위치 링크',
+      '위치링크',
+      'href',
+      'link',
+      'url',
+      'map',
+    ])
+  const division =
+    item.division ??
+    readString(record, ['division', '구분', '종목', 'type'])
+  const order =
+    item.order ?? readString(record, ['order', '순서', '정렬', '번호'])
+  const id = item.id ?? readString(record, ['id', 'ID', '식별자'])
+
+  return {
+    ...item,
+    id,
+    order,
+    division,
+    title,
+    dateText,
+    location,
+    status,
+    note,
+  }
+}
 
 const getOrderValue = (item: ApiScheduleItem) => {
   if (typeof item.order === 'number') return item.order
@@ -61,12 +135,24 @@ const getOrderValue = (item: ApiScheduleItem) => {
   return Number.POSITIVE_INFINITY
 }
 
+const getFallbackDate = (item: ApiScheduleItem) => {
+  const startSource = item.startDate ?? item.start ?? item.dateText
+  const endSource = item.endDate ?? item.end
+  return parseDateValue(startSource) ?? parseDateValue(endSource)
+}
+
 const sortByOrder = (items: ApiScheduleItem[]) =>
   items
     .map((item, index) => ({ item, index }))
     .sort((a, b) => {
       const orderDiff = getOrderValue(a.item) - getOrderValue(b.item)
-      return orderDiff !== 0 ? orderDiff : a.index - b.index
+      if (orderDiff !== 0) return orderDiff
+      const aDate = getFallbackDate(a.item)
+      const bDate = getFallbackDate(b.item)
+      if (aDate && bDate) return aDate.getTime() - bDate.getTime()
+      if (aDate) return -1
+      if (bDate) return 1
+      return a.index - b.index
     })
     .map(({ item }) => item)
 
@@ -308,7 +394,8 @@ function SchedulePage() {
     ScheduleData | ApiScheduleItem[]
   >()
   const rawItems = getScheduleItems(data)
-  const expandedItems = expandArcadeItems(rawItems)
+  const normalizedItems = rawItems.map(normalizeItem)
+  const expandedItems = expandArcadeItems(normalizedItems)
 
   const consoleItems = sortByOrder(
     expandedItems.filter((item) => normalizeDivision(item) === 'console')

@@ -28,6 +28,11 @@ type ScheduleEventCardProps = {
   statusLabel?: string
 }
 
+const isUrl = (value?: string) => {
+  if (!value) return false
+  return /^https?:\/\//i.test(value.trim())
+}
+
 export function ScheduleLane({
   iconSrc,
   title,
@@ -111,14 +116,28 @@ export function ScheduleEventCard({
             </div>
           ) : null}
           {meta2 ? (
-            <div
-              className={cn(
-                'text-xs opacity-80',
-                isFeatured ? 'text-white/85' : 'text-slate-600'
-              )}
-            >
-              {meta2}
-            </div>
+            isUrl(meta2) ? (
+              <a
+                href={meta2}
+                target='_blank'
+                rel='noreferrer'
+                className={cn(
+                  'text-xs font-semibold underline-offset-4 hover:underline',
+                  isFeatured ? 'text-white/85' : 'text-slate-600'
+                )}
+              >
+                위치 보기
+              </a>
+            ) : (
+              <div
+                className={cn(
+                  'text-xs opacity-80',
+                  isFeatured ? 'text-white/85' : 'text-slate-600'
+                )}
+              >
+                {meta2}
+              </div>
+            )
           ) : null}
         </div>
         {statusLabel ? (
