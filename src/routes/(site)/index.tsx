@@ -39,7 +39,7 @@ function HomePage() {
   return (
     <div className='space-y-7 md:space-y-9'>
       {/* HERO */}
-      <section className='relative -mt-16 overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-[0_10px_40px_rgba(0,0,0,0.45)]'>
+      <section className='relative -mt-20 overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-[0_10px_40px_rgba(0,0,0,0.45)] md:-mt-24'>
         <div className='relative h-[250px] sm:h-[300px] md:h-[400px] lg:h-[440px]'>
           <img
             src={ASSETS.hero}
