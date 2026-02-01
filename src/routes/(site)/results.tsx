@@ -180,23 +180,23 @@ function HighlightCard({
   const score = loading ? '-' : formatScore(row?.score)
 
   return (
-    <div className='flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 md:px-6'>
-      <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-[#ff2a00]'>
-        <img src={iconSrc} alt='' className='h-6 w-6' />
+    <div className='grid grid-cols-[48px_minmax(0,1fr)_96px] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 md:grid-cols-[56px_minmax(0,1fr)_140px] md:gap-4 md:px-6 md:py-4'>
+      <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-[#ff2a00] md:h-14 md:w-14'>
+        <img src={iconSrc} alt='' className='h-6 w-6 md:h-7 md:w-7' />
       </div>
-      <div className='flex min-w-0 flex-1 items-center justify-between gap-4'>
-        <div className='min-w-0 space-y-1'>
-          <div className='text-[11px] font-semibold text-white/50'>
-            {label}
-          </div>
-          <div className='truncate text-lg font-semibold text-white'>
-            {title}
-          </div>
-          {meta ? <div className='text-xs text-white/60'>{meta}</div> : null}
+      <div className='min-w-0 space-y-1'>
+        <div className='text-[10px] font-semibold text-white/50 md:text-[11px]'>
+          {label}
         </div>
-        <div className='text-right text-lg font-semibold text-white'>
-          {score}
+        <div className='truncate text-base font-semibold text-white md:text-lg'>
+          {title}
         </div>
+        {meta ? (
+          <div className='text-[11px] text-white/60 md:text-xs'>{meta}</div>
+        ) : null}
+      </div>
+      <div className='text-right text-base font-semibold text-white tabular-nums md:text-lg'>
+        {score}
       </div>
     </div>
   )
@@ -296,7 +296,7 @@ function ResultsPage() {
 
       <div className='space-y-4'>
         <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-          <div className='inline-flex w-full max-w-[360px] rounded-full bg-white/10 p-1'>
+          <div className='inline-flex w-full max-w-[280px] rounded-full bg-white/10 p-1 md:max-w-[360px]'>
             {DIVISIONS.map((division) => {
               const isActive = activeDivision === division.key
               return (
@@ -305,7 +305,7 @@ function ResultsPage() {
                   type='button'
                   onClick={() => setActiveDivision(division.key)}
                   className={cn(
-                    'flex-1 rounded-full px-4 py-2 text-sm font-semibold transition',
+                    'flex-1 rounded-full px-3 py-1.5 text-xs font-semibold transition md:px-4 md:py-2 md:text-sm',
                     isActive
                       ? 'bg-[#ff2a00] text-white'
                       : 'text-white/70 hover:text-white'
@@ -320,7 +320,7 @@ function ResultsPage() {
         </div>
 
         <div className='overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]'>
-          <div className='hidden grid-cols-[72px_minmax(0,1fr)_140px_140px] gap-4 px-5 py-3 text-xs font-semibold tracking-wide text-white/50 md:grid'>
+          <div className='grid grid-cols-[44px_minmax(0,1fr)_72px_96px] items-center gap-3 px-4 py-3 text-[11px] font-semibold tracking-wide text-white/50 md:grid-cols-[60px_minmax(0,1fr)_120px_140px] md:gap-4 md:px-5 md:text-xs'>
             <span>{LABEL_RANK}</span>
             <span>{LABEL_NICKNAME}</span>
             <span>{LABEL_CONTROLLER}</span>
@@ -340,11 +340,11 @@ function ResultsPage() {
               {displayRows.map((row) => (
                 <div
                   key={row.key}
-                  className='grid grid-cols-[56px_minmax(0,1fr)_72px] items-center gap-3 px-5 py-4 md:grid-cols-[72px_minmax(0,1fr)_140px_140px] md:gap-4'
+                  className='grid grid-cols-[44px_minmax(0,1fr)_72px_96px] items-center gap-3 px-4 py-3 md:grid-cols-[60px_minmax(0,1fr)_120px_140px] md:gap-4 md:px-5 md:py-4'
                 >
                   <div
                     className={cn(
-                      'text-base font-semibold md:text-lg',
+                      'text-sm font-semibold md:text-lg',
                       row.isTop ? 'text-[#ff2a00]' : 'text-white'
                     )}
                   >
@@ -354,14 +354,11 @@ function ResultsPage() {
                     <div className='truncate text-sm font-semibold text-white md:text-base'>
                       {row.name}
                     </div>
-                    <div className='mt-1 truncate text-xs text-white/60 md:hidden'>
-                      {row.controller}
-                    </div>
                   </div>
-                  <div className='hidden truncate text-sm text-white/60 md:block'>
+                  <div className='truncate text-xs text-white/60 md:text-sm'>
                     {row.controller}
                   </div>
-                  <div className='text-right text-sm font-semibold text-white md:text-base'>
+                  <div className='text-right text-sm font-semibold text-white tabular-nums md:text-base'>
                     {row.score}
                   </div>
                 </div>
