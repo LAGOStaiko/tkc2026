@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useState } from 'react'
+﻿import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useResults } from '@/lib/api'
@@ -120,7 +120,7 @@ const resolveDivision = (value?: string): DivisionKey | null => {
 const getRowsFromStages = (
   stages: ResultStage[] | undefined,
   division: DivisionKey
-) => {
+): ResultRow[] => {
   if (!Array.isArray(stages)) return []
   return stages.flatMap((stage) => {
     if (!Array.isArray(stage.rows) || stage.rows.length === 0) return []
@@ -214,8 +214,8 @@ function ResultsPage() {
       ? data.results_rows
       : []
 
-    let consoleRows = consoleRowsFromStages
-    let arcadeRows = arcadeRowsFromStages
+    let consoleRows: ResultRow[] = consoleRowsFromStages
+    let arcadeRows: ResultRow[] = arcadeRowsFromStages
 
     if (!consoleRows.length) {
       consoleRows = fallbackRows.filter(
@@ -373,3 +373,4 @@ function ResultsPage() {
     </TkcSection>
   )
 }
+
