@@ -175,7 +175,11 @@ function HighlightCard({
   row?: ResultRow
   loading?: boolean
 }) {
-  const title = loading ? LABEL_LOADING : row ? getDisplayName(row) : LABEL_EMPTY
+  const title = loading
+    ? LABEL_LOADING
+    : row
+      ? getDisplayName(row)
+      : LABEL_EMPTY
   const meta = loading ? '' : getControllerLabel(row)
   const score = loading ? '-' : formatScore(row?.score)
 
@@ -204,8 +208,7 @@ function HighlightCard({
 
 function ResultsPage() {
   const { data, isLoading, isError } = useResults<ResultsData>()
-  const [activeDivision, setActiveDivision] =
-    useState<DivisionKey>('console')
+  const [activeDivision, setActiveDivision] = useState<DivisionKey>('console')
 
   const divisionRows = useMemo(() => {
     const consoleRowsFromStages = getRowsFromStages(data?.console, 'console')
@@ -273,9 +276,7 @@ function ResultsPage() {
         subtitle={t('results.subtitle')}
       />
 
-      {isError && (
-        <StatusMessage variant='error'>{LABEL_FAILED}</StatusMessage>
-      )}
+      {isError && <StatusMessage variant='error'>{LABEL_FAILED}</StatusMessage>}
 
       <div className='space-y-3 md:space-y-4'>
         <HighlightCard
@@ -370,4 +371,3 @@ function ResultsPage() {
     </TkcSection>
   )
 }
-

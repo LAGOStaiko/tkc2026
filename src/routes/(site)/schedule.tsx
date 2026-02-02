@@ -42,7 +42,10 @@ const ASSETS = {
 }
 
 const normalizeKey = (value: string) =>
-  value.replace(/\uFEFF/g, '').trim().replace(/\s+/g, '')
+  value
+    .replace(/\uFEFF/g, '')
+    .trim()
+    .replace(/\s+/g, '')
 
 const arrayToRecord = (headers: unknown[], row: unknown[]) => {
   const record: Record<string, unknown> = {}
@@ -79,9 +82,7 @@ const getScheduleItems = (data: ScheduleData | unknown[] | undefined) => {
       const headerRow = data[0] as unknown[]
       if (looksLikeHeader(headerRow)) {
         return (data as unknown[]).slice(1).map((row) => {
-          return Array.isArray(row)
-            ? arrayToRecord(headerRow, row)
-            : row
+          return Array.isArray(row) ? arrayToRecord(headerRow, row) : row
         })
       }
     }
@@ -183,8 +184,7 @@ const normalizeItem = (item: unknown): ApiScheduleItem => {
   const base = (item ?? {}) as ApiScheduleItem
   const record = base as Record<string, unknown>
   const dateText =
-    base.dateText ??
-    readString(record, ['dateText', 'date', '날짜', '일자'])
+    base.dateText ?? readString(record, ['dateText', 'date', '날짜', '일자'])
   const title =
     base.title ??
     readString(record, ['title', 'name', '예선 이름', '예선이름', '행사명'])
@@ -207,8 +207,7 @@ const normalizeItem = (item: unknown): ApiScheduleItem => {
       'map',
     ])
   const division =
-    base.division ??
-    readString(record, ['division', '구분', '종목', 'type'])
+    base.division ?? readString(record, ['division', '구분', '종목', 'type'])
   const order =
     base.order ?? readString(record, ['order', '순서', '정렬', '번호'])
   const id = base.id ?? readString(record, ['id', 'ID', '식별자'])
