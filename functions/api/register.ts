@@ -23,6 +23,8 @@ const registerSchema = z
       (value) => (typeof value === "string" ? value.trim() : value),
       z.enum(["console", "arcade"])
     ),
+    // Honeypot field (should stay empty). Helps block simple bots.
+    website: z.preprocess(trimString, z.string().optional()),
     name: z.preprocess(trimString, z.string().min(1, "name is required")),
     phone: z.preprocess(trimString, z.string().min(1, "phone is required")),
     email: z.preprocess(trimString, z.string().email("valid email is required")),
@@ -39,6 +41,15 @@ const registerSchema = z
       }),
   })
   .superRefine((data, ctx) => {
+    if (data.website && data.website.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["website"],
+        message: "Bot detected",
+      });
+      return;
+    }
+
     if (data.isMinor && !data.consentLink?.trim()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -62,8 +73,10 @@ export const onRequestPost = async ({ env, request }) => {
       return badRequest(message);
     }
 
+    const { website: _website, ...payloadBase } = parsed.data;
+
     const payload: RegisterPayload = {
-      ...parsed.data,
+      ...payloadBase,
       dohirobaNo: parsed.data.dohirobaNo ?? "",
       consentLink: parsed.data.consentLink ?? "",
     };

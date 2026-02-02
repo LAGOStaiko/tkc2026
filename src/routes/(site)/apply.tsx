@@ -37,6 +37,7 @@ type RegisterResponse = {
 
 type RegisterPayload = {
   division: 'console' | 'arcade'
+  website?: string
   name: string
   phone: string
   email: string
@@ -72,6 +73,7 @@ const formSchema = z
           ? validationMessages.divisionRequired
           : undefined,
     }),
+    website: z.string().optional(),
     name: z.string().min(1, { message: validationMessages.nameRequired }),
     phone: z.string().min(1, { message: validationMessages.phoneRequired }),
     email: z
@@ -99,6 +101,7 @@ type ApplyFormValues = z.infer<typeof formSchema>
 
 const defaultValues: ApplyFormValues = {
   division: 'console',
+  website: '',
   name: '',
   phone: '',
   email: '',
@@ -172,6 +175,15 @@ function ApplyPage() {
         <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+              {/* Honeypot field (should remain empty). */}
+              <input
+                type='text'
+                tabIndex={-1}
+                autoComplete='off'
+                className='sr-only'
+                aria-hidden='true'
+                {...form.register('website')}
+              />
               <fieldset disabled={isDisabled} className='space-y-6'>
                 <FormField
                   control={form.control}

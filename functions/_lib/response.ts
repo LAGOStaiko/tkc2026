@@ -23,5 +23,8 @@ export function unauthorized(message = "Unauthorized") {
 }
 
 export function serverError(err: unknown) {
-  return json({ ok: false, error: "Internal Server Error", details: String(err) }, { status: 500 });
+  // Avoid leaking internal error details to clients. Cloudflare logs will still capture this.
+  // eslint-disable-next-line no-console
+  console.error(err);
+  return json({ ok: false, error: "Internal Server Error" }, { status: 500 });
 }
