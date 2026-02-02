@@ -44,7 +44,7 @@ function HomePage() {
           <img
             src={ASSETS.hero}
             alt='TKC2026 Hero'
-            className='h-full w-full object-cover object-left'
+            className='h-full w-full origin-left object-cover object-left scale-[1.04]'
             loading='eager'
           />
         </div>
