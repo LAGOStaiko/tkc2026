@@ -25,6 +25,8 @@ const registerSchema = z
     ),
     // Honeypot field (should stay empty). Helps block simple bots.
     website: z.preprocess(trimString, z.string().optional()),
+    // Turnstile token (required when TURNSTILE_SECRET_KEY is set).
+    turnstileToken: z.preprocess(trimString, z.string().optional()),
     name: z.preprocess(trimString, z.string().min(1, "name is required")),
     phone: z.preprocess(trimString, z.string().min(1, "phone is required")),
     email: z.preprocess(trimString, z.string().email("valid email is required")),
@@ -73,7 +75,37 @@ export const onRequestPost = async ({ env, request }) => {
       return badRequest(message);
     }
 
-    const { website: _website, ...payloadBase } = parsed.data;
+    const turnstileSecret = (env as { TURNSTILE_SECRET_KEY?: string })
+      ?.TURNSTILE_SECRET_KEY;
+    const token = parsed.data.turnstileToken?.trim() ?? "";
+
+    if (turnstileSecret) {
+      if (!token) return badRequest("Turnstile verification required");
+
+      const verifyBody = new URLSearchParams();
+      verifyBody.set("secret", turnstileSecret);
+      verifyBody.set("response", token);
+      const remoteIp = request.headers.get("CF-Connecting-IP");
+      if (remoteIp) verifyBody.set("remoteip", remoteIp);
+
+      const verifyRes = await fetch(
+        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        {
+          method: "POST",
+          body: verifyBody,
+        }
+      );
+      const verifyJson = (await verifyRes.json().catch(() => null)) as
+        | { success?: boolean }
+        | null;
+
+      if (!verifyJson?.success) {
+        return badRequest("Turnstile verification failed");
+      }
+    }
+
+    const { website: _website, turnstileToken: _token, ...payloadBase } =
+      parsed.data;
 
     const payload: RegisterPayload = {
       ...payloadBase,

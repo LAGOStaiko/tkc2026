@@ -22,6 +22,23 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { GlassCard } from '@/components/tkc/glass-card'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        element: HTMLElement,
+        options: {
+          sitekey: string
+          callback: (token: string) => void
+          'expired-callback'?: () => void
+          'error-callback'?: () => void
+        }
+      ) => string
+      remove: (widgetId: string) => void
+    }
+  }
+}
+
 export const Route = createFileRoute('/(site)/apply')({
   component: ApplyPage,
 })
@@ -38,6 +55,7 @@ type RegisterResponse = {
 type RegisterPayload = {
   division: 'console' | 'arcade'
   website?: string
+  turnstileToken?: string
   name: string
   phone: string
   email: string
@@ -74,6 +92,7 @@ const formSchema = z
           : undefined,
     }),
     website: z.string().optional(),
+    turnstileToken: z.string().optional(),
     name: z.string().min(1, { message: validationMessages.nameRequired }),
     phone: z.string().min(1, { message: validationMessages.phoneRequired }),
     email: z
@@ -102,6 +121,7 @@ type ApplyFormValues = z.infer<typeof formSchema>
 const defaultValues: ApplyFormValues = {
   division: 'console',
   website: '',
+  turnstileToken: '',
   name: '',
   phone: '',
   email: '',
@@ -119,6 +139,13 @@ function ApplyPage() {
   const applyOpen = data?.applyOpen
   const registerMutation = useRegister<RegisterResponse, RegisterPayload>()
   const [receiptId, setReceiptId] = React.useState<string | null>(null)
+  const turnstileRef = React.useRef<HTMLDivElement | null>(null)
+  const turnstileWidgetId = React.useRef<string | null>(null)
+  const [turnstileError, setTurnstileError] = React.useState<string | null>(
+    null
+  )
+  const turnstileSiteKey =
+    import.meta.env.VITE_TURNSTILE_SITE_KEY || undefined
 
   const form = useForm<ApplyFormValues>({
     resolver: zodResolver(formSchema),
@@ -130,12 +157,80 @@ function ApplyPage() {
   const isCompleted = receiptId !== null
   const isDisabled = isSubmitting || isCompleted
   const submitError = registerMutation.error ? t('apply.submitFailed') : null
+  const turnstileFieldError = form.formState.errors.turnstileToken?.message
+
+  React.useEffect(() => {
+    if (!turnstileSiteKey || !turnstileRef.current) return
+
+    let cancelled = false
+    const render = () => {
+      if (cancelled || !turnstileRef.current) return
+      if (window.turnstile?.render) {
+        if (turnstileWidgetId.current) {
+          window.turnstile.remove(turnstileWidgetId.current)
+        }
+        turnstileWidgetId.current = window.turnstile.render(
+          turnstileRef.current,
+          {
+            sitekey: turnstileSiteKey,
+            callback: (token: string) => {
+              form.setValue('turnstileToken', token, { shouldValidate: true })
+              setTurnstileError(null)
+            },
+            'expired-callback': () => {
+              form.setValue('turnstileToken', '', { shouldValidate: true })
+              setTurnstileError('인증이 만료되었습니다. 다시 시도해주세요.')
+            },
+            'error-callback': () => {
+              form.setValue('turnstileToken', '', { shouldValidate: true })
+              setTurnstileError('인증을 완료할 수 없습니다. 다시 시도해주세요.')
+            },
+          }
+        )
+      }
+    }
+
+    const scriptId = 'cf-turnstile-script'
+    const existing = document.getElementById(scriptId) as
+      | HTMLScriptElement
+      | null
+
+    if (existing && window.turnstile) {
+      render()
+    } else {
+      const script = existing ?? document.createElement('script')
+      script.id = scriptId
+      script.src =
+        'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+      script.async = true
+      script.defer = true
+      script.onload = render
+      if (!existing) {
+        document.body.appendChild(script)
+      }
+    }
+
+    return () => {
+      cancelled = true
+      if (turnstileWidgetId.current && window.turnstile?.remove) {
+        window.turnstile.remove(turnstileWidgetId.current)
+        turnstileWidgetId.current = null
+      }
+    }
+  }, [form, turnstileSiteKey])
 
   React.useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('apply.title')}`
   }, [])
 
   const onSubmit = async (values: ApplyFormValues) => {
+    if (turnstileSiteKey && !values.turnstileToken?.trim()) {
+      form.setError('turnstileToken', {
+        message: '보안 인증을 완료해주세요.',
+      })
+      return
+    }
+
     const payload: RegisterPayload = {
       ...values,
       consentLink: values.consentLink?.trim() ?? '',
@@ -184,6 +279,21 @@ function ApplyPage() {
                 aria-hidden='true'
                 {...form.register('website')}
               />
+              {turnstileSiteKey ? (
+                <div className='space-y-2'>
+                  <div ref={turnstileRef} />
+                  {turnstileError ? (
+                    <p className='text-xs text-destructive'>
+                      {turnstileError}
+                    </p>
+                  ) : null}
+                  {turnstileFieldError ? (
+                    <p className='text-xs text-destructive'>
+                      {turnstileFieldError}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
               <fieldset disabled={isDisabled} className='space-y-6'>
                 <FormField
                   control={form.control}
