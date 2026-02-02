@@ -1,6 +1,37 @@
 import { z } from "zod";
-import { badRequest, ok, serverError } from "../_lib/response";
+import { badRequest, ok, serverError, tooManyRequests } from "../_lib/response";
 import { callGasJson, type _Env } from "../_lib/gas";
+
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+
+const getClientIp = (request: Request) => {
+  const cfIp = request.headers.get("CF-Connecting-IP");
+  if (cfIp) return cfIp.trim();
+  const forwarded = request.headers.get("X-Forwarded-For");
+  if (forwarded) return forwarded.split(",")[0]?.trim() ?? "unknown";
+  return "unknown";
+};
+
+const hitRateLimit = (ip: string) => {
+  const now = Date.now();
+  const entry = rateLimitStore.get(ip);
+  if (!entry || entry.resetAt <= now) {
+    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return { limited: false, retryAfter: RATE_LIMIT_WINDOW_MS / 1000 };
+  }
+
+  entry.count += 1;
+  if (entry.count > RATE_LIMIT_MAX) {
+    return {
+      limited: true,
+      retryAfter: Math.ceil((entry.resetAt - now) / 1000),
+    };
+  }
+
+  return { limited: false, retryAfter: Math.ceil((entry.resetAt - now) / 1000) };
+};
 
 const trimString = (value: unknown) => {
   if (typeof value === "string") return value.trim();
@@ -65,6 +96,12 @@ type RegisterPayload = z.infer<typeof registerSchema>;
 
 export const onRequestPost = async ({ env, request }) => {
   try {
+    const clientIp = getClientIp(request);
+    const rate = hitRateLimit(clientIp);
+    if (rate.limited) {
+      return tooManyRequests("Too many requests", rate.retryAfter);
+    }
+
     const body = (await request.json().catch(() => null)) as unknown;
     if (!body) return badRequest("Invalid JSON body");
 

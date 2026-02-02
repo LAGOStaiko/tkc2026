@@ -18,6 +18,14 @@ export function badRequest(message: string, details?: unknown) {
   return json({ ok: false, error: message, details }, { status: 400 });
 }
 
+export function tooManyRequests(message = "Too Many Requests", retryAfter?: number) {
+  const headers: Record<string, string> = {};
+  if (retryAfter !== undefined) {
+    headers["Retry-After"] = String(retryAfter);
+  }
+  return json({ ok: false, error: message }, { status: 429, headers });
+}
+
 export function unauthorized(message = "Unauthorized") {
   return json({ ok: false, error: message }, { status: 401 });
 }
