@@ -42,7 +42,7 @@ export function ScheduleLane({
   return (
     <section className='rounded-3xl bg-white/5 p-6 shadow-lg ring-1 ring-white/10'>
       <div className='flex flex-col items-center text-center'>
-        <div className='grid h-12 w-12 place-items-center rounded-xl bg-[#ff2a2a]'>
+        <div className='grid h-12 w-12 place-items-center rounded-xl bg-[#ff2a00]'>
           <img
             src={iconSrc}
             alt=''
@@ -88,7 +88,7 @@ export function ScheduleEventCard({
     <div
       className={cn(
         'flex items-stretch overflow-hidden rounded-2xl shadow-[0_16px_28px_rgba(0,0,0,0.18)]',
-        isFeatured ? 'bg-[#ff2a2a] text-white' : 'bg-white text-slate-950'
+        isFeatured ? 'bg-[#ff2a00] text-white' : 'bg-white text-slate-950'
       )}
     >
       <div

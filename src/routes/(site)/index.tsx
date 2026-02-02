@@ -163,7 +163,7 @@ function ModeCard({
     <div className='flex flex-col rounded-2xl bg-white/5 p-7 shadow-[0_10px_40px_rgba(0,0,0,0.35)] ring-1 ring-white/10'>
       <div className='flex items-start gap-5'>
         {/* icon block (시안의 빨간 네모) */}
-        <div className='grid h-14 w-14 place-items-center rounded-xl bg-[#ff2d00]'>
+        <div className='grid h-14 w-14 place-items-center rounded-xl bg-[#ff2a00]'>
           <img
             src={iconSrc}
             alt=''

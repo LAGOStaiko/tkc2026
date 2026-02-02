@@ -143,3 +143,27 @@
     background-position: 140% 0;
   }
 }
+
+@layer utilities {
+  .site-scope .rounded-3xl {
+    border-radius: 0.75rem;
+  }
+  .site-scope .rounded-2xl {
+    border-radius: 0.5rem;
+  }
+  .site-scope .rounded-xl {
+    border-radius: 0.375rem;
+  }
+  .site-scope .rounded-lg {
+    border-radius: 0.25rem;
+  }
+  .site-scope .rounded-md {
+    border-radius: 0.1875rem;
+  }
+  .site-scope .rounded {
+    border-radius: 0.125rem;
+  }
+  .site-scope .rounded-sm {
+    border-radius: 0.0625rem;
+  }
+}

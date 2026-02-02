@@ -4,7 +4,7 @@ import { SiteContainer } from '@/components/site/site-container'
 
 export function SiteLayout() {
   return (
-    <div className='dark min-h-svh overflow-x-hidden bg-black text-foreground'>
+    <div className='site-scope dark min-h-svh overflow-x-hidden bg-black text-foreground'>
       <div className='relative'>
         <SiteHeader />
 
