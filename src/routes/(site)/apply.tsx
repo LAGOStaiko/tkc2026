@@ -144,8 +144,7 @@ function ApplyPage() {
   const [turnstileError, setTurnstileError] = React.useState<string | null>(
     null
   )
-  const turnstileSiteKey =
-    import.meta.env.VITE_TURNSTILE_SITE_KEY || undefined
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || undefined
 
   const form = useForm<ApplyFormValues>({
     resolver: zodResolver(formSchema),
@@ -191,9 +190,9 @@ function ApplyPage() {
     }
 
     const scriptId = 'cf-turnstile-script'
-    const existing = document.getElementById(scriptId) as
-      | HTMLScriptElement
-      | null
+    const existing = document.getElementById(
+      scriptId
+    ) as HTMLScriptElement | null
 
     if (existing && window.turnstile) {
       render()
@@ -283,9 +282,7 @@ function ApplyPage() {
                 <div className='space-y-2'>
                   <div ref={turnstileRef} />
                   {turnstileError ? (
-                    <p className='text-xs text-destructive'>
-                      {turnstileError}
-                    </p>
+                    <p className='text-xs text-destructive'>{turnstileError}</p>
                   ) : null}
                   {turnstileFieldError ? (
                     <p className='text-xs text-destructive'>
