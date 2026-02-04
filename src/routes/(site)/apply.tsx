@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { t } from '@/text'
 import { useRegister, useSite } from '@/lib/api'
 import { Button } from '@/components/ui/button'
@@ -239,8 +240,10 @@ function ApplyPage() {
     try {
       const result = await registerMutation.mutateAsync(payload)
       setReceiptId(String(result?.receiptId ?? ''))
-    } catch {
-      return
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : '신청 중 오류가 발생했습니다.'
+      toast.error('신청 실패', { description: message })
     }
   }
 

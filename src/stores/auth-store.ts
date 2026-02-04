@@ -21,9 +21,18 @@ interface AuthState {
   }
 }
 
+const safeParseToken = (value: string | null | undefined): string => {
+  if (!value) return ''
+  try {
+    return JSON.parse(value) as string
+  } catch {
+    return ''
+  }
+}
+
 export const useAuthStore = create<AuthState>()((set) => {
   const cookieState = getCookie(ACCESS_TOKEN)
-  const initToken = cookieState ? JSON.parse(cookieState) : ''
+  const initToken = safeParseToken(cookieState)
   return {
     auth: {
       user: null,

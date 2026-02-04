@@ -4,7 +4,18 @@ import { callGasJson, type _Env } from "../_lib/gas";
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 10;
+const CLEANUP_INTERVAL = 100; // Clean up every N requests
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+let requestCounter = 0;
+
+const cleanupExpiredEntries = () => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitStore) {
+    if (entry.resetAt <= now) {
+      rateLimitStore.delete(ip);
+    }
+  }
+};
 
 const getClientIp = (request: Request) => {
   const cfIp = request.headers.get("CF-Connecting-IP");
@@ -15,6 +26,12 @@ const getClientIp = (request: Request) => {
 };
 
 const hitRateLimit = (ip: string) => {
+  requestCounter += 1;
+  if (requestCounter >= CLEANUP_INTERVAL) {
+    requestCounter = 0;
+    cleanupExpiredEntries();
+  }
+
   const now = Date.now();
   const entry = rateLimitStore.get(ip);
   if (!entry || entry.resetAt <= now) {

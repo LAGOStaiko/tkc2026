@@ -22,6 +22,7 @@ export function getCookie(name: string): string | undefined {
 
 /**
  * Set a cookie with name, value, and optional max age
+ * Includes security flags: Secure (HTTPS only) and SameSite=Strict (CSRF protection)
  */
 export function setCookie(
   name: string,
@@ -30,7 +31,9 @@ export function setCookie(
 ): void {
   if (typeof document === 'undefined') return
 
-  document.cookie = `${name}=${value}; path=/; max-age=${maxAge}`
+  const isSecure = window.location.protocol === 'https:'
+  const secureFlag = isSecure ? '; Secure' : ''
+  document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Strict${secureFlag}`
 }
 
 /**
@@ -39,5 +42,7 @@ export function setCookie(
 export function removeCookie(name: string): void {
   if (typeof document === 'undefined') return
 
-  document.cookie = `${name}=; path=/; max-age=0`
+  const isSecure = window.location.protocol === 'https:'
+  const secureFlag = isSecure ? '; Secure' : ''
+  document.cookie = `${name}=; path=/; max-age=0; SameSite=Strict${secureFlag}`
 }
