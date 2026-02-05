@@ -73,7 +73,7 @@ export function ScheduleLane({
   )
 }
 
-export function ScheduleEventCard({
+function ScheduleEventCard({
   featured,
   dateMain,
   dateSub,

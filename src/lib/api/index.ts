@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 
-export type ApiResponse<T> = {
+type ApiResponse<T> = {
   ok: boolean
   data?: T
   error?: string
@@ -44,11 +44,11 @@ async function apiRequest<T>(path: string, init: RequestInit): Promise<T> {
   return payload.data as T
 }
 
-export function apiGet<T>(path: string) {
+function apiGet<T>(path: string) {
   return apiRequest<T>(path, { method: 'GET' })
 }
 
-export function apiPost<T>(path: string, body: unknown) {
+function apiPost<T>(path: string, body: unknown) {
   return apiRequest<T>(path, {
     method: 'POST',
     headers: {

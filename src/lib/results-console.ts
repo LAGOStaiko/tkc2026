@@ -1,12 +1,4 @@
 const ENTRY_ID_REGEX = /E-\d+/i
-const S1_REGEX = /s1\s*[:=]\s*([\d,]+)/i
-const S2_REGEX = /s2\s*[:=]\s*([\d,]+)/i
-
-const toNumber = (value?: string) => {
-  if (!value) return undefined
-  const numeric = Number(value.replace(/,/g, ''))
-  return Number.isFinite(numeric) ? numeric : undefined
-}
 
 export function extractEntryId(
   nickname?: string,
@@ -46,12 +38,3 @@ export function extractController(detail?: string) {
   return ''
 }
 
-export function extractS1S2(detail?: string) {
-  if (!detail) return {}
-  const s1Match = detail.match(S1_REGEX)
-  const s2Match = detail.match(S2_REGEX)
-  return {
-    s1: s1Match ? toNumber(s1Match[1]) : undefined,
-    s2: s2Match ? toNumber(s2Match[1]) : undefined,
-  }
-}

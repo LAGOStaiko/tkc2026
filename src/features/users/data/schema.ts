@@ -28,5 +28,3 @@ const userSchema = z.object({
   updatedAt: z.coerce.date(),
 })
 export type User = z.infer<typeof userSchema>
-
-export const userListSchema = z.array(userSchema)
