@@ -41,6 +41,23 @@ const ASSETS = {
   arcadeIcon: '/branding/arcade-icon.png',
 }
 
+const looksLikeDateValue = (value?: string) => {
+  if (!value) return false
+  const text = value.trim()
+  if (!text) return false
+  if (/^\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2}/.test(text)) return true
+  if (/^\d{1,2}[.\-/]\d{1,2}/.test(text)) return true
+  if (/\d{1,2}\s*월\s*\d{1,2}\s*일/.test(text)) return true
+  if (/^\w{3}\s+\w{3}\s+\d{1,2}\s+\d{4}/.test(text)) return true
+  const parsed = new Date(text)
+  return !Number.isNaN(parsed.getTime())
+}
+
+const looksLikeUrl = (value?: string) => {
+  const text = value?.trim().toLowerCase() ?? ''
+  return text.startsWith('http://') || text.startsWith('https://')
+}
+
 const normalizeKey = (value: string) =>
   value
     .replace(/\uFEFF/g, '')
@@ -101,34 +118,29 @@ const getScheduleItems = (data: ScheduleData | unknown[] | undefined) => {
   return []
 }
 
-const normalizeDivision = (item: ApiScheduleItem) => {
-  const division = (item.division ?? '').toLowerCase().trim()
-  if (division) {
-    if (division.includes('console') || division.includes('콘솔'))
-      return 'console'
-    if (division.includes('arcade') || division.includes('아케이드'))
-      return 'arcade'
-    if (
-      division.includes('all') ||
-      division.includes('final') ||
-      division.includes('결선')
-    ) {
-      return 'all'
-    }
-    return division
-  }
-  const title = (item.title ?? '').toLowerCase()
-  if (!title) return ''
-  if (title.includes('console') || title.includes('콘솔')) return 'console'
-  if (title.includes('arcade') || title.includes('아케이드')) return 'arcade'
-  if (
-    title.includes('final') ||
-    title.includes('결선') ||
-    title.includes('playx') ||
-    title.includes('플레이엑스포')
-  ) {
+const inferDivision = (value?: string) => {
+  const text = (value ?? '').toLowerCase().trim()
+  if (!text) return ''
+  if (text.includes('console') || text.includes('콘솔')) return 'console'
+  if (text.includes('arcade') || text.includes('아케이드')) return 'arcade'
+  if (text.includes('all') || text.includes('final') || text.includes('결선')) {
     return 'all'
   }
+  return ''
+}
+
+const normalizeDivision = (item: ApiScheduleItem) => {
+  const division = (item.division ?? '').trim()
+  const inferredFromDivision = inferDivision(division)
+  if (inferredFromDivision) return inferredFromDivision
+
+  const inferredFromTitle = inferDivision(item.title)
+  if (inferredFromTitle) return inferredFromTitle
+
+  if (division && !looksLikeDateValue(division)) {
+    return division.toLowerCase()
+  }
+
   return ''
 }
 
@@ -183,7 +195,7 @@ const normalizeItem = (item: unknown): ApiScheduleItem => {
 
   const base = (item ?? {}) as ApiScheduleItem
   const record = base as Record<string, unknown>
-  const dateText =
+  const dateTextValue =
     base.dateText ?? readString(record, ['dateText', 'date', '날짜', '일자'])
   const title =
     base.title ??
@@ -212,6 +224,19 @@ const normalizeItem = (item: unknown): ApiScheduleItem => {
     base.order ?? readString(record, ['order', '순서', '정렬', '번호'])
   const id = base.id ?? readString(record, ['id', 'ID', '식별자'])
 
+  const divisionText =
+    typeof division === 'string' ? division.trim() : undefined
+  const divisionHasDate = looksLikeDateValue(divisionText)
+
+  let dateText = dateTextValue
+  let normalizedNote = note
+  if (divisionHasDate && (!dateText || looksLikeUrl(dateText))) {
+    if (dateText && looksLikeUrl(dateText) && !normalizedNote) {
+      normalizedNote = dateText
+    }
+    dateText = divisionText
+  }
+
   return {
     ...(base as ApiScheduleItem),
     id,
@@ -221,7 +246,7 @@ const normalizeItem = (item: unknown): ApiScheduleItem => {
     dateText,
     location,
     status,
-    note,
+    note: normalizedNote,
   }
 }
 
@@ -235,7 +260,12 @@ const getOrderValue = (item: ApiScheduleItem) => {
 }
 
 const getFallbackDate = (item: ApiScheduleItem) => {
-  const startSource = item.startDate ?? item.start ?? item.dateText
+  const divisionDateCandidate =
+    typeof item.division === 'string' && looksLikeDateValue(item.division)
+      ? item.division
+      : undefined
+  const startSource =
+    item.startDate ?? item.start ?? item.dateText ?? divisionDateCandidate
   const endSource = item.endDate ?? item.end
   return parseDateValue(startSource) ?? parseDateValue(endSource)
 }
@@ -291,6 +321,12 @@ const formatMmDd = (value?: string) => {
     const [, mm, dd] = shortMatch
     return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
   }
+  const parsed = parseDateValue(value)
+  if (parsed) {
+    return `${String(parsed.getMonth() + 1).padStart(2, '0')}.${String(
+      parsed.getDate()
+    ).padStart(2, '0')}`
+  }
   return null
 }
 
@@ -312,6 +348,10 @@ const parseDateValue = (value?: string) => {
     const [, mm, dd] = koreanMatch
     const year = new Date().getFullYear()
     return new Date(year, Number(mm) - 1, Number(dd))
+  }
+  const parsed = new Date(value)
+  if (!Number.isNaN(parsed.getTime())) {
+    return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate())
   }
   return null
 }

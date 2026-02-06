@@ -7,6 +7,7 @@ import {
   isArcadeRegionKey,
   resolveArcadeSeasonArchive,
   type ArcadeRegionArchive,
+  type ArcadeStandingRow,
   type ArcadeSwissMatch,
 } from '@/lib/arcade-results-archive'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
@@ -58,6 +59,81 @@ function renderParticipant(
   }
 
   return entryId
+}
+
+type RegionFinalRankRow = {
+  rank: number
+  entryId: string
+  nickname: string
+  seed?: number
+  wins?: number
+  losses?: number
+  statusLabel: string
+}
+
+function standingStatusLabel(status: ArcadeStandingRow['status']) {
+  if (status === 'qualified') return '결선 진출'
+  if (status === 'decider') return '3-1 선발전'
+  if (status === 'eliminated') return '탈락'
+  return '진행중'
+}
+
+function buildRegionFinalRanking(region: ArcadeRegionArchive): RegionFinalRankRow[] {
+  const rows: RegionFinalRankRow[] = []
+  const used = new Set<string>()
+
+  const pushRow = (
+    entryId: string | undefined,
+    statusLabel: string,
+    forcedRank?: number,
+    nicknameOverride?: string
+  ) => {
+    if (!entryId || used.has(entryId)) return
+    const standing = region.swissStandings.find((row) => row.entryId === entryId)
+    const online = region.onlineRows.find((row) => row.entryId === entryId)
+    rows.push({
+      rank: forcedRank ?? rows.length + 1,
+      entryId,
+      nickname: nicknameOverride ?? standing?.nickname ?? online?.nickname ?? entryId,
+      seed: standing?.seed,
+      wins: standing?.wins,
+      losses: standing?.losses,
+      statusLabel,
+    })
+    used.add(entryId)
+  }
+
+  const qualifierA = region.qualifiers.groupA ?? region.seedingRows.find((row) => row.rank === 1)
+  const qualifierB = region.qualifiers.groupB ?? region.seedingRows.find((row) => row.rank === 2)
+
+  pushRow(qualifierA?.entryId, '지역 1위 (A그룹)', 1, qualifierA?.nickname)
+  pushRow(qualifierB?.entryId, '지역 2위 (B그룹)', 2, qualifierB?.nickname)
+
+  const standings = [...region.swissStandings].sort((a, b) => {
+    if (b.wins !== a.wins) return b.wins - a.wins
+    if (a.losses !== b.losses) return a.losses - b.losses
+    return a.seed - b.seed
+  })
+
+  standings.forEach((standing) => {
+    pushRow(
+      standing.entryId,
+      standingStatusLabel(standing.status),
+      undefined,
+      standing.nickname
+    )
+  })
+
+  if (rows.length === 0) {
+    region.onlineRows
+      .slice()
+      .sort((a, b) => a.rank - b.rank)
+      .forEach((row) => {
+        pushRow(row.entryId, '온라인 예선 순위', row.rank, row.nickname)
+      })
+  }
+
+  return rows.sort((a, b) => a.rank - b.rank)
 }
 
 function SwissRoundCard({
@@ -181,6 +257,11 @@ function ArcadeRegionDetailPage() {
     return getRegionByKey(archive, region)
   }, [archive, region])
 
+  const finalRankingRows = useMemo(() => {
+    if (!regionData) return []
+    return buildRegionFinalRanking(regionData)
+  }, [regionData])
+
   const swissByRound = useMemo(() => {
     if (!regionData) return []
 
@@ -238,6 +319,50 @@ function ArcadeRegionDetailPage() {
           subtitle='온라인 예선 → Swiss → 3-1 선발전 → 시드전까지 전체 경기 로그'
         />
       </div>
+
+      <section className='space-y-3'>
+        <StageTitle
+          title='최종 순위'
+          subtitle='지역 1·2위 확정자를 상단에 표시하고, 나머지는 Swiss 최종 전적으로 정렬합니다.'
+        />
+
+        {finalRankingRows.length === 0 ? (
+          <EmptyMessage>최종 순위를 계산할 데이터가 아직 없습니다.</EmptyMessage>
+        ) : (
+          <div className='overflow-x-auto rounded-xl border border-white/10'>
+            <table className='min-w-full text-left text-sm'>
+              <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
+                <tr>
+                  <th className='px-4 py-2.5'>순위</th>
+                  <th className='px-4 py-2.5'>엔트리</th>
+                  <th className='px-4 py-2.5'>닉네임</th>
+                  <th className='px-4 py-2.5 text-right'>시드</th>
+                  <th className='px-4 py-2.5 text-right'>전적</th>
+                  <th className='px-4 py-2.5'>상태</th>
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-white/[0.07]'>
+                {finalRankingRows.map((row) => (
+                  <tr key={`final-rank-${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
+                    <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
+                    <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                    <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                    <td className='px-4 py-3 text-right tabular-nums text-white/75'>
+                      {typeof row.seed === 'number' ? row.seed : '-'}
+                    </td>
+                    <td className='px-4 py-3 text-right tabular-nums text-white/75'>
+                      {typeof row.wins === 'number' && typeof row.losses === 'number'
+                        ? `${row.wins}-${row.losses}`
+                        : '-'}
+                    </td>
+                    <td className='px-4 py-3 text-white/80'>{row.statusLabel}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       <section className='space-y-3'>
         <StageTitle
