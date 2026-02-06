@@ -1,65 +1,79 @@
 export const ko = {
-  'apply.closed': '\uC2E0\uCCAD \uB9C8\uAC10',
-  'apply.failedStatus':
-    '\uC2E0\uCCAD \uC0C1\uD0DC\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
-  'apply.field.cardNo': '\uCE74\uB4DC \uBC88\uD638',
-  'apply.field.consentLink': '\uBD80\uBAA8 \uB3D9\uC758\uC11C \uB9C1\uD06C',
+  'apply.closed': '신청 마감',
+  'apply.failedStatus': '신청 상태를 불러오지 못했습니다.',
+  'apply.field.consentLink': '보호자 동의서 제출 링크',
   'apply.field.consentLinkHelp':
-    '\uBBF8\uC131\uB144\uC790\uB294 \uB3D9\uC758\uC11C \uB9C1\uD06C\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4.',
-  'apply.field.division': '\uBD80\uBB38',
-  'apply.field.dohirobaNo':
-    '\uB3D9\uB354\uD788\uB85C\uBC14 \uBC88\uD638(\uC120\uD0DD)',
-  'apply.field.email': '\uC774\uBA54\uC77C',
-  'apply.field.isMinor': '\uBBF8\uC131\uB144\uC790 \uC5EC\uBD80',
+    '미성년자는 보호자 동의서를 다운로드하여 작성 후, 스캔본 또는 사진을 클라우드(Google Drive, Naver MYBOX 등)에 업로드하고 공유 링크를 입력해 주세요.',
+  'apply.field.consentDownload': '보호자 동의서 양식 다운로드',
+  'apply.field.division': '부문',
+  'apply.field.dohirobaNo': '북번호 (동더히로바)',
+  'apply.field.email': '이메일',
+  'apply.field.isMinor': '미성년자 여부',
   'apply.field.isMinorHelp':
-    '\uBBF8\uC131\uB144\uC790\uB294 \uBCF4\uD638\uC790 \uB3D9\uC758\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4.',
-  'apply.field.name': '\uC774\uB984',
-  'apply.field.nickname': '\uB3D9\uB354\uB124\uC784',
-  'apply.field.phone': '\uC804\uD654\uBC88\uD638',
-  'apply.field.privacy': '\uAC1C\uC778\uC815\uBCF4 \uB3D9\uC758',
-  'apply.field.privacyHelp':
-    '\uAC1C\uC778\uC815\uBCF4 \uCC98\uB9AC\uBC29\uCE68\uC5D0 \uB3D9\uC758\uD574 \uC8FC\uC138\uC694.',
-  'apply.field.spectator': '\uC9C1\uAD00 \uCC38\uC5EC',
+    '미성년자(만 18세 미만)는 보호자 동의서 제출이 필요합니다.',
+  'apply.field.name': '이름',
+  'apply.field.namcoId': '남코 아이디',
+  'apply.field.nickname': '동더네임',
+  'apply.field.phone': '전화번호',
+  'apply.field.privacy': '개인정보 수집 및 이용 동의',
+  'apply.field.privacyHelp': '아래 내용을 확인하고 동의해 주세요.',
+  'apply.field.privacyDetail':
+    '수집 항목: 이름, 전화번호, 이메일, 닉네임, 남코 아이디\n수집 목적: 대회 참가 접수, 본인 확인, 대회 안내 연락\n보유 기간: 대회 종료 후 3개월 이내 파기\n동의를 거부할 수 있으나, 거부 시 대회 참가가 불가합니다.',
+  'apply.field.qualifierRegion': '온라인 예선 차수',
+  'apply.field.offlineSongs': '오프라인 예선곡 선택',
+  'apply.field.offlineSongsHelp': '곡 풀에서 4곡을 선택해 주세요. 중복 선택은 불가합니다.',
+  'apply.field.offlineSongLabel': '예선곡',
+  'apply.field.offlineSongPlaceholder': '곡을 선택해 주세요',
+  'apply.field.spectator': '직관 참여 여부',
   'apply.field.spectatorHelp':
-    '\uAD00\uB78C\uAC1D \uB3D9\uBC18 \uC2DC \uC120\uD0DD',
-  'apply.formTitle': '\uB300\uD68C \uC2E0\uCCAD\uC11C',
-  'apply.loadingStatus':
-    '\uC2E0\uCCAD \uC0C1\uD0DC\uB97C \uD655\uC778\uD558\uB294 \uC911...',
-  'apply.placeholder.cardNo': '\uC608: CARD-000000',
-  'apply.placeholder.consentLink': '\uC608: https://...',
-  'apply.placeholder.dohirobaNo': '\uC120\uD0DD \uC785\uB825',
-  'apply.placeholder.email': '\uC608: tkc@example.com',
-  'apply.placeholder.name': '\uC608: \uD64D\uAE38\uB3D9',
-  'apply.placeholder.nickname': '\uC608: \uB3D9\uB354\uB124\uC784',
-  'apply.placeholder.phone': '\uC608: 010-0000-0000',
-  'apply.receiptId': '\uC811\uC218 \uBC88\uD638',
-  'apply.submit': '\uC2E0\uCCAD\uD558\uAE30',
-  'apply.submitting': '\uC2E0\uCCAD \uC911...',
-  'apply.subtitle':
-    '\uB300\uD68C \uCC38\uAC00 \uC2E0\uCCAD \uC815\uBCF4\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
-  'apply.title': '\uB300\uD68C \uC2E0\uCCAD',
-  'apply.completed':
-    '\uC2E0\uCCAD\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
-  'apply.submitFailed':
-    '\uC2E0\uCCAD\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.cardNoRequired':
-    '\uCE74\uB4DC \uBC88\uD638\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
+    '대회에 참가하고 PlayX4 결선까지 참관하시면 대회 기념 굿즈를 지급합니다.',
+  'apply.field.videoLink': '동영상 링크',
+  'apply.field.videoLinkHelp':
+    '본인의 플레이 영상을 유튜브에 일부공개로 업로드하고 링크를 입력해 주세요.',
+  'apply.field.videoLinkGuideTitle': '유튜브 일부공개 링크 설정 방법',
+  'apply.field.videoLinkGuide':
+    '1. 유튜브 스튜디오에서 영상 업로드\n2. 공개 설정에서 "일부공개" 선택\n3. 저장 후, 영상 공유 버튼을 눌러 링크 복사\n4. 복사한 링크를 아래에 입력',
+  'apply.formTitle': '대회 신청서',
+  'apply.loadingStatus': '신청 상태를 확인하는 중...',
+  'apply.placeholder.consentLink': '예: https://drive.google.com/...',
+  'apply.placeholder.dohirobaNo': '예: 0000000000',
+  'apply.placeholder.email': '예: tkc@example.com',
+  'apply.placeholder.name': '예: 홍길동',
+  'apply.placeholder.namcoId': '예: TAIKO1234',
+  'apply.placeholder.nickname': '예: 동더네임',
+  'apply.placeholder.phone': '예: 010-0000-0000',
+  'apply.placeholder.videoLink': '예: https://youtu.be/...',
+  'apply.receiptId': '접수 번호',
+  'apply.region.seoul': '서울',
+  'apply.region.daejeon': '대전',
+  'apply.region.gwangju': '광주',
+  'apply.region.busan': '부산',
+  'apply.songPoolEmpty': '곡 풀이 아직 준비되지 않았습니다.',
+  'apply.submit': '신청하기',
+  'apply.submitting': '신청 중...',
+  'apply.subtitle': '대회 참가 신청 정보를 입력해 주세요.',
+  'apply.title': '대회 신청',
+  'apply.completed': '신청이 완료되었습니다.',
+  'apply.submitFailed': '신청에 실패했습니다. 다시 시도해 주세요.',
   'apply.validation.consentRequired':
-    '\uBBF8\uC131\uB144\uC790\uB294 \uB3D9\uC758\uC11C \uB9C1\uD06C\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4.',
-  'apply.validation.divisionRequired':
-    '\uBD80\uBB38\uC744 \uC120\uD0DD\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.emailRequired':
-    '\uC774\uBA54\uC77C\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.nameRequired':
-    '\uC774\uB984\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.nicknameRequired':
-    '\uB3D9\uB354\uB124\uC784\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.phoneRequired':
-    '\uC804\uD654\uBC88\uD638\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.',
+    '미성년자는 동의서 링크가 필요합니다.',
+  'apply.validation.divisionRequired': '부문을 선택해 주세요.',
+  'apply.validation.dohirobaNoRequired':
+    '북번호를 입력해 주세요.',
+  'apply.validation.emailRequired': '이메일을 입력해 주세요.',
+  'apply.validation.emailInvalid': '올바른 이메일 형식이 아닙니다.',
+  'apply.validation.namcoIdRequired': '남코 아이디를 입력해 주세요.',
+  'apply.validation.nameRequired': '이름을 입력해 주세요.',
+  'apply.validation.nicknameRequired': '동더네임을 입력해 주세요.',
+  'apply.validation.offlineSongsRequired':
+    '오프라인 예선곡 4곡을 모두 선택해 주세요.',
+  'apply.validation.phoneRequired': '전화번호를 입력해 주세요.',
   'apply.validation.privacyRequired':
-    '\uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC774\uC6A9\uC5D0 \uB3D9\uC758\uD574 \uC8FC\uC138\uC694.',
-  'apply.validation.emailInvalid':
-    '\uC62C\uBC14\uB978 \uC774\uBA54\uC77C \uD615\uC2DD\uC774 \uC544\uB2D9\uB2C8\uB2E4.',
+    '개인정보 수집 및 이용에 동의해 주세요.',
+  'apply.validation.qualifierRegionRequired':
+    '온라인 예선 차수를 선택해 주세요.',
+  'apply.validation.videoLinkRequired':
+    '동영상 링크를 입력해 주세요.',
   'common.close': '\uB2EB\uAE30',
   'common.loadFailed':
     '\uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',

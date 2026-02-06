@@ -79,8 +79,14 @@ const registerSchema = z
     phone: z.preprocess(trimString, z.string().min(1, "phone is required")),
     email: z.preprocess(trimString, z.string().email("valid email is required")),
     nickname: z.preprocess(trimString, z.string().min(1, "nickname is required")),
-    cardNo: z.preprocess(trimString, z.string().min(1, "cardNo is required")),
+    namcoId: z.preprocess(trimString, z.string().min(1, "namcoId is required")),
+    // Console only
+    videoLink: z.preprocess(trimString, z.string().optional()),
+    // Arcade only
     dohirobaNo: z.preprocess(trimString, z.string().optional()),
+    qualifierRegion: z.preprocess(trimString, z.string().optional()),
+    offlineSongs: z.array(z.string()).optional(),
+    // Common
     spectator: z.preprocess(parseBoolean, z.boolean()),
     isMinor: z.preprocess(parseBoolean, z.boolean()),
     consentLink: z.preprocess(trimString, z.string().optional()),
@@ -98,6 +104,44 @@ const registerSchema = z
         message: "Bot detected",
       });
       return;
+    }
+
+    // Console: videoLink required
+    if (data.division === "console" && !data.videoLink?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["videoLink"],
+        message: "videoLink is required for console division",
+      });
+    }
+
+    // Arcade: dohirobaNo, qualifierRegion, offlineSongs required
+    if (data.division === "arcade") {
+      if (!data.dohirobaNo?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["dohirobaNo"],
+          message: "dohirobaNo is required for arcade division",
+        });
+      }
+      if (!data.qualifierRegion?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["qualifierRegion"],
+          message: "qualifierRegion is required for arcade division",
+        });
+      }
+      if (
+        !data.offlineSongs ||
+        data.offlineSongs.length !== 4 ||
+        data.offlineSongs.some((s) => !s?.trim())
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["offlineSongs"],
+          message: "4 offline songs are required for arcade division",
+        });
+      }
     }
 
     if (data.isMinor && !data.consentLink?.trim()) {
@@ -163,7 +207,10 @@ export const onRequestPost = async ({ env, request }) => {
 
     const payload: RegisterPayload = {
       ...payloadBase,
+      videoLink: parsed.data.videoLink ?? "",
       dohirobaNo: parsed.data.dohirobaNo ?? "",
+      qualifierRegion: parsed.data.qualifierRegion ?? "",
+      offlineSongs: parsed.data.offlineSongs ?? [],
       consentLink: parsed.data.consentLink ?? "",
     };
 
