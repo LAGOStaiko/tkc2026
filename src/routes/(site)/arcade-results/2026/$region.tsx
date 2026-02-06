@@ -63,65 +63,105 @@ function renderParticipant(
 function SwissRoundCard({
   matches,
   round,
-  region,
 }: {
   matches: ArcadeSwissMatch[]
   round: number
   region: ArcadeRegionArchive
 }) {
   return (
-    <div className='rounded-xl border border-white/10 bg-white/[0.03] p-5'>
-      <div className='mb-4 text-sm font-bold text-[#ff2a00]'>Round {round}</div>
+    <div className='space-y-3'>
+      <div className='text-sm font-bold text-[#ff2a00]'>Round {round}</div>
 
-      <div className='space-y-2.5'>
+      <div className='grid gap-3 sm:grid-cols-2'>
         {matches.map((match, index) => {
-          const left = `${match.player1.nickname} (${match.player1.entryId})`
-          const right = match.player2
-            ? `${match.player2.nickname} (${match.player2.entryId})`
-            : 'BYE'
-          const gameLine = match.games
-            .map((game) => {
-              const level = game.level ? ` ${game.level}` : ''
-              return `${game.song}${level} ${formatScore(game.p1Score)}:${formatScore(game.p2Score)}`
-            })
-            .join(' | ')
+          const p1Name = match.player1.nickname
+          const p1Id = match.player1.entryId
+          const p2Name = match.player2?.nickname ?? 'BYE'
+          const p2Id = match.player2?.entryId
+          const isP1Winner = match.winnerEntryId === p1Id
+          const isP2Winner = Boolean(
+            match.player2 && match.winnerEntryId === p2Id
+          )
 
           return (
             <div
               key={`${match.round}-${match.table ?? index}`}
-              className='rounded-lg border border-white/10 bg-black/20 p-3.5'
+              className='rounded-xl border border-white/10 bg-white/[0.03] p-4 md:p-5'
             >
-              <div className='flex flex-wrap items-center justify-between gap-2 text-xs'>
-                <div className='text-white/60'>
-                  Table {match.table ?? index + 1}
-                  {match.highSeedEntryId ? ` · 진영 선택 ${match.highSeedEntryId}` : ''}
-                </div>
-                <div className='text-white/70'>
-                  <span className='text-white/45'>승자:</span>{' '}
-                  <span className='font-medium'>{renderParticipant(region, match.winnerEntryId, '기록 대기')}</span>
-                </div>
+              <div className='flex items-center justify-between text-[11px] text-white/50'>
+                <span>Table {match.table ?? index + 1}</span>
+                {match.highSeedEntryId ? (
+                  <span>진영 선택 {match.highSeedEntryId}</span>
+                ) : null}
               </div>
 
-              <div className='mt-2.5 text-sm font-bold text-white'>
-                {left} <span className='font-normal text-white/40'>vs</span> {right}
+              <div className='mt-3 space-y-1.5'>
+                <div
+                  className={`flex items-baseline gap-2 text-sm ${isP1Winner ? 'text-[#ff2a00]' : 'text-white'}`}
+                >
+                  <span className='font-bold'>{p1Name}</span>
+                  <span className='font-mono text-[11px] text-white/40'>
+                    {p1Id}
+                  </span>
+                  {isP1Winner ? (
+                    <span className='text-[10px] font-medium text-emerald-300'>
+                      WIN
+                    </span>
+                  ) : null}
+                </div>
+                <div className='text-[10px] font-bold tracking-widest text-white/25'>
+                  VS
+                </div>
+                <div
+                  className={`flex items-baseline gap-2 text-sm ${isP2Winner ? 'text-[#ff2a00]' : 'text-white'}`}
+                >
+                  <span className='font-bold'>{p2Name}</span>
+                  {p2Id ? (
+                    <span className='font-mono text-[11px] text-white/40'>
+                      {p2Id}
+                    </span>
+                  ) : null}
+                  {isP2Winner ? (
+                    <span className='text-[10px] font-medium text-emerald-300'>
+                      WIN
+                    </span>
+                  ) : null}
+                </div>
               </div>
 
               {match.bye ? (
-                <div className='mt-1.5 text-xs font-medium text-emerald-200'>부전승 (1승 처리)</div>
+                <div className='mt-3 rounded-md bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-200'>
+                  부전승 (1승 처리)
+                </div>
               ) : null}
 
-              {gameLine ? (
-                <div className='mt-2 text-xs leading-relaxed text-white/65'>{gameLine}</div>
+              {match.games.length > 0 ? (
+                <div className='mt-3 space-y-1.5 rounded-lg border border-white/[0.07] bg-black/20 p-3'>
+                  {match.games.map((game, gi) => (
+                    <div
+                      key={gi}
+                      className='flex flex-col gap-0.5 text-xs sm:flex-row sm:items-center sm:justify-between sm:gap-3'
+                    >
+                      <span className='text-white/55'>
+                        {game.song}
+                        {game.level ? ` ${game.level}` : ''}
+                      </span>
+                      <span className='tabular-nums font-medium text-white/80'>
+                        {formatScore(game.p1Score)} : {formatScore(game.p2Score)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               ) : null}
 
               {match.tieBreakerSong ? (
-                <div className='mt-1.5 text-xs font-medium text-[#ffb36d]'>
+                <div className='mt-2.5 text-xs font-medium text-[#ffb36d]'>
                   타이브레이커: {match.tieBreakerSong}
                 </div>
               ) : null}
 
               {match.note ? (
-                <div className='mt-1.5 text-xs text-white/55'>{match.note}</div>
+                <div className='mt-2 text-xs text-white/50'>{match.note}</div>
               ) : null}
             </div>
           )
@@ -218,7 +258,6 @@ function ArcadeRegionDetailPage() {
                   <th className='px-4 py-2.5 text-right'>과제곡 1</th>
                   <th className='px-4 py-2.5 text-right'>과제곡 2</th>
                   <th className='px-4 py-2.5 text-right'>합산</th>
-                  <th className='px-4 py-2.5'>접수시각</th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-white/[0.07]'>
@@ -239,9 +278,6 @@ function ArcadeRegionDetailPage() {
                     <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>
                       {formatScore(row.total)}
                     </td>
-                    <td className='px-4 py-3 text-xs text-white/55'>
-                      {row.submittedAt ?? '-'}
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -259,7 +295,7 @@ function ArcadeRegionDetailPage() {
         {swissByRound.length === 0 ? (
           <EmptyMessage>Swiss 경기 로그가 아직 입력되지 않았습니다.</EmptyMessage>
         ) : (
-          <div className='space-y-3'>
+          <div className='space-y-6'>
             {swissByRound.map((block) => (
               <SwissRoundCard
                 key={block.round}
