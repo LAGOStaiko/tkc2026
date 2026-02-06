@@ -67,7 +67,7 @@ function HomePage() {
       </section>
 
       {/* PLAYX4 FINAL INFO */}
-      <section className='rounded-2xl border border-white/10 bg-white/5 px-5 py-7 text-center shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:px-9 md:py-9'>
+      <section className='rounded-2xl border border-white/10 bg-white/5 p-5 text-center shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-7'>
         <div className='text-xl font-semibold text-white/90 md:text-2xl'>
           플레이 엑스포 결선 안내
         </div>
@@ -75,7 +75,7 @@ function HomePage() {
       </section>
 
       {/* VIDEO */}
-      <section className='rounded-2xl border border-white/10 bg-white/5 p-5 shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-6'>
+      <section className='rounded-2xl border border-white/10 bg-white/5 p-5 shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-7'>
         <div className='mx-auto w-full max-w-[1100px]'>
           <div className='aspect-video overflow-hidden rounded-xl border border-white/10 bg-black'>
             <iframe
@@ -92,7 +92,7 @@ function HomePage() {
       </section>
 
       {/* FOOT STRIP (Partners) */}
-      <section className='pt-3 pb-7'>
+      <section className='pt-6 pb-7'>
         <div className='flex flex-col items-center justify-between gap-5 md:flex-row'>
           <div className='flex items-center gap-3'>
             <img
