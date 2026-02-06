@@ -524,7 +524,7 @@ function ArcadeRegionDetailPage() {
           <EmptyMessage>온라인 예선 결과가 아직 입력되지 않았습니다.</EmptyMessage>
         ) : (
           <div className='overflow-x-auto rounded-xl border border-white/10'>
-            <table className='min-w-[560px] text-left text-sm'>
+            <table className='w-full min-w-[560px] text-left text-sm'>
               <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                 <tr>
                   <th className='whitespace-nowrap px-4 py-2.5'>순위</th>

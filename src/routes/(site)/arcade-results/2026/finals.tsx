@@ -50,7 +50,7 @@ function GroupSeedTable({
         <div className='text-sm text-white/55'>시드 데이터 입력 대기</div>
       ) : (
         <div className='overflow-x-auto rounded-lg border border-white/10'>
-          <table className='min-w-[480px] text-left text-sm'>
+          <table className='w-full min-w-[480px] text-left text-sm'>
             <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
               <tr>
                 <th className='whitespace-nowrap px-4 py-2.5'>시드</th>
