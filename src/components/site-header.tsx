@@ -64,7 +64,7 @@ export function SiteHeader() {
             <img
               src={LOGO_SRC}
               alt='TKC2026'
-              className='h-8 w-auto object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)] md:h-10'
+              className='h-8 w-auto object-contain mix-blend-screen drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)] md:h-10'
               loading='eager'
               draggable={false}
             />
