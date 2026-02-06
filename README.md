@@ -100,6 +100,16 @@ Start the server
   pnpm run dev
 ```
 
+## TKC2026 Google Sheets API
+
+For TKC2026 deployment, API endpoints (`/api/site`, `/api/schedule`, `/api/results`, etc.) are expected to proxy to Google Apps Script.
+
+See `docs/google-sheets-results-archive.md` for:
+
+- required environment variables
+- Apps Script `results` payload shape
+- spreadsheet tab/column schema for the Arcade 2026 archive
+
 ## Sponsoring this project ❤️
 
 If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏

@@ -47,6 +47,9 @@ import { Route as AdminSettingsDisplayRouteImport } from './routes/admin/setting
 import { Route as AdminSettingsAppearanceRouteImport } from './routes/admin/settings/appearance'
 import { Route as AdminSettingsAccountRouteImport } from './routes/admin/settings/account'
 import { Route as AdminErrorsErrorRouteImport } from './routes/admin/errors/$error'
+import { Route as siteArcadeResults2026IndexRouteImport } from './routes/(site)/arcade-results/2026/index'
+import { Route as siteArcadeResults2026FinalsRouteImport } from './routes/(site)/arcade-results/2026/finals'
+import { Route as siteArcadeResults2026RegionRouteImport } from './routes/(site)/arcade-results/2026/$region'
 
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
@@ -237,6 +240,24 @@ const AdminErrorsErrorRoute = AdminErrorsErrorRouteImport.update({
   path: '/errors/$error',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const siteArcadeResults2026IndexRoute =
+  siteArcadeResults2026IndexRouteImport.update({
+    id: '/arcade-results/2026/',
+    path: '/arcade-results/2026/',
+    getParentRoute: () => siteRouteRoute,
+  } as any)
+const siteArcadeResults2026FinalsRoute =
+  siteArcadeResults2026FinalsRouteImport.update({
+    id: '/arcade-results/2026/finals',
+    path: '/arcade-results/2026/finals',
+    getParentRoute: () => siteRouteRoute,
+  } as any)
+const siteArcadeResults2026RegionRoute =
+  siteArcadeResults2026RegionRouteImport.update({
+    id: '/arcade-results/2026/$region',
+    path: '/arcade-results/2026/$region',
+    getParentRoute: () => siteRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
@@ -274,6 +295,9 @@ export interface FileRoutesByFullPath {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tasks': typeof AdminTasksIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/arcade-results/2026/$region': typeof siteArcadeResults2026RegionRoute
+  '/arcade-results/2026/finals': typeof siteArcadeResults2026FinalsRoute
+  '/arcade-results/2026': typeof siteArcadeResults2026IndexRoute
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -309,6 +333,9 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsIndexRoute
   '/admin/tasks': typeof AdminTasksIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/arcade-results/2026/$region': typeof siteArcadeResults2026RegionRoute
+  '/arcade-results/2026/finals': typeof siteArcadeResults2026FinalsRoute
+  '/arcade-results/2026': typeof siteArcadeResults2026IndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -350,6 +377,9 @@ export interface FileRoutesById {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tasks/': typeof AdminTasksIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
+  '/(site)/arcade-results/2026/$region': typeof siteArcadeResults2026RegionRoute
+  '/(site)/arcade-results/2026/finals': typeof siteArcadeResults2026FinalsRoute
+  '/(site)/arcade-results/2026/': typeof siteArcadeResults2026IndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -389,6 +419,9 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/admin/tasks'
     | '/admin/users'
+    | '/arcade-results/2026/$region'
+    | '/arcade-results/2026/finals'
+    | '/arcade-results/2026'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -424,6 +457,9 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tasks'
     | '/admin/users'
+    | '/arcade-results/2026/$region'
+    | '/arcade-results/2026/finals'
+    | '/arcade-results/2026'
   id:
     | '__root__'
     | '/(site)'
@@ -464,6 +500,9 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/admin/tasks/'
     | '/admin/users/'
+    | '/(site)/arcade-results/2026/$region'
+    | '/(site)/arcade-results/2026/finals'
+    | '/(site)/arcade-results/2026/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -750,6 +789,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminErrorsErrorRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/(site)/arcade-results/2026/': {
+      id: '/(site)/arcade-results/2026/'
+      path: '/arcade-results/2026'
+      fullPath: '/arcade-results/2026'
+      preLoaderRoute: typeof siteArcadeResults2026IndexRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
+    '/(site)/arcade-results/2026/finals': {
+      id: '/(site)/arcade-results/2026/finals'
+      path: '/arcade-results/2026/finals'
+      fullPath: '/arcade-results/2026/finals'
+      preLoaderRoute: typeof siteArcadeResults2026FinalsRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
+    '/(site)/arcade-results/2026/$region': {
+      id: '/(site)/arcade-results/2026/$region'
+      path: '/arcade-results/2026/$region'
+      fullPath: '/arcade-results/2026/$region'
+      preLoaderRoute: typeof siteArcadeResults2026RegionRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
   }
 }
 
@@ -761,6 +821,9 @@ interface siteRouteRouteChildren {
   siteResultsRoute: typeof siteResultsRoute
   siteScheduleRoute: typeof siteScheduleRoute
   siteIndexRoute: typeof siteIndexRoute
+  siteArcadeResults2026RegionRoute: typeof siteArcadeResults2026RegionRoute
+  siteArcadeResults2026FinalsRoute: typeof siteArcadeResults2026FinalsRoute
+  siteArcadeResults2026IndexRoute: typeof siteArcadeResults2026IndexRoute
 }
 
 const siteRouteRouteChildren: siteRouteRouteChildren = {
@@ -771,6 +834,9 @@ const siteRouteRouteChildren: siteRouteRouteChildren = {
   siteResultsRoute: siteResultsRoute,
   siteScheduleRoute: siteScheduleRoute,
   siteIndexRoute: siteIndexRoute,
+  siteArcadeResults2026RegionRoute: siteArcadeResults2026RegionRoute,
+  siteArcadeResults2026FinalsRoute: siteArcadeResults2026FinalsRoute,
+  siteArcadeResults2026IndexRoute: siteArcadeResults2026IndexRoute,
 }
 
 const siteRouteRouteWithChildren = siteRouteRoute._addFileChildren(

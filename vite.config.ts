@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
+const apiProxyTarget =
+  process.env.VITE_API_PROXY_TARGET?.trim() || 'https://tkc2026.pages.dev'
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -17,7 +20,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://tkc2026.pages.dev',
+        target: apiProxyTarget,
         changeOrigin: true,
         secure: true,
       },
