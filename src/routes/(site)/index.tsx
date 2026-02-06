@@ -160,7 +160,7 @@ function ModeCard({
   detailTo: '/console' | '/arcade'
 }) {
   return (
-    <div className='flex flex-col rounded-2xl bg-white/5 p-7 shadow-[0_10px_40px_rgba(0,0,0,0.35)] ring-1 ring-white/10'>
+    <div className='flex flex-col rounded-2xl bg-white/5 p-7 shadow-[0_10px_40px_rgba(0,0,0,0.35)] ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_50px_rgba(0,0,0,0.45)] hover:ring-white/20'>
       <div className='flex items-start gap-5'>
         {/* icon block (시안의 빨간 네모) */}
         <div className='grid h-14 w-14 place-items-center rounded-xl bg-[#ff2a00]'>
@@ -184,13 +184,13 @@ function ModeCard({
       {/* buttons: 모바일 full-width 스택, sm 이상 row */}
       <div className='mt-auto grid grid-cols-1 gap-3 pt-6 sm:grid-cols-2'>
         <Link
-          className='grid h-11 place-items-center rounded-full border border-white/15 bg-white/5 text-base text-white hover:bg-white/10'
+          className='grid h-11 place-items-center rounded-full border border-white/15 bg-white/5 text-base text-white transition-all hover:border-white/30 hover:bg-white/10 active:scale-[0.98]'
           to={detailTo}
         >
           자세히 보기
         </Link>
         <Link
-          className='grid h-11 place-items-center rounded-full border border-white/15 bg-white/5 text-base text-white hover:bg-white/10'
+          className='grid h-11 place-items-center rounded-full border border-white/15 bg-white/5 text-base text-white transition-all hover:border-white/30 hover:bg-white/10 active:scale-[0.98]'
           to='/apply'
         >
           대회 신청하기

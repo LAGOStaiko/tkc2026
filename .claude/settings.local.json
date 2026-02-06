@@ -5,6 +5,11 @@
       "Bash(npm run build:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(pnpm prettier:*)",
+      "Bash(pnpm format:check:*)",
+      "Bash(pnpm knip:*)",
+      "Bash(pnpm build:*)"
+    ]
   }
 }
