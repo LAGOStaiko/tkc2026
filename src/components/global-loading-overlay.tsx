@@ -96,7 +96,7 @@ export function GlobalLoadingOverlay() {
     >
       <div className='inline-flex flex-col items-center'>
         <img
-          src='/branding/logo-tkc2026-playx4.webp'
+          src='/branding/v2/logo.png'
           alt='TKC2026'
           className='h-16 w-auto object-contain motion-safe:animate-pulse md:h-20'
           loading='eager'
