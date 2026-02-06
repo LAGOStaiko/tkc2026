@@ -28,21 +28,21 @@ const omitNode = <T extends { node?: unknown }>(props: T) => {
 const markdownComponents: Components = {
   h1: (props) => {
     const rest = omitNode(props)
-    return <h3 className='text-lg font-semibold text-white' {...rest} />
+    return <h3 className='text-lg font-bold text-white' {...rest} />
   },
   h2: (props) => {
     const rest = omitNode(props)
-    return <h3 className='text-lg font-semibold text-white' {...rest} />
+    return <h3 className='text-lg font-bold text-white' {...rest} />
   },
   h3: (props) => {
     const rest = omitNode(props)
-    return <h4 className='text-base font-semibold text-white' {...rest} />
+    return <h4 className='text-base font-bold text-white' {...rest} />
   },
   p: (props) => {
     const rest = omitNode(props)
     return (
       <p
-        className='text-sm leading-relaxed break-keep text-white/90 md:text-base md:leading-7'
+        className='text-sm leading-relaxed break-keep text-white/90 md:text-base md:leading-[1.8]'
         {...rest}
       />
     )
@@ -51,24 +51,24 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <a
-        className='text-sky-200 underline underline-offset-4 hover:text-sky-100'
+        className='font-medium text-[#ff8c66] underline underline-offset-4 hover:text-[#ff2a00]'
         {...rest}
       />
     )
   },
   ul: (props) => {
     const rest = omitNode(props)
-    return <ul className='ml-5 list-disc space-y-1' {...rest} />
+    return <ul className='ml-5 list-disc space-y-1.5' {...rest} />
   },
   ol: (props) => {
     const rest = omitNode(props)
-    return <ol className='ml-5 list-decimal space-y-1' {...rest} />
+    return <ol className='ml-5 list-decimal space-y-1.5' {...rest} />
   },
   li: (props) => {
     const rest = omitNode(props)
     return (
       <li
-        className='text-sm leading-relaxed break-keep text-white/90 md:text-base md:leading-7'
+        className='text-sm leading-relaxed break-keep text-white/90 md:text-base md:leading-[1.8]'
         {...rest}
       />
     )
@@ -77,7 +77,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <blockquote
-        className='border-l-4 border-white/15 pl-4 text-white/70'
+        className='border-l-4 border-[#ff2a00]/30 pl-4 text-white/75'
         {...rest}
       />
     )
@@ -85,13 +85,13 @@ const markdownComponents: Components = {
   code: (props) => {
     const rest = omitNode(props)
     return (
-      <code className='rounded bg-white/10 px-1 py-0.5 text-sm' {...rest} />
+      <code className='rounded bg-white/10 px-1.5 py-0.5 text-sm' {...rest} />
     )
   },
   pre: (props) => {
     const rest = omitNode(props)
     return (
-      <pre className='overflow-x-auto rounded-lg border border-white/10 bg-white/5 p-3 text-sm'>
+      <pre className='overflow-x-auto rounded-lg border border-white/10 bg-white/[0.05] p-4 text-sm'>
         {rest.children}
       </pre>
     )
@@ -108,21 +108,21 @@ const markdownComponents: Components = {
   },
   thead: (props) => {
     const rest = omitNode(props)
-    return <TableHeader className='bg-white/5 text-white/70' {...rest} />
+    return <TableHeader className='bg-white/[0.07] text-white/75' {...rest} />
   },
   tbody: (props) => {
     const rest = omitNode(props)
-    return <TableBody className='text-white/85' {...rest} />
+    return <TableBody className='text-white/90' {...rest} />
   },
   tr: (props) => {
     const rest = omitNode(props)
-    return <TableRow className='border-white/10 hover:bg-white/5' {...rest} />
+    return <TableRow className='border-white/[0.07] hover:bg-white/[0.04]' {...rest} />
   },
   th: (props) => {
     const rest = omitNode(props)
     return (
       <TableHead
-        className='border-white/10 px-3 py-2 text-xs font-semibold whitespace-normal text-white/70 md:text-sm'
+        className='border-white/[0.07] px-4 py-2.5 text-xs font-bold whitespace-normal text-white/75 md:text-sm'
         {...rest}
       />
     )
@@ -131,12 +131,12 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <TableCell
-        className='border-white/10 px-3 py-2 align-top text-sm whitespace-normal text-white/85 md:text-base'
+        className='border-white/[0.07] px-4 py-3 align-top text-sm whitespace-normal text-white/90 md:text-base'
         {...rest}
       />
     )
   },
-  hr: () => <hr className='border-white/10' />,
+  hr: () => <hr className='border-white/15' />,
 }
 
 function ArcadePage() {
@@ -153,19 +153,19 @@ function ArcadePage() {
         subtitle='예선부터 결선까지 운영 문서를 기준으로 핵심 규정을 정리했습니다.'
       />
 
-      <div className='lg:grid lg:grid-cols-[260px_1fr] lg:gap-10'>
+      <div className='lg:grid lg:grid-cols-[260px_1fr] lg:gap-12'>
         <aside className='hidden lg:block'>
           <div className='sticky top-24'>
-            <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-lg backdrop-blur-md'>
-              <p className='text-xs font-semibold tracking-[0.24em] text-white/60 uppercase'>
+            <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-lg backdrop-blur-md'>
+              <p className='text-[11px] font-bold tracking-widest text-[#ff2a00] uppercase'>
                 Rule Index
               </p>
-              <nav className='mt-4 flex flex-col gap-2 text-sm text-white/80'>
+              <nav className='mt-5 flex flex-col gap-1 text-sm'>
                 {ARCADE_RULEBOOK_SECTIONS.map((section) => (
                   <a
                     key={section.id}
                     href={`#${section.id}`}
-                    className='rounded-lg px-2 py-1 transition hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none'
+                    className='rounded-lg px-3 py-1.5 text-white/75 transition hover:bg-[#ff2a00]/10 hover:text-white focus-visible:ring-2 focus-visible:ring-[#ff2a00]/40 focus-visible:outline-none'
                   >
                     {section.title}
                   </a>
