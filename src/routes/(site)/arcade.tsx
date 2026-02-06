@@ -1,8 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { ARCADE_RULEBOOK_SECTIONS } from '@/content/arcade-rulebook'
+import {
+  FALLBACK_ARCADE_SECTIONS,
+  type ArcadeSection,
+} from '@/content/arcade-guide'
+import { useContent } from '@/lib/api'
 import { t } from '@/text'
 import {
   Table,
@@ -18,6 +22,65 @@ import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 export const Route = createFileRoute('/(site)/arcade')({
   component: ArcadePage,
 })
+
+type ContentSection = {
+  sectionKey?: ArcadeSection['sectionKey']
+  order?: number | string
+  title?: string
+  bodyMd?: string
+}
+
+type ContentData = {
+  content_sections?: ContentSection[]
+}
+
+type FieldBlock = {
+  label: string
+  body: string
+  badges?: string[]
+}
+
+const REQUIRED_KEYS: ArcadeSection['sectionKey'][] = [
+  'atAGlance',
+  'onlineQualifier',
+  'offlineSwiss',
+  'deciderAndSeeding',
+  'finals',
+  'operations',
+]
+
+const SHEET_ORDER: ArcadeSection['sectionKey'][] = [
+  'atAGlance',
+  'onlineQualifier',
+  'offlineSwiss',
+  'deciderAndSeeding',
+  'finals',
+  'operations',
+]
+
+const SECTION_IDS: Record<ArcadeSection['sectionKey'], string> = {
+  atAGlance: 'arcade-at-a-glance',
+  onlineQualifier: 'arcade-online-qualifier',
+  offlineSwiss: 'arcade-offline-swiss',
+  deciderAndSeeding: 'arcade-decider-seeding',
+  finals: 'arcade-finals',
+  operations: 'arcade-operations',
+}
+
+const SHEET_TITLES: Record<ArcadeSection['sectionKey'], string> = {
+  atAGlance: '대회 개요',
+  onlineQualifier: '온라인 예선',
+  offlineSwiss: '오프라인 예선 (Swiss)',
+  deciderAndSeeding: '3-1 결정전 / 시드전',
+  finals: 'Top 8 결선',
+  operations: '밴픽/점수/운영 규정',
+}
+
+const fallbackMap = new Map(
+  FALLBACK_ARCADE_SECTIONS.map((section) => [section.sectionKey, section])
+)
+
+const BADGE_KEYWORDS = ['필수', '중요', '불가', '금지'] as const
 
 const omitNode = <T extends { node?: unknown }>(props: T) => {
   const { node, ...rest } = props
@@ -116,7 +179,9 @@ const markdownComponents: Components = {
   },
   tr: (props) => {
     const rest = omitNode(props)
-    return <TableRow className='border-white/[0.07] hover:bg-white/[0.04]' {...rest} />
+    return (
+      <TableRow className='border-white/[0.07] hover:bg-white/[0.04]' {...rest} />
+    )
   },
   th: (props) => {
     const rest = omitNode(props)
@@ -139,8 +204,139 @@ const markdownComponents: Components = {
   hr: () => <hr className='border-white/15' />,
 }
 
+function MarkdownBlock({ body }: { body: string }) {
+  return (
+    <div className='space-y-4'>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={markdownComponents}
+      >
+        {body}
+      </ReactMarkdown>
+    </div>
+  )
+}
+
+const extractBadges = (label: string, body: string) => {
+  const text = `${label} ${body}`
+  const badges = BADGE_KEYWORDS.filter((keyword) => text.includes(keyword))
+  return badges.length > 0 ? badges : undefined
+}
+
+const splitMarkdownSections = (body: string, fallbackLabel: string) => {
+  const lines = body.split(/\r?\n/)
+  const sections: FieldBlock[] = []
+  let currentLabel = ''
+  let buffer: string[] = []
+
+  const flush = () => {
+    const content = buffer.join('\n').trim()
+    if (!content && !currentLabel) return
+    const label = currentLabel || fallbackLabel
+    if (content) {
+      sections.push({
+        label,
+        body: content,
+        badges: extractBadges(label, content),
+      })
+    }
+    buffer = []
+  }
+
+  for (const line of lines) {
+    const match = line.match(/^#{2,3}\s+(.*)$/)
+    if (match) {
+      flush()
+      currentLabel = match[1].trim()
+      continue
+    }
+    buffer.push(line)
+  }
+
+  flush()
+
+  if (sections.length === 0 && body.trim()) {
+    return [
+      {
+        label: fallbackLabel,
+        body: body.trim(),
+        badges: extractBadges(fallbackLabel, body),
+      },
+    ]
+  }
+
+  return sections
+}
+
 function ArcadePage() {
+  const { data, isError } = useContent<ContentData>('arcade')
   const title = t('nav.arcade')
+  const statusMessage = isError ? t('content.loadFailed') : null
+
+  const sections = useMemo(() => {
+    const apiSections = Array.isArray(data?.content_sections)
+      ? data.content_sections
+      : []
+    const apiMap = new Map<ArcadeSection['sectionKey'], ContentSection>()
+
+    for (const section of apiSections) {
+      if (!section?.sectionKey) continue
+      apiMap.set(section.sectionKey, section)
+    }
+
+    return REQUIRED_KEYS.map((key) => {
+      const fallback = fallbackMap.get(key)
+      const apiSection = apiMap.get(key)
+      if (!fallback) {
+        return {
+          sectionKey: key,
+          order: 0,
+          title: apiSection?.title ?? '',
+          bodyMd: apiSection?.bodyMd ?? '',
+        }
+      }
+
+      const sectionTitle = apiSection?.title?.trim()
+        ? apiSection.title
+        : fallback.title
+      const bodyMd = apiSection?.bodyMd?.trim()
+        ? apiSection.bodyMd
+        : fallback.bodyMd
+
+      return {
+        sectionKey: key,
+        order: fallback.order,
+        title: sectionTitle,
+        bodyMd,
+      }
+    })
+  }, [data])
+
+  const sectionMap = useMemo(() => {
+    return new Map(sections.map((section) => [section.sectionKey, section]))
+  }, [sections])
+
+  const tocItems = SHEET_ORDER.map((key) => ({
+    key,
+    title: SHEET_TITLES[key],
+    id: SECTION_IDS[key],
+  }))
+
+  const sheetEntries = useMemo(() => {
+    return SHEET_ORDER.flatMap((key) => {
+      const section = sectionMap.get(key)
+      if (!section) return []
+      const fields = splitMarkdownSections(section.bodyMd, section.title)
+      return [
+        {
+          key,
+          id: SECTION_IDS[key],
+          title: SHEET_TITLES[key],
+          fields,
+        },
+      ]
+    })
+  }, [sectionMap])
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${title}`
@@ -148,26 +344,27 @@ function ArcadePage() {
 
   return (
     <TkcSection>
-      <TkcPageHeader
-        title={title}
-        subtitle='예선부터 결선까지 운영 문서를 기준으로 핵심 규정을 정리했습니다.'
-      />
+      <TkcPageHeader title={title} />
+
+      {statusMessage && (
+        <p className='text-sm text-white/60'>{statusMessage}</p>
+      )}
 
       <div className='lg:grid lg:grid-cols-[260px_1fr] lg:gap-12'>
         <aside className='hidden lg:block'>
           <div className='sticky top-24'>
             <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-lg backdrop-blur-md'>
               <p className='text-[11px] font-bold tracking-widest text-[#ff2a00] uppercase'>
-                Rule Index
+                규정 목차
               </p>
               <nav className='mt-5 flex flex-col gap-1 text-sm'>
-                {ARCADE_RULEBOOK_SECTIONS.map((section) => (
+                {tocItems.map((item) => (
                   <a
-                    key={section.id}
-                    href={`#${section.id}`}
+                    key={item.key}
+                    href={`#${item.id}`}
                     className='rounded-lg px-3 py-1.5 text-white/75 transition hover:bg-[#ff2a00]/10 hover:text-white focus-visible:ring-2 focus-visible:ring-[#ff2a00]/40 focus-visible:outline-none'
                   >
-                    {section.title}
+                    {item.title}
                   </a>
                 ))}
               </nav>
@@ -176,26 +373,20 @@ function ArcadePage() {
         </aside>
 
         <div className='space-y-10 md:space-y-12'>
-          {ARCADE_RULEBOOK_SECTIONS.map((section) => (
+          {sheetEntries.map((sheet) => (
             <TkcRuleSheet
-              key={section.id}
-              id={section.id}
+              key={sheet.key}
+              id={sheet.id}
               className='scroll-mt-24'
-              title={section.title}
+              title={sheet.title}
             >
-              {section.fields.map((field, index) => (
+              {sheet.fields.map((field, index) => (
                 <TkcField
-                  key={`${section.id}-${index}`}
+                  key={`${sheet.key}-${index}`}
                   label={field.label}
-                  note={field.note}
                   badges={field.badges}
                 >
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={markdownComponents}
-                  >
-                    {field.bodyMd}
-                  </ReactMarkdown>
+                  <MarkdownBlock body={field.body} />
                 </TkcField>
               ))}
             </TkcRuleSheet>
