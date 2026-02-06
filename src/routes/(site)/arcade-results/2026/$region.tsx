@@ -320,7 +320,7 @@ function ArcadeRegionDetailPage() {
         />
       </div>
 
-      <section className='space-y-3'>
+      <section className='space-y-4'>
         <StageTitle
           title='최종 순위'
           subtitle='지역 1·2위 확정자를 상단에 표시하고, 나머지는 Swiss 최종 전적으로 정렬합니다.'
@@ -329,38 +329,91 @@ function ArcadeRegionDetailPage() {
         {finalRankingRows.length === 0 ? (
           <EmptyMessage>최종 순위를 계산할 데이터가 아직 없습니다.</EmptyMessage>
         ) : (
-          <div className='overflow-x-auto rounded-xl border border-white/10'>
-            <table className='min-w-[580px] text-left text-sm'>
-              <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
-                <tr>
-                  <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
-                  <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
-                  <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>시드</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>전적</th>
-                  <th className='whitespace-nowrap px-4 py-2.5'>상태</th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-white/[0.07]'>
-                {finalRankingRows.map((row) => (
-                  <tr key={`final-rank-${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
-                    <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
-                    <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                    <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                    <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
-                      {typeof row.seed === 'number' ? row.seed : '-'}
-                    </td>
-                    <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
-                      {typeof row.wins === 'number' && typeof row.losses === 'number'
-                        ? `${row.wins}-${row.losses}`
-                        : '-'}
-                    </td>
-                    <td className='whitespace-nowrap px-4 py-3 text-white/80'>{row.statusLabel}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            {finalRankingRows.filter((r) => r.rank <= 2).length > 0 && (
+              <div className='grid gap-3 sm:grid-cols-2'>
+                {finalRankingRows
+                  .filter((r) => r.rank <= 2)
+                  .map((row) => (
+                    <div
+                      key={`hero-${row.entryId}`}
+                      className='relative overflow-hidden rounded-xl border border-[#ff2a00]/25 bg-gradient-to-br from-[#ff2a00]/10 to-transparent p-5'
+                    >
+                      <div className='flex items-start justify-between gap-3'>
+                        <div className='space-y-1'>
+                          <div className='text-[11px] font-bold tracking-widest text-[#ff2a00] uppercase'>
+                            {row.statusLabel}
+                          </div>
+                          <div className='text-lg font-bold text-white'>{row.nickname}</div>
+                          <div className='font-mono text-xs text-white/45'>{row.entryId}</div>
+                        </div>
+                        <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[#ff2a00]/30 bg-[#ff2a00]/15 text-lg font-bold text-[#ff2a00]'>
+                          {row.rank}
+                        </div>
+                      </div>
+                      {(typeof row.wins === 'number' && typeof row.losses === 'number') && (
+                        <div className='mt-3 flex gap-4 text-xs text-white/60'>
+                          <span>시드 <span className='font-medium text-white/80'>{row.seed ?? '-'}</span></span>
+                          <span>전적 <span className='font-medium text-white/80'>{row.wins}-{row.losses}</span></span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            )}
+
+            {finalRankingRows.filter((r) => r.rank > 2).length > 0 && (
+              <div className='overflow-x-auto rounded-xl border border-white/10'>
+                <table className='min-w-[480px] text-left text-sm'>
+                  <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
+                    <tr>
+                      <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
+                      <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
+                      <th className='whitespace-nowrap px-4 py-2.5 text-right'>시드</th>
+                      <th className='whitespace-nowrap px-4 py-2.5 text-right'>전적</th>
+                      <th className='whitespace-nowrap px-4 py-2.5'>상태</th>
+                    </tr>
+                  </thead>
+                  <tbody className='divide-y divide-white/[0.07]'>
+                    {finalRankingRows
+                      .filter((r) => r.rank > 2)
+                      .map((row) => {
+                        const statusStyle =
+                          row.statusLabel === '결선 진출'
+                            ? 'border-emerald-300/30 bg-emerald-500/10 text-emerald-200'
+                            : row.statusLabel === '3-1 선발전'
+                              ? 'border-[#ffb36d]/30 bg-[#ffb36d]/10 text-[#ffb36d]'
+                              : row.statusLabel === '탈락'
+                                ? 'border-red-300/20 bg-red-500/10 text-red-300/80'
+                                : 'border-white/15 bg-white/5 text-white/60'
+                        return (
+                          <tr key={`final-rank-${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
+                            <td className='whitespace-nowrap px-4 py-3 font-bold text-white/60'>{row.rank}</td>
+                            <td className='whitespace-nowrap px-4 py-3'>
+                              <span className='font-semibold text-white'>{row.nickname}</span>
+                              <span className='ml-2 font-mono text-[11px] text-white/40'>{row.entryId}</span>
+                            </td>
+                            <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
+                              {typeof row.seed === 'number' ? row.seed : '-'}
+                            </td>
+                            <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
+                              {typeof row.wins === 'number' && typeof row.losses === 'number'
+                                ? `${row.wins}-${row.losses}`
+                                : '-'}
+                            </td>
+                            <td className='whitespace-nowrap px-4 py-3'>
+                              <span className={`inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}>
+                                {row.statusLabel}
+                              </span>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
         )}
       </section>
 
@@ -432,43 +485,6 @@ function ArcadeRegionDetailPage() {
           </div>
         )}
 
-        {regionData.swissStandings.length > 0 ? (
-          <div className='overflow-x-auto rounded-xl border border-white/10'>
-            <table className='min-w-[480px] text-left text-sm'>
-              <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
-                <tr>
-                  <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
-                  <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>시드</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>승</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>패</th>
-                  <th className='whitespace-nowrap px-4 py-2.5'>상태</th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-white/[0.07]'>
-                {regionData.swissStandings.map((row) => {
-                  const statusColor = row.status === 'qualified'
-                    ? 'text-emerald-300'
-                    : row.status === 'eliminated'
-                      ? 'text-red-300/70'
-                      : row.status === 'decider'
-                        ? 'text-[#ffb36d]'
-                        : 'text-white/60'
-                  return (
-                    <tr key={row.entryId} className='transition-colors hover:bg-white/[0.03]'>
-                      <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                      <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                      <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>{row.seed}</td>
-                      <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>{row.wins}</td>
-                      <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>{row.losses}</td>
-                      <td className={`whitespace-nowrap px-4 py-3 text-xs font-medium ${statusColor}`}>{row.status}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        ) : null}
       </section>
 
       <section className='grid gap-6 md:grid-cols-2'>

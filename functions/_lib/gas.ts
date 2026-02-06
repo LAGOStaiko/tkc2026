@@ -3,7 +3,16 @@ export interface _Env {
   GAS_API_KEY: string;    // shared secret (same as GAS Script Properties API_KEY)
 }
 
-export type GasAction = "site" | "schedule" | "results" | "content" | "register";
+export type GasAction =
+  | "site"
+  | "schedule"
+  | "results"
+  | "content"
+  | "register"
+  | "opsFeed"
+  | "opsUpsert"
+  | "opsExport"
+  | "opsInit";
 
 export async function callGas(env: _Env, action: GasAction, params?: Record<string, unknown>, payload?: unknown) {
   if (!env.GAS_WEBAPP_URL) throw new Error("Missing env.GAS_WEBAPP_URL");
