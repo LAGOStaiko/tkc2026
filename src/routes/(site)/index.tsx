@@ -11,7 +11,7 @@ const ASSETS = {
   consoleIcon: '/branding/v2/icon-console.png',
   arcadeIcon: '/branding/v2/icon-arcade.png',
 }
-const HOME_YOUTUBE_ID = '6UkPLBMEruQ'
+const HOME_YOUTUBE_ID = 'DQKIfLMIgXY'
 const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
 
 type Partner = {
