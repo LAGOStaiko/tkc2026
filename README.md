@@ -110,6 +110,13 @@ See `docs/google-sheets-results-archive.md` for:
 - Apps Script `results` payload shape
 - spreadsheet tab/column schema for the Arcade 2026 archive
 
+See `docs/arcade-ops-system.md` for full 운영 시스템:
+
+- mobile ops input (`/ops/arcade-control`)
+- ops DB -> public archive export flow
+- venue broadcast window (`/ops/arcade-broadcast`)
+- required Apps Script extension (`docs/apps-script-ops-extension.gs`)
+
 ## Sponsoring this project ❤️
 
 If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏

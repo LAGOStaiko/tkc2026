@@ -47,6 +47,8 @@ import { Route as AdminSettingsDisplayRouteImport } from './routes/admin/setting
 import { Route as AdminSettingsAppearanceRouteImport } from './routes/admin/settings/appearance'
 import { Route as AdminSettingsAccountRouteImport } from './routes/admin/settings/account'
 import { Route as AdminErrorsErrorRouteImport } from './routes/admin/errors/$error'
+import { Route as siteOpsArcadeControlRouteImport } from './routes/(site)/ops/arcade-control'
+import { Route as siteOpsArcadeBroadcastRouteImport } from './routes/(site)/ops/arcade-broadcast'
 import { Route as siteArcadeResults2026IndexRouteImport } from './routes/(site)/arcade-results/2026/index'
 import { Route as siteArcadeResults2026FinalsRouteImport } from './routes/(site)/arcade-results/2026/finals'
 import { Route as siteArcadeResults2026RegionRouteImport } from './routes/(site)/arcade-results/2026/$region'
@@ -240,6 +242,16 @@ const AdminErrorsErrorRoute = AdminErrorsErrorRouteImport.update({
   path: '/errors/$error',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const siteOpsArcadeControlRoute = siteOpsArcadeControlRouteImport.update({
+  id: '/ops/arcade-control',
+  path: '/ops/arcade-control',
+  getParentRoute: () => siteRouteRoute,
+} as any)
+const siteOpsArcadeBroadcastRoute = siteOpsArcadeBroadcastRouteImport.update({
+  id: '/ops/arcade-broadcast',
+  path: '/ops/arcade-broadcast',
+  getParentRoute: () => siteRouteRoute,
+} as any)
 const siteArcadeResults2026IndexRoute =
   siteArcadeResults2026IndexRouteImport.update({
     id: '/arcade-results/2026/',
@@ -281,6 +293,8 @@ export interface FileRoutesByFullPath {
   '/schedule': typeof siteScheduleRoute
   '/': typeof siteIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
+  '/ops/arcade-control': typeof siteOpsArcadeControlRoute
   '/admin/errors/$error': typeof AdminErrorsErrorRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
   '/admin/settings/appearance': typeof AdminSettingsAppearanceRoute
@@ -319,6 +333,8 @@ export interface FileRoutesByTo {
   '/schedule': typeof siteScheduleRoute
   '/': typeof siteIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
+  '/ops/arcade-control': typeof siteOpsArcadeControlRoute
   '/admin/errors/$error': typeof AdminErrorsErrorRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
   '/admin/settings/appearance': typeof AdminSettingsAppearanceRoute
@@ -363,6 +379,8 @@ export interface FileRoutesById {
   '/(site)/schedule': typeof siteScheduleRoute
   '/(site)/': typeof siteIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/(site)/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
+  '/(site)/ops/arcade-control': typeof siteOpsArcadeControlRoute
   '/admin/errors/$error': typeof AdminErrorsErrorRoute
   '/admin/settings/account': typeof AdminSettingsAccountRoute
   '/admin/settings/appearance': typeof AdminSettingsAppearanceRoute
@@ -405,6 +423,8 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/'
     | '/admin/'
+    | '/ops/arcade-broadcast'
+    | '/ops/arcade-control'
     | '/admin/errors/$error'
     | '/admin/settings/account'
     | '/admin/settings/appearance'
@@ -443,6 +463,8 @@ export interface FileRouteTypes {
     | '/schedule'
     | '/'
     | '/admin'
+    | '/ops/arcade-broadcast'
+    | '/ops/arcade-control'
     | '/admin/errors/$error'
     | '/admin/settings/account'
     | '/admin/settings/appearance'
@@ -486,6 +508,8 @@ export interface FileRouteTypes {
     | '/(site)/schedule'
     | '/(site)/'
     | '/admin/'
+    | '/(site)/ops/arcade-broadcast'
+    | '/(site)/ops/arcade-control'
     | '/admin/errors/$error'
     | '/admin/settings/account'
     | '/admin/settings/appearance'
@@ -789,6 +813,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminErrorsErrorRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/(site)/ops/arcade-control': {
+      id: '/(site)/ops/arcade-control'
+      path: '/ops/arcade-control'
+      fullPath: '/ops/arcade-control'
+      preLoaderRoute: typeof siteOpsArcadeControlRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
+    '/(site)/ops/arcade-broadcast': {
+      id: '/(site)/ops/arcade-broadcast'
+      path: '/ops/arcade-broadcast'
+      fullPath: '/ops/arcade-broadcast'
+      preLoaderRoute: typeof siteOpsArcadeBroadcastRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
     '/(site)/arcade-results/2026/': {
       id: '/(site)/arcade-results/2026/'
       path: '/arcade-results/2026'
@@ -821,6 +859,8 @@ interface siteRouteRouteChildren {
   siteResultsRoute: typeof siteResultsRoute
   siteScheduleRoute: typeof siteScheduleRoute
   siteIndexRoute: typeof siteIndexRoute
+  siteOpsArcadeBroadcastRoute: typeof siteOpsArcadeBroadcastRoute
+  siteOpsArcadeControlRoute: typeof siteOpsArcadeControlRoute
   siteArcadeResults2026RegionRoute: typeof siteArcadeResults2026RegionRoute
   siteArcadeResults2026FinalsRoute: typeof siteArcadeResults2026FinalsRoute
   siteArcadeResults2026IndexRoute: typeof siteArcadeResults2026IndexRoute
@@ -834,6 +874,8 @@ const siteRouteRouteChildren: siteRouteRouteChildren = {
   siteResultsRoute: siteResultsRoute,
   siteScheduleRoute: siteScheduleRoute,
   siteIndexRoute: siteIndexRoute,
+  siteOpsArcadeBroadcastRoute: siteOpsArcadeBroadcastRoute,
+  siteOpsArcadeControlRoute: siteOpsArcadeControlRoute,
   siteArcadeResults2026RegionRoute: siteArcadeResults2026RegionRoute,
   siteArcadeResults2026FinalsRoute: siteArcadeResults2026FinalsRoute,
   siteArcadeResults2026IndexRoute: siteArcadeResults2026IndexRoute,

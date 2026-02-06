@@ -462,55 +462,95 @@ function ArcadeRegionDetailPage() {
         </div>
 
         {finalRankingRows.filter((r) => r.rank > 2).length > 0 && (
-          <div className='overflow-x-auto rounded-xl border border-white/10'>
-            <table className='w-full min-w-[480px] text-left text-sm'>
-              <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
-                <tr>
-                  <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
-                  <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>시드</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>전적</th>
-                  <th className='whitespace-nowrap px-4 py-2.5'>상태</th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-white/[0.07]'>
-                {finalRankingRows
-                  .filter((r) => r.rank > 2)
-                  .map((row) => {
-                    const statusStyle =
-                      row.statusLabel === '결선 진출'
-                        ? 'border-emerald-300/30 bg-emerald-500/10 text-emerald-200'
-                        : row.statusLabel === '3-1 선발전'
-                          ? 'border-[#ffb36d]/30 bg-[#ffb36d]/10 text-[#ffb36d]'
-                          : row.statusLabel === '탈락'
-                            ? 'border-red-300/20 bg-red-500/10 text-red-300/80'
-                            : 'border-white/15 bg-white/5 text-white/60'
-                    return (
-                      <tr key={`final-rank-${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
-                        <td className='whitespace-nowrap px-4 py-3 font-bold text-white/60'>{row.rank}</td>
-                        <td className='whitespace-nowrap px-4 py-3'>
+          <>
+            {/* Desktop table */}
+            <div className='hidden overflow-x-auto rounded-xl border border-white/10 md:block'>
+              <table className='w-full min-w-[480px] text-left text-sm'>
+                <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
+                  <tr>
+                    <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
+                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>시드</th>
+                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>전적</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>상태</th>
+                  </tr>
+                </thead>
+                <tbody className='divide-y divide-white/[0.07]'>
+                  {finalRankingRows
+                    .filter((r) => r.rank > 2)
+                    .map((row) => {
+                      const statusStyle =
+                        row.statusLabel === '결선 진출'
+                          ? 'border-emerald-300/30 bg-emerald-500/10 text-emerald-200'
+                          : row.statusLabel === '3-1 선발전'
+                            ? 'border-[#ffb36d]/30 bg-[#ffb36d]/10 text-[#ffb36d]'
+                            : row.statusLabel === '탈락'
+                              ? 'border-red-300/20 bg-red-500/10 text-red-300/80'
+                              : 'border-white/15 bg-white/5 text-white/60'
+                      return (
+                        <tr key={`final-rank-${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
+                          <td className='whitespace-nowrap px-4 py-3 font-bold text-white/60'>{row.rank}</td>
+                          <td className='whitespace-nowrap px-4 py-3'>
+                            <span className='font-semibold text-white'>{row.nickname}</span>
+                            <span className='ml-2 font-mono text-[11px] text-white/40'>{row.entryId}</span>
+                          </td>
+                          <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
+                            {typeof row.seed === 'number' ? row.seed : '-'}
+                          </td>
+                          <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
+                            {typeof row.wins === 'number' && typeof row.losses === 'number'
+                              ? `${row.wins}-${row.losses}`
+                              : '-'}
+                          </td>
+                          <td className='whitespace-nowrap px-4 py-3'>
+                            <span className={`inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}>
+                              {row.statusLabel}
+                            </span>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className='space-y-2 md:hidden'>
+              {finalRankingRows
+                .filter((r) => r.rank > 2)
+                .map((row) => {
+                  const statusStyle =
+                    row.statusLabel === '결선 진출'
+                      ? 'border-emerald-300/30 bg-emerald-500/10 text-emerald-200'
+                      : row.statusLabel === '3-1 선발전'
+                        ? 'border-[#ffb36d]/30 bg-[#ffb36d]/10 text-[#ffb36d]'
+                        : row.statusLabel === '탈락'
+                          ? 'border-red-300/20 bg-red-500/10 text-red-300/80'
+                          : 'border-white/15 bg-white/5 text-white/60'
+                  return (
+                    <div
+                      key={`m-final-${row.entryId}-${row.rank}`}
+                      className='flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3'
+                    >
+                      <span className='w-6 text-center text-sm font-bold text-white/50'>{row.rank}</span>
+                      <div className='min-w-0 flex-1'>
+                        <div className='flex items-baseline gap-1.5'>
                           <span className='font-semibold text-white'>{row.nickname}</span>
-                          <span className='ml-2 font-mono text-[11px] text-white/40'>{row.entryId}</span>
-                        </td>
-                        <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
-                          {typeof row.seed === 'number' ? row.seed : '-'}
-                        </td>
-                        <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
-                          {typeof row.wins === 'number' && typeof row.losses === 'number'
-                            ? `${row.wins}-${row.losses}`
-                            : '-'}
-                        </td>
-                        <td className='whitespace-nowrap px-4 py-3'>
-                          <span className={`inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}>
-                            {row.statusLabel}
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  })}
-              </tbody>
-            </table>
-          </div>
+                          <span className='font-mono text-[11px] text-white/35'>{row.entryId}</span>
+                        </div>
+                        <div className='mt-1 flex items-center gap-3 text-xs text-white/55'>
+                          <span>시드 {typeof row.seed === 'number' ? row.seed : '-'}</span>
+                          <span>전적 {typeof row.wins === 'number' && typeof row.losses === 'number' ? `${row.wins}-${row.losses}` : '-'}</span>
+                        </div>
+                      </div>
+                      <span className={`flex-shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}>
+                        {row.statusLabel}
+                      </span>
+                    </div>
+                  )
+                })}
+            </div>
+          </>
         )}
       </section>
 
@@ -523,41 +563,78 @@ function ArcadeRegionDetailPage() {
         {sortedOnlineRows.length === 0 ? (
           <EmptyMessage>온라인 예선 결과가 아직 입력되지 않았습니다.</EmptyMessage>
         ) : (
-          <div className='overflow-x-auto rounded-xl border border-white/10'>
-            <table className='w-full min-w-[560px] text-left text-sm'>
-              <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
-                <tr>
-                  <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
-                  <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
-                  <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>과제곡 1</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>과제곡 2</th>
-                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>합산</th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-white/[0.07]'>
-                {sortedOnlineRows.map((row) => (
-                  <tr
-                    key={`${row.entryId}-${row.rank}`}
-                    className={`transition-colors hover:bg-white/[0.03] ${row.advanced ? 'bg-emerald-500/5' : ''}`}
-                  >
-                    <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
-                    <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                    <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                    <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
-                      {formatScore(row.score1)}
-                    </td>
-                    <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
-                      {formatScore(row.score2)}
-                    </td>
-                    <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>
-                      {formatScore(row.total)}
-                    </td>
+          <>
+            {/* Desktop table */}
+            <div className='hidden overflow-x-auto rounded-xl border border-white/10 md:block'>
+              <table className='w-full min-w-[560px] text-left text-sm'>
+                <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
+                  <tr>
+                    <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
+                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>과제곡 1</th>
+                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>과제곡 2</th>
+                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>합산</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className='divide-y divide-white/[0.07]'>
+                  {sortedOnlineRows.map((row) => (
+                    <tr
+                      key={`${row.entryId}-${row.rank}`}
+                      className={`transition-colors hover:bg-white/[0.03] ${row.advanced ? 'bg-emerald-500/5' : ''}`}
+                    >
+                      <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
+                      <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                      <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                      <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
+                        {formatScore(row.score1)}
+                      </td>
+                      <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
+                        {formatScore(row.score2)}
+                      </td>
+                      <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>
+                        {formatScore(row.total)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className='space-y-2 md:hidden'>
+              {sortedOnlineRows.map((row) => (
+                <div
+                  key={`m-${row.entryId}-${row.rank}`}
+                  className={`rounded-xl border border-white/10 p-4 ${row.advanced ? 'border-emerald-300/20 bg-emerald-500/5' : 'bg-white/[0.03]'}`}
+                >
+                  <div className='flex items-start justify-between gap-3'>
+                    <div className='min-w-0'>
+                      <div className='text-base font-bold text-white'>{row.nickname}</div>
+                      <div className='mt-0.5 font-mono text-xs text-white/45'>{row.entryId}</div>
+                    </div>
+                    <div className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#ff2a00]/15 text-sm font-bold text-[#ff2a00]'>
+                      {row.rank}
+                    </div>
+                  </div>
+                  <div className='mt-3 grid grid-cols-3 gap-2 text-xs'>
+                    <div className='rounded-lg bg-white/[0.05] px-2.5 py-2 text-center'>
+                      <div className='text-white/45'>과제곡 1</div>
+                      <div className='mt-0.5 font-bold tabular-nums text-white/80'>{formatScore(row.score1)}</div>
+                    </div>
+                    <div className='rounded-lg bg-white/[0.05] px-2.5 py-2 text-center'>
+                      <div className='text-white/45'>과제곡 2</div>
+                      <div className='mt-0.5 font-bold tabular-nums text-white/80'>{formatScore(row.score2)}</div>
+                    </div>
+                    <div className='rounded-lg bg-[#ff2a00]/10 px-2.5 py-2 text-center'>
+                      <div className='text-[#ff2a00]/60'>합산</div>
+                      <div className='mt-0.5 font-bold tabular-nums text-white'>{formatScore(row.total)}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </section>
 

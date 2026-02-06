@@ -1,4 +1,4 @@
-import { unauthorized, type json } from "./response";
+import { unauthorized } from "./response";
 
 type OpsEnv = {
   OPS_OPERATOR_KEY?: string;
@@ -17,7 +17,7 @@ export function readOpsKey(request: Request) {
   return "";
 }
 
-export function requireOpsAuth(env: OpsEnv, request: Request): ReturnType<typeof json> | null {
+export function requireOpsAuth(env: OpsEnv, request: Request): Response | null {
   const expected = env.OPS_OPERATOR_KEY?.trim();
   if (!expected) {
     return unauthorized("Server is not configured for ops auth");
