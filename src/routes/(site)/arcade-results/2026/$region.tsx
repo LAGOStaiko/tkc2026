@@ -330,32 +330,32 @@ function ArcadeRegionDetailPage() {
           <EmptyMessage>최종 순위를 계산할 데이터가 아직 없습니다.</EmptyMessage>
         ) : (
           <div className='overflow-x-auto rounded-xl border border-white/10'>
-            <table className='min-w-full text-left text-sm'>
+            <table className='min-w-[580px] text-left text-sm'>
               <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                 <tr>
-                  <th className='px-4 py-2.5'>순위</th>
-                  <th className='px-4 py-2.5'>엔트리</th>
-                  <th className='px-4 py-2.5'>닉네임</th>
-                  <th className='px-4 py-2.5 text-right'>시드</th>
-                  <th className='px-4 py-2.5 text-right'>전적</th>
-                  <th className='px-4 py-2.5'>상태</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
+                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>시드</th>
+                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>전적</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>상태</th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-white/[0.07]'>
                 {finalRankingRows.map((row) => (
                   <tr key={`final-rank-${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
-                    <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
-                    <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                    <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                    <td className='px-4 py-3 text-right tabular-nums text-white/75'>
+                    <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
+                    <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                    <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                    <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
                       {typeof row.seed === 'number' ? row.seed : '-'}
                     </td>
-                    <td className='px-4 py-3 text-right tabular-nums text-white/75'>
+                    <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
                       {typeof row.wins === 'number' && typeof row.losses === 'number'
                         ? `${row.wins}-${row.losses}`
                         : '-'}
                     </td>
-                    <td className='px-4 py-3 text-white/80'>{row.statusLabel}</td>
+                    <td className='whitespace-nowrap px-4 py-3 text-white/80'>{row.statusLabel}</td>
                   </tr>
                 ))}
               </tbody>
@@ -374,15 +374,15 @@ function ArcadeRegionDetailPage() {
           <EmptyMessage>온라인 예선 결과가 아직 입력되지 않았습니다.</EmptyMessage>
         ) : (
           <div className='overflow-x-auto rounded-xl border border-white/10'>
-            <table className='min-w-full text-left text-sm'>
+            <table className='min-w-[560px] text-left text-sm'>
               <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                 <tr>
-                  <th className='px-4 py-2.5'>순위</th>
-                  <th className='px-4 py-2.5'>엔트리</th>
-                  <th className='px-4 py-2.5'>닉네임</th>
-                  <th className='px-4 py-2.5 text-right'>과제곡 1</th>
-                  <th className='px-4 py-2.5 text-right'>과제곡 2</th>
-                  <th className='px-4 py-2.5 text-right'>합산</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
+                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>과제곡 1</th>
+                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>과제곡 2</th>
+                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>합산</th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-white/[0.07]'>
@@ -391,16 +391,16 @@ function ArcadeRegionDetailPage() {
                     key={`${row.entryId}-${row.rank}`}
                     className={`transition-colors hover:bg-white/[0.03] ${row.advanced ? 'bg-emerald-500/5' : ''}`}
                   >
-                    <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
-                    <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                    <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                    <td className='px-4 py-3 text-right tabular-nums text-white/75'>
+                    <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
+                    <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                    <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                    <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
                       {formatScore(row.score1)}
                     </td>
-                    <td className='px-4 py-3 text-right tabular-nums text-white/75'>
+                    <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
                       {formatScore(row.score2)}
                     </td>
-                    <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>
+                    <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>
                       {formatScore(row.total)}
                     </td>
                   </tr>
@@ -434,15 +434,15 @@ function ArcadeRegionDetailPage() {
 
         {regionData.swissStandings.length > 0 ? (
           <div className='overflow-x-auto rounded-xl border border-white/10'>
-            <table className='min-w-full text-left text-sm'>
+            <table className='min-w-[480px] text-left text-sm'>
               <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                 <tr>
-                  <th className='px-4 py-2.5'>엔트리</th>
-                  <th className='px-4 py-2.5'>닉네임</th>
-                  <th className='px-4 py-2.5 text-right'>시드</th>
-                  <th className='px-4 py-2.5 text-right'>승</th>
-                  <th className='px-4 py-2.5 text-right'>패</th>
-                  <th className='px-4 py-2.5'>상태</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
+                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>시드</th>
+                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>승</th>
+                  <th className='whitespace-nowrap px-4 py-2.5 text-right'>패</th>
+                  <th className='whitespace-nowrap px-4 py-2.5'>상태</th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-white/[0.07]'>
@@ -456,12 +456,12 @@ function ArcadeRegionDetailPage() {
                         : 'text-white/60'
                   return (
                     <tr key={row.entryId} className='transition-colors hover:bg-white/[0.03]'>
-                      <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                      <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                      <td className='px-4 py-3 text-right tabular-nums text-white/75'>{row.seed}</td>
-                      <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>{row.wins}</td>
-                      <td className='px-4 py-3 text-right tabular-nums text-white/75'>{row.losses}</td>
-                      <td className={`px-4 py-3 text-xs font-medium ${statusColor}`}>{row.status}</td>
+                      <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                      <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                      <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>{row.seed}</td>
+                      <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>{row.wins}</td>
+                      <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>{row.losses}</td>
+                      <td className={`whitespace-nowrap px-4 py-3 text-xs font-medium ${statusColor}`}>{row.status}</td>
                     </tr>
                   )
                 })}
@@ -482,22 +482,22 @@ function ArcadeRegionDetailPage() {
             <EmptyMessage>3-1 선발전 결과가 아직 없습니다.</EmptyMessage>
           ) : (
             <div className='overflow-x-auto rounded-xl border border-white/10'>
-              <table className='min-w-full text-left text-sm'>
+              <table className='min-w-[380px] text-left text-sm'>
                 <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                   <tr>
-                    <th className='px-4 py-2.5'>순위</th>
-                    <th className='px-4 py-2.5'>엔트리</th>
-                    <th className='px-4 py-2.5'>닉네임</th>
-                    <th className='px-4 py-2.5 text-right'>점수</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
+                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>점수</th>
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-white/[0.07]'>
                   {sortedDeciderRows.map((row) => (
                     <tr key={`${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
-                      <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
-                      <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                      <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                      <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>
+                      <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
+                      <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                      <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                      <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>
                         {formatScore(row.score)}
                       </td>
                     </tr>
@@ -524,22 +524,22 @@ function ArcadeRegionDetailPage() {
             <EmptyMessage>시드 배정전 결과가 아직 없습니다.</EmptyMessage>
           ) : (
             <div className='overflow-x-auto rounded-xl border border-white/10'>
-              <table className='min-w-full text-left text-sm'>
+              <table className='min-w-[380px] text-left text-sm'>
                 <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                   <tr>
-                    <th className='px-4 py-2.5'>순위</th>
-                    <th className='px-4 py-2.5'>엔트리</th>
-                    <th className='px-4 py-2.5'>닉네임</th>
-                    <th className='px-4 py-2.5 text-right'>점수</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
+                    <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
+                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>점수</th>
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-white/[0.07]'>
                   {sortedSeedingRows.map((row) => (
                     <tr key={`${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
-                      <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
-                      <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                      <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                      <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>
+                      <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
+                      <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                      <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                      <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>
                         {formatScore(row.score)}
                       </td>
                     </tr>

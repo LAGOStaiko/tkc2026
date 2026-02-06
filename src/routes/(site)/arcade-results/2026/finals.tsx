@@ -50,14 +50,14 @@ function GroupSeedTable({
         <div className='text-sm text-white/55'>시드 데이터 입력 대기</div>
       ) : (
         <div className='overflow-x-auto rounded-lg border border-white/10'>
-          <table className='min-w-full text-left text-sm'>
+          <table className='min-w-[480px] text-left text-sm'>
             <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
               <tr>
-                <th className='px-4 py-2.5'>시드</th>
-                <th className='px-4 py-2.5'>지역</th>
-                <th className='px-4 py-2.5'>엔트리</th>
-                <th className='px-4 py-2.5'>닉네임</th>
-                <th className='px-4 py-2.5 text-right'>배정전 점수</th>
+                <th className='whitespace-nowrap px-4 py-2.5'>시드</th>
+                <th className='whitespace-nowrap px-4 py-2.5'>지역</th>
+                <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
+                <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
+                <th className='whitespace-nowrap px-4 py-2.5 text-right'>배정전 점수</th>
               </tr>
             </thead>
             <tbody className='divide-y divide-white/[0.07]'>
@@ -65,11 +65,11 @@ function GroupSeedTable({
                 .sort((a, b) => a.seed - b.seed)
                 .map((row) => (
                   <tr key={`${row.regionKey}-${row.entryId}-${row.seed}`} className='transition-colors hover:bg-white/[0.03]'>
-                    <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.seed}</td>
-                    <td className='px-4 py-3 text-white/75'>{row.regionLabel}</td>
-                    <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                    <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                    <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>
+                    <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.seed}</td>
+                    <td className='whitespace-nowrap px-4 py-3 text-white/75'>{row.regionLabel}</td>
+                    <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                    <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                    <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>
                       {formatScore(row.score)}
                     </td>
                   </tr>
