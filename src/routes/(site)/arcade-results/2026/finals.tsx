@@ -43,33 +43,33 @@ function GroupSeedTable({
   rows: ArcadeFinalSeedRow[]
 }) {
   return (
-    <div className='rounded-xl border border-white/10 bg-white/[0.03] p-4'>
-      <div className='mb-3 text-sm font-semibold text-white'>{title}</div>
+    <div className='rounded-xl border border-white/10 bg-white/[0.03] p-5'>
+      <div className='mb-4 text-sm font-bold text-[#ff2a00]'>{title}</div>
 
       {rows.length === 0 ? (
-        <div className='text-xs text-white/55'>시드 데이터 입력 대기</div>
+        <div className='text-sm text-white/55'>시드 데이터 입력 대기</div>
       ) : (
         <div className='overflow-x-auto rounded-lg border border-white/10'>
           <table className='min-w-full text-left text-sm'>
-            <thead className='bg-white/5 text-xs text-white/60'>
+            <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
               <tr>
-                <th className='px-3 py-2'>시드</th>
-                <th className='px-3 py-2'>지역</th>
-                <th className='px-3 py-2'>엔트리</th>
-                <th className='px-3 py-2'>닉네임</th>
-                <th className='px-3 py-2 text-right'>배정전 점수</th>
+                <th className='px-4 py-2.5'>시드</th>
+                <th className='px-4 py-2.5'>지역</th>
+                <th className='px-4 py-2.5'>엔트리</th>
+                <th className='px-4 py-2.5'>닉네임</th>
+                <th className='px-4 py-2.5 text-right'>배정전 점수</th>
               </tr>
             </thead>
-            <tbody className='divide-y divide-white/10'>
+            <tbody className='divide-y divide-white/[0.07]'>
               {[...rows]
                 .sort((a, b) => a.seed - b.seed)
                 .map((row) => (
-                  <tr key={`${row.regionKey}-${row.entryId}-${row.seed}`}>
-                    <td className='px-3 py-2 text-white'>{row.seed}</td>
-                    <td className='px-3 py-2 text-white/70'>{row.regionLabel}</td>
-                    <td className='px-3 py-2 text-white/70'>{row.entryId}</td>
-                    <td className='px-3 py-2 text-white'>{row.nickname}</td>
-                    <td className='px-3 py-2 text-right font-semibold text-white'>
+                  <tr key={`${row.regionKey}-${row.entryId}-${row.seed}`} className='transition-colors hover:bg-white/[0.03]'>
+                    <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.seed}</td>
+                    <td className='px-4 py-3 text-white/75'>{row.regionLabel}</td>
+                    <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                    <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                    <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>
                       {formatScore(row.score)}
                     </td>
                   </tr>
@@ -98,7 +98,7 @@ function ArcadeFinals2026Page() {
   return (
     <TkcSection className='space-y-8 md:space-y-10'>
       <div className='space-y-3'>
-        <a href='/arcade-results/2026' className='text-sm text-white/55 hover:text-white'>
+        <a href='/arcade-results/2026' className='text-sm text-white/60 hover:text-[#ff2a00] transition-colors'>
           ← 아케이드 시즌 페이지로 돌아가기
         </a>
         <TkcPageHeader
@@ -118,11 +118,11 @@ function ArcadeFinals2026Page() {
         <GroupSeedTable title='B그룹 시드 (지역 2위)' rows={archive.finals.groupBSeeds} />
       </section>
 
-      <section className='space-y-3'>
-        <h2 className='text-lg font-semibold text-white'>Top 8 크로스 대진</h2>
+      <section className='space-y-4'>
+        <h2 className='text-lg font-bold text-white'>Top 8 크로스 대진</h2>
 
         {crossMatches.length === 0 ? (
-          <div className='rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white/60'>
+          <div className='rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/60'>
             결선 대진 데이터 입력 대기
           </div>
         ) : (
@@ -131,32 +131,44 @@ function ArcadeFinals2026Page() {
               .slice()
               .sort((a, b) => a.matchNo - b.matchNo)
               .map((match) => {
-                const left = `${match.left.regionLabel} ${match.left.nickname} (${match.left.entryId})`
-                const right = `${match.right.regionLabel} ${match.right.nickname} (${match.right.entryId})`
-                const winner =
-                  match.winnerEntryId &&
-                  (match.winnerEntryId === match.left.entryId
-                    ? left
-                    : match.winnerEntryId === match.right.entryId
-                      ? right
-                      : match.winnerEntryId)
+                const leftName = `${match.left.regionLabel} ${match.left.nickname}`
+                const leftId = match.left.entryId
+                const rightName = `${match.right.regionLabel} ${match.right.nickname}`
+                const rightId = match.right.entryId
+                const isLeftWinner = match.winnerEntryId === match.left.entryId
+                const isRightWinner = match.winnerEntryId === match.right.entryId
+                const winnerLabel = isLeftWinner
+                  ? `${leftName} (${leftId})`
+                  : isRightWinner
+                    ? `${rightName} (${rightId})`
+                    : match.winnerEntryId || null
 
                 return (
                   <div
                     key={`final-${match.matchNo}`}
-                    className='rounded-xl border border-white/10 bg-white/[0.03] p-4'
+                    className='rounded-xl border border-white/10 bg-white/[0.03] p-5'
                   >
-                    <div className='text-xs text-[#ff2a00]'>Match {match.matchNo}</div>
-                    <div className='mt-2 text-sm text-white'>{left}</div>
-                    <div className='my-1 text-xs text-white/45'>VS</div>
-                    <div className='text-sm text-white'>{right}</div>
+                    <div className='text-xs font-bold tracking-wide text-[#ff2a00]'>MATCH {match.matchNo}</div>
 
-                    <div className='mt-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-xs text-white/65'>
-                      승자: {winner ?? '기록 대기'}
+                    <div className='mt-3 space-y-2'>
+                      <div className={`flex items-baseline gap-2 text-sm ${isLeftWinner ? 'text-[#ff2a00] font-bold' : 'text-white'}`}>
+                        <span>{leftName}</span>
+                        <span className='font-mono text-[11px] text-white/45'>{leftId}</span>
+                      </div>
+                      <div className='text-xs font-bold text-white/40'>VS</div>
+                      <div className={`flex items-baseline gap-2 text-sm ${isRightWinner ? 'text-[#ff2a00] font-bold' : 'text-white'}`}>
+                        <span>{rightName}</span>
+                        <span className='font-mono text-[11px] text-white/45'>{rightId}</span>
+                      </div>
+                    </div>
+
+                    <div className='mt-4 rounded-lg border border-white/10 bg-black/25 px-3.5 py-2.5 text-xs'>
+                      <span className='text-white/50'>승자:</span>{' '}
+                      <span className='font-semibold text-white/80'>{winnerLabel ?? '기록 대기'}</span>
                     </div>
 
                     {match.note ? (
-                      <div className='mt-2 text-xs text-white/45'>{match.note}</div>
+                      <div className='mt-2.5 text-xs text-white/55'>{match.note}</div>
                     ) : null}
                   </div>
                 )

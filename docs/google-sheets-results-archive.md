@@ -144,7 +144,56 @@ You can also trigger this via API (`doPost`) with `action: "initSheets"`:
 - `all` (default): core + archive
 - `archive`: archive only
 
-## 5) Frontend routes using the archive
+## 5) Seed a finished tournament example
+
+`Code.gs` includes a sample seeder for "대회 종료 후" 상태:
+
+- `seedArchiveFinishedExample2026()` -> replaces all archive tabs with 2026 sample data
+
+Safe API trigger is also available:
+
+```json
+{
+  "apiKey": "YOUR_API_KEY",
+  "action": "seedArchiveSample",
+  "params": {
+    "overwrite": true
+  }
+}
+```
+
+Notes:
+
+- This **replaces** rows in all `arcade_archive_*` tabs (header row is kept).
+- Use only for demo/testing before real results are entered.
+
+## 6) Spreadsheet menu buttons + readability format
+
+`Code.gs` now provides a custom menu on spreadsheet open (`onOpen`):
+
+- `Init + Format (All)`
+- `Init + Format (Archive)`
+- `Format (All)`
+- `Format (Archive)`
+- `Seed Sample 2026`
+- `Clear Archive Rows`
+
+The formatting pass applies:
+
+- frozen header row
+- header styling (dark background + bold white text)
+- alternating row banding
+- filter on header row
+- basic alignment/number formats by column name
+- auto-resize with min/max width bounds
+
+API actions for the same operations:
+
+- `action: "initAndFormatSheets"` (`params.scope`: `all` or `archive`)
+- `action: "formatSheets"` (`params.scope`: `all` or `archive`)
+- `action: "clearSheetRows"` (`params.scope`: `all` or `archive`, use with caution)
+
+## 7) Frontend routes using the archive
 
 - `/results` (hub)
 - `/arcade-results/2026` (season overview)

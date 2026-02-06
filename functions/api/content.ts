@@ -1,7 +1,10 @@
 import { badRequest, ok, serverError } from "../_lib/response";
-import { callGasJson, type _Env } from "../_lib/gas";
+import { callGasJson } from "../_lib/gas";
 
 const ALLOWED_PAGES = new Set(["home", "console", "arcade", "contact"]);
+const CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=60, s-maxage=180, stale-while-revalidate=180",
+};
 
 export const onRequestGet = async ({ env, request }) => {
   try {
@@ -13,7 +16,7 @@ export const onRequestGet = async ({ env, request }) => {
     }
 
     const gas = await callGasJson(env, "content", { page });
-    return ok({ data: gas.data });
+    return ok({ data: gas.data }, { headers: CACHE_HEADERS });
   } catch (err) {
     return serverError(err);
   }

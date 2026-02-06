@@ -19,7 +19,7 @@ const formatScore = (value: number) => value.toLocaleString('en-US')
 
 function EmptyMessage({ children }: { children: string }) {
   return (
-    <div className='rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white/60'>
+    <div className='rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/60'>
       {children}
     </div>
   )
@@ -27,9 +27,12 @@ function EmptyMessage({ children }: { children: string }) {
 
 function StageTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className='space-y-1'>
-      <h2 className='text-lg font-semibold text-white'>{title}</h2>
-      {subtitle ? <p className='text-xs text-white/55'>{subtitle}</p> : null}
+    <div className='space-y-1.5'>
+      <h2 className='flex items-center gap-2.5 text-lg font-bold text-white'>
+        <span className='inline-block h-4 w-1 rounded-full bg-[#ff2a00]' />
+        {title}
+      </h2>
+      {subtitle ? <p className='pl-3.5 text-sm text-white/60'>{subtitle}</p> : null}
     </div>
   )
 }
@@ -67,10 +70,10 @@ function SwissRoundCard({
   region: ArcadeRegionArchive
 }) {
   return (
-    <div className='rounded-xl border border-white/10 bg-white/[0.03] p-4'>
-      <div className='mb-3 text-sm font-semibold text-white'>Round {round}</div>
+    <div className='rounded-xl border border-white/10 bg-white/[0.03] p-5'>
+      <div className='mb-4 text-sm font-bold text-[#ff2a00]'>Round {round}</div>
 
-      <div className='space-y-2'>
+      <div className='space-y-2.5'>
         {matches.map((match, index) => {
           const left = `${match.player1.nickname} (${match.player1.entryId})`
           const right = match.player2
@@ -86,38 +89,39 @@ function SwissRoundCard({
           return (
             <div
               key={`${match.round}-${match.table ?? index}`}
-              className='rounded-lg border border-white/10 bg-black/20 p-3'
+              className='rounded-lg border border-white/10 bg-black/20 p-3.5'
             >
-              <div className='flex flex-wrap items-center justify-between gap-2 text-xs text-white/65'>
-                <div>
+              <div className='flex flex-wrap items-center justify-between gap-2 text-xs'>
+                <div className='text-white/60'>
                   Table {match.table ?? index + 1}
                   {match.highSeedEntryId ? ` · 진영 선택 ${match.highSeedEntryId}` : ''}
                 </div>
-                <div>
-                  승자: {renderParticipant(region, match.winnerEntryId, '기록 대기')}
+                <div className='text-white/70'>
+                  <span className='text-white/45'>승자:</span>{' '}
+                  <span className='font-medium'>{renderParticipant(region, match.winnerEntryId, '기록 대기')}</span>
                 </div>
               </div>
 
-              <div className='mt-2 text-sm font-semibold text-white'>
-                {left} vs {right}
+              <div className='mt-2.5 text-sm font-bold text-white'>
+                {left} <span className='font-normal text-white/40'>vs</span> {right}
               </div>
 
               {match.bye ? (
-                <div className='mt-1 text-xs text-emerald-100'>부전승 (1승 처리)</div>
+                <div className='mt-1.5 text-xs font-medium text-emerald-200'>부전승 (1승 처리)</div>
               ) : null}
 
               {gameLine ? (
-                <div className='mt-2 text-xs text-white/60'>{gameLine}</div>
+                <div className='mt-2 text-xs leading-relaxed text-white/65'>{gameLine}</div>
               ) : null}
 
               {match.tieBreakerSong ? (
-                <div className='mt-1 text-xs text-[#ffb36d]'>
+                <div className='mt-1.5 text-xs font-medium text-[#ffb36d]'>
                   타이브레이커: {match.tieBreakerSong}
                 </div>
               ) : null}
 
               {match.note ? (
-                <div className='mt-1 text-xs text-white/45'>{match.note}</div>
+                <div className='mt-1.5 text-xs text-white/55'>{match.note}</div>
               ) : null}
             </div>
           )
@@ -165,7 +169,7 @@ function ArcadeRegionDetailPage() {
   if (!regionData) {
     return (
       <TkcSection className='space-y-8'>
-        <a href='/arcade-results/2026' className='text-sm text-white/55 hover:text-white'>
+        <a href='/arcade-results/2026' className='text-sm text-white/60 hover:text-[#ff2a00] transition-colors'>
           ← 아케이드 시즌 페이지로 돌아가기
         </a>
         <TkcPageHeader title='지역을 찾을 수 없습니다' subtitle='유효한 지역 키: seoul, daejeon, gwangju, busan' />
@@ -186,7 +190,7 @@ function ArcadeRegionDetailPage() {
   return (
     <TkcSection className='space-y-8 md:space-y-10'>
       <div className='space-y-3'>
-        <a href='/arcade-results/2026' className='text-sm text-white/55 hover:text-white'>
+        <a href='/arcade-results/2026' className='text-sm text-white/60 hover:text-[#ff2a00] transition-colors'>
           ← 아케이드 시즌 페이지로 돌아가기
         </a>
         <TkcPageHeader
@@ -206,36 +210,36 @@ function ArcadeRegionDetailPage() {
         ) : (
           <div className='overflow-x-auto rounded-xl border border-white/10'>
             <table className='min-w-full text-left text-sm'>
-              <thead className='bg-white/5 text-xs text-white/60'>
+              <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                 <tr>
-                  <th className='px-3 py-2'>순위</th>
-                  <th className='px-3 py-2'>엔트리</th>
-                  <th className='px-3 py-2'>닉네임</th>
-                  <th className='px-3 py-2 text-right'>과제곡 1</th>
-                  <th className='px-3 py-2 text-right'>과제곡 2</th>
-                  <th className='px-3 py-2 text-right'>합산</th>
-                  <th className='px-3 py-2'>접수시각</th>
+                  <th className='px-4 py-2.5'>순위</th>
+                  <th className='px-4 py-2.5'>엔트리</th>
+                  <th className='px-4 py-2.5'>닉네임</th>
+                  <th className='px-4 py-2.5 text-right'>과제곡 1</th>
+                  <th className='px-4 py-2.5 text-right'>과제곡 2</th>
+                  <th className='px-4 py-2.5 text-right'>합산</th>
+                  <th className='px-4 py-2.5'>접수시각</th>
                 </tr>
               </thead>
-              <tbody className='divide-y divide-white/10'>
+              <tbody className='divide-y divide-white/[0.07]'>
                 {sortedOnlineRows.map((row) => (
                   <tr
                     key={`${row.entryId}-${row.rank}`}
-                    className={row.advanced ? 'bg-emerald-500/5' : undefined}
+                    className={`transition-colors hover:bg-white/[0.03] ${row.advanced ? 'bg-emerald-500/5' : ''}`}
                   >
-                    <td className='px-3 py-2 text-white'>{row.rank}</td>
-                    <td className='px-3 py-2 text-white/70'>{row.entryId}</td>
-                    <td className='px-3 py-2 text-white'>{row.nickname}</td>
-                    <td className='px-3 py-2 text-right text-white/70'>
+                    <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
+                    <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                    <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                    <td className='px-4 py-3 text-right tabular-nums text-white/75'>
                       {formatScore(row.score1)}
                     </td>
-                    <td className='px-3 py-2 text-right text-white/70'>
+                    <td className='px-4 py-3 text-right tabular-nums text-white/75'>
                       {formatScore(row.score2)}
                     </td>
-                    <td className='px-3 py-2 text-right font-semibold text-white'>
+                    <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>
                       {formatScore(row.total)}
                     </td>
-                    <td className='px-3 py-2 text-xs text-white/55'>
+                    <td className='px-4 py-3 text-xs text-white/55'>
                       {row.submittedAt ?? '-'}
                     </td>
                   </tr>
@@ -270,35 +274,44 @@ function ArcadeRegionDetailPage() {
         {regionData.swissStandings.length > 0 ? (
           <div className='overflow-x-auto rounded-xl border border-white/10'>
             <table className='min-w-full text-left text-sm'>
-              <thead className='bg-white/5 text-xs text-white/60'>
+              <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                 <tr>
-                  <th className='px-3 py-2'>엔트리</th>
-                  <th className='px-3 py-2'>닉네임</th>
-                  <th className='px-3 py-2 text-right'>시드</th>
-                  <th className='px-3 py-2 text-right'>승</th>
-                  <th className='px-3 py-2 text-right'>패</th>
-                  <th className='px-3 py-2'>상태</th>
+                  <th className='px-4 py-2.5'>엔트리</th>
+                  <th className='px-4 py-2.5'>닉네임</th>
+                  <th className='px-4 py-2.5 text-right'>시드</th>
+                  <th className='px-4 py-2.5 text-right'>승</th>
+                  <th className='px-4 py-2.5 text-right'>패</th>
+                  <th className='px-4 py-2.5'>상태</th>
                 </tr>
               </thead>
-              <tbody className='divide-y divide-white/10'>
-                {regionData.swissStandings.map((row) => (
-                  <tr key={row.entryId}>
-                    <td className='px-3 py-2 text-white/70'>{row.entryId}</td>
-                    <td className='px-3 py-2 text-white'>{row.nickname}</td>
-                    <td className='px-3 py-2 text-right text-white/70'>{row.seed}</td>
-                    <td className='px-3 py-2 text-right text-white'>{row.wins}</td>
-                    <td className='px-3 py-2 text-right text-white'>{row.losses}</td>
-                    <td className='px-3 py-2 text-xs text-white/60'>{row.status}</td>
-                  </tr>
-                ))}
+              <tbody className='divide-y divide-white/[0.07]'>
+                {regionData.swissStandings.map((row) => {
+                  const statusColor = row.status === 'qualified'
+                    ? 'text-emerald-300'
+                    : row.status === 'eliminated'
+                      ? 'text-red-300/70'
+                      : row.status === 'decider'
+                        ? 'text-[#ffb36d]'
+                        : 'text-white/60'
+                  return (
+                    <tr key={row.entryId} className='transition-colors hover:bg-white/[0.03]'>
+                      <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                      <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                      <td className='px-4 py-3 text-right tabular-nums text-white/75'>{row.seed}</td>
+                      <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>{row.wins}</td>
+                      <td className='px-4 py-3 text-right tabular-nums text-white/75'>{row.losses}</td>
+                      <td className={`px-4 py-3 text-xs font-medium ${statusColor}`}>{row.status}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         ) : null}
       </section>
 
-      <section className='grid gap-5 md:grid-cols-2'>
-        <div className='space-y-3'>
+      <section className='grid gap-6 md:grid-cols-2'>
+        <div className='space-y-4'>
           <StageTitle
             title='3-1 추가 진출자 선발전'
             subtitle='과제곡: 大空と太鼓の踊り (Lv.9)'
@@ -309,21 +322,21 @@ function ArcadeRegionDetailPage() {
           ) : (
             <div className='overflow-x-auto rounded-xl border border-white/10'>
               <table className='min-w-full text-left text-sm'>
-                <thead className='bg-white/5 text-xs text-white/60'>
+                <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                   <tr>
-                    <th className='px-3 py-2'>순위</th>
-                    <th className='px-3 py-2'>엔트리</th>
-                    <th className='px-3 py-2'>닉네임</th>
-                    <th className='px-3 py-2 text-right'>점수</th>
+                    <th className='px-4 py-2.5'>순위</th>
+                    <th className='px-4 py-2.5'>엔트리</th>
+                    <th className='px-4 py-2.5'>닉네임</th>
+                    <th className='px-4 py-2.5 text-right'>점수</th>
                   </tr>
                 </thead>
-                <tbody className='divide-y divide-white/10'>
+                <tbody className='divide-y divide-white/[0.07]'>
                   {sortedDeciderRows.map((row) => (
-                    <tr key={`${row.entryId}-${row.rank}`}>
-                      <td className='px-3 py-2 text-white'>{row.rank}</td>
-                      <td className='px-3 py-2 text-white/70'>{row.entryId}</td>
-                      <td className='px-3 py-2 text-white'>{row.nickname}</td>
-                      <td className='px-3 py-2 text-right font-semibold text-white'>
+                    <tr key={`${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
+                      <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
+                      <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                      <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                      <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>
                         {formatScore(row.score)}
                       </td>
                     </tr>
@@ -334,13 +347,13 @@ function ArcadeRegionDetailPage() {
           )}
 
           {regionData.deciderWinnerEntryId ? (
-            <div className='rounded-lg border border-emerald-300/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-100'>
+            <div className='rounded-lg border border-emerald-300/30 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-200'>
               선발전 통과: {renderParticipant(regionData, regionData.deciderWinnerEntryId)}
             </div>
           ) : null}
         </div>
 
-        <div className='space-y-3'>
+        <div className='space-y-4'>
           <StageTitle
             title='결선 시드 배정전'
             subtitle='과제곡: タイコロール (Lv.10)'
@@ -351,21 +364,21 @@ function ArcadeRegionDetailPage() {
           ) : (
             <div className='overflow-x-auto rounded-xl border border-white/10'>
               <table className='min-w-full text-left text-sm'>
-                <thead className='bg-white/5 text-xs text-white/60'>
+                <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                   <tr>
-                    <th className='px-3 py-2'>순위</th>
-                    <th className='px-3 py-2'>엔트리</th>
-                    <th className='px-3 py-2'>닉네임</th>
-                    <th className='px-3 py-2 text-right'>점수</th>
+                    <th className='px-4 py-2.5'>순위</th>
+                    <th className='px-4 py-2.5'>엔트리</th>
+                    <th className='px-4 py-2.5'>닉네임</th>
+                    <th className='px-4 py-2.5 text-right'>점수</th>
                   </tr>
                 </thead>
-                <tbody className='divide-y divide-white/10'>
+                <tbody className='divide-y divide-white/[0.07]'>
                   {sortedSeedingRows.map((row) => (
-                    <tr key={`${row.entryId}-${row.rank}`}>
-                      <td className='px-3 py-2 text-white'>{row.rank}</td>
-                      <td className='px-3 py-2 text-white/70'>{row.entryId}</td>
-                      <td className='px-3 py-2 text-white'>{row.nickname}</td>
-                      <td className='px-3 py-2 text-right font-semibold text-white'>
+                    <tr key={`${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
+                      <td className='px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
+                      <td className='px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
+                      <td className='px-4 py-3 font-semibold text-white'>{row.nickname}</td>
+                      <td className='px-4 py-3 text-right font-bold tabular-nums text-white'>
                         {formatScore(row.score)}
                       </td>
                     </tr>
@@ -375,18 +388,22 @@ function ArcadeRegionDetailPage() {
             </div>
           )}
 
-          <div className='grid gap-2 text-xs'>
-            <div className='rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-white/75'>
-              지역 1위(A):{' '}
-              {regionData.qualifiers.groupA
-                ? `${regionData.qualifiers.groupA.nickname} (${regionData.qualifiers.groupA.entryId})`
-                : '미확정'}
+          <div className='grid gap-2.5 text-sm'>
+            <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-4 py-3'>
+              <span className='text-white/55'>지역 1위(A):</span>{' '}
+              <span className='font-semibold text-white'>
+                {regionData.qualifiers.groupA
+                  ? `${regionData.qualifiers.groupA.nickname} (${regionData.qualifiers.groupA.entryId})`
+                  : '미확정'}
+              </span>
             </div>
-            <div className='rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-white/75'>
-              지역 2위(B):{' '}
-              {regionData.qualifiers.groupB
-                ? `${regionData.qualifiers.groupB.nickname} (${regionData.qualifiers.groupB.entryId})`
-                : '미확정'}
+            <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-4 py-3'>
+              <span className='text-white/55'>지역 2위(B):</span>{' '}
+              <span className='font-semibold text-white'>
+                {regionData.qualifiers.groupB
+                  ? `${regionData.qualifiers.groupB.nickname} (${regionData.qualifiers.groupB.entryId})`
+                  : '미확정'}
+              </span>
             </div>
           </div>
         </div>

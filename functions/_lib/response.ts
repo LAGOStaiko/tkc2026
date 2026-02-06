@@ -10,8 +10,8 @@ export function json(data: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(data), { ...init, headers });
 }
 
-export function ok(data: unknown) {
-  return json({ ok: true, ...data }, { status: 200 });
+export function ok(data: unknown, init: ResponseInit = {}) {
+  return json({ ok: true, ...data }, { status: 200, ...init });
 }
 
 export function badRequest(message: string, details?: unknown) {

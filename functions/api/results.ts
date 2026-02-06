@@ -1,10 +1,14 @@
 import { ok, serverError } from "../_lib/response";
-import { callGasJson, type _Env } from "../_lib/gas";
+import { callGasJson } from "../_lib/gas";
+
+const CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=5, s-maxage=20, stale-while-revalidate=30",
+};
 
 export const onRequestGet = async ({ env }) => {
   try {
     const gas = await callGasJson(env, "results");
-    return ok({ data: gas.data });
+    return ok({ data: gas.data }, { headers: CACHE_HEADERS });
   } catch (err) {
     return serverError(err);
   }

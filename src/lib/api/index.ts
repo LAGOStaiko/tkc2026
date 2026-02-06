@@ -1,5 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 
+const SITE_STALE_MS = 5 * 60 * 1000
+const CONTENT_STALE_MS = 5 * 60 * 1000
+const SCHEDULE_STALE_MS = 60 * 1000
+const RESULTS_STALE_MS = 20 * 1000
+
 type ApiResponse<T> = {
   ok: boolean
   data?: T
@@ -62,6 +67,9 @@ export function useSite<T = unknown>() {
   return useQuery({
     queryKey: ['site'],
     queryFn: () => apiGet<T>('/api/site'),
+    staleTime: SITE_STALE_MS,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 }
 
@@ -69,6 +77,9 @@ export function useSchedule<T = unknown>() {
   return useQuery({
     queryKey: ['schedule'],
     queryFn: () => apiGet<T>('/api/schedule'),
+    staleTime: SCHEDULE_STALE_MS,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 }
 
@@ -76,6 +87,9 @@ export function useResults<T = unknown>() {
   return useQuery({
     queryKey: ['results'],
     queryFn: () => apiGet<T>('/api/results'),
+    staleTime: RESULTS_STALE_MS,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 }
 
@@ -86,6 +100,9 @@ export function useContent<T = unknown>(
   return useQuery({
     queryKey: ['content', page],
     queryFn: () => apiGet<T>(`/api/content?${params.toString()}`),
+    staleTime: CONTENT_STALE_MS,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 }
 
