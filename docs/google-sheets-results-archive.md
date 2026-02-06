@@ -113,7 +113,38 @@ Recommended core columns:
 - right side: `rightSeed`, `rightRegion`, `rightRegionLabel`, `rightEntryId`, `rightNickname`
 - `winnerEntryId`, `note`
 
-## 4) Frontend routes using the archive
+## 4) Auto-create spreadsheet tabs
+
+`Code.gs` now includes helpers that can create tabs and header rows automatically:
+
+- `initializeSpreadsheetTabs()` -> creates core + archive tabs
+- `initializeArchiveTabs()` -> creates archive-only tabs
+
+How to run in Apps Script editor:
+
+1. Open the bound Apps Script project.
+2. Select function `initializeSpreadsheetTabs` (or `initializeArchiveTabs`).
+3. Click Run.
+4. Verify tabs and row-1 headers were created.
+
+You can also trigger this via API (`doPost`) with `action: "initSheets"`:
+
+```json
+{
+  "apiKey": "YOUR_API_KEY",
+  "action": "initSheets",
+  "params": {
+    "scope": "all"
+  }
+}
+```
+
+`scope` can be:
+
+- `all` (default): core + archive
+- `archive`: archive only
+
+## 5) Frontend routes using the archive
 
 - `/results` (hub)
 - `/arcade-results/2026` (season overview)
