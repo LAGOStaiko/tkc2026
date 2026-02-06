@@ -37,7 +37,7 @@ const navItems: NavItem[] = [
   { label: t('nav.contact'), to: '/contact' },
 ]
 
-const LOGO_SRC = '/branding/logo-transparent.png'
+const LOGO_SRC = '/branding/v2/logo.png'
 
 function isActivePath(pathname: string, item: NavItem) {
   if (item.to === '/') return pathname === '/'
