@@ -5,6 +5,8 @@ import {
   buildRegionFinalRanking,
   buildRegionWeekStatuses,
   buildSwissProgress,
+  listFinalPendingMatches,
+  listSwissPendingMatches,
   OPS_REGION_OPTIONS,
   type OpsProgressMatch,
   type OpsRegionKey,
@@ -126,6 +128,8 @@ function ArcadeOpsBroadcastPage() {
   )
   const swissProgress = useMemo(() => buildSwissProgress(regionArchive), [regionArchive])
   const finalsProgress = useMemo(() => buildFinalsProgress(archive), [archive])
+  const swissPending = useMemo(() => listSwissPendingMatches(regionArchive), [regionArchive])
+  const finalsPending = useMemo(() => listFinalPendingMatches(archive), [archive])
   const finalRanking = useMemo(
     () => (regionArchive ? buildRegionFinalRanking(regionArchive) : []),
     [regionArchive]
@@ -141,6 +145,8 @@ function ArcadeOpsBroadcastPage() {
   const primaryStageLabel = swissProgress.current
     ? 'Swiss 진행중'
     : (finalsProgress.current ? 'Top8 진행중' : '진행 대기')
+
+  const pendingQueue = swissPending.length > 0 ? swissPending : finalsPending
 
   const fetchFeed = useCallback(async () => {
     try {
@@ -266,6 +272,31 @@ function ArcadeOpsBroadcastPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className='rounded-2xl border border-white/15 bg-white/[0.04] p-4'>
+            <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>Pending Queue</h3>
+            <div className='mt-2 text-[11px] text-white/60'>
+              Swiss remaining {swissPending.length} / Top8 remaining {finalsPending.length}
+            </div>
+
+            {pendingQueue.length === 0 ? (
+              <div className='mt-3 text-xs text-white/60'>No pending matches.</div>
+            ) : (
+              <div className='mt-3 space-y-1.5 text-xs'>
+                {pendingQueue.slice(0, 6).map((match) => (
+                  <div
+                    key={match.id}
+                    className='rounded-md border border-white/10 bg-black/25 px-2.5 py-2'
+                  >
+                    <div className='font-semibold text-white/85'>{match.label}</div>
+                    <div className='text-white/65'>
+                      {match.leftName} vs {match.rightName}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className='rounded-2xl border border-white/15 bg-white/[0.04] p-4'>

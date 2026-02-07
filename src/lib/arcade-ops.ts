@@ -1,5 +1,6 @@
 import type {
   ArcadeFinalCrossMatch,
+  ArcadeParticipant,
   ArcadeRegionArchive,
   ArcadeSeasonArchive,
   ArcadeStandingRow,
@@ -419,6 +420,13 @@ export type OpsProgressSummary = {
   previous?: OpsProgressMatch
 }
 
+export type OpsRegionParticipant = {
+  entryId: string
+  nickname: string
+  seed?: number
+  status?: ArcadeStandingRow['status']
+}
+
 function numToDraft(value?: number) {
   return typeof value === 'number' && Number.isFinite(value) ? String(value) : ''
 }
@@ -449,6 +457,32 @@ function sortSwissMatches(rows: ArcadeSwissMatch[]) {
 
 function sortFinalMatches(rows: ArcadeFinalCrossMatch[]) {
   return rows.slice().sort((a, b) => a.matchNo - b.matchNo)
+}
+
+function mergeParticipant(
+  map: Map<string, OpsRegionParticipant>,
+  participant: ArcadeParticipant | undefined,
+  patch: Partial<OpsRegionParticipant> = {}
+) {
+  if (!participant?.entryId) return
+
+  const current = map.get(participant.entryId)
+  if (!current) {
+    map.set(participant.entryId, {
+      entryId: participant.entryId,
+      nickname: participant.nickname || participant.entryId,
+      seed: participant.seed,
+      ...patch,
+    })
+    return
+  }
+
+  map.set(participant.entryId, {
+    ...current,
+    nickname: current.nickname || participant.nickname || participant.entryId,
+    seed: current.seed ?? participant.seed,
+    ...patch,
+  })
 }
 
 function toSwissProgressMatch(match: ArcadeSwissMatch): OpsProgressMatch {
@@ -556,6 +590,66 @@ export function buildSwissProgress(region?: ArcadeRegionArchive): OpsProgressSum
 export function buildFinalsProgress(archive: ArcadeSeasonArchive): OpsProgressSummary {
   const items = sortFinalMatches(archive.finals.crossMatches).map(toFinalProgressMatch)
   return buildProgressSummary(items)
+}
+
+export function listSwissPendingMatches(region?: ArcadeRegionArchive): OpsProgressMatch[] {
+  if (!region) return []
+  return sortSwissMatches(region.swissMatches)
+    .filter((match) => !match.winnerEntryId)
+    .map(toSwissProgressMatch)
+}
+
+export function listFinalPendingMatches(
+  archive: ArcadeSeasonArchive
+): OpsProgressMatch[] {
+  return sortFinalMatches(archive.finals.crossMatches)
+    .filter((match) => !match.winnerEntryId)
+    .map(toFinalProgressMatch)
+}
+
+export function buildRegionParticipants(
+  region?: ArcadeRegionArchive
+): OpsRegionParticipant[] {
+  if (!region) return []
+
+  const map = new Map<string, OpsRegionParticipant>()
+
+  region.swissStandings.forEach((standing) => {
+    mergeParticipant(
+      map,
+      {
+        entryId: standing.entryId,
+        nickname: standing.nickname,
+        seed: standing.seed,
+      },
+      { status: standing.status }
+    )
+  })
+
+  region.onlineRows.forEach((online) => {
+    mergeParticipant(map, {
+      entryId: online.entryId,
+      nickname: online.nickname,
+    })
+  })
+
+  region.seedingRows.forEach((seedRow) => {
+    mergeParticipant(map, {
+      entryId: seedRow.entryId,
+      nickname: seedRow.nickname,
+      seed: seedRow.rank,
+    })
+  })
+
+  mergeParticipant(map, region.qualifiers.groupA)
+  mergeParticipant(map, region.qualifiers.groupB)
+
+  return [...map.values()].sort((a, b) => {
+    const aSeed = typeof a.seed === 'number' ? a.seed : Number.MAX_SAFE_INTEGER
+    const bSeed = typeof b.seed === 'number' ? b.seed : Number.MAX_SAFE_INTEGER
+    if (aSeed !== bSeed) return aSeed - bSeed
+    return a.entryId.localeCompare(b.entryId)
+  })
 }
 
 export function buildSwissDraftFromMatch(match: ArcadeSwissMatch): Record<string, string> {

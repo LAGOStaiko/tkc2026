@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -17,6 +18,7 @@ import {
   buildNextFinalMatchDraft,
   buildNextSwissMatchDraft,
   buildOpsUpsertPayload,
+  buildRegionParticipants,
   buildRegionFinalRanking,
   buildRegionWeekStatuses,
   buildSwissProgress,
@@ -104,6 +106,59 @@ function matchLine(match?: OpsProgressMatch) {
   return `${match.label} - ${match.leftName} vs ${match.rightName}`
 }
 
+type BulkSwissSeedRow = {
+  table: number
+  p1EntryId: string
+  p2EntryId?: string
+  note?: string
+}
+
+function parseBulkSwissLines(source: string): BulkSwissSeedRow[] {
+  const rows: BulkSwissSeedRow[] = []
+  const usedTables = new Set<number>()
+
+  source
+    .split(/\r?\n/g)
+    .forEach((line, index) => {
+      const text = line.trim()
+      if (!text || text.startsWith('#')) return
+
+      const parts = (text.includes(',') ? text.split(',') : text.split(/\s+/g))
+        .map((part) => part.trim())
+        .filter((part) => part.length > 0)
+
+      if (parts.length < 3) {
+        throw new Error(`Invalid line ${index + 1}. Use: table,p1EntryId,p2EntryId[,note]`)
+      }
+
+      const table = Number(parts[0])
+      if (!Number.isInteger(table) || table <= 0) {
+        throw new Error(`Invalid table number at line ${index + 1}`)
+      }
+      if (usedTables.has(table)) {
+        throw new Error(`Duplicate table ${table} in pre-draw lines`)
+      }
+      usedTables.add(table)
+
+      const p1EntryId = parts[1]
+      const p2Token = parts[2]
+      const isBye = p2Token === '-' || p2Token.toLowerCase() === 'bye'
+
+      rows.push({
+        table,
+        p1EntryId,
+        p2EntryId: isBye ? undefined : p2Token,
+        note: parts.length > 3 ? parts.slice(3).join(', ') : undefined,
+      })
+    })
+
+  if (rows.length === 0) {
+    throw new Error('No pre-draw lines found')
+  }
+
+  return rows.sort((a, b) => a.table - b.table)
+}
+
 function ArcadeOpsControlPage() {
   const [operatorKey, setOperatorKey] = useState('')
   const [season, setSeason] = useState(DEFAULT_SEASON)
@@ -117,6 +172,16 @@ function ArcadeOpsControlPage() {
   const [isInitRunning, setIsInitRunning] = useState(false)
   const [isExportRegionRunning, setIsExportRegionRunning] = useState(false)
   const [isExportAllRunning, setIsExportAllRunning] = useState(false)
+  const [isBulkSeeding, setIsBulkSeeding] = useState(false)
+
+  const [bulkRound, setBulkRound] = useState('1')
+  const [bulkSong1, setBulkSong1] = useState('')
+  const [bulkLevel1, setBulkLevel1] = useState('')
+  const [bulkSong2, setBulkSong2] = useState('')
+  const [bulkLevel2, setBulkLevel2] = useState('')
+  const [bulkSong3, setBulkSong3] = useState('')
+  const [bulkLevel3, setBulkLevel3] = useState('')
+  const [bulkLines, setBulkLines] = useState('')
 
   const [infoMessage, setInfoMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -137,6 +202,16 @@ function ArcadeOpsControlPage() {
   }, [regionArchive])
   const swissProgress = useMemo(() => buildSwissProgress(regionArchive), [regionArchive])
   const finalsProgress = useMemo(() => buildFinalsProgress(archive), [archive])
+  const regionParticipants = useMemo(
+    () => buildRegionParticipants(regionArchive),
+    [regionArchive]
+  )
+
+  const participantByEntryId = useMemo(() => {
+    return new Map(
+      regionParticipants.map((participant) => [participant.entryId, participant] as const)
+    )
+  }, [regionParticipants])
 
   const isSequentialStage = stage === 'swissMatch' || stage === 'finalMatch'
   const stageCurrent = stage === 'swissMatch'
@@ -148,6 +223,14 @@ function ArcadeOpsControlPage() {
   const stagePrevious = stage === 'swissMatch'
     ? swissProgress.previous
     : (stage === 'finalMatch' ? finalsProgress.previous : undefined)
+  const currentSwissRound = useMemo(() => {
+    if (!regionArchive || regionArchive.swissMatches.length === 0) return null
+    const unresolved = regionArchive.swissMatches.find((match) => !match.winnerEntryId)
+    if (unresolved) return unresolved.round
+
+    const rounds = regionArchive.swissMatches.map((match) => match.round)
+    return rounds.length > 0 ? Math.max(...rounds) : null
+  }, [regionArchive])
 
   const winnerOptions = useMemo(() => {
     if (stage === 'swissMatch') {
@@ -200,6 +283,12 @@ function ArcadeOpsControlPage() {
   useEffect(() => {
     setDraft(buildInitialDraft(stage))
   }, [stage])
+
+  useEffect(() => {
+    if (stage !== 'swissMatch') return
+    if (bulkRound.trim().length > 0) return
+    setBulkRound(String(currentSwissRound ?? 1))
+  }, [bulkRound, currentSwissRound, stage])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -305,6 +394,164 @@ function ArcadeOpsControlPage() {
       applyTemplate(buildNextFinalMatchDraft(archive))
       setInfoMessage('다음 Top8 경기 입력 슬롯을 불러왔습니다.')
       setErrorMessage('')
+    }
+  }
+
+  const handlePrefillRoundLines = () => {
+    if (!regionArchive) {
+      setErrorMessage('No regional feed data loaded yet')
+      return
+    }
+
+    const round = Number(bulkRound)
+    if (!Number.isInteger(round) || round <= 0) {
+      setErrorMessage('Round must be a positive integer')
+      return
+    }
+
+    const matches = regionArchive.swissMatches
+      .filter((match) => match.round === round)
+      .sort((a, b) => (a.table ?? 0) - (b.table ?? 0))
+
+    if (matches.length === 0) {
+      setErrorMessage(`No existing round ${round} matches found`)
+      return
+    }
+
+    const lines = matches.map((match) => {
+      const table = match.table ?? 0
+      const p1 = match.player1.entryId || '-'
+      const p2 = match.player2?.entryId || (match.bye ? 'BYE' : '-')
+      const note = match.note ? `,${match.note}` : ''
+      return `${table},${p1},${p2}${note}`
+    })
+
+    const first = matches[0]
+    const game1 = first.games[0]
+    const game2 = first.games[1]
+    const game3 = first.games[2]
+
+    setBulkRound(String(round))
+    if (game1?.song) setBulkSong1(game1.song)
+    if (game1?.level) setBulkLevel1(game1.level)
+    if (game2?.song) setBulkSong2(game2.song)
+    if (game2?.level) setBulkLevel2(game2.level)
+    if (game3?.song) setBulkSong3(game3.song)
+    if (game3?.level) setBulkLevel3(game3.level)
+    setBulkLines(lines.join('\n'))
+
+    setErrorMessage('')
+    setInfoMessage(`Loaded ${matches.length} table rows for round ${round}`)
+  }
+
+  const handleGenerateSeedOrderLines = () => {
+    const activePlayers = regionParticipants
+      .filter((player) => player.status !== 'eliminated')
+      .sort((a, b) => {
+        const aSeed = typeof a.seed === 'number' ? a.seed : Number.MAX_SAFE_INTEGER
+        const bSeed = typeof b.seed === 'number' ? b.seed : Number.MAX_SAFE_INTEGER
+        if (aSeed !== bSeed) return aSeed - bSeed
+        return a.entryId.localeCompare(b.entryId)
+      })
+
+    if (activePlayers.length < 2) {
+      setErrorMessage('Need at least two players to auto-generate pairings')
+      return
+    }
+
+    const lines: string[] = []
+    for (let i = 0; i < activePlayers.length; i += 2) {
+      const table = Math.floor(i / 2) + 1
+      const p1 = activePlayers[i]
+      const p2 = activePlayers[i + 1]
+      lines.push(`${table},${p1.entryId},${p2 ? p2.entryId : 'BYE'}`)
+    }
+
+    const suggestedRound = currentSwissRound ?? 1
+    setBulkRound(String(suggestedRound))
+    setBulkLines(lines.join('\n'))
+    setErrorMessage('')
+    setInfoMessage(`Generated ${lines.length} tables from current participant list`)
+  }
+
+  const handleBulkSeedRound = async () => {
+    try {
+      setIsBulkSeeding(true)
+      setErrorMessage('')
+      setInfoMessage('')
+
+      const round = Number(bulkRound)
+      if (!Number.isInteger(round) || round <= 0) {
+        throw new Error('Round must be a positive integer')
+      }
+      if (!bulkSong1.trim() || !bulkSong2.trim()) {
+        throw new Error('song1 and song2 are required for round pre-draw')
+      }
+
+      const rows = parseBulkSwissLines(bulkLines)
+      const normalizedSeason = season.trim() || DEFAULT_SEASON
+
+      for (const row of rows) {
+        const p1 = participantByEntryId.get(row.p1EntryId)
+        const p2 = row.p2EntryId ? participantByEntryId.get(row.p2EntryId) : undefined
+        const bye = !row.p2EntryId
+
+        const p1Seed = p1?.seed
+        const p2Seed = p2?.seed
+        let highSeedEntryId = row.p1EntryId
+        if (!bye && typeof p1Seed === 'number' && typeof p2Seed === 'number') {
+          highSeedEntryId = p1Seed <= p2Seed ? row.p1EntryId : row.p2EntryId!
+        }
+
+        const payload = {
+          stage: 'swissMatch' as const,
+          season: normalizedSeason,
+          region,
+          keyFields: ['season', 'region', 'round', 'table'],
+          row: {
+            season: normalizedSeason,
+            region,
+            round,
+            table: row.table,
+            highSeedEntryId,
+            p1EntryId: row.p1EntryId,
+            p1Nickname: p1?.nickname || row.p1EntryId,
+            p1Seed: typeof p1Seed === 'number' ? p1Seed : '',
+            p2EntryId: row.p2EntryId ?? '',
+            p2Nickname: p2?.nickname || row.p2EntryId || '',
+            p2Seed: typeof p2Seed === 'number' ? p2Seed : '',
+            song1: bulkSong1.trim(),
+            level1: bulkLevel1.trim(),
+            p1Score1: '',
+            p2Score1: '',
+            song2: bulkSong2.trim(),
+            level2: bulkLevel2.trim(),
+            p1Score2: '',
+            p2Score2: '',
+            song3: bulkSong3.trim(),
+            level3: bulkLevel3.trim(),
+            p1Score3: '',
+            p2Score3: '',
+            winnerEntryId: bye ? row.p1EntryId : '',
+            tieBreakerSong: '',
+            bye,
+            note: row.note || `pre-draw round ${round}`,
+          },
+        }
+
+        await requestOpsApi('/api/ops/upsert', 'POST', payload, operatorKey)
+      }
+
+      const fresh = await fetchFeed()
+      const nextArchive = resolveArcadeSeasonArchive(fresh)
+      const nextRegion = getRegionByKey(nextArchive, region)
+      applyTemplate(buildCurrentSwissMatchDraft(nextRegion) ?? buildNextSwissMatchDraft(nextRegion))
+
+      setInfoMessage(`Round ${round} pre-draw saved (${rows.length} tables)`)
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Round pre-draw save failed')
+    } finally {
+      setIsBulkSeeding(false)
     }
   }
 
@@ -578,6 +825,122 @@ function ArcadeOpsControlPage() {
                 onClick={handleLoadNextMatch}
               >
                 다음 경기 슬롯
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
+        {stage === 'swissMatch' ? (
+          <div className='mt-4 rounded-xl border border-white/10 bg-black/20 p-3'>
+            <div className='flex flex-wrap items-center justify-between gap-2'>
+              <p className='text-xs font-semibold text-white/80'>
+                Round pre-draw (bulk schedule before start)
+              </p>
+              <span className='text-[11px] text-white/55'>
+                players loaded: {regionParticipants.length}
+              </span>
+            </div>
+
+            <p className='mt-1 text-[11px] text-white/55'>
+              Format: `table,p1EntryId,p2EntryId[,note]` one line each. Use `BYE` or `-` for no opponent.
+            </p>
+
+            <div className='mt-3 grid gap-2 md:grid-cols-3'>
+              <div className='space-y-1'>
+                <label className='text-[11px] text-white/60'>round</label>
+                <Input
+                  type='number'
+                  inputMode='numeric'
+                  value={bulkRound}
+                  onChange={(event) => setBulkRound(event.target.value)}
+                  placeholder={currentSwissRound ? String(currentSwissRound) : '1'}
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-[11px] text-white/60'>song1 / level1</label>
+                <div className='grid grid-cols-3 gap-2'>
+                  <Input
+                    className='col-span-2'
+                    value={bulkSong1}
+                    onChange={(event) => setBulkSong1(event.target.value)}
+                    placeholder='Song 1'
+                  />
+                  <Input
+                    value={bulkLevel1}
+                    onChange={(event) => setBulkLevel1(event.target.value)}
+                    placeholder='Lv'
+                  />
+                </div>
+              </div>
+              <div className='space-y-1'>
+                <label className='text-[11px] text-white/60'>song2 / level2</label>
+                <div className='grid grid-cols-3 gap-2'>
+                  <Input
+                    className='col-span-2'
+                    value={bulkSong2}
+                    onChange={(event) => setBulkSong2(event.target.value)}
+                    placeholder='Song 2'
+                  />
+                  <Input
+                    value={bulkLevel2}
+                    onChange={(event) => setBulkLevel2(event.target.value)}
+                    placeholder='Lv'
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className='mt-2 grid gap-2 md:grid-cols-3'>
+              <div className='space-y-1 md:col-span-1'>
+                <label className='text-[11px] text-white/60'>song3 / level3 (optional)</label>
+                <div className='grid grid-cols-3 gap-2'>
+                  <Input
+                    className='col-span-2'
+                    value={bulkSong3}
+                    onChange={(event) => setBulkSong3(event.target.value)}
+                    placeholder='Song 3'
+                  />
+                  <Input
+                    value={bulkLevel3}
+                    onChange={(event) => setBulkLevel3(event.target.value)}
+                    placeholder='Lv'
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className='mt-2'>
+              <Textarea
+                value={bulkLines}
+                onChange={(event) => setBulkLines(event.target.value)}
+                placeholder={'1,SEO-01,SEO-16\n2,SEO-02,SEO-15\n3,SEO-03,BYE'}
+                className='min-h-32 font-mono text-xs'
+              />
+            </div>
+
+            <div className='mt-3 flex flex-wrap gap-2'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handlePrefillRoundLines}
+                disabled={isBulkSeeding}
+              >
+                Load current round lines
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handleGenerateSeedOrderLines}
+                disabled={isBulkSeeding}
+              >
+                Auto-generate by seed order
+              </Button>
+              <Button
+                size='sm'
+                onClick={handleBulkSeedRound}
+                disabled={isBulkSeeding}
+              >
+                {isBulkSeeding ? 'Saving pre-draw...' : 'Save round pre-draw'}
               </Button>
             </div>
           </div>
