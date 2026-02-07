@@ -529,6 +529,10 @@ function menuPurgeApiCache_() {
   notifyMenuResult_('Purge API Cache', purgeApiCache_());
 }
 
+function menuWriteOpsGuide_() {
+  notifyMenuResult_('Write Ops Guide', handleOpsGuide_({ overwrite: true }));
+}
+
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('TKC2026 Tools')
@@ -542,6 +546,7 @@ function onOpen() {
     .addItem('Clear Archive Rows', 'menuClearArchiveRows_')
     .addSeparator()
     .addItem('Purge API Cache', 'menuPurgeApiCache_')
+    .addItem('Write Ops Guide Sheet', 'menuWriteOpsGuide_')
     .addToUi();
 }
 
@@ -1589,6 +1594,7 @@ function doPost(e) {
       return json_(seedResult);
     }
     if (action === 'opsInit') return json_(handleOpsInit_(params));
+    if (action === 'opsGuide') return json_(handleOpsGuide_(params));
     if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
     if (action === 'opsExport') return json_(handleOpsExport_(payload || params));
     if (action === 'opsFeed') return json_(handleOpsFeed_(params));
@@ -1729,6 +1735,148 @@ function handleOpsInit_(params) {
       created: created,
       headerUpdated: updated,
       sheets: sheets
+    }
+  };
+}
+
+function getOpsGuideSchema_(sheetName) {
+  var name = trim_(sheetName) || 'ops_sheet_guide';
+  return {
+    name: name,
+    headers: ['order', 'sheet', 'purpose', 'whenToEdit', 'requiredFields', 'example', 'notes']
+  };
+}
+
+function buildOpsGuideRows_() {
+  return [
+    {
+      order: 1,
+      sheet: 'ops_db_online',
+      purpose: 'Online ranking per region (seed source)',
+      whenToEdit: 'Before each regional week starts',
+      requiredFields: 'season,region,rank,entryId,nickname,score1,score2,total,advanced',
+      example: '2026,seoul,1,SEO-01,Player1,996000,994000,1990000,TRUE',
+      notes: '1 row per player; total can be omitted (auto-calculated on upsert).'
+    },
+    {
+      order: 2,
+      sheet: 'ops_db_swiss_matches',
+      purpose: 'Swiss match-level schedule and score',
+      whenToEdit: 'Round pre-draw + after each match result',
+      requiredFields: 'season,region,round,table,p1EntryId,p2EntryId,song1,song2,winnerEntryId',
+      example: '2026,seoul,1,1,SEO-01,SEO-16,Song A,Song B,SEO-01',
+      notes: 'Use one row per table. For bye set bye=TRUE and keep p2 fields blank.'
+    },
+    {
+      order: 3,
+      sheet: 'ops_db_swiss_standings',
+      purpose: 'Swiss standings snapshot',
+      whenToEdit: 'After each round batch or when standings are finalized',
+      requiredFields: 'season,region,entryId,nickname,seed,wins,losses,status',
+      example: '2026,seoul,SEO-01,Player1,1,3,0,qualified',
+      notes: 'status: qualified / decider / eliminated / alive'
+    },
+    {
+      order: 4,
+      sheet: 'ops_db_decider',
+      purpose: 'Decider stage ranking and winner flag',
+      whenToEdit: 'After decider scores are finalized',
+      requiredFields: 'season,region,rank,entryId,nickname,score,winner',
+      example: '2026,seoul,1,SEO-02,Player2,994500,TRUE',
+      notes: 'winnerEntryId auto-fills from entryId when winner=TRUE.'
+    },
+    {
+      order: 5,
+      sheet: 'ops_db_seeding',
+      purpose: 'A/B group seeding source by region',
+      whenToEdit: 'After regional qualifiers are fixed',
+      requiredFields: 'season,region,rank,entryId,nickname,score',
+      example: '2026,seoul,1,SEO-01,Player1,997100',
+      notes: 'Typically 2 rows per region (rank 1=A, rank 2=B).'
+    },
+    {
+      order: 6,
+      sheet: 'ops_db_qualifiers',
+      purpose: 'Final qualifier assignment by group',
+      whenToEdit: 'When A/B qualifiers are confirmed',
+      requiredFields: 'season,region,group,entryId,nickname,seed',
+      example: '2026,seoul,A,SEO-01,Player1,1',
+      notes: 'group must be A or B.'
+    },
+    {
+      order: 7,
+      sheet: 'ops_db_finals_a',
+      purpose: 'Final bracket Group A seed list',
+      whenToEdit: 'Once finals seeds are locked',
+      requiredFields: 'season,seed,region,entryId,nickname',
+      example: '2026,1,seoul,SEO-01,Player1',
+      notes: 'One row per seed.'
+    },
+    {
+      order: 8,
+      sheet: 'ops_db_finals_b',
+      purpose: 'Final bracket Group B seed list',
+      whenToEdit: 'Once finals seeds are locked',
+      requiredFields: 'season,seed,region,entryId,nickname',
+      example: '2026,1,gwangju,GWA-02,PlayerX',
+      notes: 'One row per seed.'
+    },
+    {
+      order: 9,
+      sheet: 'ops_db_finals_matches',
+      purpose: 'Top8 cross matches and winners',
+      whenToEdit: 'Before/after each finals match',
+      requiredFields: 'season,matchNo,leftEntryId,rightEntryId,winnerEntryId',
+      example: '2026,1,SEO-01,BUS-02,SEO-01',
+      notes: 'Fill left/right metadata for broadcast clarity.'
+    },
+    {
+      order: 10,
+      sheet: 'ops_db_events',
+      purpose: 'Audit/event log (auto append)',
+      whenToEdit: 'Do not edit manually',
+      requiredFields: 'createdAt,stage,season,region,entryId,message',
+      example: '(auto)',
+      notes: 'Written by opsUpsert/opsExport/opsGuide.'
+    }
+  ];
+}
+
+function handleOpsGuide_(params) {
+  params = params || {};
+  var overwrite = params.overwrite === undefined ? true : toBool_(params.overwrite);
+  var schema = getOpsGuideSchema_(params.sheetName);
+  var rows = buildOpsGuideRows_();
+
+  var ss = getSs_();
+  ensureSheetSchema_(ss, schema.name, schema.headers);
+  var sh = ss.getSheetByName(schema.name);
+
+  var lastRow = sh.getLastRow();
+  if (overwrite && lastRow > 1) {
+    sh.getRange(2, 1, lastRow - 1, schema.headers.length).clearContent();
+  }
+
+  var values = rows.map(function(row){
+    return schema.headers.map(function(header){
+      return row[header] !== undefined ? row[header] : '';
+    });
+  });
+
+  if (values.length > 0) {
+    sh.getRange(2, 1, values.length, schema.headers.length).setValues(values);
+  }
+  sh.setFrozenRows(1);
+  sh.autoResizeColumns(1, schema.headers.length);
+
+  appendOpsEvent_('guide', '', '', '', 'guide rows=' + values.length + ', sheet=' + schema.name);
+
+  return {
+    ok: true,
+    data: {
+      sheet: schema.name,
+      rows: values.length,
+      overwrite: overwrite
     }
   };
 }
@@ -2234,6 +2382,7 @@ function initializeOpsTabs() {
  * Required additions in doPost(e):
  *
  * if (action === 'opsInit') return json_(handleOpsInit_(params));
+ * if (action === 'opsGuide') return json_(handleOpsGuide_(params));
  * if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
  * if (action === 'opsExport') return json_(handleOpsExport_(payload || params));
  * if (action === 'opsFeed') return json_(handleOpsFeed_(params));

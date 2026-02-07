@@ -99,7 +99,7 @@ export const ko = {
   'contact.subtitle':
     '\uBB38\uC758 \uC0AC\uD56D\uC740 \uC544\uB798 \uCC44\uB110\uB85C \uC5F0\uB77D\uD574 \uC8FC\uC138\uC694.',
   'contact.title': '\uBB38\uC758',
-  'console.sheet.overview': '\uC9C4\uD589 \uAC1C\uC694',
+  'console.sheet.overview': '\uB300\uD68C \uAC1C\uC694',
   'console.sheet.eligibility': '\uACF5\uD1B5 \uADDC\uC815',
   'console.sheet.stage1': '1\uCC28 \uC608\uC120',
   'console.sheet.stage2': '2\uCC28 \uC608\uC120',

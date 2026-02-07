@@ -80,7 +80,7 @@ const fallbackMap = new Map(
   FALLBACK_CONSOLE_SECTIONS.map((section) => [section.sectionKey, section])
 )
 
-const BADGE_KEYWORDS = ['필수', '금지', '추후 공지'] as const
+const BADGE_KEYWORDS = ['필수', '중요', '금지', '불가', '추후 공지'] as const
 
 const omitNode = <T extends { node?: unknown }>(props: T) => {
   const { node, ...rest } = props
@@ -163,7 +163,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <div className='-mx-4 overflow-x-auto px-4'>
-        <Table className='min-w-[560px] text-sm md:text-base'>
+        <Table className='text-sm md:text-base'>
           {rest.children}
         </Table>
       </div>
@@ -185,7 +185,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <TableHead
-        className='border-white/[0.07] px-4 py-2.5 text-xs font-bold whitespace-normal text-white/75 md:text-sm'
+        className='border-white/[0.07] px-3 py-2 text-xs font-bold break-keep text-white/75 md:px-4 md:py-2.5 md:text-sm'
         {...rest}
       />
     )
@@ -194,7 +194,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <TableCell
-        className='border-white/[0.07] px-4 py-3 align-top text-sm whitespace-normal text-white/90 md:text-base'
+        className='border-white/[0.07] px-3 py-2.5 align-top text-sm break-keep text-white/90 md:px-4 md:py-3 md:text-base'
         {...rest}
       />
     )

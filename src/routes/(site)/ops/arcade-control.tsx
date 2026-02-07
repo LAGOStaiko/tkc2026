@@ -170,6 +170,7 @@ function ArcadeOpsControlPage() {
 
   const [isSaving, setIsSaving] = useState(false)
   const [isInitRunning, setIsInitRunning] = useState(false)
+  const [isGuideRunning, setIsGuideRunning] = useState(false)
   const [isExportRegionRunning, setIsExportRegionRunning] = useState(false)
   const [isExportAllRunning, setIsExportAllRunning] = useState(false)
   const [isBulkSeeding, setIsBulkSeeding] = useState(false)
@@ -623,6 +624,24 @@ function ArcadeOpsControlPage() {
     }
   }
 
+  const handleWriteOpsGuide = async () => {
+    try {
+      setIsGuideRunning(true)
+      setErrorMessage('')
+      setInfoMessage('')
+      await requestOpsApi(
+        '/api/ops/guide',
+        'POST',
+        { overwrite: true, sheetName: 'ops_sheet_guide' },
+        operatorKey
+      )
+      setInfoMessage('Ops guide sheet has been written. (ops_sheet_guide)')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to write ops guide sheet')
+    } finally {
+      setIsGuideRunning(false)
+    }
+  }
   const handleExportAll = async () => {
     try {
       setIsExportAllRunning(true)
@@ -1066,6 +1085,13 @@ function ArcadeOpsControlPage() {
             disabled={isExportAllRunning}
           >
             {isExportAllRunning ? '송출 중..' : '시즌 전체 송출'}
+          </Button>
+          <Button
+            variant='outline'
+            onClick={handleWriteOpsGuide}
+            disabled={isGuideRunning}
+          >
+            {isGuideRunning ? 'Writing guide..' : 'Write ops guide sheet'}
           </Button>
         </div>
       </section>
