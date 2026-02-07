@@ -1743,101 +1743,101 @@ function getOpsGuideSchema_(sheetName) {
   var name = trim_(sheetName) || 'ops_sheet_guide';
   return {
     name: name,
-    headers: ['order', 'sheet', 'purpose', 'whenToEdit', 'requiredFields', 'example', 'notes']
+    headers: ['순번', '시트명', '용도', '수정타이밍', '필수입력', '입력예시', '운영메모']
   };
 }
 
 function buildOpsGuideRows_() {
   return [
     {
-      order: 1,
-      sheet: 'ops_db_online',
-      purpose: 'Online ranking per region (seed source)',
-      whenToEdit: 'Before each regional week starts',
-      requiredFields: 'season,region,rank,entryId,nickname,score1,score2,total,advanced',
-      example: '2026,seoul,1,SEO-01,Player1,996000,994000,1990000,TRUE',
-      notes: '1 row per player; total can be omitted (auto-calculated on upsert).'
+      '순번': 1,
+      '시트명': 'ops_db_online',
+      '용도': '지역 온라인 예선 랭킹 입력(시드 기준 데이터)',
+      '수정타이밍': '각 지역 주차 시작 전 또는 온라인 점수 확정 직후',
+      '필수입력': 'season, region, rank, entryId, nickname, score1, score2, advanced',
+      '입력예시': '2026, seoul, 1, SEO-01, 서울선수01, 996000, 994000, TRUE',
+      '운영메모': '선수 1명당 1행. total은 비워도 opsUpsert 시 자동 계산 가능.'
     },
     {
-      order: 2,
-      sheet: 'ops_db_swiss_matches',
-      purpose: 'Swiss match-level schedule and score',
-      whenToEdit: 'Round pre-draw + after each match result',
-      requiredFields: 'season,region,round,table,p1EntryId,p2EntryId,song1,song2,winnerEntryId',
-      example: '2026,seoul,1,1,SEO-01,SEO-16,Song A,Song B,SEO-01',
-      notes: 'Use one row per table. For bye set bye=TRUE and keep p2 fields blank.'
+      '순번': 2,
+      '시트명': 'ops_db_swiss_matches',
+      '용도': '스위스 라운드 매치별 대진/선곡/점수/승자 입력',
+      '수정타이밍': '라운드 시작 전 대진/선곡 선입력 + 경기 종료 직후 점수/승자 업데이트',
+      '필수입력': 'season, region, round, table, p1EntryId, p2EntryId, song1, song2, winnerEntryId',
+      '입력예시': '2026, seoul, 1, 1, SEO-01, SEO-16, 과제곡A, 과제곡B, SEO-01',
+      '운영메모': '테이블(매치) 1개당 1행. 부전승은 bye=TRUE, p2 관련 칸 비움.'
     },
     {
-      order: 3,
-      sheet: 'ops_db_swiss_standings',
-      purpose: 'Swiss standings snapshot',
-      whenToEdit: 'After each round batch or when standings are finalized',
-      requiredFields: 'season,region,entryId,nickname,seed,wins,losses,status',
-      example: '2026,seoul,SEO-01,Player1,1,3,0,qualified',
-      notes: 'status: qualified / decider / eliminated / alive'
+      '순번': 3,
+      '시트명': 'ops_db_swiss_standings',
+      '용도': '스위스 라운드 중간/최종 순위표',
+      '수정타이밍': '각 라운드 종료 후 일괄 갱신 또는 지역 최종 확정 시',
+      '필수입력': 'season, region, entryId, nickname, seed, wins, losses, status',
+      '입력예시': '2026, seoul, SEO-01, 서울선수01, 1, 3, 0, qualified',
+      '운영메모': 'status 권장값: qualified / decider / eliminated / alive'
     },
     {
-      order: 4,
-      sheet: 'ops_db_decider',
-      purpose: 'Decider stage ranking and winner flag',
-      whenToEdit: 'After decider scores are finalized',
-      requiredFields: 'season,region,rank,entryId,nickname,score,winner',
-      example: '2026,seoul,1,SEO-02,Player2,994500,TRUE',
-      notes: 'winnerEntryId auto-fills from entryId when winner=TRUE.'
+      '순번': 4,
+      '시트명': 'ops_db_decider',
+      '용도': '데시더 라운드 점수/순위 및 승자 확정',
+      '수정타이밍': '데시더 경기 종료 후 즉시',
+      '필수입력': 'season, region, rank, entryId, nickname, score, winner',
+      '입력예시': '2026, seoul, 1, SEO-02, 서울선수02, 994500, TRUE',
+      '운영메모': 'winner=TRUE이면 winnerEntryId는 entryId 기준으로 자동 보정 가능.'
     },
     {
-      order: 5,
-      sheet: 'ops_db_seeding',
-      purpose: 'A/B group seeding source by region',
-      whenToEdit: 'After regional qualifiers are fixed',
-      requiredFields: 'season,region,rank,entryId,nickname,score',
-      example: '2026,seoul,1,SEO-01,Player1,997100',
-      notes: 'Typically 2 rows per region (rank 1=A, rank 2=B).'
+      '순번': 5,
+      '시트명': 'ops_db_seeding',
+      '용도': '지역 대표 A/B 시드 산정용 점수표',
+      '수정타이밍': '지역별 본선 진출자 확정 직후',
+      '필수입력': 'season, region, rank, entryId, nickname, score',
+      '입력예시': '2026, seoul, 1, SEO-01, 서울선수01, 997100',
+      '운영메모': '보통 지역당 2행(1위=A그룹, 2위=B그룹).'
     },
     {
-      order: 6,
-      sheet: 'ops_db_qualifiers',
-      purpose: 'Final qualifier assignment by group',
-      whenToEdit: 'When A/B qualifiers are confirmed',
-      requiredFields: 'season,region,group,entryId,nickname,seed',
-      example: '2026,seoul,A,SEO-01,Player1,1',
-      notes: 'group must be A or B.'
+      '순번': 6,
+      '시트명': 'ops_db_qualifiers',
+      '용도': '최종 본선 진출자 A/B 그룹 확정',
+      '수정타이밍': '그룹 배정이 확정되는 즉시',
+      '필수입력': 'season, region, group, entryId, nickname, seed',
+      '입력예시': '2026, seoul, A, SEO-01, 서울선수01, 1',
+      '운영메모': 'group 값은 반드시 A 또는 B.'
     },
     {
-      order: 7,
-      sheet: 'ops_db_finals_a',
-      purpose: 'Final bracket Group A seed list',
-      whenToEdit: 'Once finals seeds are locked',
-      requiredFields: 'season,seed,region,entryId,nickname',
-      example: '2026,1,seoul,SEO-01,Player1',
-      notes: 'One row per seed.'
+      '순번': 7,
+      '시트명': 'ops_db_finals_a',
+      '용도': '본선 대진용 A그룹 시드 리스트',
+      '수정타이밍': '본선 시드 확정 시',
+      '필수입력': 'season, seed, region, entryId, nickname',
+      '입력예시': '2026, 1, seoul, SEO-01, 서울선수01',
+      '운영메모': '시드 1개당 1행.'
     },
     {
-      order: 8,
-      sheet: 'ops_db_finals_b',
-      purpose: 'Final bracket Group B seed list',
-      whenToEdit: 'Once finals seeds are locked',
-      requiredFields: 'season,seed,region,entryId,nickname',
-      example: '2026,1,gwangju,GWA-02,PlayerX',
-      notes: 'One row per seed.'
+      '순번': 8,
+      '시트명': 'ops_db_finals_b',
+      '용도': '본선 대진용 B그룹 시드 리스트',
+      '수정타이밍': '본선 시드 확정 시',
+      '필수입력': 'season, seed, region, entryId, nickname',
+      '입력예시': '2026, 1, gwangju, GWA-02, 광주선수02',
+      '운영메모': '시드 1개당 1행.'
     },
     {
-      order: 9,
-      sheet: 'ops_db_finals_matches',
-      purpose: 'Top8 cross matches and winners',
-      whenToEdit: 'Before/after each finals match',
-      requiredFields: 'season,matchNo,leftEntryId,rightEntryId,winnerEntryId',
-      example: '2026,1,SEO-01,BUS-02,SEO-01',
-      notes: 'Fill left/right metadata for broadcast clarity.'
+      '순번': 9,
+      '시트명': 'ops_db_finals_matches',
+      '용도': '본선(8강) 교차 대진 및 승자 기록',
+      '수정타이밍': '매치 시작 전 대진 입력 + 매치 종료 후 승자 반영',
+      '필수입력': 'season, matchNo, leftEntryId, rightEntryId, winnerEntryId',
+      '입력예시': '2026, 1, SEO-01, BUS-02, SEO-01',
+      '운영메모': '송출 화면 가독성을 위해 left/right 지역/시드 메타도 함께 입력 권장.'
     },
     {
-      order: 10,
-      sheet: 'ops_db_events',
-      purpose: 'Audit/event log (auto append)',
-      whenToEdit: 'Do not edit manually',
-      requiredFields: 'createdAt,stage,season,region,entryId,message',
-      example: '(auto)',
-      notes: 'Written by opsUpsert/opsExport/opsGuide.'
+      '순번': 10,
+      '시트명': 'ops_db_events',
+      '용도': '운영 로그(자동 누적)',
+      '수정타이밍': '수동 수정 금지',
+      '필수입력': 'createdAt, stage, season, region, entryId, message',
+      '입력예시': '(자동 기록)',
+      '운영메모': 'opsUpsert/opsExport/opsGuide 실행 시 자동 추가됨.'
     }
   ];
 }
