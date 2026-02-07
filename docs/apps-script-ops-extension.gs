@@ -3,6 +3,8 @@
  *
  * Adds actions:
  * - opsInit   : create ops_db_* tabs
+ * - opsBeginnerGuide : write a beginner-friendly runbook sheet
+ * - opsFirstTimeSetup : one-click setup for first operators
  * - opsUpsert : write/update one row into ops_db_*
  * - opsSwissRebuildStandings : rebuild ops_db_swiss_standings from match results
  * - opsExport : copy ops_db_* -> arcade_archive_* (incremental upsert)
@@ -271,6 +273,164 @@ function handleOpsGuide_(params) {
       sheet: schema.name,
       rows: values.length,
       overwrite: overwrite
+    }
+  };
+}
+
+function getOpsBeginnerGuideSchema_(sheetName) {
+  var name = trim_(sheetName) || 'ops_beginner_guide';
+  return {
+    name: name,
+    headers: ['step', 'task', 'where', 'description', 'done']
+  };
+}
+
+function buildOpsBeginnerGuideRows_() {
+  return [
+    {
+      step: 1,
+      task: 'first-time setup',
+      where: 'menu / API',
+      description: 'Run opsFirstTimeSetup once to prepare tabs, style and guides.',
+      done: false
+    },
+    {
+      step: 2,
+      task: 'check daily scope',
+      where: 'ops_db_online, ops_db_swiss_standings',
+      description: 'Confirm season/region and player IDs before matches start.',
+      done: false
+    },
+    {
+      step: 3,
+      task: 'record match result',
+      where: 'ops_db_swiss_matches',
+      description: 'Enter scores and winnerEntryId per table. BYE uses bye=TRUE.',
+      done: false
+    },
+    {
+      step: 4,
+      task: 'close round',
+      where: 'opsRoundClose',
+      description: 'Rebuild standings + auto-pair next round + export archive.',
+      done: false
+    }
+  ];
+}
+
+function handleOpsBeginnerGuide_(params) {
+  params = params || {};
+  var overwrite = params.overwrite === undefined ? true : toBool_(params.overwrite);
+  var schema = getOpsBeginnerGuideSchema_(params.sheetName);
+  var rows = buildOpsBeginnerGuideRows_();
+
+  var ss = getSs_();
+  ensureSheetSchema_(ss, schema.name, schema.headers);
+  var sh = ss.getSheetByName(schema.name);
+
+  var lastRow = sh.getLastRow();
+  if (overwrite && lastRow > 1) {
+    sh.getRange(2, 1, lastRow - 1, schema.headers.length).clearContent();
+  }
+
+  var values = rows.map(function(row){
+    return schema.headers.map(function(header){
+      return row[header] !== undefined ? row[header] : '';
+    });
+  });
+
+  if (values.length > 0) {
+    sh.getRange(2, 1, values.length, schema.headers.length).setValues(values);
+    sh.getRange(2, schema.headers.length, values.length, 1).insertCheckboxes();
+  }
+
+  sh.setFrozenRows(1);
+  sh.autoResizeColumns(1, schema.headers.length);
+
+  appendOpsEvent_('beginnerGuide', '', '', '', 'beginner rows=' + values.length + ', sheet=' + schema.name);
+
+  return {
+    ok: true,
+    data: {
+      sheet: schema.name,
+      rows: values.length,
+      overwrite: overwrite
+    }
+  };
+}
+
+function handleFormatOpsTabs_() {
+  if (typeof applyReadableSheetStyle_ !== 'function') {
+    return { ok: false, error: 'applyReadableSheetStyle_ helper is required' };
+  }
+
+  var ss = getSs_();
+  var schemas = getOpsSheetSchemas_();
+  var sheets = schemas.map(function(schema){
+    return applyReadableSheetStyle_(ss, schema.name, schema.headers);
+  });
+
+  return {
+    ok: true,
+    data: {
+      total: sheets.length,
+      sheets: sheets
+    }
+  };
+}
+
+function handleOpsFirstTimeSetup_(params) {
+  params = params || {};
+  var initAll = params.initAll === undefined ? true : toBool_(params.initAll);
+  var overwriteGuide = params.overwriteGuide === undefined ? true : toBool_(params.overwriteGuide);
+
+  var baseInit = null;
+  if (initAll && typeof handleInitAndFormat_ === 'function') {
+    baseInit = handleInitAndFormat_({ scope: 'all' });
+    if (!baseInit.ok) return baseInit;
+  }
+
+  var opsInit = handleOpsInit_({});
+  if (!opsInit.ok) return opsInit;
+
+  var opsFormatted = handleFormatOpsTabs_();
+  if (!opsFormatted.ok) return opsFormatted;
+
+  var guide = handleOpsGuide_({ overwrite: overwriteGuide });
+  if (!guide.ok) return guide;
+
+  var inlineGuide = null;
+  if (typeof handleOpsInlineGuide_ === 'function') {
+    inlineGuide = handleOpsInlineGuide_({ overwrite: overwriteGuide });
+    if (!inlineGuide.ok) return inlineGuide;
+  }
+
+  var beginnerGuide = handleOpsBeginnerGuide_({ overwrite: overwriteGuide });
+  if (!beginnerGuide.ok) return beginnerGuide;
+
+  appendOpsEvent_(
+    'firstSetup',
+    '',
+    '',
+    '',
+    'initAll=' + String(initAll) +
+    ', opsTabs=' + (opsInit.data ? opsInit.data.total : 0) +
+    ', inline=' + (inlineGuide && inlineGuide.data ? inlineGuide.data.total : 0)
+  );
+
+  return {
+    ok: true,
+    data: {
+      total: baseInit && baseInit.data ? toNumber_(baseInit.data.total, 0) : 0,
+      created: baseInit && baseInit.data ? toNumber_(baseInit.data.created, 0) : 0,
+      headerUpdated: baseInit && baseInit.data ? toNumber_(baseInit.data.headerUpdated, 0) : 0,
+      formatted: baseInit && baseInit.data ? toNumber_(baseInit.data.formatted, 0) : 0,
+      opsTabs: opsInit.data ? toNumber_(opsInit.data.total, 0) : 0,
+      opsFormatted: opsFormatted.data ? toNumber_(opsFormatted.data.total, 0) : 0,
+      guideRows: guide.data ? toNumber_(guide.data.rows, 0) : 0,
+      inlineSheets: inlineGuide && inlineGuide.data ? toNumber_(inlineGuide.data.total, 0) : 0,
+      beginnerGuideRows: beginnerGuide.data ? toNumber_(beginnerGuide.data.rows, 0) : 0,
+      beginnerGuideSheet: beginnerGuide.data ? beginnerGuide.data.sheet : ''
     }
   };
 }
@@ -1506,6 +1666,8 @@ function initializeOpsTabs() {
  *
  * if (action === 'opsInit') return json_(handleOpsInit_(params));
  * if (action === 'opsGuide') return json_(handleOpsGuide_(params));
+ * if (action === 'opsBeginnerGuide') return json_(handleOpsBeginnerGuide_(params));
+ * if (action === 'opsFirstTimeSetup') return json_(handleOpsFirstTimeSetup_(payload || params));
  * if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
  * if (action === 'opsSwissRebuildStandings') return json_(handleOpsSwissRebuildStandings_(payload || params));
  * if (action === 'opsExport') return json_(handleOpsExport_(payload || params));

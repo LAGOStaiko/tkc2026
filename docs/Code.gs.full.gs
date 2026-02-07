@@ -532,9 +532,15 @@ function notifyMenuResult_(title, result) {
   if (typeof data.rebuiltRows === 'number') parts.push('rebuiltRows=' + data.rebuiltRows);
   if (typeof data.writtenRows === 'number') parts.push('writtenRows=' + data.writtenRows);
   if (typeof data.generatedRows === 'number') parts.push('generatedRows=' + data.generatedRows);
+  if (typeof data.opsTabs === 'number') parts.push('opsTabs=' + data.opsTabs);
+  if (typeof data.opsFormatted === 'number') parts.push('opsFormatted=' + data.opsFormatted);
+  if (typeof data.guideRows === 'number') parts.push('guideRows=' + data.guideRows);
+  if (typeof data.inlineSheets === 'number') parts.push('inlineSheets=' + data.inlineSheets);
+  if (typeof data.beginnerGuideRows === 'number') parts.push('beginnerGuideRows=' + data.beginnerGuideRows);
   if (typeof data.totalRows === 'number') parts.push('totalRows=' + data.totalRows);
   if (data.region) parts.push('region=' + data.region);
   if (data.season) parts.push('season=' + data.season);
+  if (data.beginnerGuideSheet) parts.push('beginnerGuideSheet=' + data.beginnerGuideSheet);
   if (data.sheetId) parts.push('sheetId=' + data.sheetId);
   if (data.name) parts.push('name=' + data.name);
 
@@ -675,6 +681,25 @@ function menuWriteOpsInlineGuide_() {
   notifyMenuResult_('시트별 인라인 가이드 작성', handleOpsInlineGuide_({ overwrite: true }));
 }
 
+function menuWriteOpsBeginnerGuide_() {
+  notifyMenuResult_('운영 시작 가이드 시트 작성', handleOpsBeginnerGuide_({ overwrite: true }));
+}
+
+function menuOpsFirstTimeSetup_() {
+  var ui = SpreadsheetApp.getUi();
+  var button = ui.alert(
+    '처음 운영 세팅을 시작할까요?',
+    '초기 탭/서식/운영 가이드/인라인 가이드를 한 번에 준비합니다.',
+    ui.ButtonSet.YES_NO
+  );
+  if (button !== ui.Button.YES) return;
+
+  notifyMenuResult_(
+    '운영 시작 세팅(원클릭)',
+    handleOpsFirstTimeSetup_({ initAll: true, overwriteGuide: true })
+  );
+}
+
 function menuOpsRoundClosePrompt_() {
   var ui = SpreadsheetApp.getUi();
 
@@ -727,6 +752,9 @@ function onOpen() {
     .addSeparator()
     .addItem('API 캐시 비우기', 'menuPurgeApiCache_')
     .addItem('SHEET_ID 현재 시트로 바인딩', 'menuBindSheetIdToActive_')
+    .addSeparator()
+    .addItem('운영 시작 세팅(원클릭)', 'menuOpsFirstTimeSetup_')
+    .addItem('운영 시작 가이드 시트 작성', 'menuWriteOpsBeginnerGuide_')
     .addItem('운영 가이드 시트 작성', 'menuWriteOpsGuide_')
     .addItem('시트별 인라인 가이드 작성', 'menuWriteOpsInlineGuide_')
     .addItem('스위스 라운드 종료(자동 대진+내보내기)', 'menuOpsRoundClosePrompt_')
@@ -1787,6 +1815,8 @@ function doPost(e) {
     if (action === 'opsInit') return json_(handleOpsInit_(params));
     if (action === 'opsGuide') return json_(handleOpsGuide_(params));
     if (action === 'opsInlineGuide') return json_(handleOpsInlineGuide_(params));
+    if (action === 'opsBeginnerGuide') return json_(handleOpsBeginnerGuide_(params));
+    if (action === 'opsFirstTimeSetup') return json_(handleOpsFirstTimeSetup_(payload || params));
     if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
     if (action === 'opsSwissRebuildStandings') return json_(handleOpsSwissRebuildStandings_(payload || params));
     if (action === 'opsExport') return json_(handleOpsExport_(payload || params));
@@ -1807,6 +1837,8 @@ function doPost(e) {
  *
  * Adds actions:
  * - opsInit   : create ops_db_* tabs
+ * - opsBeginnerGuide : write a beginner-friendly runbook sheet
+ * - opsFirstTimeSetup : one-click setup for first operators
  * - opsUpsert : write/update one row into ops_db_*
  * - opsSwissRebuildStandings : rebuild ops_db_swiss_standings from match results
  * - opsExport : copy ops_db_* -> arcade_archive_* (incremental upsert)
@@ -2079,6 +2111,102 @@ function handleOpsGuide_(params) {
   };
 }
 
+function getOpsBeginnerGuideSchema_(sheetName) {
+  var name = trim_(sheetName) || 'ops_beginner_guide';
+  return {
+    name: name,
+    headers: ['순서', '작업', '실행위치', '설명', '완료']
+  };
+}
+
+function buildOpsBeginnerGuideRows_() {
+  return [
+    {
+      '순서': 1,
+      '작업': '처음 1회 세팅',
+      '실행위치': '메뉴 > TKC2026 도구',
+      '설명': '\'운영 시작 세팅(원클릭)\'을 1회 실행해 탭/서식/가이드를 자동 준비합니다.',
+      '완료': false
+    },
+    {
+      '순서': 2,
+      '작업': '오늘 운영 지역 확인',
+      '실행위치': 'ops_db_online, ops_db_swiss_standings',
+      '설명': 'season/region 값이 맞는지, 선수 ID/닉네임/seed가 채워졌는지 확인합니다.',
+      '완료': false
+    },
+    {
+      '순서': 3,
+      '작업': '경기 중 점수 입력',
+      '실행위치': 'ops_db_swiss_matches',
+      '설명': '매치별로 점수와 winnerEntryId를 입력합니다. 부전승은 bye=TRUE로 처리합니다.',
+      '완료': false
+    },
+    {
+      '순서': 4,
+      '작업': '라운드 종료 처리',
+      '실행위치': '메뉴 > 스위스 라운드 종료(자동 대진+내보내기)',
+      '설명': 'standings 재계산 + 다음 라운드 자동 대진 + archive 내보내기를 한 번에 실행합니다.',
+      '완료': false
+    },
+    {
+      '순서': 5,
+      '작업': '송출 확인',
+      '실행위치': 'opsFeed / results API',
+      '설명': '대진/순위/승자 데이터가 화면에 반영되었는지 확인합니다.',
+      '완료': false
+    },
+    {
+      '순서': 6,
+      '작업': '문제 발생 시 복구',
+      '실행위치': 'opsSwissRebuildStandings',
+      '설명': '매치 결과가 맞다면 standings를 재생성한 뒤 다시 라운드 종료를 실행합니다.',
+      '완료': false
+    }
+  ];
+}
+
+function handleOpsBeginnerGuide_(params) {
+  params = params || {};
+  var overwrite = params.overwrite === undefined ? true : toBool_(params.overwrite);
+  var schema = getOpsBeginnerGuideSchema_(params.sheetName);
+  var rows = buildOpsBeginnerGuideRows_();
+
+  var ss = getSs_();
+  ensureSheetSchema_(ss, schema.name, schema.headers);
+  var sh = ss.getSheetByName(schema.name);
+
+  var lastRow = sh.getLastRow();
+  if (overwrite && lastRow > 1) {
+    sh.getRange(2, 1, lastRow - 1, schema.headers.length).clearContent();
+  }
+
+  var values = rows.map(function(row){
+    return schema.headers.map(function(header){
+      return row[header] !== undefined ? row[header] : '';
+    });
+  });
+
+  if (values.length > 0) {
+    sh.getRange(2, 1, values.length, schema.headers.length).setValues(values);
+    sh.getRange(2, 5, values.length, 1).insertCheckboxes();
+  }
+
+  sh.setFrozenRows(1);
+  sh.autoResizeColumns(1, schema.headers.length);
+
+  appendOpsEvent_('beginnerGuide', '', '', '', 'beginner rows=' + values.length + ', sheet=' + schema.name);
+
+  return {
+    ok: true,
+    data: {
+      sheet: schema.name,
+      rows: values.length,
+      overwrite: overwrite
+    }
+  };
+}
+
 function getOpsInlineGuideMap_() {
   return {
     ops_db_online: [
@@ -2237,6 +2365,79 @@ function handleOpsInlineGuide_(params) {
       total: results.length,
       overwrite: overwrite,
       sheets: results
+    }
+  };
+}
+
+function handleFormatOpsTabs_() {
+  var ss = getSs_();
+  var schemas = getOpsSheetSchemas_();
+  var sheets = schemas.map(function(schema){
+    return applyReadableSheetStyle_(ss, schema.name, schema.headers);
+  });
+
+  return {
+    ok: true,
+    data: {
+      total: sheets.length,
+      sheets: sheets
+    }
+  };
+}
+
+function handleOpsFirstTimeSetup_(params) {
+  params = params || {};
+  var initAll = params.initAll === undefined ? true : toBool_(params.initAll);
+  var overwriteGuide = params.overwriteGuide === undefined ? true : toBool_(params.overwriteGuide);
+
+  var baseInit = null;
+  if (initAll) {
+    baseInit = handleInitAndFormat_({ scope: 'all' });
+    if (!baseInit.ok) return baseInit;
+  }
+
+  var opsInit = handleOpsInit_({});
+  if (!opsInit.ok) return opsInit;
+
+  var opsFormatted = handleFormatOpsTabs_();
+  if (!opsFormatted.ok) return opsFormatted;
+
+  var guide = handleOpsGuide_({ overwrite: overwriteGuide });
+  if (!guide.ok) return guide;
+
+  var inlineGuide = handleOpsInlineGuide_({ overwrite: overwriteGuide });
+  if (!inlineGuide.ok) return inlineGuide;
+
+  var beginnerGuide = handleOpsBeginnerGuide_({ overwrite: overwriteGuide });
+  if (!beginnerGuide.ok) return beginnerGuide;
+
+  if (typeof purgeApiCache_ === 'function') {
+    try { purgeApiCache_(); } catch (err) {}
+  }
+
+  appendOpsEvent_(
+    'firstSetup',
+    '',
+    '',
+    '',
+    'initAll=' + String(initAll) +
+    ', opsTabs=' + (opsInit.data ? opsInit.data.total : 0) +
+    ', inline=' + (inlineGuide.data ? inlineGuide.data.total : 0)
+  );
+
+  return {
+    ok: true,
+    data: {
+      total: baseInit && baseInit.data ? toNumber_(baseInit.data.total, 0) : 0,
+      created: baseInit && baseInit.data ? toNumber_(baseInit.data.created, 0) : 0,
+      headerUpdated: baseInit && baseInit.data ? toNumber_(baseInit.data.headerUpdated, 0) : 0,
+      formatted: baseInit && baseInit.data ? toNumber_(baseInit.data.formatted, 0) : 0,
+      opsTabs: opsInit.data ? toNumber_(opsInit.data.total, 0) : 0,
+      opsFormatted: opsFormatted.data ? toNumber_(opsFormatted.data.total, 0) : 0,
+      guideRows: guide.data ? toNumber_(guide.data.rows, 0) : 0,
+      inlineSheets: inlineGuide.data ? toNumber_(inlineGuide.data.total, 0) : 0,
+      beginnerGuideRows: beginnerGuide.data ? toNumber_(beginnerGuide.data.rows, 0) : 0,
+      beginnerGuideSheet: beginnerGuide.data ? beginnerGuide.data.sheet : ''
     }
   };
 }
@@ -3473,6 +3674,8 @@ function initializeOpsTabs() {
  * if (action === 'opsInit') return json_(handleOpsInit_(params));
  * if (action === 'opsGuide') return json_(handleOpsGuide_(params));
  * if (action === 'opsInlineGuide') return json_(handleOpsInlineGuide_(params));
+ * if (action === 'opsBeginnerGuide') return json_(handleOpsBeginnerGuide_(params));
+ * if (action === 'opsFirstTimeSetup') return json_(handleOpsFirstTimeSetup_(payload || params));
  * if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
  * if (action === 'opsSwissRebuildStandings') return json_(handleOpsSwissRebuildStandings_(payload || params));
  * if (action === 'opsExport') return json_(handleOpsExport_(payload || params));
