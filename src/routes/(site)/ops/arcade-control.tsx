@@ -10,11 +10,19 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
+  buildCurrentFinalMatchDraft,
+  buildCurrentSwissMatchDraft,
+  buildFinalsProgress,
   buildInitialDraft,
+  buildNextFinalMatchDraft,
+  buildNextSwissMatchDraft,
   buildOpsUpsertPayload,
   buildRegionFinalRanking,
+  buildRegionWeekStatuses,
+  buildSwissProgress,
   OPS_REGION_OPTIONS,
   OPS_STAGE_DEFINITIONS,
+  type OpsProgressMatch,
   type OpsRegionKey,
   type OpsStageKey,
 } from '@/lib/arcade-ops'
@@ -79,6 +87,23 @@ async function requestOpsApi(
   return payload.data
 }
 
+function statusBadgeClass(status: 'pending' | 'live' | 'done') {
+  if (status === 'done') return 'border-emerald-300/25 bg-emerald-500/10 text-emerald-200'
+  if (status === 'live') return 'border-[#ff2a00]/35 bg-[#ff2a00]/10 text-[#ffd6cf]'
+  return 'border-white/20 bg-white/[0.06] text-white/70'
+}
+
+function statusLabel(status: 'pending' | 'live' | 'done') {
+  if (status === 'done') return '완료'
+  if (status === 'live') return '진행중'
+  return '대기'
+}
+
+function matchLine(match?: OpsProgressMatch) {
+  if (!match) return '매치 없음'
+  return `${match.label} - ${match.leftName} vs ${match.rightName}`
+}
+
 function ArcadeOpsControlPage() {
   const [operatorKey, setOperatorKey] = useState('')
   const [season, setSeason] = useState(DEFAULT_SEASON)
@@ -104,21 +129,53 @@ function ArcadeOpsControlPage() {
   const stageDef = OPS_STAGE_DEFINITIONS[stage]
 
   const archive = useMemo(() => resolveArcadeSeasonArchive(feedRaw), [feedRaw])
+  const weekStatuses = useMemo(() => buildRegionWeekStatuses(archive), [archive])
   const regionArchive = useMemo(() => getRegionByKey(archive, region), [archive, region])
   const finalRanking = useMemo(() => {
     if (!regionArchive) return []
     return buildRegionFinalRanking(regionArchive)
   }, [regionArchive])
+  const swissProgress = useMemo(() => buildSwissProgress(regionArchive), [regionArchive])
+  const finalsProgress = useMemo(() => buildFinalsProgress(archive), [archive])
 
-  const latestSwissRound = useMemo(() => {
-    if (!regionArchive || regionArchive.swissMatches.length === 0) return null
-    const maxRound = Math.max(...regionArchive.swissMatches.map((match) => match.round))
-    const rows = regionArchive.swissMatches
-      .filter((match) => match.round === maxRound)
-      .slice()
-      .sort((a, b) => (a.table ?? 0) - (b.table ?? 0))
-    return { round: maxRound, rows }
-  }, [regionArchive])
+  const isSequentialStage = stage === 'swissMatch' || stage === 'finalMatch'
+  const stageCurrent = stage === 'swissMatch'
+    ? swissProgress.current
+    : (stage === 'finalMatch' ? finalsProgress.current : undefined)
+  const stageNext = stage === 'swissMatch'
+    ? swissProgress.next
+    : (stage === 'finalMatch' ? finalsProgress.next : undefined)
+  const stagePrevious = stage === 'swissMatch'
+    ? swissProgress.previous
+    : (stage === 'finalMatch' ? finalsProgress.previous : undefined)
+
+  const winnerOptions = useMemo(() => {
+    if (stage === 'swissMatch') {
+      return [
+        {
+          entryId: draft.p1EntryId?.trim() ?? '',
+          nickname: draft.p1Nickname?.trim() ?? draft.p1EntryId?.trim() ?? '',
+        },
+        {
+          entryId: draft.p2EntryId?.trim() ?? '',
+          nickname: draft.p2Nickname?.trim() ?? draft.p2EntryId?.trim() ?? '',
+        },
+      ].filter((row) => row.entryId)
+    }
+    if (stage === 'finalMatch') {
+      return [
+        {
+          entryId: draft.leftEntryId?.trim() ?? '',
+          nickname: draft.leftNickname?.trim() ?? draft.leftEntryId?.trim() ?? '',
+        },
+        {
+          entryId: draft.rightEntryId?.trim() ?? '',
+          nickname: draft.rightNickname?.trim() ?? draft.rightEntryId?.trim() ?? '',
+        },
+      ].filter((row) => row.entryId)
+    }
+    return []
+  }, [draft, stage])
 
   const broadcastUrl = useMemo(
     () => `/ops/arcade-broadcast?season=${encodeURIComponent(season)}&region=${region}`,
@@ -128,6 +185,13 @@ function ArcadeOpsControlPage() {
   const setDraftField = (name: string, value: string) => {
     setDraft((prev) => ({ ...prev, [name]: value }))
   }
+
+  const applyTemplate = useCallback((template: Record<string, string>) => {
+    setDraft({
+      ...buildInitialDraft(stage),
+      ...template,
+    })
+  }, [stage])
 
   const resetDraft = useCallback(() => {
     setDraft(buildInitialDraft(stage))
@@ -174,18 +238,23 @@ function ArcadeOpsControlPage() {
         )
       }
 
-      setFeedRaw(payload.data ?? null)
+      const data = payload.data ?? null
+      setFeedRaw(data)
       setLastFeedAt(new Date().toLocaleTimeString('ko-KR', { hour12: false }))
+      return data
     } catch (err) {
       setFeedError(err instanceof Error ? err.message : '송출 데이터 조회 실패')
+      return null
     } finally {
       setFeedLoading(false)
     }
   }, [region, season])
 
   useEffect(() => {
-    fetchFeed()
-    const timer = window.setInterval(fetchFeed, REFRESH_MS)
+    void fetchFeed()
+    const timer = window.setInterval(() => {
+      void fetchFeed()
+    }, REFRESH_MS)
     return () => window.clearInterval(timer)
   }, [fetchFeed])
 
@@ -196,6 +265,46 @@ function ArcadeOpsControlPage() {
       if (!value || value.trim().length === 0) {
         throw new Error(`필수 항목 누락: ${field.label}`)
       }
+    }
+  }
+
+  const handleLoadCurrentMatch = () => {
+    if (stage === 'swissMatch') {
+      const template = buildCurrentSwissMatchDraft(regionArchive)
+      if (!template) {
+        setErrorMessage('현재 진행중인 Swiss 경기가 없습니다.')
+        return
+      }
+      applyTemplate(template)
+      setInfoMessage('현재 Swiss 경기 정보를 입력폼에 불러왔습니다.')
+      setErrorMessage('')
+      return
+    }
+
+    if (stage === 'finalMatch') {
+      const template = buildCurrentFinalMatchDraft(archive)
+      if (!template) {
+        setErrorMessage('현재 진행중인 Top8 경기가 없습니다.')
+        return
+      }
+      applyTemplate(template)
+      setInfoMessage('현재 Top8 경기 정보를 입력폼에 불러왔습니다.')
+      setErrorMessage('')
+    }
+  }
+
+  const handleLoadNextMatch = () => {
+    if (stage === 'swissMatch') {
+      applyTemplate(buildNextSwissMatchDraft(regionArchive))
+      setInfoMessage('다음 Swiss 경기 입력 슬롯을 불러왔습니다.')
+      setErrorMessage('')
+      return
+    }
+
+    if (stage === 'finalMatch') {
+      applyTemplate(buildNextFinalMatchDraft(archive))
+      setInfoMessage('다음 Top8 경기 입력 슬롯을 불러왔습니다.')
+      setErrorMessage('')
     }
   }
 
@@ -214,8 +323,18 @@ function ArcadeOpsControlPage() {
       })
 
       await requestOpsApi('/api/ops/upsert', 'POST', payload, operatorKey)
+      const fresh = await fetchFeed()
+
+      if (stage === 'swissMatch') {
+        const nextArchive = resolveArcadeSeasonArchive(fresh)
+        const nextRegion = getRegionByKey(nextArchive, region)
+        applyTemplate(buildNextSwissMatchDraft(nextRegion))
+      } else if (stage === 'finalMatch') {
+        const nextArchive = resolveArcadeSeasonArchive(fresh)
+        applyTemplate(buildNextFinalMatchDraft(nextArchive))
+      }
+
       setInfoMessage(`${stageDef.label} 입력 완료`)
-      await fetchFeed()
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : '입력 저장 실패')
     } finally {
@@ -249,9 +368,9 @@ function ArcadeOpsControlPage() {
         { season: season.trim() || DEFAULT_SEASON, region },
         operatorKey
       )
-      setInfoMessage(`${OPS_REGION_OPTIONS.find((r) => r.value === region)?.label ?? region} 데이터 내보내기 완료`)
+      setInfoMessage('이번 주 지역 결과를 송출용 아카이브로 반영했습니다.')
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '지역 내보내기 실패')
+      setErrorMessage(err instanceof Error ? err.message : '지역 송출 실패')
     } finally {
       setIsExportRegionRunning(false)
     }
@@ -268,9 +387,9 @@ function ArcadeOpsControlPage() {
         { season: season.trim() || DEFAULT_SEASON, region: 'all' },
         operatorKey
       )
-      setInfoMessage(`시즌 ${season || DEFAULT_SEASON} 전체 내보내기 완료`)
+      setInfoMessage(`시즌 ${season || DEFAULT_SEASON} 전체 송출 완료`)
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '전체 내보내기 실패')
+      setErrorMessage(err instanceof Error ? err.message : '전체 송출 실패')
     } finally {
       setIsExportAllRunning(false)
     }
@@ -280,7 +399,7 @@ function ArcadeOpsControlPage() {
     <TkcSection className='space-y-6 md:space-y-8'>
       <TkcPageHeader
         title='아케이드 운영 콘솔'
-        subtitle='스마트폰 입력 → 운영 DB 저장 → 검수 후 홈페이지 아카이브 내보내기'
+        subtitle='지역은 주간 단위로 전환하고, 경기는 한 매치씩 순차 입력/송출합니다.'
       />
 
       <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
@@ -306,7 +425,7 @@ function ArcadeOpsControlPage() {
           </div>
 
           <div className='space-y-1.5'>
-            <label className='text-xs font-semibold text-white/70'>지역</label>
+            <label className='text-xs font-semibold text-white/70'>현재 지역</label>
             <Select
               value={region}
               onValueChange={(value) => setRegion(value as OpsRegionKey)}
@@ -332,7 +451,7 @@ function ArcadeOpsControlPage() {
             rel='noreferrer'
             className='inline-flex h-9 items-center rounded-md border border-white/15 bg-white/[0.04] px-3 text-xs font-semibold text-white/80 transition-colors hover:bg-white/[0.08]'
           >
-            송출 창 열기
+            실시간 송출 화면 열기
           </a>
           <Button
             variant='outline'
@@ -340,7 +459,7 @@ function ArcadeOpsControlPage() {
             onClick={fetchFeed}
             disabled={feedLoading}
           >
-            {feedLoading ? '새로고침 중...' : 'DB 새로고침'}
+            {feedLoading ? '새로고침 중..' : 'DB 새로고침'}
           </Button>
         </div>
 
@@ -359,9 +478,49 @@ function ArcadeOpsControlPage() {
 
       <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
         <div className='space-y-1.5'>
-          <h2 className='text-base font-bold text-white'>현장 입력</h2>
+          <h2 className='text-base font-bold text-white'>주간 지역 운영 보드</h2>
           <p className='text-xs text-white/60'>
-            룰북 기준 스테이지별로 필요한 항목만 입력합니다. 동일 키 재입력 시 기존 값을 업데이트합니다.
+            1주차부터 4주차까지 지역을 순서대로 운영합니다. 카드를 눌러 현재 주차 지역을 즉시 전환할 수 있습니다.
+          </p>
+        </div>
+
+        <div className='mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4'>
+          {weekStatuses.map((week) => (
+            <button
+              key={week.key}
+              type='button'
+              onClick={() => setRegion(week.key)}
+              className={`rounded-xl border p-3 text-left transition ${
+                region === week.key
+                  ? 'border-[#ff2a00]/70 bg-[#ff2a00]/10'
+                  : 'border-white/10 bg-black/20 hover:border-white/25'
+              }`}
+            >
+              <div className='flex items-center justify-between gap-2'>
+                <span className='text-xs font-semibold text-white/70'>
+                  {week.weekNo}주차
+                </span>
+                <span
+                  className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${statusBadgeClass(week.status)}`}
+                >
+                  {statusLabel(week.status)}
+                </span>
+              </div>
+
+              <p className='mt-2 text-sm font-bold text-white'>{week.label}</p>
+              <p className='mt-2 text-[11px] text-white/60'>
+                온라인 {week.onlineEntries}명 / Swiss {week.swissCompleted}/{week.swissTotal} / 결선확정 {week.qualifierCount}/2
+              </p>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
+        <div className='space-y-1.5'>
+          <h2 className='text-base font-bold text-white'>순차 입력</h2>
+          <p className='text-xs text-white/60'>
+            한 경기씩 끝날 때마다 저장하고 다음 경기 슬롯으로 이동합니다.
           </p>
         </div>
 
@@ -384,6 +543,45 @@ function ArcadeOpsControlPage() {
           </Select>
           <p className='text-xs text-white/55'>{stageDef.description}</p>
         </div>
+
+        {isSequentialStage ? (
+          <div className='mt-4 rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/5 p-3'>
+            <p className='text-xs font-semibold text-[#ffd6cf]'>
+              순차 진행 가이드 ({stage === 'swissMatch' ? 'Swiss' : 'Top8'})
+            </p>
+            <div className='mt-2 grid gap-2 text-xs md:grid-cols-3'>
+              <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                <div className='text-white/50'>현재 경기</div>
+                <div className='mt-1 font-medium text-white/85'>{matchLine(stageCurrent)}</div>
+              </div>
+              <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                <div className='text-white/50'>다음 경기</div>
+                <div className='mt-1 font-medium text-white/85'>{matchLine(stageNext)}</div>
+              </div>
+              <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                <div className='text-white/50'>직전 결과</div>
+                <div className='mt-1 font-medium text-white/85'>{matchLine(stagePrevious)}</div>
+              </div>
+            </div>
+
+            <div className='mt-3 flex flex-wrap gap-2'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handleLoadCurrentMatch}
+              >
+                현재 경기 불러오기
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handleLoadNextMatch}
+              >
+                다음 경기 슬롯
+              </Button>
+            </div>
+          </div>
+        ) : null}
 
         <div className='mt-4 grid gap-3 md:grid-cols-2'>
           {stageDef.fields.map((field) => {
@@ -445,9 +643,27 @@ function ArcadeOpsControlPage() {
           })}
         </div>
 
+        {winnerOptions.length > 0 ? (
+          <div className='mt-3 rounded-lg border border-white/10 bg-black/25 p-3'>
+            <p className='text-xs text-white/60'>승자 빠른 선택</p>
+            <div className='mt-2 flex flex-wrap gap-2'>
+              {winnerOptions.map((option) => (
+                <Button
+                  key={option.entryId}
+                  size='sm'
+                  variant='outline'
+                  onClick={() => setDraftField('winnerEntryId', option.entryId)}
+                >
+                  {option.nickname || option.entryId}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className='mt-4 flex flex-wrap gap-2'>
           <Button onClick={handleSaveRow} disabled={isSaving}>
-            {isSaving ? '저장 중...' : 'DB 저장'}
+            {isSaving ? '저장 중..' : 'DB 저장'}
           </Button>
           <Button
             variant='outline'
@@ -461,9 +677,9 @@ function ArcadeOpsControlPage() {
 
       <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
         <div className='space-y-1.5'>
-          <h2 className='text-base font-bold text-white'>내보내기</h2>
+          <h2 className='text-base font-bold text-white'>송출 반영</h2>
           <p className='text-xs text-white/60'>
-            운영 DB 데이터를 검수한 뒤 홈페이지용 아카이브 시트로 반영합니다.
+            경기 종료 직후 현재 지역만 송출하면, 방송/제어 페이지가 실시간으로 최신 결과를 반영합니다.
           </p>
         </div>
 
@@ -473,20 +689,20 @@ function ArcadeOpsControlPage() {
             onClick={handleInitOpsTabs}
             disabled={isInitRunning}
           >
-            {isInitRunning ? '초기화 중...' : '운영 DB 탭 초기화'}
+            {isInitRunning ? '초기화 중..' : '운영 DB 탭 초기화'}
           </Button>
           <Button
             onClick={handleExportRegion}
             disabled={isExportRegionRunning}
           >
-            {isExportRegionRunning ? '내보내는 중...' : '선택 지역 내보내기'}
+            {isExportRegionRunning ? '송출 중..' : '이번 주 지역 송출'}
           </Button>
           <Button
             variant='secondary'
             onClick={handleExportAll}
             disabled={isExportAllRunning}
           >
-            {isExportAllRunning ? '내보내는 중...' : '시즌 전체 내보내기'}
+            {isExportAllRunning ? '송출 중..' : '시즌 전체 송출'}
           </Button>
         </div>
       </section>
@@ -495,7 +711,7 @@ function ArcadeOpsControlPage() {
         <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
           <div className='flex items-center justify-between'>
             <h3 className='text-sm font-bold text-white'>
-              {OPS_REGION_OPTIONS.find((option) => option.value === region)?.label} 최종 순위 미리보기
+              {OPS_REGION_OPTIONS.find((option) => option.value === region)?.label} 지역 순위 미리보기
             </h3>
             <span className='text-[11px] text-white/45'>
               {lastFeedAt ? `DB ${lastFeedAt} 갱신` : '갱신 대기'}
@@ -546,40 +762,34 @@ function ArcadeOpsControlPage() {
         </div>
 
         <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-          <h3 className='text-sm font-bold text-white'>현재 라운드 Swiss 매치</h3>
-          {latestSwissRound ? (
-            <>
-              <p className='mt-2 text-xs text-white/55'>
-                Round {latestSwissRound.round}
-              </p>
-              <div className='mt-3 space-y-2'>
-                {latestSwissRound.rows.map((match, index) => (
-                  <div
-                    key={`${match.round}-${match.table ?? index}`}
-                    className='rounded-lg border border-white/10 bg-black/25 px-3 py-2 text-xs'
-                  >
-                    <div className='font-semibold text-white/80'>
-                      T{match.table ?? index + 1} · {match.player1.nickname} vs{' '}
-                      {match.player2?.nickname ?? 'BYE'}
-                    </div>
-                    <div className='mt-1 text-white/55'>
-                      승자:{' '}
-                      <span className='font-medium text-white/80'>
-                        {match.winnerEntryId || '기록 대기'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <p className='mt-3 text-xs text-white/60'>
-              Swiss 매치 기록이 없습니다.
-            </p>
-          )}
+          <h3 className='text-sm font-bold text-white'>경기 진행 요약</h3>
 
-          <div className='mt-4 grid gap-2 text-xs'>
+          <div className='mt-3 grid gap-2 text-xs'>
             <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
+              <span className='text-white/55'>Swiss 진행:</span>{' '}
+              <span className='font-semibold text-white/80'>
+                {swissProgress.completed}/{swissProgress.total}
+              </span>
+            </div>
+            <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
+              <span className='text-white/55'>Top8 진행:</span>{' '}
+              <span className='font-semibold text-white/80'>
+                {finalsProgress.completed}/{finalsProgress.total}
+              </span>
+            </div>
+            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+              <span className='text-white/55'>현재 Swiss:</span>{' '}
+              <span className='font-semibold text-white/80'>
+                {matchLine(swissProgress.current)}
+              </span>
+            </div>
+            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+              <span className='text-white/55'>현재 Top8:</span>{' '}
+              <span className='font-semibold text-white/80'>
+                {matchLine(finalsProgress.current)}
+              </span>
+            </div>
+            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
               <span className='text-white/55'>A그룹:</span>{' '}
               <span className='font-semibold text-white/80'>
                 {regionArchive?.qualifiers.groupA
@@ -587,29 +797,12 @@ function ArcadeOpsControlPage() {
                   : '미확정'}
               </span>
             </div>
-            <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
+            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
               <span className='text-white/55'>B그룹:</span>{' '}
               <span className='font-semibold text-white/80'>
                 {regionArchive?.qualifiers.groupB
                   ? `${regionArchive.qualifiers.groupB.nickname} (${regionArchive.qualifiers.groupB.entryId})`
                   : '미확정'}
-              </span>
-            </div>
-            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-              <span className='text-white/55'>결선 매치 데이터:</span>{' '}
-              <span className='font-semibold text-white/80'>
-                {archive.finals.crossMatches.length}경기
-              </span>
-            </div>
-            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-              <span className='text-white/55'>결선 승자 입력:</span>{' '}
-              <span className='font-semibold text-white/80'>
-                {
-                  archive.finals.crossMatches.filter(
-                    (row) => Boolean(row.winnerEntryId)
-                  ).length
-                }
-                경기
               </span>
             </div>
           </div>

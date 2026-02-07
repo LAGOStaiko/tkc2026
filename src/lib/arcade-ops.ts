@@ -1,4 +1,10 @@
-import type { ArcadeRegionArchive, ArcadeStandingRow } from './arcade-results-archive'
+import type {
+  ArcadeFinalCrossMatch,
+  ArcadeRegionArchive,
+  ArcadeSeasonArchive,
+  ArcadeStandingRow,
+  ArcadeSwissMatch,
+} from './arcade-results-archive'
 
 export type OpsRegionKey = 'seoul' | 'daejeon' | 'gwangju' | 'busan'
 
@@ -380,4 +386,284 @@ export function buildRegionFinalRanking(region: ArcadeRegionArchive): OpsRegionF
   }
 
   return rows.sort((a, b) => a.rank - b.rank)
+}
+
+export type OpsRegionWeekStatus = {
+  key: OpsRegionKey
+  label: string
+  weekNo: number
+  onlineEntries: number
+  swissTotal: number
+  swissCompleted: number
+  qualifierCount: number
+  status: 'pending' | 'live' | 'done'
+}
+
+export type OpsProgressMatch = {
+  id: string
+  stage: 'swiss' | 'finals'
+  label: string
+  leftName: string
+  leftEntryId: string
+  rightName: string
+  rightEntryId: string
+  winnerEntryId?: string
+  note?: string
+}
+
+export type OpsProgressSummary = {
+  total: number
+  completed: number
+  current?: OpsProgressMatch
+  next?: OpsProgressMatch
+  previous?: OpsProgressMatch
+}
+
+function numToDraft(value?: number) {
+  return typeof value === 'number' && Number.isFinite(value) ? String(value) : ''
+}
+
+function countQualifiers(region: ArcadeRegionArchive) {
+  let count = 0
+  if (region.qualifiers.groupA?.entryId) count += 1
+  if (region.qualifiers.groupB?.entryId) count += 1
+  return count
+}
+
+function regionHasStarted(region: ArcadeRegionArchive) {
+  return (
+    region.onlineRows.length > 0 ||
+    region.swissMatches.length > 0 ||
+    region.swissStandings.length > 0 ||
+    region.deciderRows.length > 0 ||
+    region.seedingRows.length > 0 ||
+    countQualifiers(region) > 0
+  )
+}
+
+function sortSwissMatches(rows: ArcadeSwissMatch[]) {
+  return rows
+    .slice()
+    .sort((a, b) => (a.round - b.round) || ((a.table ?? 0) - (b.table ?? 0)))
+}
+
+function sortFinalMatches(rows: ArcadeFinalCrossMatch[]) {
+  return rows.slice().sort((a, b) => a.matchNo - b.matchNo)
+}
+
+function toSwissProgressMatch(match: ArcadeSwissMatch): OpsProgressMatch {
+  return {
+    id: `swiss-${match.round}-${match.table ?? 0}`,
+    stage: 'swiss',
+    label: `R${match.round} T${match.table ?? '-'}`,
+    leftName: match.player1.nickname || match.player1.entryId || 'P1',
+    leftEntryId: match.player1.entryId || '',
+    rightName: match.player2?.nickname || (match.bye ? 'BYE' : 'P2'),
+    rightEntryId: match.player2?.entryId || '',
+    winnerEntryId: match.winnerEntryId,
+    note: match.note,
+  }
+}
+
+function toFinalProgressMatch(match: ArcadeFinalCrossMatch): OpsProgressMatch {
+  return {
+    id: `final-${match.matchNo}`,
+    stage: 'finals',
+    label: `Top8 M${match.matchNo}`,
+    leftName: match.left.nickname || match.left.entryId || 'LEFT',
+    leftEntryId: match.left.entryId || '',
+    rightName: match.right.nickname || match.right.entryId || 'RIGHT',
+    rightEntryId: match.right.entryId || '',
+    winnerEntryId: match.winnerEntryId,
+    note: match.note,
+  }
+}
+
+function buildProgressSummary(items: OpsProgressMatch[]): OpsProgressSummary {
+  const total = items.length
+  const completed = items.filter((item) => Boolean(item.winnerEntryId)).length
+  const currentIndex = items.findIndex((item) => !item.winnerEntryId)
+
+  if (currentIndex < 0) {
+    return {
+      total,
+      completed,
+      previous: items.length > 0 ? items[items.length - 1] : undefined,
+    }
+  }
+
+  let previous: OpsProgressMatch | undefined
+  for (let i = currentIndex - 1; i >= 0; i -= 1) {
+    if (items[i].winnerEntryId) {
+      previous = items[i]
+      break
+    }
+  }
+
+  return {
+    total,
+    completed,
+    current: items[currentIndex],
+    next: items[currentIndex + 1],
+    previous,
+  }
+}
+
+export function buildRegionWeekStatuses(archive: ArcadeSeasonArchive): OpsRegionWeekStatus[] {
+  const regionByKey = new Map(archive.regions.map((region) => [region.key, region]))
+
+  return OPS_REGION_OPTIONS.map((option, index) => {
+    const region = regionByKey.get(option.value)
+    if (!region) {
+      return {
+        key: option.value,
+        label: option.label,
+        weekNo: index + 1,
+        onlineEntries: 0,
+        swissTotal: 0,
+        swissCompleted: 0,
+        qualifierCount: 0,
+        status: 'pending' as const,
+      }
+    }
+
+    const qualifierCount = countQualifiers(region)
+    const swissTotal = region.swissMatches.length
+    const swissCompleted = region.swissMatches.filter((row) => Boolean(row.winnerEntryId)).length
+    const status = qualifierCount >= 2
+      ? 'done'
+      : (regionHasStarted(region) ? 'live' : 'pending')
+
+    return {
+      key: option.value,
+      label: option.label,
+      weekNo: index + 1,
+      onlineEntries: region.onlineRows.length,
+      swissTotal,
+      swissCompleted,
+      qualifierCount,
+      status,
+    }
+  })
+}
+
+export function buildSwissProgress(region?: ArcadeRegionArchive): OpsProgressSummary {
+  if (!region) return { total: 0, completed: 0 }
+  const items = sortSwissMatches(region.swissMatches).map(toSwissProgressMatch)
+  return buildProgressSummary(items)
+}
+
+export function buildFinalsProgress(archive: ArcadeSeasonArchive): OpsProgressSummary {
+  const items = sortFinalMatches(archive.finals.crossMatches).map(toFinalProgressMatch)
+  return buildProgressSummary(items)
+}
+
+export function buildSwissDraftFromMatch(match: ArcadeSwissMatch): Record<string, string> {
+  const game1 = match.games[0]
+  const game2 = match.games[1]
+  const game3 = match.games[2]
+
+  return {
+    round: numToDraft(match.round),
+    table: numToDraft(match.table),
+    highSeedEntryId: match.highSeedEntryId ?? '',
+    p1EntryId: match.player1.entryId ?? '',
+    p1Nickname: match.player1.nickname ?? '',
+    p1Seed: numToDraft(match.player1.seed),
+    p2EntryId: match.player2?.entryId ?? '',
+    p2Nickname: match.player2?.nickname ?? '',
+    p2Seed: numToDraft(match.player2?.seed),
+    song1: game1?.song ?? '',
+    level1: game1?.level ?? '',
+    p1Score1: numToDraft(game1?.p1Score),
+    p2Score1: numToDraft(game1?.p2Score),
+    song2: game2?.song ?? '',
+    level2: game2?.level ?? '',
+    p1Score2: numToDraft(game2?.p1Score),
+    p2Score2: numToDraft(game2?.p2Score),
+    song3: game3?.song ?? '',
+    level3: game3?.level ?? '',
+    p1Score3: numToDraft(game3?.p1Score),
+    p2Score3: numToDraft(game3?.p2Score),
+    winnerEntryId: match.winnerEntryId ?? '',
+    tieBreakerSong: match.tieBreakerSong ?? '',
+    bye: match.bye ? 'true' : 'false',
+    note: match.note ?? '',
+  }
+}
+
+export function buildCurrentSwissMatchDraft(
+  region?: ArcadeRegionArchive
+): Record<string, string> | null {
+  if (!region) return null
+  const current = sortSwissMatches(region.swissMatches).find((row) => !row.winnerEntryId)
+  return current ? buildSwissDraftFromMatch(current) : null
+}
+
+export function buildNextSwissMatchDraft(region?: ArcadeRegionArchive): Record<string, string> {
+  if (!region || region.swissMatches.length === 0) {
+    return {
+      round: '1',
+      table: '1',
+      bye: 'false',
+    }
+  }
+
+  const sorted = sortSwissMatches(region.swissMatches)
+  const current = sorted.find((row) => !row.winnerEntryId)
+  if (current) return buildSwissDraftFromMatch(current)
+
+  const last = sorted[sorted.length - 1]
+  const nextTable = (last.table ?? sorted.length) + 1
+
+  return {
+    round: String(last.round),
+    table: String(nextTable),
+    bye: 'false',
+  }
+}
+
+export function buildFinalMatchDraftFromMatch(
+  match: ArcadeFinalCrossMatch
+): Record<string, string> {
+  return {
+    matchNo: numToDraft(match.matchNo),
+    leftSeed: numToDraft(match.left.seed),
+    leftRegion: match.left.regionKey,
+    leftRegionLabel: match.left.regionLabel ?? '',
+    leftEntryId: match.left.entryId ?? '',
+    leftNickname: match.left.nickname ?? '',
+    rightSeed: numToDraft(match.right.seed),
+    rightRegion: match.right.regionKey,
+    rightRegionLabel: match.right.regionLabel ?? '',
+    rightEntryId: match.right.entryId ?? '',
+    rightNickname: match.right.nickname ?? '',
+    winnerEntryId: match.winnerEntryId ?? '',
+    note: match.note ?? '',
+  }
+}
+
+export function buildCurrentFinalMatchDraft(
+  archive: ArcadeSeasonArchive
+): Record<string, string> | null {
+  const current = sortFinalMatches(archive.finals.crossMatches).find(
+    (row) => !row.winnerEntryId
+  )
+  return current ? buildFinalMatchDraftFromMatch(current) : null
+}
+
+export function buildNextFinalMatchDraft(
+  archive: ArcadeSeasonArchive
+): Record<string, string> {
+  const sorted = sortFinalMatches(archive.finals.crossMatches)
+  const current = sorted.find((row) => !row.winnerEntryId)
+  if (current) return buildFinalMatchDraftFromMatch(current)
+
+  const nextNo = sorted.length > 0
+    ? Math.max(...sorted.map((row) => row.matchNo)) + 1
+    : 1
+
+  return {
+    matchNo: String(nextNo),
+  }
 }
