@@ -262,7 +262,7 @@ function ApplyPage() {
     const selected = [offlineSong1, offlineSong2, offlineSong3, offlineSong4]
     const currentValue = selected[currentIndex]
     const usedTitles = selected
-      .filter((s, i) => i !== currentIndex && s)
+      .filter((s, i): s is string => i !== currentIndex && !!s)
       .map((s) => parseSongTitle(s))
     return songPool.filter(
       (song) =>
