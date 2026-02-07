@@ -13,7 +13,13 @@ export type GasAction =
   | "opsUpsert"
   | "opsExport"
   | "opsInit"
-  | "opsGuide";
+  | "opsGuide"
+  | "opsSwissRebuildStandings"
+  | "opsSwissNextRound"
+  | "opsRoundClose"
+  | "opsInlineGuide"
+  | "opsBeginnerGuide"
+  | "opsFirstTimeSetup";
 
 export async function callGas(env: _Env, action: GasAction, params?: Record<string, unknown>, payload?: unknown) {
   if (!env.GAS_WEBAPP_URL) throw new Error("Missing env.GAS_WEBAPP_URL");

@@ -7,9 +7,10 @@ import {
   isArcadeRegionKey,
   resolveArcadeSeasonArchive,
   type ArcadeRegionArchive,
-  type ArcadeStandingRow,
   type ArcadeSwissMatch,
 } from '@/lib/arcade-results-archive'
+import { buildRegionFinalRanking } from '@/lib/arcade-results-ranking'
+import { formatSongLabel } from '@/content/arcade-songs'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/arcade-results/2026/$region')({
@@ -59,81 +60,6 @@ function renderParticipant(
   }
 
   return entryId
-}
-
-type RegionFinalRankRow = {
-  rank: number
-  entryId: string
-  nickname: string
-  seed?: number
-  wins?: number
-  losses?: number
-  statusLabel: string
-}
-
-function standingStatusLabel(status: ArcadeStandingRow['status']) {
-  if (status === 'qualified') return '결선 진출'
-  if (status === 'decider') return '3-1 선발전'
-  if (status === 'eliminated') return '탈락'
-  return '진행중'
-}
-
-function buildRegionFinalRanking(region: ArcadeRegionArchive): RegionFinalRankRow[] {
-  const rows: RegionFinalRankRow[] = []
-  const used = new Set<string>()
-
-  const pushRow = (
-    entryId: string | undefined,
-    statusLabel: string,
-    forcedRank?: number,
-    nicknameOverride?: string
-  ) => {
-    if (!entryId || used.has(entryId)) return
-    const standing = region.swissStandings.find((row) => row.entryId === entryId)
-    const online = region.onlineRows.find((row) => row.entryId === entryId)
-    rows.push({
-      rank: forcedRank ?? rows.length + 1,
-      entryId,
-      nickname: nicknameOverride ?? standing?.nickname ?? online?.nickname ?? entryId,
-      seed: standing?.seed,
-      wins: standing?.wins,
-      losses: standing?.losses,
-      statusLabel,
-    })
-    used.add(entryId)
-  }
-
-  const qualifierA = region.qualifiers.groupA ?? region.seedingRows.find((row) => row.rank === 1)
-  const qualifierB = region.qualifiers.groupB ?? region.seedingRows.find((row) => row.rank === 2)
-
-  pushRow(qualifierA?.entryId, '지역 1위 (A그룹)', 1, qualifierA?.nickname)
-  pushRow(qualifierB?.entryId, '지역 2위 (B그룹)', 2, qualifierB?.nickname)
-
-  const standings = [...region.swissStandings].sort((a, b) => {
-    if (b.wins !== a.wins) return b.wins - a.wins
-    if (a.losses !== b.losses) return a.losses - b.losses
-    return a.seed - b.seed
-  })
-
-  standings.forEach((standing) => {
-    pushRow(
-      standing.entryId,
-      standingStatusLabel(standing.status),
-      undefined,
-      standing.nickname
-    )
-  })
-
-  if (rows.length === 0) {
-    region.onlineRows
-      .slice()
-      .sort((a, b) => a.rank - b.rank)
-      .forEach((row) => {
-        pushRow(row.entryId, '온라인 예선 순위', row.rank, row.nickname)
-      })
-  }
-
-  return rows.sort((a, b) => a.rank - b.rank)
 }
 
 function SwissRoundCard({
@@ -362,7 +288,7 @@ function ArcadeRegionDetailPage() {
           <div className='space-y-3'>
             <div className='flex flex-wrap items-baseline gap-x-2 gap-y-0.5'>
               <span className='text-sm font-bold text-white'>3-1 추가 진출자 선발전</span>
-              <span className='text-xs text-white/45'>大空と太鼓の踊り (Lv.9)</span>
+              <span className='text-xs text-white/45'>{formatSongLabel('decider31')}</span>
             </div>
 
             {sortedDeciderRows.length === 0 ? (
@@ -406,7 +332,7 @@ function ArcadeRegionDetailPage() {
           <div className='space-y-3'>
             <div className='flex flex-wrap items-baseline gap-x-2 gap-y-0.5'>
               <span className='text-sm font-bold text-white'>결선 시드 배정전</span>
-              <span className='text-xs text-white/45'>タイコロール (Lv.10)</span>
+              <span className='text-xs text-white/45'>{formatSongLabel('seeding')}</span>
             </div>
 
             {sortedSeedingRows.length === 0 ? (

@@ -173,6 +173,7 @@ function ArcadeOpsControlPage() {
   const [isGuideRunning, setIsGuideRunning] = useState(false)
   const [isExportRegionRunning, setIsExportRegionRunning] = useState(false)
   const [isExportAllRunning, setIsExportAllRunning] = useState(false)
+  const [exportReplaceMode, setExportReplaceMode] = useState(false)
   const [isBulkSeeding, setIsBulkSeeding] = useState(false)
 
   const [bulkRound, setBulkRound] = useState('1')
@@ -606,17 +607,24 @@ function ArcadeOpsControlPage() {
   }
 
   const handleExportRegion = async () => {
+    if (exportReplaceMode && !confirm('해당 지역 시즌 데이터만 정리 후 재송출합니다. 결선 시트는 유지됩니다. 계속하시겠습니까?')) return
     try {
       setIsExportRegionRunning(true)
       setErrorMessage('')
       setInfoMessage('')
+      const payload: Record<string, string> = { season: season.trim() || DEFAULT_SEASON, region }
+      if (exportReplaceMode) payload.mode = 'replace'
       await requestOpsApi(
         '/api/ops/export',
         'POST',
-        { season: season.trim() || DEFAULT_SEASON, region },
+        payload,
         operatorKey
       )
-      setInfoMessage('이번 주 지역 결과를 송출용 아카이브로 반영했습니다.')
+      setInfoMessage(
+        exportReplaceMode
+          ? '이번 주 지역 결과를 클린 송출했습니다. (지역 스코프 시트만 초기화 후 재송출)'
+          : '이번 주 지역 결과를 송출용 아카이브로 반영했습니다.'
+      )
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : '지역 송출 실패')
     } finally {
@@ -643,17 +651,24 @@ function ArcadeOpsControlPage() {
     }
   }
   const handleExportAll = async () => {
+    if (exportReplaceMode && !confirm('시즌 전체 아카이브를 정리 후 재송출합니다 (결선 포함). 계속하시겠습니까?')) return
     try {
       setIsExportAllRunning(true)
       setErrorMessage('')
       setInfoMessage('')
+      const payload: Record<string, string> = { season: season.trim() || DEFAULT_SEASON, region: 'all' }
+      if (exportReplaceMode) payload.mode = 'replace'
       await requestOpsApi(
         '/api/ops/export',
         'POST',
-        { season: season.trim() || DEFAULT_SEASON, region: 'all' },
+        payload,
         operatorKey
       )
-      setInfoMessage(`시즌 ${season || DEFAULT_SEASON} 전체 송출 완료`)
+      setInfoMessage(
+        exportReplaceMode
+          ? `시즌 ${season || DEFAULT_SEASON} 전체 클린 송출 완료 (결선 포함, 고아 데이터 제거됨)`
+          : `시즌 ${season || DEFAULT_SEASON} 전체 송출 완료`
+      )
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : '전체 송출 실패')
     } finally {
@@ -1065,7 +1080,17 @@ function ArcadeOpsControlPage() {
           </p>
         </div>
 
-        <div className='mt-4 flex flex-wrap gap-2'>
+        <label className='mt-4 flex items-center gap-2 text-xs text-white/70'>
+          <input
+            type='checkbox'
+            checked={exportReplaceMode}
+            onChange={(e) => setExportReplaceMode(e.target.checked)}
+            className='accent-[#ff2a00]'
+          />
+          기존 아카이브 초기화 후 재송출 (고아 데이터 제거)
+        </label>
+
+        <div className='mt-3 flex flex-wrap gap-2'>
           <Button
             variant='outline'
             onClick={handleInitOpsTabs}

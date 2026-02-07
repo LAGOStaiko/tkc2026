@@ -1,4 +1,6 @@
-﻿const REGION_DEFINITIONS = [
+﻿import { formatSongLabel } from '@/content/arcade-songs'
+
+const REGION_DEFINITIONS = [
   { key: 'seoul', label: '1차 서울', shortLabel: '서울' },
   { key: 'daejeon', label: '2차 대전', shortLabel: '대전' },
   { key: 'gwangju', label: '3차 광주', shortLabel: '광주' },
@@ -489,10 +491,10 @@ function buildEmptyArchive(): ArcadeSeasonArchive {
     season: '2026',
     title: '아케이드 예선 아카이브',
     songs: {
-      online1: 'うそうそ時 (Lv.8)',
-      online2: '輝きを求めて (Lv.8)',
-      decider31: '大空と太鼓の踊り (Lv.9)',
-      seeding: 'タイコロール (Lv.10)',
+      online1: formatSongLabel('online1'),
+      online2: formatSongLabel('online2'),
+      decider31: formatSongLabel('decider31'),
+      seeding: formatSongLabel('seeding'),
     },
     regions: REGION_DEFINITIONS.map((region) => buildEmptyRegion(region.key)),
     finals: {

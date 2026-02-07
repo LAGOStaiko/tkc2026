@@ -7,6 +7,7 @@ import { ChevronDown, Download } from 'lucide-react'
 import { t } from '@/text'
 import { toast } from 'sonner'
 import { useRegister, useSite } from '@/lib/api'
+import { parseSongOption, parseSongTitle } from '@/content/swiss-song-pool'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -256,14 +257,16 @@ function ApplyPage() {
   const submitError = registerMutation.error ? t('apply.submitFailed') : null
   const turnstileFieldError = form.formState.errors.turnstileToken?.message
 
-  // Get available songs for each selector, filtering out songs already selected in other selectors
+  // Get available songs for each selector, filtering out songs with the same title already selected
   const getAvailableSongs = (currentIndex: number) => {
     const selected = [offlineSong1, offlineSong2, offlineSong3, offlineSong4]
     const currentValue = selected[currentIndex]
+    const usedTitles = selected
+      .filter((s, i) => i !== currentIndex && s)
+      .map((s) => parseSongTitle(s))
     return songPool.filter(
       (song) =>
-        song === currentValue ||
-        !selected.some((s, i) => i !== currentIndex && s === song)
+        song === currentValue || !usedTitles.includes(parseSongTitle(song))
     )
   }
 
@@ -692,7 +695,7 @@ function ApplyPage() {
                                     <SelectContent>
                                       {getAvailableSongs(index).map((song) => (
                                         <SelectItem key={song} value={song}>
-                                          {song}
+                                          {parseSongOption(song)?.label ?? song}
                                         </SelectItem>
                                       ))}
                                     </SelectContent>

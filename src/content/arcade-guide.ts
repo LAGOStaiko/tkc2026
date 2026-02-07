@@ -1,3 +1,5 @@
+import { ARCADE_SONGS } from './arcade-songs'
+
 export type ArcadeSection = {
   sectionKey:
     | 'atAGlance'
@@ -47,8 +49,8 @@ export const FALLBACK_ARCADE_SECTIONS: ArcadeSection[] = [
 
 | 과제곡 | 난이도 |
 |---|---|
-| うそうそ時 | Lv.8 |
-| 輝きを求めて | Lv.8 |
+| ${ARCADE_SONGS.online1.title} | Lv.${ARCADE_SONGS.online1.level} |
+| ${ARCADE_SONGS.online2.title} | Lv.${ARCADE_SONGS.online2.level} |
 
 ## 선발
 
@@ -96,7 +98,7 @@ Swiss 종료 후 3-1 참가자끼리 추가 선발전을 진행합니다.
 
 | 과제곡 | 난이도 | 결과 |
 |---|---|---|
-| 大空と太鼓の踊り | Lv.9 | 최고 점수 1명 결선 진출 |
+| ${ARCADE_SONGS.decider31.title} | Lv.${ARCADE_SONGS.decider31.level} | 최고 점수 1명 결선 진출 |
 
 ## 결선 시드 배정전
 
@@ -104,7 +106,7 @@ Swiss 종료 후 3-1 참가자끼리 추가 선발전을 진행합니다.
 
 | 과제곡 | 난이도 | 목적 |
 |---|---|---|
-| タイコロール | Lv.10 | A/B 그룹 내 시드 순위 산정 |`,
+| ${ARCADE_SONGS.seeding.title} | Lv.${ARCADE_SONGS.seeding.level} | A/B 그룹 내 시드 순위 산정 |`,
   },
   {
     sectionKey: 'finals',

@@ -217,14 +217,110 @@ function initializeArchiveTabs() {
   return handleInitSheets_({ scope: 'archive' });
 }
 
-var API_CACHE_VERSION_ = '2026-02-06';
+var API_CACHE_VERSION_ = '2026-02-07';
 var CONTENT_PAGE_KEYS_ = ['home', 'console', 'arcade', 'contact'];
+var OPS_FEED_REGION_KEYS_ = ['', 'seoul', 'daejeon', 'gwangju', 'busan'];
+var OPS_FEED_SEASON_KEYS_ = ['2026'];
+var ARCADE_SONGS_ = {
+  online1: 'うそうそ時 (Lv.8)',
+  online2: '輝きを求めて (Lv.8)',
+  decider31: '大空と太鼓の踊り (Lv.9)',
+  seeding: 'タイコロール (Lv.10)'
+};
+
+var SWISS_SONG_POOL_ = [
+  { title: 'きみのあかり', oni: 5, ura: 8 },
+  { title: '鏡の国のアリス', oni: 6, ura: 8 },
+  { title: 'タイムトラベラー', oni: 6 },
+  { title: 'ナツモノ☆', oni: 6 },
+  { title: 'Growing Up', oni: 6 },
+  { title: '虹色・夢色・太鼓色', oni: 6 },
+  { title: '想いを手に願いを込めて', oni: 7 },
+  { title: 'さいたま2000', oni: 7 },
+  { title: 'Mood Swing', oni: 7 },
+  { title: 'Aloft in the wind', oni: 7 },
+  { title: 'Emma', oni: 7 },
+  { title: 'Hello, Worldooon!!', oni: 7 },
+  { title: 'Fly again!', oni: 7 },
+  { title: 'フリフリ♪ノリノリ♪', oni: 7, ura: 9 },
+  { title: '願いはエスペラント', oni: 7 },
+  { title: 'ねぇ教えて', oni: 7 },
+  { title: '駄々っ子モンスター', oni: 7 },
+  { title: 'ゴーゴー・キッチン', oni: 7 },
+  { title: 'Fly away', oni: 7 },
+  { title: '季曲', oni: 7, ura: 8 },
+  { title: '黒神クロニクル', oni: 7 },
+  { title: 'スポーツダイジェスドン', oni: 7, ura: 9 },
+  { title: '伝説の祭り', oni: 7 },
+  { title: 'メカデス。', oni: 7 },
+  { title: 'カラメルタイム☆', oni: 8 },
+  { title: '東京特許キョ許可局局長!!', oni: 8 },
+  { title: 'Phantom Rider', oni: 8, ura: 9 },
+  { title: '月影SASURAI', oni: 8, ura: 9 },
+  { title: '化物月夜', oni: 8 },
+  { title: 'エリンギのエクボ', oni: 8 },
+  { title: 'オレサマパイレーツ', oni: 8 },
+  { title: 'Amanda', oni: 8 },
+  { title: 'Donder Time', oni: 8 },
+  { title: "The Magician's Dream", oni: 8 },
+  { title: 'エンジェル ドリーム', oni: 8 },
+  { title: 'Day by Day!', oni: 8 },
+  { title: 'がしゃどくろ', oni: 8 },
+  { title: '恋幻想(Love Fantasy)', oni: 8 },
+  { title: 'めたるぽりす', oni: 9, ura: 9 },
+  { title: '氷竜 ～Kooryu～', oni: 9 },
+  { title: 'ユースフルコースター', oni: 9 },
+  { title: 'よくでる2000', oni: 9 },
+  { title: '少女の神の粒子', oni: 9 },
+  { title: "GO GET'EM!", oni: 9, ura: 9 },
+  { title: 'Turquoise Tachometer', oni: 9 },
+  { title: 'DIMENSIONS', oni: 9 },
+  { title: '女帝 ～インバラトゥーラ～', oni: 9 },
+  { title: 'Amber Light', oni: 9 },
+  { title: '電子ドラムの達人', oni: 9 },
+  { title: 'Solitude Star', oni: 9 },
+  { title: 'パラレルロリポップ', oni: 9 },
+  { title: '初音ミクの消失‐劇場版‐', oni: 9 },
+  { title: '歌劇「リコレクトブルー', oni: 9 },
+  { title: 'リトルホワイトウィッチ', oni: 9 },
+  { title: '天妖ノ舞', oni: 9 },
+  { title: '秋竜 ～Shiuryu～', oni: 9 },
+  { title: '魔方陣 ‐サモン・デルタ‐', oni: 9 },
+  { title: '亜空間遊泳ac12.5', oni: 9 },
+  { title: 'はやさいたま2000', oni: 9 },
+  { title: 'EDY ‐エレクトリカルダンシングヨガ‐', oni: 9 },
+  { title: 'メヌエット', oni: 9 },
+  { title: 'いっそこのままで', oni: 9 },
+  { title: 'サラえる', oni: 9 },
+  { title: '凛', oni: 9 },
+  { title: '太鼓乱舞 皆伝', oni: 8 },
+  { title: '黄泉のイザナミ', oni: 8 },
+  { title: 'LOVE戦!!', oni: 8, ura: 9 },
+  { title: 'Choco Chiptune.', oni: 8 },
+  { title: 'クルクルクロックル', oni: 8 },
+  { title: '夢色コースター', oni: 8 }
+];
+
+function buildArcadeSongPoolOptions_() {
+  var options = [];
+  for (var i = 0; i < SWISS_SONG_POOL_.length; i++) {
+    var s = SWISS_SONG_POOL_[i];
+    options.push(s.title + '|oni|' + s.oni);
+    if (s.ura) options.push(s.title + '|ura|' + s.ura);
+  }
+  return options;
+}
 
 function getApiCacheKey_(action, params) {
   var base = 'tkc2026:' + API_CACHE_VERSION_ + ':' + String(action || '').trim();
   if (action === 'content') {
     var page = params && params.page ? String(params.page).trim().toLowerCase() : '';
     return base + ':' + page;
+  }
+  if (action === 'opsFeed') {
+    var season = params && params.season ? String(params.season).trim() : '2026';
+    var region = params && params.region ? String(params.region).trim().toLowerCase() : '';
+    return base + ':' + season + ':' + region;
   }
   return base;
 }
@@ -234,6 +330,7 @@ function getApiCacheTtlSec_(action) {
   if (action === 'content') return 180;   // 3m
   if (action === 'schedule') return 90;   // 90s
   if (action === 'results') return 20;    // 20s (results update sensitivity)
+  if (action === 'opsFeed') return 15;    // 15s (ops 라이브 데이터, 폴링 빈도 대응)
   return 60;
 }
 
@@ -272,6 +369,11 @@ function getApiCacheKeys_() {
   for (var i = 0; i < CONTENT_PAGE_KEYS_.length; i++) {
     keys.push(getApiCacheKey_('content', { page: CONTENT_PAGE_KEYS_[i] }));
   }
+  for (var s = 0; s < OPS_FEED_SEASON_KEYS_.length; s++) {
+    for (var j = 0; j < OPS_FEED_REGION_KEYS_.length; j++) {
+      keys.push(getApiCacheKey_('opsFeed', { season: OPS_FEED_SEASON_KEYS_[s], region: OPS_FEED_REGION_KEYS_[j] }));
+    }
+  }
   return keys;
 }
 
@@ -289,6 +391,27 @@ function purgeApiCache_() {
       removed: keys.length
     }
   };
+}
+
+/**
+ * opsFeed 캐시만 시즌/지역 기준으로 삭제.
+ * season 미지정 시 OPS_FEED_SEASON_KEYS_ 전체, region 미지정 시 전 지역 삭제.
+ */
+function purgeOpsFeedCache_(season, region) {
+  var cache = CacheService.getScriptCache();
+  var seasons = season ? [String(season).trim()] : OPS_FEED_SEASON_KEYS_;
+  var regions = region ? ['', String(region).trim().toLowerCase()] : OPS_FEED_REGION_KEYS_;
+  var keys = [];
+  for (var s = 0; s < seasons.length; s++) {
+    for (var r = 0; r < regions.length; r++) {
+      keys.push(getApiCacheKey_('opsFeed', { season: seasons[s], region: regions[r] }));
+    }
+  }
+  try {
+    cache.removeAll(keys);
+  } catch (err) {
+    for (var i = 0; i < keys.length; i++) cache.remove(keys[i]);
+  }
 }
 
 function resolveScope_(params, fallback) {
@@ -1484,12 +1607,7 @@ function buildArcadeArchive2026_() {
   return {
     season: season,
     title: '아케이드 예선 아카이브',
-    songs: {
-      online1: 'うそうそ時 (Lv.8)',
-      online2: '輝きを求めて (Lv.8)',
-      decider31: '大空と太鼓の踊り (Lv.9)',
-      seeding: 'タイコロール (Lv.10)'
-    },
+    songs: ARCADE_SONGS_,
     regions: regions,
     finals: {
       groupASeeds: groupASeeds,
@@ -1532,7 +1650,8 @@ function handleSite_() {
     applyNotice: String(map.applyNotice || ''),
     footerInfoMd: String(map.footerInfoMd || ''),
     rulesLastUpdated: String(map.rulesLastUpdated || ''),
-    partners: partnersRows
+    partners: partnersRows,
+    arcadeSongPool: buildArcadeSongPoolOptions_()
   };
 
   return { ok: true, data: data };
@@ -1817,12 +1936,32 @@ function doPost(e) {
     if (action === 'opsInlineGuide') return json_(handleOpsInlineGuide_(params));
     if (action === 'opsBeginnerGuide') return json_(handleOpsBeginnerGuide_(params));
     if (action === 'opsFirstTimeSetup') return json_(handleOpsFirstTimeSetup_(payload || params));
-    if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
-    if (action === 'opsSwissRebuildStandings') return json_(handleOpsSwissRebuildStandings_(payload || params));
-    if (action === 'opsExport') return json_(handleOpsExport_(payload || params));
-    if (action === 'opsFeed') return json_(handleOpsFeed_(params));
-    if (action === 'opsSwissNextRound') return json_(handleOpsSwissNextRound_(payload || params));
-    if (action === 'opsRoundClose') return json_(handleOpsRoundClose_(payload || params));
+    if (action === 'opsUpsert') {
+      var upsertResult = handleOpsUpsert_(payload);
+      if (upsertResult.ok) { purgeApiCache_(); purgeOpsFeedCache_(); }
+      return json_(upsertResult);
+    }
+    if (action === 'opsSwissRebuildStandings') {
+      var rebuildStResult = handleOpsSwissRebuildStandings_(payload || params);
+      if (rebuildStResult.ok) { purgeApiCache_(); purgeOpsFeedCache_(); }
+      return json_(rebuildStResult);
+    }
+    if (action === 'opsExport') {
+      var exportResult = handleOpsExport_(payload || params);
+      if (exportResult.ok) purgeOpsFeedCache_();
+      return json_(exportResult);
+    }
+    if (action === 'opsFeed') return json_(executeCachedAction_('opsFeed', params, function() { return handleOpsFeed_(params); }));
+    if (action === 'opsSwissNextRound') {
+      var nextRoundResult = handleOpsSwissNextRound_(payload || params);
+      if (nextRoundResult.ok) { purgeApiCache_(); purgeOpsFeedCache_(); }
+      return json_(nextRoundResult);
+    }
+    if (action === 'opsRoundClose') {
+      var roundCloseResult = handleOpsRoundClose_(payload || params);
+      if (roundCloseResult.ok) purgeOpsFeedCache_();
+      return json_(roundCloseResult);
+    }
     if (action === 'purgeCache') return json_(purgeApiCache_());
     if (action === 'register') return json_(handleRegister_(payload));
 
@@ -1839,12 +1978,17 @@ function doPost(e) {
  * - opsInit   : create ops_db_* tabs
  * - opsBeginnerGuide : write a beginner-friendly runbook sheet
  * - opsFirstTimeSetup : one-click setup for first operators
- * - opsUpsert : write/update one row into ops_db_*
- * - opsSwissRebuildStandings : rebuild ops_db_swiss_standings from match results
- * - opsExport : copy ops_db_* -> arcade_archive_* (incremental upsert)
- * - opsFeed   : build archive payload from ops_db_* for broadcast/control pages
- * - opsSwissNextRound : generate next swiss round pairings (with BYE)
- * - opsRoundClose     : opsSwissNextRound + opsExport in one call
+ * - opsUpsert : write/update one row into ops_db_*  → purgeApiCache_ + purgeOpsFeedCache_
+ * - opsSwissRebuildStandings : rebuild swiss_standings → purgeApiCache_ + purgeOpsFeedCache_
+ * - opsExport : copy ops_db_* -> arcade_archive_*   → purgeApiCache_ (내부) + purgeOpsFeedCache_
+ * - opsFeed   : build archive payload (executeCachedAction_ 래핑, 15s TTL, season:region 키)
+ * - opsSwissNextRound : generate next swiss round    → purgeApiCache_ + purgeOpsFeedCache_
+ * - opsRoundClose     : rebuild + nextRound + export → purgeOpsFeedCache_ (내부 + doPost)
+ *
+ * Cache invalidation:
+ * - purgeApiCache_()      : 전체 캐시(site/content/schedule/results/opsFeed) 정적 키 삭제
+ * - purgeOpsFeedCache_(season, region) : opsFeed 캐시만 시즌/지역 기준 타겟 삭제
+ * - 모든 mutation 성공 시 두 함수를 함께 호출하여 캐시 정합성 보장
  *
  * Required existing helpers from your current Code.gs:
  * - getSs_()
@@ -2648,6 +2792,26 @@ function clearOpsRowsBySeasonRegion_(sheet, headers, season, region) {
   return cleared;
 }
 
+function clearRowsBySeason_(sheet, headers, season) {
+  var seasonIdx = headers.indexOf('season');
+  if (seasonIdx < 0) return 0;
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return 0;
+
+  var data = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+  var cleared = 0;
+
+  for (var i = data.length - 1; i >= 0; i--) {
+    if (trim_(data[i][seasonIdx]) === season) {
+      sheet.getRange(i + 2, 1, 1, headers.length).clearContent();
+      cleared++;
+    }
+  }
+
+  return cleared;
+}
+
 function buildSwissSeedNicknameStatusMap_(season, region) {
   var map = {};
   var standingsRows = getOpsRowsBySeasonRegion_('ops_db_swiss_standings', season, region);
@@ -3305,6 +3469,9 @@ function handleOpsRoundClose_(payload) {
     }
   }
 
+  // exportArchive=false 경로에서도 opsFeed 캐시 무효화 보장
+  purgeOpsFeedCache_(season, region);
+
   appendOpsEvent_(
     'roundClose',
     swissResult.data.season,
@@ -3338,6 +3505,9 @@ function handleOpsExport_(payload) {
     if (!region) return { ok: false, error: 'region 값이 올바르지 않습니다.' };
   }
 
+  var mode = trim_(payload.mode || 'upsert').toLowerCase();
+  if (mode !== 'replace') mode = 'upsert';
+
   var exportDefs = [
     { from: 'ops_db_online', to: 'arcade_archive_online', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
     { from: 'ops_db_swiss_matches', to: 'arcade_archive_swiss_matches', keyFields: ['season', 'region', 'round', 'table'], regionScoped: true },
@@ -3359,6 +3529,7 @@ function handleOpsExport_(payload) {
   var ss = getSs_();
   var resultSheets = [];
   var totalWritten = 0;
+  var totalCleared = 0;
 
   for (var i = 0; i < exportDefs.length; i++) {
     var def = exportDefs[i];
@@ -3370,6 +3541,26 @@ function handleOpsExport_(payload) {
 
     ensureSheetSchema_(ss, targetSchema.name, targetSchema.headers);
     var targetSheet = ss.getSheetByName(targetSchema.name);
+
+    // 지역 단위 replace는 지역 스코프 시트만 정리, 결선 시트는 유지
+    if (mode === 'replace') {
+      var cleared = 0;
+      if (region !== 'all') {
+        // 지역 replace: regionScoped 시트만 정리, finals(regionScoped=false)는 건드리지 않음
+        if (def.regionScoped) {
+          cleared = clearOpsRowsBySeasonRegion_(targetSheet, targetSchema.headers, season, region);
+        }
+      } else {
+        // 전체 replace: 모든 시트(region-scoped + finals) 시즌 행 정리
+        if (def.regionScoped) {
+          cleared = clearOpsRowsBySeasonRegion_(targetSheet, targetSchema.headers, season, '');
+        } else {
+          cleared = clearRowsBySeason_(targetSheet, targetSchema.headers, season);
+        }
+      }
+      totalCleared += cleared;
+    }
+
     var written = 0;
 
     for (var r = 0; r < rows.length; r++) {
@@ -3390,12 +3581,16 @@ function handleOpsExport_(payload) {
     try { purgeApiCache_(); } catch (err) {}
   }
 
+  var clearedScope = mode === 'replace'
+    ? (region !== 'all' ? 'regionScopedOnly' : 'seasonAll')
+    : 'none';
+
   appendOpsEvent_(
     'export',
     season,
     region,
     '',
-    'exported rows=' + totalWritten
+    'mode=' + mode + ', scope=' + clearedScope + ', exported rows=' + totalWritten + (mode === 'replace' ? ', cleared=' + totalCleared : '')
   );
 
   return {
@@ -3403,8 +3598,11 @@ function handleOpsExport_(payload) {
     data: {
       season: season,
       region: region,
+      mode: mode,
+      clearedScope: clearedScope,
       totalSheets: resultSheets.length,
       totalRows: totalWritten,
+      totalCleared: totalCleared,
       sheets: resultSheets
     }
   };
@@ -3640,12 +3838,7 @@ function buildArcadeArchiveFromOps_(params) {
   return {
     season: season,
     title: '아케이드 운영 DB 송출',
-    songs: {
-      online1: 'うそうそ時 (Lv.8)',
-      online2: '輝きを求めて (Lv.8)',
-      decider31: '大空と太鼓の踊り (Lv.9)',
-      seeding: 'タイコロール (Lv.10)'
-    },
+    songs: ARCADE_SONGS_,
     regions: regions,
     finals: {
       groupASeeds: finalsA,

@@ -9,7 +9,8 @@
       "Bash(pnpm prettier:*)",
       "Bash(pnpm format:check:*)",
       "Bash(pnpm knip:*)",
-      "Bash(pnpm build:*)"
+      "Bash(pnpm build:*)",
+      "Bash(find:*)"
     ]
   }
 }

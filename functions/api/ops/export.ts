@@ -12,6 +12,10 @@ const exportSchema = z.object({
     (v) => (typeof v === "string" ? v.trim().toLowerCase() : v),
     z.enum(["all", "seoul", "daejeon", "gwangju", "busan"]).optional()
   ),
+  mode: z.preprocess(
+    (v) => (typeof v === "string" ? v.trim().toLowerCase() : v),
+    z.enum(["upsert", "replace"]).optional()
+  ),
 });
 
 export const onRequestPost = async ({ request, env }) => {
@@ -28,6 +32,7 @@ export const onRequestPost = async ({ request, env }) => {
     const payload = {
       season: parsed.data.season ?? "2026",
       region: parsed.data.region ?? "all",
+      mode: parsed.data.mode ?? "upsert",
     };
 
     const gas = await callGasJson(env, "opsExport", {}, payload);

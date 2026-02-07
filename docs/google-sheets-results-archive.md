@@ -1,5 +1,9 @@
 ﻿# Google Spreadsheet Integration for Results Archive
 
+운영 실무 문서(초심자 포함)는 아래 문서를 함께 참고하세요.
+
+- `docs/ops-operator-manual-ko.md`
+
 This project already reads data from `/api/results`.
 The `/api/results` endpoint is a Cloudflare Pages Function that proxies to Google Apps Script (`action: "results"`).
 
@@ -328,3 +332,87 @@ API actions for the same operations:
 - `/arcade-results/2026/finals` (Top 8 finals)
 
 These pages are already wired and render even if the archive tables are empty.
+
+## 8) Frontend module structure
+
+### Ranking utility (`src/lib/arcade-results-ranking.ts`)
+
+Lightweight module containing:
+- `RegionFinalRank` type
+- `standingStatusLabel()` — Korean labels for standing status
+- `buildRegionFinalRanking()` — builds the final ranking table for a region
+
+**Dependency rule:** This module only imports from `arcade-results-archive`. It must **never** import from `arcade-ops` to keep the public results page bundle separate from ops code.
+
+The public results page (`$region.tsx`) imports directly from `arcade-results-ranking`.
+Ops pages (`arcade-control`, `arcade-broadcast`) access the same functions via re-exports from `arcade-ops`.
+
+### GasAction–Apps Script sync rule (`functions/_lib/gas.ts`)
+
+The `GasAction` type union lists only actions that are called from the frontend/Netlify layer.
+Additional GAS-only actions (e.g. `initSheets`, `formatSheets`, `purgeCache`) exist in `Code.gs.full.gs` but are intentionally excluded from `GasAction` since they are only invoked from the Apps Script menu or direct API calls.
+
+When adding a new GAS action that will be called from Netlify Functions, add it to `GasAction` in `gas.ts` to maintain type safety.
+
+### Export mode (`opsExport`)
+
+`opsExport` accepts a `mode` parameter:
+- `upsert` (default): Update existing rows by key or append new rows. **Does not delete** — rows removed from `ops_db_*` remain as orphan data in `arcade_archive_*`.
+- `replace`: Clear all matching season+region rows from the archive before writing. Removes orphan data but briefly empties the archive during the operation.
+
+```json
+{
+  "action": "opsExport",
+  "payload": {
+    "season": "2026",
+    "region": "seoul",
+    "mode": "replace"
+  }
+}
+```
+
+**Protection rule — region replace vs season-all replace:**
+
+| Scope | region-scoped sheets | finals sheets (non-region) |
+|---|---|---|
+| `region !== 'all'` + `replace` | season+region rows cleared | **not touched** (protected) |
+| `region = 'all'` + `replace` | all season rows cleared | season rows cleared |
+| `upsert` (any region) | upsert only (no delete) | upsert only (no delete) |
+
+Response includes `clearedScope` field:
+- `regionScopedOnly` — region replace (finals protected)
+- `seasonAll` — full season replace (finals included)
+- `none` — upsert mode (no clearing)
+
+`opsRoundClose` uses the default `upsert` mode internally — use the manual export with `replace` when orphan cleanup is needed.
+
+**Regression checklist:**
+
+- Region + replace: finals sheets row count unchanged
+- Season-all + replace: finals sheets season rows cleared
+- Upsert (default): existing behavior unchanged
+- `opsRoundClose`: default upsert maintained
+
+### opsFeed caching
+
+`opsFeed` uses GAS `CacheService` via `executeCachedAction_` with a **15-second TTL**.
+
+**Cache key structure:** `tkc2026:<version>:opsFeed:<season>:<region>`
+- Keys are **season+region** variant: one key per season/region combination.
+- Regions: `''` (all), `seoul`, `daejeon`, `gwangju`, `busan` — Seasons: `OPS_FEED_SEASON_KEYS_` (currently `['2026']`).
+- Different seasons produce distinct cache keys, preventing cross-season data contamination.
+
+**Invalidation:**
+- `purgeApiCache_()` — deletes all static cache keys (site/content/schedule/results + all opsFeed season/region combos).
+- `purgeOpsFeedCache_(season?, region?)` — targeted helper that deletes opsFeed keys only.
+  - `season` 미지정 시 `OPS_FEED_SEASON_KEYS_` 전체 삭제, `region` 미지정 시 전 지역(all + 4개) 삭제.
+  - `region` 지정 시 해당 지역 키 + all-region(`''`) 키 삭제.
+- All ops mutations call both on success:
+  - `opsUpsert`, `opsSwissRebuildStandings`, `opsSwissNextRound`: `purgeApiCache_()` + `purgeOpsFeedCache_()`
+  - `opsExport`: `purgeApiCache_()` (내부) + `purgeOpsFeedCache_()` (doPost)
+  - `opsRoundClose`: `purgeOpsFeedCache_(season, region)` (내부) + `purgeOpsFeedCache_()` (doPost)
+- **원칙: opsFeed 캐시는 시즌/지역 단위이며, 데이터 변경 직후 무효화된다.**
+
+**Bypass & limits:**
+- `noCache` query param bypasses the cache for forced refresh.
+- If the payload exceeds CacheService's 100KB per-value limit, the cache write silently fails and subsequent requests recompute.
