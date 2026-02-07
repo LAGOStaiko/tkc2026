@@ -4,6 +4,7 @@
  * Adds actions:
  * - opsInit   : create ops_db_* tabs
  * - opsUpsert : write/update one row into ops_db_*
+ * - opsSwissRebuildStandings : rebuild ops_db_swiss_standings from match results
  * - opsExport : copy ops_db_* -> arcade_archive_* (incremental upsert)
  * - opsFeed   : build archive payload from ops_db_* for broadcast/control pages
  * - opsSwissNextRound : generate next swiss round pairings (with BYE)
@@ -330,18 +331,18 @@ function appendOpsEvent_(stage, season, region, entryId, message) {
 
 function handleOpsUpsert_(payload) {
   if (!payload || typeof payload !== 'object') {
-    return { ok: false, error: 'Invalid payload' };
+    return { ok: false, error: 'payload 형식이 올바르지 않습니다.' };
   }
 
   var stage = trim_(payload.stage);
   var stageConfig = getOpsStageConfig_()[stage];
   if (!stageConfig) {
-    return { ok: false, error: 'Unknown stage: ' + stage };
+    return { ok: false, error: '알 수 없는 stage입니다: ' + stage };
   }
 
   var row = payload.row;
   if (!row || typeof row !== 'object') {
-    return { ok: false, error: 'payload.row is required' };
+    return { ok: false, error: 'payload.row는 필수입니다.' };
   }
 
   var season = trim_(payload.season) || trim_(row.season) || '2026';
@@ -356,7 +357,7 @@ function handleOpsUpsert_(payload) {
       break;
     }
   }
-  if (!schema) return { ok: false, error: 'Schema not found for stage' };
+  if (!schema) return { ok: false, error: 'stage에 해당하는 스키마를 찾을 수 없습니다.' };
 
   var normalized = {};
   for (var h = 0; h < schema.headers.length; h++) {
@@ -385,7 +386,7 @@ function handleOpsUpsert_(payload) {
   if (stage === 'qualifier') {
     normalized.group = trim_(normalized.group).toUpperCase();
     if (normalized.group !== 'A' && normalized.group !== 'B') {
-      return { ok: false, error: 'qualifier.group must be A or B' };
+      return { ok: false, error: 'qualifier.group은 A 또는 B여야 합니다.' };
     }
   }
 
@@ -445,6 +446,288 @@ function getOpsRowsBySeasonRegion_(sheetName, season, region) {
     if (season && rowSeason && rowSeason !== season) return false;
     return normalizeRegionKey_(r.region) === region;
   });
+}
+
+function normalizeSwissStandingStatus_(value) {
+  var status = trim_(value).toLowerCase();
+  if (status === 'qualified' || status === 'decider' || status === 'eliminated' || status === 'alive') {
+    return status;
+  }
+  return 'alive';
+}
+
+function clearOpsRowsBySeasonRegion_(sheet, headers, season, region) {
+  var seasonIdx = headers.indexOf('season');
+  var regionIdx = headers.indexOf('region');
+  if (seasonIdx < 0 || regionIdx < 0) return 0;
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return 0;
+
+  var data = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+  var cleared = 0;
+
+  for (var i = data.length - 1; i >= 0; i--) {
+    var rowSeason = trim_(data[i][seasonIdx]);
+    var rowRegion = normalizeRegionKey_(data[i][regionIdx]);
+
+    if (season && rowSeason && rowSeason !== season) continue;
+    if (region && rowRegion !== region) continue;
+
+    sheet.getRange(i + 2, 1, 1, headers.length).clearContent();
+    cleared++;
+  }
+
+  return cleared;
+}
+
+function buildSwissSeedNicknameStatusMap_(season, region) {
+  var map = {};
+  var standingsRows = getOpsRowsBySeasonRegion_('ops_db_swiss_standings', season, region);
+
+  for (var i = 0; i < standingsRows.length; i++) {
+    var standing = standingsRows[i];
+    var entryId = trim_(standing.entryId);
+    if (!entryId) continue;
+
+    var meta = map[entryId] || { seed: null, nickname: '', status: 'alive' };
+    var seed = toNumber_(standing.seed, null);
+    if (seed !== null && (meta.seed === null || seed < meta.seed)) meta.seed = seed;
+
+    var nickname = trim_(standing.nickname);
+    if (!meta.nickname && nickname) meta.nickname = nickname;
+
+    meta.status = normalizeSwissStandingStatus_(standing.status || meta.status);
+    map[entryId] = meta;
+  }
+
+  var onlineRows = getOpsRowsBySeasonRegion_('ops_db_online', season, region).sort(function(a, b){
+    return toNumber_(a.rank, 9999) - toNumber_(b.rank, 9999);
+  });
+
+  for (var j = 0; j < onlineRows.length; j++) {
+    var online = onlineRows[j];
+    var onlineEntryId = trim_(online.entryId);
+    if (!onlineEntryId) continue;
+
+    var onlineMeta = map[onlineEntryId] || { seed: null, nickname: '', status: 'alive' };
+    var rank = toNumber_(online.rank, null);
+    if (rank !== null && (onlineMeta.seed === null || rank < onlineMeta.seed)) {
+      onlineMeta.seed = rank;
+    }
+
+    var onlineNickname = trim_(online.nickname);
+    if (!onlineMeta.nickname && onlineNickname) onlineMeta.nickname = onlineNickname;
+    if (!onlineMeta.status) onlineMeta.status = 'alive';
+
+    map[onlineEntryId] = onlineMeta;
+  }
+
+  return map;
+}
+
+function ensureSwissStatsParticipant_(statsMap, metaMap, entryId, nickname, seed) {
+  var id = trim_(entryId);
+  if (!id) return '';
+
+  var meta = metaMap[id] || { seed: null, nickname: '', status: 'alive' };
+  var parsedSeed = toNumber_(seed, null);
+  if (parsedSeed !== null && (meta.seed === null || parsedSeed < meta.seed)) {
+    meta.seed = parsedSeed;
+  }
+
+  var parsedNickname = trim_(nickname);
+  if (!meta.nickname && parsedNickname) meta.nickname = parsedNickname;
+  if (!meta.status) meta.status = 'alive';
+  metaMap[id] = meta;
+
+  if (!statsMap[id]) {
+    statsMap[id] = {
+      entryId: id,
+      wins: 0,
+      losses: 0
+    };
+  }
+
+  return id;
+}
+
+function buildSwissStandingRowsFromMatches_(payload) {
+  payload = payload || {};
+
+  var season = trim_(payload.season) || '2026';
+  var region = normalizeRegionKey_(payload.region);
+  if (!region) {
+    return { ok: false, error: 'region은 seoul/daejeon/gwangju/busan 중 하나여야 합니다.' };
+  }
+
+  var strict = toBool_(payload.strict);
+  var matchRows = getOpsRowsBySeasonRegion_('ops_db_swiss_matches', season, region);
+  var maxRound = 0;
+  for (var i = 0; i < matchRows.length; i++) {
+    maxRound = Math.max(maxRound, toNumber_(matchRows[i].round, 0));
+  }
+
+  var untilRound = toNumber_(payload.untilRound, null);
+  if (untilRound === null) untilRound = maxRound;
+  untilRound = Math.floor(untilRound);
+  if (untilRound < 0) {
+    return { ok: false, error: 'untilRound는 0 이상이어야 합니다.' };
+  }
+
+  var metaMap = buildSwissSeedNicknameStatusMap_(season, region);
+  var statsMap = {};
+  Object.keys(metaMap).forEach(function(entryId){
+    statsMap[entryId] = {
+      entryId: entryId,
+      wins: 0,
+      losses: 0
+    };
+  });
+
+  var unresolved = 0;
+
+  for (var m = 0; m < matchRows.length; m++) {
+    var match = matchRows[m];
+    var round = toNumber_(match.round, 0);
+    if (round > untilRound) continue;
+
+    var p1Id = ensureSwissStatsParticipant_(
+      statsMap,
+      metaMap,
+      match.p1EntryId,
+      match.p1Nickname,
+      match.p1Seed
+    );
+    var p2Id = ensureSwissStatsParticipant_(
+      statsMap,
+      metaMap,
+      match.p2EntryId,
+      match.p2Nickname,
+      match.p2Seed
+    );
+
+    var bye = toBool_(match.bye) || (!trim_(match.p2EntryId) && !trim_(match.p2Nickname));
+    var winnerId = trim_(match.winnerEntryId);
+
+    if (bye) {
+      var byeWinnerId = winnerId || p1Id || p2Id;
+      if (!byeWinnerId) {
+        unresolved++;
+        continue;
+      }
+      ensureSwissStatsParticipant_(statsMap, metaMap, byeWinnerId, '', '');
+      statsMap[byeWinnerId].wins += 1;
+      continue;
+    }
+
+    if (!p1Id || !p2Id || !winnerId) {
+      unresolved++;
+      continue;
+    }
+
+    if (winnerId === p1Id) {
+      statsMap[p1Id].wins += 1;
+      statsMap[p2Id].losses += 1;
+    } else if (winnerId === p2Id) {
+      statsMap[p2Id].wins += 1;
+      statsMap[p1Id].losses += 1;
+    } else {
+      unresolved++;
+    }
+  }
+
+  if (strict && unresolved > 0) {
+    return {
+      ok: false,
+      error: '미확정 매치가 있어 standings를 재계산할 수 없습니다. winnerEntryId 누락/불일치=' + unresolved
+    };
+  }
+
+  var rows = Object.keys(statsMap).map(function(entryId){
+    var meta = metaMap[entryId] || {};
+    var stats = statsMap[entryId] || { wins: 0, losses: 0 };
+    return {
+      season: season,
+      region: region,
+      entryId: entryId,
+      nickname: meta.nickname || entryId,
+      seed: meta.seed !== null && meta.seed !== undefined ? meta.seed : '',
+      wins: toNumber_(stats.wins, 0),
+      losses: toNumber_(stats.losses, 0),
+      status: normalizeSwissStandingStatus_(meta.status)
+    };
+  });
+
+  rows.sort(function(a, b){
+    if (b.wins !== a.wins) return b.wins - a.wins;
+    if (a.losses !== b.losses) return a.losses - b.losses;
+    var aSeed = toNumber_(a.seed, 9999);
+    var bSeed = toNumber_(b.seed, 9999);
+    if (aSeed !== bSeed) return aSeed - bSeed;
+    return String(a.entryId).localeCompare(String(b.entryId));
+  });
+
+  return {
+    ok: true,
+    data: {
+      season: season,
+      region: region,
+      maxRound: maxRound,
+      untilRound: untilRound,
+      unresolved: unresolved,
+      rows: rows
+    }
+  };
+}
+
+function handleOpsSwissRebuildStandings_(payload) {
+  payload = payload || {};
+
+  var built = buildSwissStandingRowsFromMatches_(payload);
+  if (!built.ok) return built;
+
+  var rows = built.data.rows || [];
+  var season = built.data.season;
+  var region = built.data.region;
+  var overwrite = payload.overwrite === undefined ? true : toBool_(payload.overwrite);
+
+  var schema = getOpsSchemaByName_('ops_db_swiss_standings');
+  if (!schema) return { ok: false, error: 'ops_db_swiss_standings 스키마를 찾을 수 없습니다.' };
+
+  var ss = getSs_();
+  ensureSheetSchema_(ss, schema.name, schema.headers);
+  var sh = ss.getSheetByName(schema.name);
+
+  var clearedRows = 0;
+  if (overwrite) {
+    clearedRows = clearOpsRowsBySeasonRegion_(sh, schema.headers, season, region);
+  }
+
+  for (var i = 0; i < rows.length; i++) {
+    upsertSheetRow_(sh, schema.headers, ['season', 'region', 'entryId'], rows[i]);
+  }
+
+  appendOpsEvent_(
+    'swissRebuild',
+    season,
+    region,
+    '',
+    'rows=' + rows.length + ', unresolved=' + built.data.unresolved + ', untilRound=' + built.data.untilRound
+  );
+
+  return {
+    ok: true,
+    data: {
+      season: season,
+      region: region,
+      writtenRows: rows.length,
+      clearedRows: clearedRows,
+      unresolved: built.data.unresolved,
+      maxRound: built.data.maxRound,
+      untilRound: built.data.untilRound
+    }
+  };
 }
 
 function buildSwissPairableParticipants_(season, region) {
@@ -678,7 +961,7 @@ function handleOpsSwissNextRound_(payload) {
   var season = trim_(payload.season) || '2026';
   var region = normalizeRegionKey_(payload.region);
   if (!region) {
-    return { ok: false, error: 'region is required (seoul/daejeon/gwangju/busan)' };
+    return { ok: false, error: 'region은 seoul/daejeon/gwangju/busan 중 하나여야 합니다.' };
   }
 
   var existingMatches = getOpsRowsBySeasonRegion_('ops_db_swiss_matches', season, region);
@@ -690,7 +973,7 @@ function handleOpsSwissNextRound_(payload) {
 
   var requestedRound = toNumber_(payload.round, null);
   var round = requestedRound === null ? (maxRound + 1) : Math.floor(requestedRound);
-  if (round < 1) return { ok: false, error: 'round must be >= 1' };
+  if (round < 1) return { ok: false, error: 'round는 1 이상이어야 합니다.' };
 
   var existingTargetRows = existingMatches.filter(function(row){
     return toNumber_(row.round, 0) === round;
@@ -700,7 +983,7 @@ function handleOpsSwissNextRound_(payload) {
   if (existingTargetRows.length > 0 && !overwrite) {
     return {
       ok: false,
-      error: 'target round already has rows. set overwrite=true to regenerate',
+      error: '대상 라운드에 이미 행이 있습니다. 다시 생성하려면 overwrite=true를 사용하세요.',
       data: { season: season, region: region, round: round, existingRows: existingTargetRows.length }
     };
   }
@@ -720,7 +1003,7 @@ function handleOpsSwissNextRound_(payload) {
     if (incomplete > 0) {
       return {
         ok: false,
-        error: 'Previous round is not complete. missing winnerEntryId=' + incomplete + '. set force=true to override',
+        error: '이전 라운드가 완료되지 않았습니다. winnerEntryId 누락=' + incomplete + ', 강행하려면 force=true를 사용하세요.',
         data: { season: season, region: region, round: round, previousRound: prevRound, incomplete: incomplete }
       };
     }
@@ -728,7 +1011,7 @@ function handleOpsSwissNextRound_(payload) {
 
   var participants = buildSwissPairableParticipants_(season, region);
   if (participants.length === 0) {
-    return { ok: false, error: 'No standings rows found to generate swiss matches' };
+    return { ok: false, error: '스위스 매칭 생성에 사용할 standings 데이터가 없습니다.' };
   }
 
   var history = buildSwissOpponentHistory_(existingMatches, round);
@@ -765,7 +1048,7 @@ function handleOpsSwissNextRound_(payload) {
   }
 
   var schema = getOpsSchemaByName_('ops_db_swiss_matches');
-  if (!schema) return { ok: false, error: 'ops_db_swiss_matches schema not found' };
+  if (!schema) return { ok: false, error: 'ops_db_swiss_matches 스키마를 찾을 수 없습니다.' };
 
   var ss = getSs_();
   ensureSheetSchema_(ss, schema.name, schema.headers);
@@ -805,6 +1088,32 @@ function handleOpsSwissNextRound_(payload) {
 function handleOpsRoundClose_(payload) {
   payload = payload || {};
 
+  var season = trim_(payload.season) || '2026';
+  var region = normalizeRegionKey_(payload.region);
+  if (!region) {
+    return { ok: false, error: 'region은 seoul/daejeon/gwangju/busan 중 하나여야 합니다.' };
+  }
+
+  var requestedRound = toNumber_(payload.round, null);
+  if (requestedRound !== null) requestedRound = Math.floor(requestedRound);
+
+  var rebuildPayload = {
+    season: season,
+    region: region,
+    strict: true,
+    overwrite: true
+  };
+  if (requestedRound !== null) {
+    rebuildPayload.untilRound = Math.max(requestedRound - 1, 0);
+  }
+
+  var rebuildResult = handleOpsSwissRebuildStandings_(rebuildPayload);
+  if (!rebuildResult.ok) return rebuildResult;
+
+  payload.season = season;
+  payload.region = region;
+  if (requestedRound !== null) payload.round = requestedRound;
+
   var swissResult = handleOpsSwissNextRound_(payload);
   if (!swissResult.ok) return swissResult;
 
@@ -819,8 +1128,9 @@ function handleOpsRoundClose_(payload) {
     if (!exportResult.ok) {
       return {
         ok: false,
-        error: 'Swiss round created but export failed: ' + String(exportResult.error || 'Unknown error'),
+        error: '스위스 라운드 생성 후 export에 실패했습니다: ' + String(exportResult.error || '알 수 없는 오류'),
         data: {
+          rebuild: rebuildResult.data,
           swiss: swissResult.data,
           export: exportResult
         }
@@ -833,7 +1143,9 @@ function handleOpsRoundClose_(payload) {
     swissResult.data.season,
     swissResult.data.region,
     '',
-    'round=' + swissResult.data.round + ', export=' + (exportArchive ? 'true' : 'false')
+    'round=' + swissResult.data.round +
+    ', rebuilt=' + (rebuildResult.data ? rebuildResult.data.writtenRows : 0) +
+    ', export=' + (exportArchive ? 'true' : 'false')
   );
 
   return {
@@ -842,6 +1154,7 @@ function handleOpsRoundClose_(payload) {
       season: swissResult.data.season,
       region: swissResult.data.region,
       round: swissResult.data.round,
+      rebuiltRows: rebuildResult.data ? toNumber_(rebuildResult.data.writtenRows, 0) : 0,
       generatedRows: swissResult.data.generatedRows,
       totalRows: exportResult && exportResult.data ? toNumber_(exportResult.data.totalRows, 0) : 0
     }
@@ -855,7 +1168,7 @@ function handleOpsExport_(payload) {
   var region = trim_(payload.region || 'all').toLowerCase();
   if (region !== 'all') {
     region = normalizeRegionKey_(region);
-    if (!region) return { ok: false, error: 'Invalid region' };
+    if (!region) return { ok: false, error: 'region 값이 올바르지 않습니다.' };
   }
 
   var exportDefs = [
@@ -1194,6 +1507,7 @@ function initializeOpsTabs() {
  * if (action === 'opsInit') return json_(handleOpsInit_(params));
  * if (action === 'opsGuide') return json_(handleOpsGuide_(params));
  * if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
+ * if (action === 'opsSwissRebuildStandings') return json_(handleOpsSwissRebuildStandings_(payload || params));
  * if (action === 'opsExport') return json_(handleOpsExport_(payload || params));
  * if (action === 'opsFeed') return json_(handleOpsFeed_(params));
  * if (action === 'opsSwissNextRound') return json_(handleOpsSwissNextRound_(payload || params));
