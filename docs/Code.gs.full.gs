@@ -53,10 +53,41 @@ function isoDateTime_(d) {
   return Utilities.formatDate(d, tz, "yyyy-MM-dd'T'HH:mm:ss");
 }
 
+function getActiveSpreadsheetOrNull_() {
+  try {
+    return SpreadsheetApp.getActiveSpreadsheet();
+  } catch (err) {
+    return null;
+  }
+}
+
 function getSs_() {
-  var sheetId = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
-  if (!sheetId) throw new Error('Missing Script Property SHEET_ID');
-  return SpreadsheetApp.openById(sheetId);
+  var props = PropertiesService.getScriptProperties();
+  var sheetId = trim_(props.getProperty('SHEET_ID'));
+  var active = getActiveSpreadsheetOrNull_();
+
+  // For spreadsheet-bound/menu execution, always trust active spreadsheet first.
+  if (active) {
+    var activeId = active.getId();
+    if (sheetId !== activeId) {
+      props.setProperty('SHEET_ID', activeId);
+    }
+    return active;
+  }
+
+  if (!sheetId) {
+    throw new Error('Missing Script Property SHEET_ID');
+  }
+
+  try {
+    return SpreadsheetApp.openById(sheetId);
+  } catch (err) {
+    throw new Error(
+      'Failed to open SHEET_ID=' + sheetId +
+      '. Check spreadsheet access permission and Script Property SHEET_ID. ' +
+      'Original: ' + String(err)
+    );
+  }
 }
 
 function getSheet_(name) {
@@ -128,6 +159,25 @@ function getSheetSchemas_(scope) {
 
   if (scope === 'archive') return archive;
   return core.concat(archive);
+}
+
+function getKnownHeadersForSheet_(sheetName) {
+  var name = trim_(sheetName);
+  if (!name) return null;
+
+  var all = getSheetSchemas_('all');
+  for (var i = 0; i < all.length; i++) {
+    if (all[i].name === name) return all[i].headers;
+  }
+
+  if (typeof getOpsSheetSchemas_ === 'function') {
+    var ops = getOpsSheetSchemas_();
+    for (var j = 0; j < ops.length; j++) {
+      if (ops[j].name === name) return ops[j].headers;
+    }
+  }
+
+  return null;
 }
 
 function handleInitSheets_(params) {
@@ -478,6 +528,13 @@ function notifyMenuResult_(title, result) {
   if (typeof data.headerUpdated === 'number') parts.push('headerUpdated=' + data.headerUpdated);
   if (typeof data.formatted === 'number') parts.push('formatted=' + data.formatted);
   if (typeof data.clearedRows === 'number') parts.push('clearedRows=' + data.clearedRows);
+  if (typeof data.round === 'number') parts.push('round=' + data.round);
+  if (typeof data.generatedRows === 'number') parts.push('generatedRows=' + data.generatedRows);
+  if (typeof data.totalRows === 'number') parts.push('totalRows=' + data.totalRows);
+  if (data.region) parts.push('region=' + data.region);
+  if (data.season) parts.push('season=' + data.season);
+  if (data.sheetId) parts.push('sheetId=' + data.sheetId);
+  if (data.name) parts.push('name=' + data.name);
 
   var message = parts.length ? parts.join(', ') : 'Done';
   SpreadsheetApp.getActiveSpreadsheet().toast(message, title, 7);
@@ -529,13 +586,134 @@ function menuPurgeApiCache_() {
   notifyMenuResult_('Purge API Cache', purgeApiCache_());
 }
 
+function handleSheetBindingDebug_() {
+  var props = PropertiesService.getScriptProperties();
+  var propSheetId = trim_(props.getProperty('SHEET_ID'));
+  var active = null;
+  var activeId = '';
+  var activeName = '';
+
+  try {
+    active = SpreadsheetApp.getActiveSpreadsheet();
+  } catch (errActive) {
+    active = null;
+  }
+
+  if (active) {
+    activeId = active.getId();
+    activeName = active.getName();
+  }
+
+  var openByIdOk = false;
+  var openByIdError = '';
+  if (propSheetId) {
+    try {
+      SpreadsheetApp.openById(propSheetId);
+      openByIdOk = true;
+    } catch (errOpen) {
+      openByIdOk = false;
+      openByIdError = String(errOpen);
+    }
+  }
+
+  return {
+    ok: true,
+    data: {
+      activeSheetId: activeId,
+      activeSheetName: activeName,
+      propertySheetId: propSheetId,
+      propertyOpenByIdOk: openByIdOk,
+      propertyOpenByIdError: openByIdError
+    }
+  };
+}
+
+function menuSheetBindingDebug_() {
+  var result = handleSheetBindingDebug_();
+  var data = result.data || {};
+  var ui = SpreadsheetApp.getUi();
+  var message =
+    'activeSheetId: ' + (data.activeSheetId || '(none)') + '\n' +
+    'activeSheetName: ' + (data.activeSheetName || '(none)') + '\n' +
+    'propertySheetId: ' + (data.propertySheetId || '(none)') + '\n' +
+    'propertyOpenByIdOk: ' + String(!!data.propertyOpenByIdOk);
+
+  if (!data.propertyOpenByIdOk && data.propertyOpenByIdError) {
+    message += '\nopenByIdError: ' + data.propertyOpenByIdError;
+  }
+  ui.alert('Sheet Binding Debug', message, ui.ButtonSet.OK);
+}
+
+function handleBindSheetIdToActive_() {
+  var ss = getActiveSpreadsheetOrNull_();
+  if (!ss) {
+    return { ok: false, error: 'No active spreadsheet context' };
+  }
+
+  var sheetId = ss.getId();
+  PropertiesService.getScriptProperties().setProperty('SHEET_ID', sheetId);
+  return {
+    ok: true,
+    data: {
+      sheetId: sheetId,
+      name: ss.getName()
+    }
+  };
+}
+
+function menuBindSheetIdToActive_() {
+  notifyMenuResult_('Bind SHEET_ID (Active)', handleBindSheetIdToActive_());
+}
+
 function menuWriteOpsGuide_() {
   notifyMenuResult_('Write Ops Guide', handleOpsGuide_({ overwrite: true }));
+}
+
+function menuWriteOpsInlineGuide_() {
+  notifyMenuResult_('Write Ops Inline Guide', handleOpsInlineGuide_({ overwrite: true }));
+}
+
+function menuOpsRoundClosePrompt_() {
+  var ui = SpreadsheetApp.getUi();
+
+  var regionRes = ui.prompt(
+    'Swiss Round Close',
+    'region 입력 (seoul/daejeon/gwangju/busan)',
+    ui.ButtonSet.OK_CANCEL
+  );
+  if (regionRes.getSelectedButton() !== ui.Button.OK) return;
+  var region = trim_(regionRes.getResponseText()).toLowerCase();
+
+  var seasonRes = ui.prompt(
+    'Swiss Round Close',
+    'season 입력 (기본값: 2026)',
+    ui.ButtonSet.OK_CANCEL
+  );
+  if (seasonRes.getSelectedButton() !== ui.Button.OK) return;
+  var season = trim_(seasonRes.getResponseText()) || '2026';
+
+  var roundRes = ui.prompt(
+    'Swiss Round Close',
+    'round 입력 (비우면 다음 라운드 자동)',
+    ui.ButtonSet.OK_CANCEL
+  );
+  if (roundRes.getSelectedButton() !== ui.Button.OK) return;
+
+  var payload = {
+    season: season,
+    region: region,
+    exportArchive: true
+  };
+  var roundText = trim_(roundRes.getResponseText());
+  if (roundText) payload.round = toNumber_(roundText, null);
+
+  notifyMenuResult_('Swiss Round Close', handleOpsRoundClose_(payload));
 }
 
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('TKC2026 Tools')
+    .addItem('Sheet Binding Debug', 'menuSheetBindingDebug_')
     .addItem('Init + Format (All)', 'menuInitAllTabs_')
     .addItem('Init + Format (Archive)', 'menuInitArchiveTabs_')
     .addSeparator()
@@ -546,7 +724,10 @@ function onOpen() {
     .addItem('Clear Archive Rows', 'menuClearArchiveRows_')
     .addSeparator()
     .addItem('Purge API Cache', 'menuPurgeApiCache_')
+    .addItem('Bind SHEET_ID (Active)', 'menuBindSheetIdToActive_')
     .addItem('Write Ops Guide Sheet', 'menuWriteOpsGuide_')
+    .addItem('Write Ops Inline Guides', 'menuWriteOpsInlineGuide_')
+    .addItem('Swiss Round Close (Auto Pair+Export)', 'menuOpsRoundClosePrompt_')
     .addToUi();
 }
 
@@ -892,7 +1073,11 @@ function seedArchiveFinishedExample2026() {
 
 function readTable_(sheetName) {
   var sh = getSheet_(sheetName);
-  var values = sh.getDataRange().getValues();
+  var knownHeaders = getKnownHeadersForSheet_(sheetName);
+  var width = knownHeaders ? knownHeaders.length : sh.getLastColumn();
+  width = Math.max(1, Math.min(width, sh.getMaxColumns()));
+  var lastRow = Math.max(sh.getLastRow(), 1);
+  var values = sh.getRange(1, 1, lastRow, width).getValues();
   if (values.length < 2) return { headers: values[0] || [], rows: [] };
   var headers = values[0].map(function(h){ return String(h).trim(); });
   var rows = [];
@@ -917,7 +1102,11 @@ function readOptionalTable_(sheetName) {
   var sh = ss.getSheetByName(sheetName);
   if (!sh) return { headers: [], rows: [] };
 
-  var values = sh.getDataRange().getValues();
+  var knownHeaders = getKnownHeadersForSheet_(sheetName);
+  var width = knownHeaders ? knownHeaders.length : sh.getLastColumn();
+  width = Math.max(1, Math.min(width, sh.getMaxColumns()));
+  var lastRow = Math.max(sh.getLastRow(), 1);
+  var values = sh.getRange(1, 1, lastRow, width).getValues();
   if (values.length < 2) return { headers: values[0] || [], rows: [] };
 
   var headers = values[0].map(function(h){ return String(h).trim(); });
@@ -1595,9 +1784,12 @@ function doPost(e) {
     }
     if (action === 'opsInit') return json_(handleOpsInit_(params));
     if (action === 'opsGuide') return json_(handleOpsGuide_(params));
+    if (action === 'opsInlineGuide') return json_(handleOpsInlineGuide_(params));
     if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
     if (action === 'opsExport') return json_(handleOpsExport_(payload || params));
     if (action === 'opsFeed') return json_(handleOpsFeed_(params));
+    if (action === 'opsSwissNextRound') return json_(handleOpsSwissNextRound_(payload || params));
+    if (action === 'opsRoundClose') return json_(handleOpsRoundClose_(payload || params));
     if (action === 'purgeCache') return json_(purgeApiCache_());
     if (action === 'register') return json_(handleRegister_(payload));
 
@@ -1615,6 +1807,8 @@ function doPost(e) {
  * - opsUpsert : write/update one row into ops_db_*
  * - opsExport : copy ops_db_* -> arcade_archive_* (incremental upsert)
  * - opsFeed   : build archive payload from ops_db_* for broadcast/control pages
+ * - opsSwissNextRound : generate next swiss round pairings (with BYE)
+ * - opsRoundClose     : opsSwissNextRound + opsExport in one call
  *
  * Required existing helpers from your current Code.gs:
  * - getSs_()
@@ -1881,6 +2075,168 @@ function handleOpsGuide_(params) {
   };
 }
 
+function getOpsInlineGuideMap_() {
+  return {
+    ops_db_online: [
+      { item: '입력 단위', desc: '선수 1명 = 1행입니다.' },
+      { item: '핵심 컬럼', desc: 'season, region, rank, entryId, nickname, score1, score2, advanced' },
+      { item: 'region 입력값', desc: 'seoul / daejeon / gwangju / busan 권장 (한글 지역명도 일부 정규화됨).' },
+      { item: 'total 처리', desc: 'opsUpsert 경유 시 score1+score2 자동 계산됩니다. 수동 입력도 가능.' },
+      { item: 'advanced', desc: 'TRUE/FALSE로 입력합니다. 지역 본선 진출 여부 표시입니다.' },
+      { item: '운영 흐름', desc: '지역 시작 전 선수명단/시드 입력 -> 온라인 점수 확정 후 갱신 -> export 실행.' }
+    ],
+    ops_db_swiss_matches: [
+      { item: '입력 단위', desc: '매치(테이블) 1개 = 1행입니다.' },
+      { item: '라운드 시작 전', desc: 'round/table/p1/p2/highSeed/song1/song2를 먼저 채워 대진표를 선공개합니다.' },
+      { item: '경기 종료 후', desc: 'p1Score1/p2Score1, p1Score2/p2Score2, winnerEntryId를 즉시 입력합니다.' },
+      { item: '타이브레이커', desc: '동점이면 song3/level3/p1Score3/p2Score3 및 tieBreakerSong을 입력합니다.' },
+      { item: '부전승', desc: 'bye=TRUE, p2 관련 컬럼은 비우고 winnerEntryId는 p1EntryId로 입력합니다.' },
+      { item: '중복 키 주의', desc: 'season+region+round+table 조합은 유일해야 합니다.' }
+    ],
+    ops_db_swiss_standings: [
+      { item: '입력 단위', desc: '선수 1명 = 1행입니다.' },
+      { item: '핵심 컬럼', desc: 'seed, wins, losses, status를 반드시 관리합니다.' },
+      { item: 'status 권장값', desc: 'qualified / decider / eliminated / alive' },
+      { item: '갱신 시점', desc: '라운드 종료 후 일괄 업데이트(실시간 송출 정확도 향상).' },
+      { item: '정렬 기준', desc: 'wins 내림차순, losses 오름차순, seed 오름차순으로 맞추면 검수에 유리합니다.' }
+    ],
+    ops_db_decider: [
+      { item: '입력 단위', desc: '선수 1명 = 1행입니다.' },
+      { item: '핵심 컬럼', desc: 'rank, entryId, score, winner를 반드시 입력합니다.' },
+      { item: 'winner 규칙', desc: '최종 승자 행만 winner=TRUE로 입력합니다.' },
+      { item: '자동 보정', desc: 'winner=TRUE이고 winnerEntryId 비었으면 entryId로 자동 보정됩니다.' },
+      { item: '갱신 시점', desc: '데시더 종료 직후 즉시 입력 후 export 실행 권장.' }
+    ],
+    ops_db_seeding: [
+      { item: '입력 단위', desc: '지역별 시드 대상자 1명 = 1행입니다.' },
+      { item: '핵심 컬럼', desc: 'rank, entryId, score를 기준으로 그룹 시드 산정에 사용됩니다.' },
+      { item: '운영 규칙', desc: '일반적으로 rank 1 -> A그룹, rank 2 -> B그룹으로 사용합니다.' },
+      { item: '갱신 시점', desc: '지역 대표 확정 직후 입력합니다.' }
+    ],
+    ops_db_qualifiers: [
+      { item: '입력 단위', desc: '지역+그룹(A/B) 1개 = 1행입니다.' },
+      { item: '핵심 컬럼', desc: 'group, entryId, nickname, seed' },
+      { item: 'group 값', desc: 'A 또는 B만 허용됩니다(소문자 입력 시 업서트에서 대문자 보정).' },
+      { item: '갱신 시점', desc: '그룹 배정이 확정되는 즉시 입력합니다.' }
+    ],
+    ops_db_finals_a: [
+      { item: '입력 단위', desc: '시드 1개 = 1행입니다.' },
+      { item: '핵심 컬럼', desc: 'season, seed, region, entryId, nickname' },
+      { item: '운영 팁', desc: 'regionLabel을 같이 넣으면 방송/현장 송출 가독성이 좋아집니다.' }
+    ],
+    ops_db_finals_b: [
+      { item: '입력 단위', desc: '시드 1개 = 1행입니다.' },
+      { item: '핵심 컬럼', desc: 'season, seed, region, entryId, nickname' },
+      { item: '운영 팁', desc: 'A/B 시드 번호 중복 여부를 눈으로 한번 더 검수하세요.' }
+    ],
+    ops_db_finals_matches: [
+      { item: '입력 단위', desc: '본선 매치 1개 = 1행입니다.' },
+      { item: '핵심 컬럼', desc: 'matchNo, leftEntryId, rightEntryId, winnerEntryId' },
+      { item: '사전 입력', desc: '경기 전 left/right seed/region/entryId를 먼저 채워 송출 준비합니다.' },
+      { item: '사후 입력', desc: '경기 종료 즉시 winnerEntryId 업데이트 후 export 실행합니다.' },
+      { item: '운영 팁', desc: 'left/right 닉네임/지역 라벨도 함께 입력하면 화면 품질이 좋아집니다.' }
+    ],
+    ops_db_events: [
+      { item: '시트 성격', desc: '자동 이벤트 로그 전용 시트입니다.' },
+      { item: '수정 여부', desc: '수동 수정/삭제를 권장하지 않습니다.' },
+      { item: '기록 시점', desc: 'opsUpsert / opsExport / opsGuide / opsInlineGuide 실행 시 자동 누적됩니다.' }
+    ]
+  };
+}
+
+function writeOpsInlineGuideBlock_(sheet, schema, rows, overwrite) {
+  var baseCol = schema.headers.length + 2;
+  var rowCount = Math.max((rows ? rows.length : 0) + 4, 16);
+  var requiredCols = baseCol + 1; // two guide columns: baseCol and baseCol+1
+  if (sheet.getMaxColumns() < requiredCols) {
+    sheet.insertColumnsAfter(sheet.getMaxColumns(), requiredCols - sheet.getMaxColumns());
+  }
+  var block = sheet.getRange(1, baseCol, rowCount, 2);
+
+  if (!overwrite) {
+    var currentTitle = trim_(sheet.getRange(1, baseCol).getValue());
+    if (currentTitle) {
+      return { sheet: schema.name, rows: 0, skipped: true };
+    }
+  }
+
+  block.breakApart();
+  block.clearContent();
+  block.clearFormat();
+
+  var titleRange = sheet.getRange(1, baseCol, 1, 2);
+  titleRange
+    .merge()
+    .setValue('입력 가이드 - ' + schema.name)
+    .setBackground('#111827')
+    .setFontColor('#ffffff')
+    .setFontWeight('bold')
+    .setHorizontalAlignment('left')
+    .setVerticalAlignment('middle');
+
+  var headerRange = sheet.getRange(2, baseCol, 1, 2);
+  headerRange
+    .setValues([['항목', '설명']])
+    .setBackground('#e5e7eb')
+    .setFontWeight('bold')
+    .setHorizontalAlignment('left');
+
+  if (rows && rows.length > 0) {
+    var values = rows.map(function(r){
+      return [r.item || '', r.desc || ''];
+    });
+    sheet.getRange(3, baseCol, values.length, 2).setValues(values);
+  }
+
+  var usedRows = Math.max((rows ? rows.length : 0) + 2, 2);
+  sheet.getRange(1, baseCol, usedRows + 1, 2)
+    .setWrap(true)
+    .setVerticalAlignment('top')
+    .setHorizontalAlignment('left');
+
+  sheet.setColumnWidth(baseCol, 170);
+  sheet.setColumnWidth(baseCol + 1, 560);
+
+  return { sheet: schema.name, rows: rows ? rows.length : 0, skipped: false };
+}
+
+function handleOpsInlineGuide_(params) {
+  params = params || {};
+  var overwrite = params.overwrite === undefined ? true : toBool_(params.overwrite);
+  var targetSheet = trim_(params.sheetName);
+
+  var map = getOpsInlineGuideMap_();
+  var schemas = getOpsSheetSchemas_().filter(function(schema){
+    if (!targetSheet) return true;
+    return schema.name === targetSheet;
+  });
+
+  if (schemas.length === 0) {
+    return { ok: false, error: 'No matching ops_db_* sheet for sheetName=' + targetSheet };
+  }
+
+  var ss = getSs_();
+  var results = [];
+  for (var i = 0; i < schemas.length; i++) {
+    var schema = schemas[i];
+    ensureSheetSchema_(ss, schema.name, schema.headers);
+    var sh = ss.getSheetByName(schema.name);
+    var rows = map[schema.name] || [{ item: '안내', desc: '이 시트용 가이드가 아직 등록되지 않았습니다.' }];
+    results.push(writeOpsInlineGuideBlock_(sh, schema, rows, overwrite));
+  }
+
+  appendOpsEvent_('inlineGuide', '', '', '', 'inline guide sheets=' + results.length);
+
+  return {
+    ok: true,
+    data: {
+      total: results.length,
+      overwrite: overwrite,
+      sheets: results
+    }
+  };
+}
+
 function upsertSheetRow_(sheet, headers, keyFields, rowObj) {
   var keyIndexes = [];
   for (var i = 0; i < keyFields.length; i++) {
@@ -2036,6 +2392,423 @@ function filterOpsRows_(rows, season, region, isRegionScoped) {
     }
     return true;
   });
+}
+
+function getOpsSchemaByName_(sheetName) {
+  var schemas = getOpsSheetSchemas_();
+  for (var i = 0; i < schemas.length; i++) {
+    if (schemas[i].name === sheetName) return schemas[i];
+  }
+  return null;
+}
+
+function getOpsRowsBySeasonRegion_(sheetName, season, region) {
+  return readOptionalTable_(sheetName).rows.filter(function(r){
+    var rowSeason = trim_(r.season);
+    if (season && rowSeason && rowSeason !== season) return false;
+    return normalizeRegionKey_(r.region) === region;
+  });
+}
+
+function buildSwissPairableParticipants_(season, region) {
+  var source = getOpsRowsBySeasonRegion_('ops_db_swiss_standings', season, region);
+
+  function toParticipants_(rows, excludeFinalized) {
+    var map = {};
+    var list = [];
+
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var entryId = trim_(row.entryId);
+      if (!entryId || map[entryId]) continue;
+
+      var status = trim_(row.status).toLowerCase();
+      if (excludeFinalized && (status === 'eliminated' || status === 'qualified')) {
+        continue;
+      }
+
+      map[entryId] = true;
+      list.push({
+        entryId: entryId,
+        nickname: trim_(row.nickname) || entryId,
+        seed: toNumber_(row.seed, list.length + 1),
+        wins: toNumber_(row.wins, 0),
+        losses: toNumber_(row.losses, 0),
+        status: status
+      });
+    }
+
+    list.sort(function(a, b){
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      if (a.losses !== b.losses) return a.losses - b.losses;
+      if (a.seed !== b.seed) return a.seed - b.seed;
+      return String(a.entryId).localeCompare(String(b.entryId));
+    });
+
+    return list;
+  }
+
+  var pairable = toParticipants_(source, true);
+  if (pairable.length === 0) pairable = toParticipants_(source, false);
+  return pairable;
+}
+
+function buildSwissOpponentHistory_(matchRows, maxRoundExclusive) {
+  var history = {};
+
+  for (var i = 0; i < matchRows.length; i++) {
+    var row = matchRows[i];
+    var round = toNumber_(row.round, 0);
+    if (maxRoundExclusive && round >= maxRoundExclusive) continue;
+
+    if (toBool_(row.bye)) continue;
+
+    var p1 = trim_(row.p1EntryId);
+    var p2 = trim_(row.p2EntryId);
+    if (!p1 || !p2) continue;
+
+    if (!history[p1]) history[p1] = {};
+    if (!history[p2]) history[p2] = {};
+    history[p1][p2] = true;
+    history[p2][p1] = true;
+  }
+
+  return history;
+}
+
+function hasSwissByeBefore_(entryId, matchRows, maxRoundExclusive) {
+  for (var i = 0; i < matchRows.length; i++) {
+    var row = matchRows[i];
+    var round = toNumber_(row.round, 0);
+    if (maxRoundExclusive && round >= maxRoundExclusive) continue;
+    if (!toBool_(row.bye)) continue;
+
+    if (trim_(row.p1EntryId) === entryId || trim_(row.p2EntryId) === entryId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function pickSwissByeParticipant_(participants, matchRows, maxRoundExclusive) {
+  if (participants.length % 2 === 0) return null;
+
+  for (var i = participants.length - 1; i >= 0; i--) {
+    if (!hasSwissByeBefore_(participants[i].entryId, matchRows, maxRoundExclusive)) {
+      return participants.splice(i, 1)[0];
+    }
+  }
+
+  return participants.pop();
+}
+
+function pickSwissOpponentIndex_(base, pool, history) {
+  var i;
+
+  for (i = 0; i < pool.length; i++) {
+    var c1 = pool[i];
+    var rematch1 = !!(history[base.entryId] && history[base.entryId][c1.entryId]);
+    if (!rematch1 && c1.wins === base.wins) return i;
+  }
+
+  for (i = 0; i < pool.length; i++) {
+    var c2 = pool[i];
+    var rematch2 = !!(history[base.entryId] && history[base.entryId][c2.entryId]);
+    if (!rematch2) return i;
+  }
+
+  for (i = 0; i < pool.length; i++) {
+    if (pool[i].wins === base.wins) return i;
+  }
+
+  return 0;
+}
+
+function buildSwissPairs_(participants, history) {
+  var pending = participants.slice();
+  var pairs = [];
+
+  while (pending.length >= 2) {
+    var base = pending.shift();
+    var oppIndex = pickSwissOpponentIndex_(base, pending, history);
+    var opp = pending.splice(oppIndex, 1)[0];
+
+    var rematch = !!(history[base.entryId] && history[base.entryId][opp.entryId]);
+    var p1 = base.seed <= opp.seed ? base : opp;
+    var p2 = base.seed <= opp.seed ? opp : base;
+
+    pairs.push({
+      p1: p1,
+      p2: p2,
+      rematch: rematch
+    });
+
+    if (!history[base.entryId]) history[base.entryId] = {};
+    if (!history[opp.entryId]) history[opp.entryId] = {};
+    history[base.entryId][opp.entryId] = true;
+    history[opp.entryId][base.entryId] = true;
+  }
+
+  return pairs;
+}
+
+function clearOpsSwissRoundRows_(sheet, headers, season, region, round) {
+  var seasonIdx = headers.indexOf('season');
+  var regionIdx = headers.indexOf('region');
+  var roundIdx = headers.indexOf('round');
+  if (seasonIdx < 0 || regionIdx < 0 || roundIdx < 0) return 0;
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return 0;
+
+  var data = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+  var cleared = 0;
+
+  for (var i = data.length - 1; i >= 0; i--) {
+    var rowSeason = trim_(data[i][seasonIdx]);
+    var rowRegion = normalizeRegionKey_(data[i][regionIdx]);
+    var rowRound = toNumber_(data[i][roundIdx], 0);
+
+    if (season && rowSeason && rowSeason !== season) continue;
+    if (rowRegion !== region) continue;
+    if (rowRound !== round) continue;
+
+    sheet.getRange(i + 2, 1, 1, headers.length).clearContent();
+    cleared++;
+  }
+
+  return cleared;
+}
+
+function buildSwissMatchRow_(season, region, round, tableNo, p1, p2, note) {
+  var row = {
+    season: season,
+    region: region,
+    round: round,
+    table: tableNo,
+    highSeedEntryId: '',
+    p1EntryId: '',
+    p1Nickname: '',
+    p1Seed: '',
+    p2EntryId: '',
+    p2Nickname: '',
+    p2Seed: '',
+    song1: '',
+    level1: '',
+    p1Score1: '',
+    p2Score1: '',
+    song2: '',
+    level2: '',
+    p1Score2: '',
+    p2Score2: '',
+    song3: '',
+    level3: '',
+    p1Score3: '',
+    p2Score3: '',
+    winnerEntryId: '',
+    tieBreakerSong: '',
+    bye: false,
+    note: note || ''
+  };
+
+  if (p1) {
+    row.p1EntryId = p1.entryId;
+    row.p1Nickname = p1.nickname || p1.entryId;
+    row.p1Seed = p1.seed;
+  }
+
+  if (p2) {
+    row.p2EntryId = p2.entryId;
+    row.p2Nickname = p2.nickname || p2.entryId;
+    row.p2Seed = p2.seed;
+  }
+
+  if (p1 && p2) {
+    row.highSeedEntryId = p1.seed <= p2.seed ? p1.entryId : p2.entryId;
+  } else if (p1) {
+    row.highSeedEntryId = p1.entryId;
+    row.bye = true;
+    row.winnerEntryId = p1.entryId;
+    if (!row.note) row.note = 'AUTO-BYE';
+  }
+
+  return row;
+}
+
+function handleOpsSwissNextRound_(payload) {
+  payload = payload || {};
+
+  var season = trim_(payload.season) || '2026';
+  var region = normalizeRegionKey_(payload.region);
+  if (!region) {
+    return { ok: false, error: 'region is required (seoul/daejeon/gwangju/busan)' };
+  }
+
+  var existingMatches = getOpsRowsBySeasonRegion_('ops_db_swiss_matches', season, region);
+  var maxRound = 0;
+  for (var i = 0; i < existingMatches.length; i++) {
+    var rr = toNumber_(existingMatches[i].round, 0);
+    if (rr > maxRound) maxRound = rr;
+  }
+
+  var requestedRound = toNumber_(payload.round, null);
+  var round = requestedRound === null ? (maxRound + 1) : Math.floor(requestedRound);
+  if (round < 1) return { ok: false, error: 'round must be >= 1' };
+
+  var existingTargetRows = existingMatches.filter(function(row){
+    return toNumber_(row.round, 0) === round;
+  });
+  var overwrite = toBool_(payload.overwrite);
+  var force = toBool_(payload.force);
+  if (existingTargetRows.length > 0 && !overwrite) {
+    return {
+      ok: false,
+      error: 'target round already has rows. set overwrite=true to regenerate',
+      data: { season: season, region: region, round: round, existingRows: existingTargetRows.length }
+    };
+  }
+
+  var prevRound = round - 1;
+  if (!force && prevRound >= 1) {
+    var prevRows = existingMatches.filter(function(row){
+      return toNumber_(row.round, 0) === prevRound;
+    });
+    var incomplete = 0;
+    for (var pr = 0; pr < prevRows.length; pr++) {
+      var prev = prevRows[pr];
+      var bye = toBool_(prev.bye);
+      var winnerEntryId = trim_(prev.winnerEntryId);
+      if (!bye && !winnerEntryId) incomplete++;
+    }
+    if (incomplete > 0) {
+      return {
+        ok: false,
+        error: 'Previous round is not complete. missing winnerEntryId=' + incomplete + '. set force=true to override',
+        data: { season: season, region: region, round: round, previousRound: prevRound, incomplete: incomplete }
+      };
+    }
+  }
+
+  var participants = buildSwissPairableParticipants_(season, region);
+  if (participants.length === 0) {
+    return { ok: false, error: 'No standings rows found to generate swiss matches' };
+  }
+
+  var history = buildSwissOpponentHistory_(existingMatches, round);
+  var byeParticipant = pickSwissByeParticipant_(participants, existingMatches, round);
+  var pairs = buildSwissPairs_(participants, history);
+
+  var rowsToWrite = [];
+  var summary = [];
+  var tableNo = 1;
+
+  for (var p = 0; p < pairs.length; p++) {
+    var pair = pairs[p];
+    var note = pair.rematch ? 'AUTO(rematch fallback)' : 'AUTO';
+    var row = buildSwissMatchRow_(season, region, round, tableNo, pair.p1, pair.p2, note);
+    rowsToWrite.push(row);
+    summary.push({
+      table: tableNo,
+      p1EntryId: row.p1EntryId,
+      p2EntryId: row.p2EntryId,
+      rematchFallback: pair.rematch
+    });
+    tableNo++;
+  }
+
+  if (byeParticipant) {
+    var byeRow = buildSwissMatchRow_(season, region, round, tableNo, byeParticipant, null, 'AUTO-BYE');
+    rowsToWrite.push(byeRow);
+    summary.push({
+      table: tableNo,
+      p1EntryId: byeRow.p1EntryId,
+      p2EntryId: '',
+      bye: true
+    });
+  }
+
+  var schema = getOpsSchemaByName_('ops_db_swiss_matches');
+  if (!schema) return { ok: false, error: 'ops_db_swiss_matches schema not found' };
+
+  var ss = getSs_();
+  ensureSheetSchema_(ss, schema.name, schema.headers);
+  var sh = ss.getSheetByName(schema.name);
+
+  var clearedRows = 0;
+  if (overwrite && existingTargetRows.length > 0) {
+    clearedRows = clearOpsSwissRoundRows_(sh, schema.headers, season, region, round);
+  }
+
+  for (var w = 0; w < rowsToWrite.length; w++) {
+    upsertSheetRow_(sh, schema.headers, ['season', 'region', 'round', 'table'], rowsToWrite[w]);
+  }
+
+  appendOpsEvent_(
+    'swissNextRound',
+    season,
+    region,
+    '',
+    'round=' + round + ', rows=' + rowsToWrite.length + ', bye=' + (byeParticipant ? byeParticipant.entryId : '')
+  );
+
+  return {
+    ok: true,
+    data: {
+      season: season,
+      region: region,
+      round: round,
+      generatedRows: rowsToWrite.length,
+      clearedRows: clearedRows,
+      byeEntryId: byeParticipant ? byeParticipant.entryId : '',
+      pairs: summary
+    }
+  };
+}
+
+function handleOpsRoundClose_(payload) {
+  payload = payload || {};
+
+  var swissResult = handleOpsSwissNextRound_(payload);
+  if (!swissResult.ok) return swissResult;
+
+  var exportArchive = payload.exportArchive === undefined ? true : toBool_(payload.exportArchive);
+  var exportResult = null;
+
+  if (exportArchive) {
+    exportResult = handleOpsExport_({
+      season: swissResult.data.season,
+      region: swissResult.data.region
+    });
+    if (!exportResult.ok) {
+      return {
+        ok: false,
+        error: 'Swiss round created but export failed: ' + String(exportResult.error || 'Unknown error'),
+        data: {
+          swiss: swissResult.data,
+          export: exportResult
+        }
+      };
+    }
+  }
+
+  appendOpsEvent_(
+    'roundClose',
+    swissResult.data.season,
+    swissResult.data.region,
+    '',
+    'round=' + swissResult.data.round + ', export=' + (exportArchive ? 'true' : 'false')
+  );
+
+  return {
+    ok: true,
+    data: {
+      season: swissResult.data.season,
+      region: swissResult.data.region,
+      round: swissResult.data.round,
+      generatedRows: swissResult.data.generatedRows,
+      totalRows: exportResult && exportResult.data ? toNumber_(exportResult.data.totalRows, 0) : 0
+    }
+  };
 }
 
 function handleOpsExport_(payload) {
@@ -2383,8 +3156,11 @@ function initializeOpsTabs() {
  *
  * if (action === 'opsInit') return json_(handleOpsInit_(params));
  * if (action === 'opsGuide') return json_(handleOpsGuide_(params));
+ * if (action === 'opsInlineGuide') return json_(handleOpsInlineGuide_(params));
  * if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
  * if (action === 'opsExport') return json_(handleOpsExport_(payload || params));
  * if (action === 'opsFeed') return json_(handleOpsFeed_(params));
+ * if (action === 'opsSwissNextRound') return json_(handleOpsSwissNextRound_(payload || params));
+ * if (action === 'opsRoundClose') return json_(handleOpsRoundClose_(payload || params));
  */
 

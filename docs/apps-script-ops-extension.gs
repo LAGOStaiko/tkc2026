@@ -6,6 +6,8 @@
  * - opsUpsert : write/update one row into ops_db_*
  * - opsExport : copy ops_db_* -> arcade_archive_* (incremental upsert)
  * - opsFeed   : build archive payload from ops_db_* for broadcast/control pages
+ * - opsSwissNextRound : generate next swiss round pairings (with BYE)
+ * - opsRoundClose     : opsSwissNextRound + opsExport in one call
  *
  * Required existing helpers from your current Code.gs:
  * - getSs_()
@@ -429,6 +431,423 @@ function filterOpsRows_(rows, season, region, isRegionScoped) {
   });
 }
 
+function getOpsSchemaByName_(sheetName) {
+  var schemas = getOpsSheetSchemas_();
+  for (var i = 0; i < schemas.length; i++) {
+    if (schemas[i].name === sheetName) return schemas[i];
+  }
+  return null;
+}
+
+function getOpsRowsBySeasonRegion_(sheetName, season, region) {
+  return readOptionalTable_(sheetName).rows.filter(function(r){
+    var rowSeason = trim_(r.season);
+    if (season && rowSeason && rowSeason !== season) return false;
+    return normalizeRegionKey_(r.region) === region;
+  });
+}
+
+function buildSwissPairableParticipants_(season, region) {
+  var source = getOpsRowsBySeasonRegion_('ops_db_swiss_standings', season, region);
+
+  function toParticipants_(rows, excludeFinalized) {
+    var map = {};
+    var list = [];
+
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var entryId = trim_(row.entryId);
+      if (!entryId || map[entryId]) continue;
+
+      var status = trim_(row.status).toLowerCase();
+      if (excludeFinalized && (status === 'eliminated' || status === 'qualified')) {
+        continue;
+      }
+
+      map[entryId] = true;
+      list.push({
+        entryId: entryId,
+        nickname: trim_(row.nickname) || entryId,
+        seed: toNumber_(row.seed, list.length + 1),
+        wins: toNumber_(row.wins, 0),
+        losses: toNumber_(row.losses, 0),
+        status: status
+      });
+    }
+
+    list.sort(function(a, b){
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      if (a.losses !== b.losses) return a.losses - b.losses;
+      if (a.seed !== b.seed) return a.seed - b.seed;
+      return String(a.entryId).localeCompare(String(b.entryId));
+    });
+
+    return list;
+  }
+
+  var pairable = toParticipants_(source, true);
+  if (pairable.length === 0) pairable = toParticipants_(source, false);
+  return pairable;
+}
+
+function buildSwissOpponentHistory_(matchRows, maxRoundExclusive) {
+  var history = {};
+
+  for (var i = 0; i < matchRows.length; i++) {
+    var row = matchRows[i];
+    var round = toNumber_(row.round, 0);
+    if (maxRoundExclusive && round >= maxRoundExclusive) continue;
+
+    if (toBool_(row.bye)) continue;
+
+    var p1 = trim_(row.p1EntryId);
+    var p2 = trim_(row.p2EntryId);
+    if (!p1 || !p2) continue;
+
+    if (!history[p1]) history[p1] = {};
+    if (!history[p2]) history[p2] = {};
+    history[p1][p2] = true;
+    history[p2][p1] = true;
+  }
+
+  return history;
+}
+
+function hasSwissByeBefore_(entryId, matchRows, maxRoundExclusive) {
+  for (var i = 0; i < matchRows.length; i++) {
+    var row = matchRows[i];
+    var round = toNumber_(row.round, 0);
+    if (maxRoundExclusive && round >= maxRoundExclusive) continue;
+    if (!toBool_(row.bye)) continue;
+
+    if (trim_(row.p1EntryId) === entryId || trim_(row.p2EntryId) === entryId) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function pickSwissByeParticipant_(participants, matchRows, maxRoundExclusive) {
+  if (participants.length % 2 === 0) return null;
+
+  for (var i = participants.length - 1; i >= 0; i--) {
+    if (!hasSwissByeBefore_(participants[i].entryId, matchRows, maxRoundExclusive)) {
+      return participants.splice(i, 1)[0];
+    }
+  }
+
+  return participants.pop();
+}
+
+function pickSwissOpponentIndex_(base, pool, history) {
+  var i;
+
+  for (i = 0; i < pool.length; i++) {
+    var c1 = pool[i];
+    var rematch1 = !!(history[base.entryId] && history[base.entryId][c1.entryId]);
+    if (!rematch1 && c1.wins === base.wins) return i;
+  }
+
+  for (i = 0; i < pool.length; i++) {
+    var c2 = pool[i];
+    var rematch2 = !!(history[base.entryId] && history[base.entryId][c2.entryId]);
+    if (!rematch2) return i;
+  }
+
+  for (i = 0; i < pool.length; i++) {
+    if (pool[i].wins === base.wins) return i;
+  }
+
+  return 0;
+}
+
+function buildSwissPairs_(participants, history) {
+  var pending = participants.slice();
+  var pairs = [];
+
+  while (pending.length >= 2) {
+    var base = pending.shift();
+    var oppIndex = pickSwissOpponentIndex_(base, pending, history);
+    var opp = pending.splice(oppIndex, 1)[0];
+
+    var rematch = !!(history[base.entryId] && history[base.entryId][opp.entryId]);
+    var p1 = base.seed <= opp.seed ? base : opp;
+    var p2 = base.seed <= opp.seed ? opp : base;
+
+    pairs.push({
+      p1: p1,
+      p2: p2,
+      rematch: rematch
+    });
+
+    if (!history[base.entryId]) history[base.entryId] = {};
+    if (!history[opp.entryId]) history[opp.entryId] = {};
+    history[base.entryId][opp.entryId] = true;
+    history[opp.entryId][base.entryId] = true;
+  }
+
+  return pairs;
+}
+
+function clearOpsSwissRoundRows_(sheet, headers, season, region, round) {
+  var seasonIdx = headers.indexOf('season');
+  var regionIdx = headers.indexOf('region');
+  var roundIdx = headers.indexOf('round');
+  if (seasonIdx < 0 || regionIdx < 0 || roundIdx < 0) return 0;
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return 0;
+
+  var data = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+  var cleared = 0;
+
+  for (var i = data.length - 1; i >= 0; i--) {
+    var rowSeason = trim_(data[i][seasonIdx]);
+    var rowRegion = normalizeRegionKey_(data[i][regionIdx]);
+    var rowRound = toNumber_(data[i][roundIdx], 0);
+
+    if (season && rowSeason && rowSeason !== season) continue;
+    if (rowRegion !== region) continue;
+    if (rowRound !== round) continue;
+
+    sheet.getRange(i + 2, 1, 1, headers.length).clearContent();
+    cleared++;
+  }
+
+  return cleared;
+}
+
+function buildSwissMatchRow_(season, region, round, tableNo, p1, p2, note) {
+  var row = {
+    season: season,
+    region: region,
+    round: round,
+    table: tableNo,
+    highSeedEntryId: '',
+    p1EntryId: '',
+    p1Nickname: '',
+    p1Seed: '',
+    p2EntryId: '',
+    p2Nickname: '',
+    p2Seed: '',
+    song1: '',
+    level1: '',
+    p1Score1: '',
+    p2Score1: '',
+    song2: '',
+    level2: '',
+    p1Score2: '',
+    p2Score2: '',
+    song3: '',
+    level3: '',
+    p1Score3: '',
+    p2Score3: '',
+    winnerEntryId: '',
+    tieBreakerSong: '',
+    bye: false,
+    note: note || ''
+  };
+
+  if (p1) {
+    row.p1EntryId = p1.entryId;
+    row.p1Nickname = p1.nickname || p1.entryId;
+    row.p1Seed = p1.seed;
+  }
+
+  if (p2) {
+    row.p2EntryId = p2.entryId;
+    row.p2Nickname = p2.nickname || p2.entryId;
+    row.p2Seed = p2.seed;
+  }
+
+  if (p1 && p2) {
+    row.highSeedEntryId = p1.seed <= p2.seed ? p1.entryId : p2.entryId;
+  } else if (p1) {
+    row.highSeedEntryId = p1.entryId;
+    row.bye = true;
+    row.winnerEntryId = p1.entryId;
+    if (!row.note) row.note = 'AUTO-BYE';
+  }
+
+  return row;
+}
+
+function handleOpsSwissNextRound_(payload) {
+  payload = payload || {};
+
+  var season = trim_(payload.season) || '2026';
+  var region = normalizeRegionKey_(payload.region);
+  if (!region) {
+    return { ok: false, error: 'region is required (seoul/daejeon/gwangju/busan)' };
+  }
+
+  var existingMatches = getOpsRowsBySeasonRegion_('ops_db_swiss_matches', season, region);
+  var maxRound = 0;
+  for (var i = 0; i < existingMatches.length; i++) {
+    var rr = toNumber_(existingMatches[i].round, 0);
+    if (rr > maxRound) maxRound = rr;
+  }
+
+  var requestedRound = toNumber_(payload.round, null);
+  var round = requestedRound === null ? (maxRound + 1) : Math.floor(requestedRound);
+  if (round < 1) return { ok: false, error: 'round must be >= 1' };
+
+  var existingTargetRows = existingMatches.filter(function(row){
+    return toNumber_(row.round, 0) === round;
+  });
+  var overwrite = toBool_(payload.overwrite);
+  var force = toBool_(payload.force);
+  if (existingTargetRows.length > 0 && !overwrite) {
+    return {
+      ok: false,
+      error: 'target round already has rows. set overwrite=true to regenerate',
+      data: { season: season, region: region, round: round, existingRows: existingTargetRows.length }
+    };
+  }
+
+  var prevRound = round - 1;
+  if (!force && prevRound >= 1) {
+    var prevRows = existingMatches.filter(function(row){
+      return toNumber_(row.round, 0) === prevRound;
+    });
+    var incomplete = 0;
+    for (var pr = 0; pr < prevRows.length; pr++) {
+      var prev = prevRows[pr];
+      var bye = toBool_(prev.bye);
+      var winnerEntryId = trim_(prev.winnerEntryId);
+      if (!bye && !winnerEntryId) incomplete++;
+    }
+    if (incomplete > 0) {
+      return {
+        ok: false,
+        error: 'Previous round is not complete. missing winnerEntryId=' + incomplete + '. set force=true to override',
+        data: { season: season, region: region, round: round, previousRound: prevRound, incomplete: incomplete }
+      };
+    }
+  }
+
+  var participants = buildSwissPairableParticipants_(season, region);
+  if (participants.length === 0) {
+    return { ok: false, error: 'No standings rows found to generate swiss matches' };
+  }
+
+  var history = buildSwissOpponentHistory_(existingMatches, round);
+  var byeParticipant = pickSwissByeParticipant_(participants, existingMatches, round);
+  var pairs = buildSwissPairs_(participants, history);
+
+  var rowsToWrite = [];
+  var summary = [];
+  var tableNo = 1;
+
+  for (var p = 0; p < pairs.length; p++) {
+    var pair = pairs[p];
+    var note = pair.rematch ? 'AUTO(rematch fallback)' : 'AUTO';
+    var row = buildSwissMatchRow_(season, region, round, tableNo, pair.p1, pair.p2, note);
+    rowsToWrite.push(row);
+    summary.push({
+      table: tableNo,
+      p1EntryId: row.p1EntryId,
+      p2EntryId: row.p2EntryId,
+      rematchFallback: pair.rematch
+    });
+    tableNo++;
+  }
+
+  if (byeParticipant) {
+    var byeRow = buildSwissMatchRow_(season, region, round, tableNo, byeParticipant, null, 'AUTO-BYE');
+    rowsToWrite.push(byeRow);
+    summary.push({
+      table: tableNo,
+      p1EntryId: byeRow.p1EntryId,
+      p2EntryId: '',
+      bye: true
+    });
+  }
+
+  var schema = getOpsSchemaByName_('ops_db_swiss_matches');
+  if (!schema) return { ok: false, error: 'ops_db_swiss_matches schema not found' };
+
+  var ss = getSs_();
+  ensureSheetSchema_(ss, schema.name, schema.headers);
+  var sh = ss.getSheetByName(schema.name);
+
+  var clearedRows = 0;
+  if (overwrite && existingTargetRows.length > 0) {
+    clearedRows = clearOpsSwissRoundRows_(sh, schema.headers, season, region, round);
+  }
+
+  for (var w = 0; w < rowsToWrite.length; w++) {
+    upsertSheetRow_(sh, schema.headers, ['season', 'region', 'round', 'table'], rowsToWrite[w]);
+  }
+
+  appendOpsEvent_(
+    'swissNextRound',
+    season,
+    region,
+    '',
+    'round=' + round + ', rows=' + rowsToWrite.length + ', bye=' + (byeParticipant ? byeParticipant.entryId : '')
+  );
+
+  return {
+    ok: true,
+    data: {
+      season: season,
+      region: region,
+      round: round,
+      generatedRows: rowsToWrite.length,
+      clearedRows: clearedRows,
+      byeEntryId: byeParticipant ? byeParticipant.entryId : '',
+      pairs: summary
+    }
+  };
+}
+
+function handleOpsRoundClose_(payload) {
+  payload = payload || {};
+
+  var swissResult = handleOpsSwissNextRound_(payload);
+  if (!swissResult.ok) return swissResult;
+
+  var exportArchive = payload.exportArchive === undefined ? true : toBool_(payload.exportArchive);
+  var exportResult = null;
+
+  if (exportArchive) {
+    exportResult = handleOpsExport_({
+      season: swissResult.data.season,
+      region: swissResult.data.region
+    });
+    if (!exportResult.ok) {
+      return {
+        ok: false,
+        error: 'Swiss round created but export failed: ' + String(exportResult.error || 'Unknown error'),
+        data: {
+          swiss: swissResult.data,
+          export: exportResult
+        }
+      };
+    }
+  }
+
+  appendOpsEvent_(
+    'roundClose',
+    swissResult.data.season,
+    swissResult.data.region,
+    '',
+    'round=' + swissResult.data.round + ', export=' + (exportArchive ? 'true' : 'false')
+  );
+
+  return {
+    ok: true,
+    data: {
+      season: swissResult.data.season,
+      region: swissResult.data.region,
+      round: swissResult.data.round,
+      generatedRows: swissResult.data.generatedRows,
+      totalRows: exportResult && exportResult.data ? toNumber_(exportResult.data.totalRows, 0) : 0
+    }
+  };
+}
+
 function handleOpsExport_(payload) {
   payload = payload || {};
 
@@ -777,4 +1196,6 @@ function initializeOpsTabs() {
  * if (action === 'opsUpsert') return json_(handleOpsUpsert_(payload));
  * if (action === 'opsExport') return json_(handleOpsExport_(payload || params));
  * if (action === 'opsFeed') return json_(handleOpsFeed_(params));
+ * if (action === 'opsSwissNextRound') return json_(handleOpsSwissNextRound_(payload || params));
+ * if (action === 'opsRoundClose') return json_(handleOpsRoundClose_(payload || params));
  */
