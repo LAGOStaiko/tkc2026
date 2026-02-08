@@ -334,7 +334,7 @@ function getApiCacheTtlSec_(action) {
   if (action === 'schedule') return 90;   // 90s
   if (action === 'results') return 20;    // 20s (results update sensitivity)
   if (action === 'opsFeed') return 15;    // 15s (ops 라이브 데이터, 폴링 빈도 대응)
-  if (action === 'showcaseSongs') return 180; // 3m
+  if (action === 'showcaseSongs') return 15;  // 15s (revealed 즉시 반영)
   if (action === 'songPools') return 180;     // 3m
   return 60;
 }

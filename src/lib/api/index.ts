@@ -4,7 +4,7 @@ const SITE_STALE_MS = 5 * 60 * 1000
 const CONTENT_STALE_MS = 5 * 60 * 1000
 const SCHEDULE_STALE_MS = 60 * 1000
 const RESULTS_STALE_MS = 60 * 1000
-const SONGS_STALE_MS = 3 * 60 * 1000
+const SONGS_STALE_MS = 30 * 1000
 const SONG_POOLS_STALE_MS = 5 * 60 * 1000
 const PERSIST_PREFIX = 'tkc2026:api-cache:v1:'
 
@@ -198,8 +198,8 @@ export function useSongs<T = unknown>() {
     initialData: persisted?.data,
     initialDataUpdatedAt: persisted?.updatedAt,
     staleTime: SONGS_STALE_MS,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   })
 }
 
