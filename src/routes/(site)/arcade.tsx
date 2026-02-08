@@ -70,8 +70,8 @@ const SECTION_IDS: Record<ArcadeSection['sectionKey'], string> = {
 const SHEET_TITLES: Record<ArcadeSection['sectionKey'], string> = {
   atAGlance: '대회 개요',
   onlineQualifier: '온라인 예선',
-  offlineSwiss: '오프라인 예선 (Swiss)',
-  deciderAndSeeding: '3-1 결정전 / 시드전',
+  offlineSwiss: '오프라인 예선 (스위스 스테이지)',
+  deciderAndSeeding: '결선 진출자 선발전 / 시드전',
   finals: 'Top 8 결선',
   operations: '밴픽/점수/운영 규정',
 }

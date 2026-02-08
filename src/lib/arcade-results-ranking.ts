@@ -15,7 +15,7 @@ export type RegionFinalRank = {
 
 export function standingStatusLabel(status: ArcadeStandingRow['status']) {
   if (status === 'qualified') return '결선 진출'
-  if (status === 'decider') return '3-1 선발전'
+  if (status === 'decider') return '결선 진출자 선발전'
   if (status === 'eliminated') return '탈락'
   return '진행중'
 }

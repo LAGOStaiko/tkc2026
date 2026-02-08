@@ -69,9 +69,11 @@ function HomePage() {
       {/* PLAYX4 FINAL INFO */}
       <section className='rounded-2xl border border-white/10 bg-white/5 p-5 text-center shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-7'>
         <div className='text-xl font-semibold text-white/90 md:text-2xl'>
-          플레이 엑스포 결선 안내
+          플레이엑스포 결선 안내
         </div>
-        <div className='mt-2 text-base text-white/60'>추후 공개됩니다.</div>
+        <div className='mt-2 text-base text-white/60'>
+          추후 공개 예정입니다.
+        </div>
       </section>
 
       {/* VIDEO */}
@@ -140,7 +142,7 @@ function HomePage() {
           </div>
 
           <div className='text-sm text-white/50'>
-            © {new Date().getFullYear()} 태고의 달인 플레이 엑스포 토너먼트
+            © {new Date().getFullYear()} 태고의 달인 플레이엑스포 토너먼트
           </div>
         </div>
       </section>

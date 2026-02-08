@@ -264,7 +264,7 @@ function ArcadeRegionDetailPage() {
         </a>
         <TkcPageHeader
           title={`${regionData.label} 결과 아카이브`}
-          subtitle='온라인 예선 → Swiss → 3-1 선발전 → 시드전까지 전체 경기 로그'
+          subtitle='온라인 예선 → 스위스 스테이지 → 결선 진출자 선발전 → 시드전까지 전체 경기 로그'
         />
       </div>
 
@@ -480,7 +480,7 @@ function ArcadeRegionDetailPage() {
                       const statusStyle =
                         row.statusLabel === '결선 진출'
                           ? 'border-emerald-300/30 bg-emerald-500/10 text-emerald-200'
-                          : row.statusLabel === '3-1 선발전'
+                          : row.statusLabel === '결선 진출자 선발전'
                             ? 'border-[#ffb36d]/30 bg-[#ffb36d]/10 text-[#ffb36d]'
                             : row.statusLabel === '탈락'
                               ? 'border-red-300/20 bg-red-500/10 text-red-300/80'
@@ -532,7 +532,7 @@ function ArcadeRegionDetailPage() {
                   const statusStyle =
                     row.statusLabel === '결선 진출'
                       ? 'border-emerald-300/30 bg-emerald-500/10 text-emerald-200'
-                      : row.statusLabel === '3-1 선발전'
+                      : row.statusLabel === '결선 진출자 선발전'
                         ? 'border-[#ffb36d]/30 bg-[#ffb36d]/10 text-[#ffb36d]'
                         : row.statusLabel === '탈락'
                           ? 'border-red-300/20 bg-red-500/10 text-red-300/80'
@@ -690,13 +690,13 @@ function ArcadeRegionDetailPage() {
 
       <section className='space-y-3'>
         <StageTitle
-          title='Swiss Stage'
+          title='스위스 스테이지'
           subtitle='1:1 · 2곡 합산 · 2패 누적 탈락 · 동점 시 타이브레이커 반복'
         />
 
         {swissByRound.length === 0 ? (
           <EmptyMessage>
-            Swiss 경기 로그가 아직 입력되지 않았습니다.
+            스위스 스테이지 경기 로그가 아직 입력되지 않았습니다.
           </EmptyMessage>
         ) : (
           <div className='space-y-6'>

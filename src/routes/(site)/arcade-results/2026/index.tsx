@@ -84,13 +84,13 @@ function ArcadeResults2026Page() {
             detail={`${archive.songs.online1} + ${archive.songs.online2}`}
           />
           <StageRuleCard
-            title='Swiss Stage'
+            title='스위스 스테이지'
             description='16명 스위스 시스템, 2패 누적 시 탈락 (최대 4R).'
             detail='상위 시드 진영 선택 · 동점 시 랜덤 타이브레이커 반복'
           />
           <StageRuleCard
-            title='3-1 선발전 / 시드 배정전'
-            description='3-1 참가자 추가 선발 후, 결선 시드 배정전 진행.'
+            title='결선 진출자 선발전 / 시드 배정전'
+            description='3승 1패 참가자 추가 선발 후, 결선 시드 배정전 진행.'
             detail={`${archive.songs.decider31} / ${archive.songs.seeding}`}
           />
           <StageRuleCard

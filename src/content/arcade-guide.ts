@@ -25,7 +25,7 @@ export const FALLBACK_ARCADE_SECTIONS: ArcadeSection[] = [
 | 단계 | 지역별 선발 | 전체 |
 |---|---:|---:|
 | 온라인 예선 (스코어 어택) | 16명 | 64명 |
-| 오프라인 예선 (Swiss) | 2명 | 8명 |
+| 오프라인 예선 (스위스 스테이지) | 2명 | 8명 |
 | Top 8 결선 | - | 8명 |
 
 진행 흐름: **온라인 예선 -> 오프라인 예선 -> Top 8 결선**
@@ -61,7 +61,7 @@ export const FALLBACK_ARCADE_SECTIONS: ArcadeSection[] = [
   {
     sectionKey: 'offlineSwiss',
     order: 3,
-    title: '오프라인 예선 (Swiss Stage)',
+    title: '오프라인 예선 (스위스 스테이지)',
     bodyMd: `## 기본 규정
 
 - 참가 대상: 차수별 온라인 상위 16명
@@ -85,16 +85,16 @@ export const FALLBACK_ARCADE_SECTIONS: ArcadeSection[] = [
 ## 종료 판정
 
 - 4-0: 결선 자동 진출
-- 3-1: 3-1 결정전 진출
+- 3-1: 결선 진출자 선발전 진출
 - 2패 누적: 탈락`,
   },
   {
     sectionKey: 'deciderAndSeeding',
     order: 4,
-    title: '3-1 결정전 / 결선 시드 배정전',
-    bodyMd: `## 3-1 결정전
+    title: '결선 진출자 선발전 / 결선 시드 배정전',
+    bodyMd: `## 결선 진출자 선발전
 
-Swiss 종료 후 3-1 참가자끼리 추가 선발전을 진행합니다.
+스위스 스테이지 종료 후 3승 1패 참가자끼리 추가 선발전을 진행합니다.
 
 | 과제곡 | 난이도 | 결과 |
 |---|---|---|

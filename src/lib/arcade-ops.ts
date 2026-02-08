@@ -75,7 +75,7 @@ const YES_NO_OPTIONS = [
 const STANDING_STATUS_OPTIONS = [
   { value: 'alive', label: '진행중' },
   { value: 'qualified', label: '결선 진출 확정' },
-  { value: 'decider', label: '3-1 선발전 대상' },
+  { value: 'decider', label: '결선 진출자 선발전 대상' },
   { value: 'eliminated', label: '탈락' },
 ]
 
@@ -315,8 +315,8 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
   },
   decider: {
     key: 'decider',
-    label: '3-1 선발전 입력',
-    description: '3-1 결정전 점수 및 통과자를 기록합니다.',
+    label: '결선 진출자 선발전 입력',
+    description: '결선 진출자 선발전 점수 및 통과자를 기록합니다.',
     regionScoped: true,
     keyFields: ['season', 'region', 'entryId'],
     fields: [

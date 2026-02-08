@@ -93,8 +93,8 @@ function ResultsHubPage() {
             {archive.season} 시즌 아카이브
           </h2>
           <p className='mt-2.5 text-sm leading-relaxed text-white/75'>
-            온라인 예선, Swiss Stage, 3-1 선발전, 시드전, Top 8 결선을 단계별로
-            조회할 수 있습니다.
+            온라인 예선, 스위스 스테이지, 결선 진출자 선발전, 시드전, Top 8
+            결선을 단계별로 조회할 수 있습니다.
           </p>
           <div className='mt-5 flex flex-wrap gap-2'>
             <StatChip label='지역 확정' value={`${finalizedRegionCount}/4`} />

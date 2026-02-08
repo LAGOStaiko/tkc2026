@@ -77,7 +77,7 @@ function SongPoolPage() {
       [
         {
           key: 'arcadeSwiss',
-          label: '아케이드 스위스',
+          label: '아케이드 스위스 스테이지',
           iconSrc: '/branding/arcade-icon.png',
           pool: arcadeSwiss,
         },

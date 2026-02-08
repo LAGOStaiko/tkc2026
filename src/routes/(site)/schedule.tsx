@@ -511,7 +511,7 @@ const toLaneItems = (
   })
 
 const renderFinalMeta = (item: ApiScheduleItem | undefined) => {
-  if (!item) return '추후 공지됩니다.'
+  if (!item) return '추후 공개 예정입니다.'
 
   const dateText = item.dateText
     ? item.dateText
@@ -525,7 +525,7 @@ const renderFinalMeta = (item: ApiScheduleItem | undefined) => {
       })()
 
   const pieces = [dateText, item.location, item.note].filter(Boolean)
-  return pieces.length > 0 ? pieces.join(' · ') : '추후 공지됩니다.'
+  return pieces.length > 0 ? pieces.join(' · ') : '추후 공개 예정입니다.'
 }
 
 function SchedulePage() {

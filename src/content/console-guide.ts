@@ -95,7 +95,7 @@ export const FALLBACK_CONSOLE_SECTIONS: ConsoleSection[] = [
 ## 신청 시 제출 정보(필수)
 
 - 이름  
-- 닉네임(동더네임)  
+- 닉네임(동더 네임)  
 - 전화번호  
 - 이메일  
 
