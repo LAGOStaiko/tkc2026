@@ -27,9 +27,7 @@ export function TkcRuleSheet({
     <GlassCard id={id} className={cn('p-6 md:p-8', className)}>
       <div className='flex items-center gap-3'>
         <span className='inline-block h-6 w-1 rounded-full bg-[#ff2a00]' />
-        <h2 className='text-xl font-bold text-white md:text-2xl'>
-          {title}
-        </h2>
+        <h2 className='text-xl font-bold text-white md:text-2xl'>{title}</h2>
       </div>
       <div className='mt-6'>{children}</div>
     </GlassCard>

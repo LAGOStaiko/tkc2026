@@ -16,7 +16,8 @@
       "Bash(xargs cat:*)",
       "Bash(pnpm.cmd tsc:*)",
       "Bash(pnpm.cmd vite build:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git config:*)"
     ]
   }
 }

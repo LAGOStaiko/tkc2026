@@ -7,19 +7,23 @@ import type {
   ArcadeSwissMatch,
 } from './arcade-results-archive'
 
-export { buildRegionFinalRanking, standingStatusLabel } from './arcade-results-ranking'
+export {
+  buildRegionFinalRanking,
+  standingStatusLabel,
+} from './arcade-results-ranking'
 export type { RegionFinalRank } from './arcade-results-ranking'
 /** @deprecated Use `RegionFinalRank` from `arcade-results-ranking` instead */
 export type { RegionFinalRank as OpsRegionFinalRank } from './arcade-results-ranking'
 
 export type OpsRegionKey = 'seoul' | 'daejeon' | 'gwangju' | 'busan'
 
-export const OPS_REGION_OPTIONS: Array<{ value: OpsRegionKey; label: string }> = [
-  { value: 'seoul', label: '1차 서울' },
-  { value: 'daejeon', label: '2차 대전' },
-  { value: 'gwangju', label: '3차 광주' },
-  { value: 'busan', label: '4차 부산' },
-]
+export const OPS_REGION_OPTIONS: Array<{ value: OpsRegionKey; label: string }> =
+  [
+    { value: 'seoul', label: '1차 서울' },
+    { value: 'daejeon', label: '2차 대전' },
+    { value: 'gwangju', label: '3차 광주' },
+    { value: 'busan', label: '4차 부산' },
+  ]
 
 export type OpsStageKey =
   | 'online'
@@ -83,14 +87,57 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
     regionScoped: true,
     keyFields: ['season', 'region', 'entryId'],
     fields: [
-      { name: 'rank', label: '순위', type: 'number', required: true, placeholder: '1' },
-      { name: 'entryId', label: '엔트리 ID', required: true, placeholder: 'SEO-01' },
-      { name: 'nickname', label: '닉네임', required: true, placeholder: '서울선수01' },
-      { name: 'score1', label: '과제곡1 점수', type: 'number', required: true, placeholder: '995800' },
-      { name: 'score2', label: '과제곡2 점수', type: 'number', required: true, placeholder: '994200' },
-      { name: 'total', label: '합산 점수', type: 'number', placeholder: '비우면 자동 합산' },
-      { name: 'submittedAt', label: '제출 시각', placeholder: '2026-03-21 10:25:00' },
-      { name: 'advanced', label: '오프라인 진출', type: 'boolean', defaultValue: 'true', options: YES_NO_OPTIONS },
+      {
+        name: 'rank',
+        label: '순위',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'entryId',
+        label: '엔트리 ID',
+        required: true,
+        placeholder: 'SEO-01',
+      },
+      {
+        name: 'nickname',
+        label: '닉네임',
+        required: true,
+        placeholder: '서울선수01',
+      },
+      {
+        name: 'score1',
+        label: '과제곡1 점수',
+        type: 'number',
+        required: true,
+        placeholder: '995800',
+      },
+      {
+        name: 'score2',
+        label: '과제곡2 점수',
+        type: 'number',
+        required: true,
+        placeholder: '994200',
+      },
+      {
+        name: 'total',
+        label: '합산 점수',
+        type: 'number',
+        placeholder: '비우면 자동 합산',
+      },
+      {
+        name: 'submittedAt',
+        label: '제출 시각',
+        placeholder: '2026-03-21 10:25:00',
+      },
+      {
+        name: 'advanced',
+        label: '오프라인 진출',
+        type: 'boolean',
+        defaultValue: 'true',
+        options: YES_NO_OPTIONS,
+      },
     ],
   },
   swissMatch: {
@@ -100,30 +147,119 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
     regionScoped: true,
     keyFields: ['season', 'region', 'round', 'table'],
     fields: [
-      { name: 'round', label: '라운드', type: 'number', required: true, placeholder: '1' },
-      { name: 'table', label: '테이블', type: 'number', required: true, placeholder: '1' },
-      { name: 'highSeedEntryId', label: '상위 시드 엔트리', placeholder: 'SEO-01' },
-      { name: 'p1EntryId', label: 'P1 엔트리', required: true, placeholder: 'SEO-01' },
-      { name: 'p1Nickname', label: 'P1 닉네임', required: true, placeholder: '서울선수01' },
+      {
+        name: 'round',
+        label: '라운드',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'table',
+        label: '테이블',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'highSeedEntryId',
+        label: '상위 시드 엔트리',
+        placeholder: 'SEO-01',
+      },
+      {
+        name: 'p1EntryId',
+        label: 'P1 엔트리',
+        required: true,
+        placeholder: 'SEO-01',
+      },
+      {
+        name: 'p1Nickname',
+        label: 'P1 닉네임',
+        required: true,
+        placeholder: '서울선수01',
+      },
       { name: 'p1Seed', label: 'P1 시드', type: 'number', placeholder: '1' },
       { name: 'p2EntryId', label: 'P2 엔트리', placeholder: 'SEO-16' },
       { name: 'p2Nickname', label: 'P2 닉네임', placeholder: '서울선수16' },
       { name: 'p2Seed', label: 'P2 시드', type: 'number', placeholder: '16' },
-      { name: 'song1', label: '곡1', required: true, placeholder: '自由選曲 A' },
+      {
+        name: 'song1',
+        label: '곡1',
+        required: true,
+        placeholder: '自由選曲 A',
+      },
       { name: 'level1', label: '곡1 레벨', placeholder: '★9' },
-      { name: 'p1Score1', label: 'P1 곡1 점수', type: 'number', required: true, placeholder: '982000' },
-      { name: 'p2Score1', label: 'P2 곡1 점수', type: 'number', required: true, placeholder: '981200' },
-      { name: 'song2', label: '곡2', required: true, placeholder: '自由選曲 B' },
+      {
+        name: 'p1Score1',
+        label: 'P1 곡1 점수',
+        type: 'number',
+        required: true,
+        placeholder: '982000',
+      },
+      {
+        name: 'p2Score1',
+        label: 'P2 곡1 점수',
+        type: 'number',
+        required: true,
+        placeholder: '981200',
+      },
+      {
+        name: 'song2',
+        label: '곡2',
+        required: true,
+        placeholder: '自由選曲 B',
+      },
       { name: 'level2', label: '곡2 레벨', placeholder: '★9' },
-      { name: 'p1Score2', label: 'P1 곡2 점수', type: 'number', required: true, placeholder: '980500' },
-      { name: 'p2Score2', label: 'P2 곡2 점수', type: 'number', required: true, placeholder: '979900' },
-      { name: 'song3', label: '타이브레이커 곡', placeholder: 'Random Draw Song' },
+      {
+        name: 'p1Score2',
+        label: 'P1 곡2 점수',
+        type: 'number',
+        required: true,
+        placeholder: '980500',
+      },
+      {
+        name: 'p2Score2',
+        label: 'P2 곡2 점수',
+        type: 'number',
+        required: true,
+        placeholder: '979900',
+      },
+      {
+        name: 'song3',
+        label: '타이브레이커 곡',
+        placeholder: 'Random Draw Song',
+      },
       { name: 'level3', label: '타이브레이커 레벨', placeholder: '★10' },
-      { name: 'p1Score3', label: 'P1 타이브레이커 점수', type: 'number', placeholder: '980800' },
-      { name: 'p2Score3', label: 'P2 타이브레이커 점수', type: 'number', placeholder: '979900' },
-      { name: 'winnerEntryId', label: '승자 엔트리', required: true, placeholder: 'SEO-01' },
-      { name: 'tieBreakerSong', label: '타이브레이커 곡명', placeholder: '동점 아니면 비움' },
-      { name: 'bye', label: '부전승', type: 'boolean', defaultValue: 'false', options: YES_NO_OPTIONS },
+      {
+        name: 'p1Score3',
+        label: 'P1 타이브레이커 점수',
+        type: 'number',
+        placeholder: '980800',
+      },
+      {
+        name: 'p2Score3',
+        label: 'P2 타이브레이커 점수',
+        type: 'number',
+        placeholder: '979900',
+      },
+      {
+        name: 'winnerEntryId',
+        label: '승자 엔트리',
+        required: true,
+        placeholder: 'SEO-01',
+      },
+      {
+        name: 'tieBreakerSong',
+        label: '타이브레이커 곡명',
+        placeholder: '동점 아니면 비움',
+      },
+      {
+        name: 'bye',
+        label: '부전승',
+        type: 'boolean',
+        defaultValue: 'false',
+        options: YES_NO_OPTIONS,
+      },
       { name: 'note', label: '비고', placeholder: '동점 재경기 1회' },
     ],
   },
@@ -134,11 +270,39 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
     regionScoped: true,
     keyFields: ['season', 'region', 'entryId'],
     fields: [
-      { name: 'entryId', label: '엔트리 ID', required: true, placeholder: 'SEO-01' },
-      { name: 'nickname', label: '닉네임', required: true, placeholder: '서울선수01' },
-      { name: 'seed', label: '초기 시드', type: 'number', required: true, placeholder: '1' },
-      { name: 'wins', label: '승', type: 'number', required: true, placeholder: '3' },
-      { name: 'losses', label: '패', type: 'number', required: true, placeholder: '1' },
+      {
+        name: 'entryId',
+        label: '엔트리 ID',
+        required: true,
+        placeholder: 'SEO-01',
+      },
+      {
+        name: 'nickname',
+        label: '닉네임',
+        required: true,
+        placeholder: '서울선수01',
+      },
+      {
+        name: 'seed',
+        label: '초기 시드',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'wins',
+        label: '승',
+        type: 'number',
+        required: true,
+        placeholder: '3',
+      },
+      {
+        name: 'losses',
+        label: '패',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
       {
         name: 'status',
         label: '상태',
@@ -156,11 +320,39 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
     regionScoped: true,
     keyFields: ['season', 'region', 'entryId'],
     fields: [
-      { name: 'rank', label: '순위', type: 'number', required: true, placeholder: '1' },
-      { name: 'entryId', label: '엔트리 ID', required: true, placeholder: 'SEO-02' },
-      { name: 'nickname', label: '닉네임', required: true, placeholder: '서울선수02' },
-      { name: 'score', label: '점수', type: 'number', required: true, placeholder: '994500' },
-      { name: 'winner', label: '선발 통과', type: 'boolean', defaultValue: 'false', options: YES_NO_OPTIONS },
+      {
+        name: 'rank',
+        label: '순위',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'entryId',
+        label: '엔트리 ID',
+        required: true,
+        placeholder: 'SEO-02',
+      },
+      {
+        name: 'nickname',
+        label: '닉네임',
+        required: true,
+        placeholder: '서울선수02',
+      },
+      {
+        name: 'score',
+        label: '점수',
+        type: 'number',
+        required: true,
+        placeholder: '994500',
+      },
+      {
+        name: 'winner',
+        label: '선발 통과',
+        type: 'boolean',
+        defaultValue: 'false',
+        options: YES_NO_OPTIONS,
+      },
       { name: 'winnerEntryId', label: '통과 엔트리ID', placeholder: 'SEO-02' },
       { name: 'note', label: '비고', placeholder: 'Top 8 진출 확정' },
     ],
@@ -172,10 +364,32 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
     regionScoped: true,
     keyFields: ['season', 'region', 'entryId'],
     fields: [
-      { name: 'rank', label: '순위', type: 'number', required: true, placeholder: '1' },
-      { name: 'entryId', label: '엔트리 ID', required: true, placeholder: 'SEO-01' },
-      { name: 'nickname', label: '닉네임', required: true, placeholder: '서울선수01' },
-      { name: 'score', label: '점수', type: 'number', required: true, placeholder: '997500' },
+      {
+        name: 'rank',
+        label: '순위',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'entryId',
+        label: '엔트리 ID',
+        required: true,
+        placeholder: 'SEO-01',
+      },
+      {
+        name: 'nickname',
+        label: '닉네임',
+        required: true,
+        placeholder: '서울선수01',
+      },
+      {
+        name: 'score',
+        label: '점수',
+        type: 'number',
+        required: true,
+        placeholder: '997500',
+      },
       { name: 'note', label: '비고', placeholder: '지역 1위(A그룹)' },
     ],
   },
@@ -197,9 +411,25 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
           { value: 'B', label: 'B그룹 (지역 2위)' },
         ],
       },
-      { name: 'entryId', label: '엔트리 ID', required: true, placeholder: 'SEO-01' },
-      { name: 'nickname', label: '닉네임', required: true, placeholder: '서울선수01' },
-      { name: 'seed', label: '지역 순위', type: 'number', required: true, placeholder: '1' },
+      {
+        name: 'entryId',
+        label: '엔트리 ID',
+        required: true,
+        placeholder: 'SEO-01',
+      },
+      {
+        name: 'nickname',
+        label: '닉네임',
+        required: true,
+        placeholder: '서울선수01',
+      },
+      {
+        name: 'seed',
+        label: '지역 순위',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
     ],
   },
   finalA: {
@@ -209,12 +439,39 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
     regionScoped: false,
     keyFields: ['season', 'seed'],
     fields: [
-      { name: 'seed', label: 'A그룹 시드', type: 'number', required: true, placeholder: '1' },
-      { name: 'region', label: '지역 키', type: 'select', required: true, options: REGION_SELECT_OPTIONS },
+      {
+        name: 'seed',
+        label: 'A그룹 시드',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'region',
+        label: '지역 키',
+        type: 'select',
+        required: true,
+        options: REGION_SELECT_OPTIONS,
+      },
       { name: 'regionLabel', label: '지역 표기', placeholder: '서울' },
-      { name: 'entryId', label: '엔트리 ID', required: true, placeholder: 'SEO-01' },
-      { name: 'nickname', label: '닉네임', required: true, placeholder: '서울선수01' },
-      { name: 'score', label: '시드전 점수', type: 'number', placeholder: '998200' },
+      {
+        name: 'entryId',
+        label: '엔트리 ID',
+        required: true,
+        placeholder: 'SEO-01',
+      },
+      {
+        name: 'nickname',
+        label: '닉네임',
+        required: true,
+        placeholder: '서울선수01',
+      },
+      {
+        name: 'score',
+        label: '시드전 점수',
+        type: 'number',
+        placeholder: '998200',
+      },
     ],
   },
   finalB: {
@@ -224,12 +481,39 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
     regionScoped: false,
     keyFields: ['season', 'seed'],
     fields: [
-      { name: 'seed', label: 'B그룹 시드', type: 'number', required: true, placeholder: '1' },
-      { name: 'region', label: '지역 키', type: 'select', required: true, options: REGION_SELECT_OPTIONS },
+      {
+        name: 'seed',
+        label: 'B그룹 시드',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'region',
+        label: '지역 키',
+        type: 'select',
+        required: true,
+        options: REGION_SELECT_OPTIONS,
+      },
       { name: 'regionLabel', label: '지역 표기', placeholder: '대전' },
-      { name: 'entryId', label: '엔트리 ID', required: true, placeholder: 'DAE-02' },
-      { name: 'nickname', label: '닉네임', required: true, placeholder: '대전선수02' },
-      { name: 'score', label: '시드전 점수', type: 'number', placeholder: '996300' },
+      {
+        name: 'entryId',
+        label: '엔트리 ID',
+        required: true,
+        placeholder: 'DAE-02',
+      },
+      {
+        name: 'nickname',
+        label: '닉네임',
+        required: true,
+        placeholder: '대전선수02',
+      },
+      {
+        name: 'score',
+        label: '시드전 점수',
+        type: 'number',
+        placeholder: '996300',
+      },
     ],
   },
   finalMatch: {
@@ -239,18 +523,77 @@ export const OPS_STAGE_DEFINITIONS: Record<OpsStageKey, OpsStageDefinition> = {
     regionScoped: false,
     keyFields: ['season', 'matchNo'],
     fields: [
-      { name: 'matchNo', label: '매치 번호', type: 'number', required: true, placeholder: '1' },
-      { name: 'leftSeed', label: '좌측 시드', type: 'number', required: true, placeholder: '1' },
-      { name: 'leftRegion', label: '좌측 지역 키', type: 'select', required: true, options: REGION_SELECT_OPTIONS },
+      {
+        name: 'matchNo',
+        label: '매치 번호',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'leftSeed',
+        label: '좌측 시드',
+        type: 'number',
+        required: true,
+        placeholder: '1',
+      },
+      {
+        name: 'leftRegion',
+        label: '좌측 지역 키',
+        type: 'select',
+        required: true,
+        options: REGION_SELECT_OPTIONS,
+      },
       { name: 'leftRegionLabel', label: '좌측 지역 표기', placeholder: '서울' },
-      { name: 'leftEntryId', label: '좌측 엔트리', required: true, placeholder: 'SEO-01' },
-      { name: 'leftNickname', label: '좌측 닉네임', required: true, placeholder: '서울선수01' },
-      { name: 'rightSeed', label: '우측 시드', type: 'number', required: true, placeholder: '4' },
-      { name: 'rightRegion', label: '우측 지역 키', type: 'select', required: true, options: REGION_SELECT_OPTIONS },
-      { name: 'rightRegionLabel', label: '우측 지역 표기', placeholder: '부산' },
-      { name: 'rightEntryId', label: '우측 엔트리', required: true, placeholder: 'BUS-02' },
-      { name: 'rightNickname', label: '우측 닉네임', required: true, placeholder: '부산선수02' },
-      { name: 'winnerEntryId', label: '승자 엔트리', required: true, placeholder: 'SEO-01' },
+      {
+        name: 'leftEntryId',
+        label: '좌측 엔트리',
+        required: true,
+        placeholder: 'SEO-01',
+      },
+      {
+        name: 'leftNickname',
+        label: '좌측 닉네임',
+        required: true,
+        placeholder: '서울선수01',
+      },
+      {
+        name: 'rightSeed',
+        label: '우측 시드',
+        type: 'number',
+        required: true,
+        placeholder: '4',
+      },
+      {
+        name: 'rightRegion',
+        label: '우측 지역 키',
+        type: 'select',
+        required: true,
+        options: REGION_SELECT_OPTIONS,
+      },
+      {
+        name: 'rightRegionLabel',
+        label: '우측 지역 표기',
+        placeholder: '부산',
+      },
+      {
+        name: 'rightEntryId',
+        label: '우측 엔트리',
+        required: true,
+        placeholder: 'BUS-02',
+      },
+      {
+        name: 'rightNickname',
+        label: '우측 닉네임',
+        required: true,
+        placeholder: '부산선수02',
+      },
+      {
+        name: 'winnerEntryId',
+        label: '승자 엔트리',
+        required: true,
+        placeholder: 'SEO-01',
+      },
       { name: 'note', label: '비고', placeholder: '8강 결과 반영' },
     ],
   },
@@ -317,7 +660,6 @@ export function buildOpsUpsertPayload(args: {
   }
 }
 
-
 export type OpsRegionWeekStatus = {
   key: OpsRegionKey
   label: string
@@ -357,7 +699,9 @@ export type OpsRegionParticipant = {
 }
 
 function numToDraft(value?: number) {
-  return typeof value === 'number' && Number.isFinite(value) ? String(value) : ''
+  return typeof value === 'number' && Number.isFinite(value)
+    ? String(value)
+    : ''
 }
 
 function countQualifiers(region: ArcadeRegionArchive) {
@@ -381,7 +725,7 @@ function regionHasStarted(region: ArcadeRegionArchive) {
 function sortSwissMatches(rows: ArcadeSwissMatch[]) {
   return rows
     .slice()
-    .sort((a, b) => (a.round - b.round) || ((a.table ?? 0) - (b.table ?? 0)))
+    .sort((a, b) => a.round - b.round || (a.table ?? 0) - (b.table ?? 0))
 }
 
 function sortFinalMatches(rows: ArcadeFinalCrossMatch[]) {
@@ -472,8 +816,12 @@ function buildProgressSummary(items: OpsProgressMatch[]): OpsProgressSummary {
   }
 }
 
-export function buildRegionWeekStatuses(archive: ArcadeSeasonArchive): OpsRegionWeekStatus[] {
-  const regionByKey = new Map(archive.regions.map((region) => [region.key, region]))
+export function buildRegionWeekStatuses(
+  archive: ArcadeSeasonArchive
+): OpsRegionWeekStatus[] {
+  const regionByKey = new Map(
+    archive.regions.map((region) => [region.key, region])
+  )
 
   return OPS_REGION_OPTIONS.map((option, index) => {
     const region = regionByKey.get(option.value)
@@ -492,10 +840,15 @@ export function buildRegionWeekStatuses(archive: ArcadeSeasonArchive): OpsRegion
 
     const qualifierCount = countQualifiers(region)
     const swissTotal = region.swissMatches.length
-    const swissCompleted = region.swissMatches.filter((row) => Boolean(row.winnerEntryId)).length
-    const status = qualifierCount >= 2
-      ? 'done'
-      : (regionHasStarted(region) ? 'live' : 'pending')
+    const swissCompleted = region.swissMatches.filter((row) =>
+      Boolean(row.winnerEntryId)
+    ).length
+    const status =
+      qualifierCount >= 2
+        ? 'done'
+        : regionHasStarted(region)
+          ? 'live'
+          : 'pending'
 
     return {
       key: option.value,
@@ -510,18 +863,26 @@ export function buildRegionWeekStatuses(archive: ArcadeSeasonArchive): OpsRegion
   })
 }
 
-export function buildSwissProgress(region?: ArcadeRegionArchive): OpsProgressSummary {
+export function buildSwissProgress(
+  region?: ArcadeRegionArchive
+): OpsProgressSummary {
   if (!region) return { total: 0, completed: 0 }
   const items = sortSwissMatches(region.swissMatches).map(toSwissProgressMatch)
   return buildProgressSummary(items)
 }
 
-export function buildFinalsProgress(archive: ArcadeSeasonArchive): OpsProgressSummary {
-  const items = sortFinalMatches(archive.finals.crossMatches).map(toFinalProgressMatch)
+export function buildFinalsProgress(
+  archive: ArcadeSeasonArchive
+): OpsProgressSummary {
+  const items = sortFinalMatches(archive.finals.crossMatches).map(
+    toFinalProgressMatch
+  )
   return buildProgressSummary(items)
 }
 
-export function listSwissPendingMatches(region?: ArcadeRegionArchive): OpsProgressMatch[] {
+export function listSwissPendingMatches(
+  region?: ArcadeRegionArchive
+): OpsProgressMatch[] {
   if (!region) return []
   return sortSwissMatches(region.swissMatches)
     .filter((match) => !match.winnerEntryId)
@@ -581,7 +942,9 @@ export function buildRegionParticipants(
   })
 }
 
-export function buildSwissDraftFromMatch(match: ArcadeSwissMatch): Record<string, string> {
+export function buildSwissDraftFromMatch(
+  match: ArcadeSwissMatch
+): Record<string, string> {
   const game1 = match.games[0]
   const game2 = match.games[1]
   const game3 = match.games[2]
@@ -619,11 +982,15 @@ export function buildCurrentSwissMatchDraft(
   region?: ArcadeRegionArchive
 ): Record<string, string> | null {
   if (!region) return null
-  const current = sortSwissMatches(region.swissMatches).find((row) => !row.winnerEntryId)
+  const current = sortSwissMatches(region.swissMatches).find(
+    (row) => !row.winnerEntryId
+  )
   return current ? buildSwissDraftFromMatch(current) : null
 }
 
-export function buildNextSwissMatchDraft(region?: ArcadeRegionArchive): Record<string, string> {
+export function buildNextSwissMatchDraft(
+  region?: ArcadeRegionArchive
+): Record<string, string> {
   if (!region || region.swissMatches.length === 0) {
     return {
       round: '1',
@@ -682,9 +1049,8 @@ export function buildNextFinalMatchDraft(
   const current = sorted.find((row) => !row.winnerEntryId)
   if (current) return buildFinalMatchDraftFromMatch(current)
 
-  const nextNo = sorted.length > 0
-    ? Math.max(...sorted.map((row) => row.matchNo)) + 1
-    : 1
+  const nextNo =
+    sorted.length > 0 ? Math.max(...sorted.map((row) => row.matchNo)) + 1 : 1
 
   return {
     matchNo: String(nextNo),

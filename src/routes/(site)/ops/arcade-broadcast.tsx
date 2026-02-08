@@ -57,8 +57,10 @@ function statusLabel(status: 'pending' | 'live' | 'done') {
 }
 
 function statusBadgeClass(status: 'pending' | 'live' | 'done') {
-  if (status === 'done') return 'border-emerald-300/25 bg-emerald-500/10 text-emerald-200'
-  if (status === 'live') return 'border-[#ff2a00]/35 bg-[#ff2a00]/10 text-[#ffd6cf]'
+  if (status === 'done')
+    return 'border-emerald-300/25 bg-emerald-500/10 text-emerald-200'
+  if (status === 'live')
+    return 'border-[#ff2a00]/35 bg-[#ff2a00]/10 text-[#ffd6cf]'
   return 'border-white/20 bg-white/[0.06] text-white/70'
 }
 
@@ -98,14 +100,19 @@ function MatchCard({
             {match.leftEntryId || '-'} / {match.rightEntryId || '-'}
           </div>
           <div className='mt-3 text-xs text-white/55'>
-            승자: <span className='font-semibold text-white/85'>{matchWinnerLabel(match)}</span>
+            승자:{' '}
+            <span className='font-semibold text-white/85'>
+              {matchWinnerLabel(match)}
+            </span>
           </div>
           {match.note ? (
             <div className='mt-1 text-xs text-white/50'>{match.note}</div>
           ) : null}
         </>
       ) : (
-        <div className='mt-3 text-sm text-white/60'>진행중인 경기가 없습니다.</div>
+        <div className='mt-3 text-sm text-white/60'>
+          진행중인 경기가 없습니다.
+        </div>
       )}
     </div>
   )
@@ -120,16 +127,31 @@ function ArcadeOpsBroadcastPage() {
   const [lastUpdateAt, setLastUpdateAt] = useState('')
 
   const archive = useMemo(() => resolveArcadeSeasonArchive(feedRaw), [feedRaw])
-  const regionArchive = useMemo(() => getRegionByKey(archive, region), [archive, region])
-  const weekStatuses = useMemo(() => buildRegionWeekStatuses(archive), [archive])
+  const regionArchive = useMemo(
+    () => getRegionByKey(archive, region),
+    [archive, region]
+  )
+  const weekStatuses = useMemo(
+    () => buildRegionWeekStatuses(archive),
+    [archive]
+  )
   const weekStatus = useMemo(
     () => weekStatuses.find((week) => week.key === region),
     [region, weekStatuses]
   )
-  const swissProgress = useMemo(() => buildSwissProgress(regionArchive), [regionArchive])
+  const swissProgress = useMemo(
+    () => buildSwissProgress(regionArchive),
+    [regionArchive]
+  )
   const finalsProgress = useMemo(() => buildFinalsProgress(archive), [archive])
-  const swissPending = useMemo(() => listSwissPendingMatches(regionArchive), [regionArchive])
-  const finalsPending = useMemo(() => listFinalPendingMatches(archive), [archive])
+  const swissPending = useMemo(
+    () => listSwissPendingMatches(regionArchive),
+    [regionArchive]
+  )
+  const finalsPending = useMemo(
+    () => listFinalPendingMatches(archive),
+    [archive]
+  )
   const finalRanking = useMemo(
     () => (regionArchive ? buildRegionFinalRanking(regionArchive) : []),
     [regionArchive]
@@ -138,13 +160,19 @@ function ArcadeOpsBroadcastPage() {
   const primaryCurrent = swissProgress.current ?? finalsProgress.current
   const primaryNext = swissProgress.current
     ? swissProgress.next
-    : (finalsProgress.current ? finalsProgress.next : undefined)
+    : finalsProgress.current
+      ? finalsProgress.next
+      : undefined
   const primaryPrevious = swissProgress.current
     ? swissProgress.previous
-    : (finalsProgress.current ? finalsProgress.previous : (swissProgress.previous ?? finalsProgress.previous))
+    : finalsProgress.current
+      ? finalsProgress.previous
+      : (swissProgress.previous ?? finalsProgress.previous)
   const primaryStageLabel = swissProgress.current
     ? 'Swiss 진행중'
-    : (finalsProgress.current ? 'Top8 진행중' : '진행 대기')
+    : finalsProgress.current
+      ? 'Top8 진행중'
+      : '진행 대기'
 
   const pendingQueue = swissPending.length > 0 ? swissPending : finalsPending
 
@@ -156,7 +184,9 @@ function ArcadeOpsBroadcastPage() {
         method: 'GET',
         headers: { Accept: 'application/json' },
       })
-      const payload = (await response.json().catch(() => null)) as ApiEnvelope | null
+      const payload = (await response
+        .json()
+        .catch(() => null)) as ApiEnvelope | null
 
       if (!response.ok || !payload?.ok) {
         throw new Error(
@@ -171,7 +201,11 @@ function ArcadeOpsBroadcastPage() {
         })
       )
     } catch (err) {
-      setError(err instanceof Error ? err.message : '송출 데이터를 불러오지 못했습니다.')
+      setError(
+        err instanceof Error
+          ? err.message
+          : '송출 데이터를 불러오지 못했습니다.'
+      )
     }
   }, [region, season])
 
@@ -184,7 +218,8 @@ function ArcadeOpsBroadcastPage() {
   }, [fetchFeed])
 
   const regionLabel =
-    OPS_REGION_OPTIONS.find((option) => option.value === region)?.label ?? region
+    OPS_REGION_OPTIONS.find((option) => option.value === region)?.label ??
+    region
 
   return (
     <section className='min-h-[calc(100svh-6rem)] space-y-5 bg-black px-4 py-5 text-white md:px-8 md:py-8'>
@@ -200,7 +235,9 @@ function ArcadeOpsBroadcastPage() {
 
         <div className='mt-2 flex flex-wrap items-center gap-2 text-xs md:text-sm'>
           <span className='text-white/60'>현재 상태:</span>
-          <span className='font-semibold text-[#ffb8a8]'>{primaryStageLabel}</span>
+          <span className='font-semibold text-[#ffb8a8]'>
+            {primaryStageLabel}
+          </span>
           {weekStatus ? (
             <span
               className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${statusBadgeClass(weekStatus.status)}`}
@@ -220,7 +257,7 @@ function ArcadeOpsBroadcastPage() {
       <div className='grid gap-4 xl:grid-cols-3'>
         <section className='space-y-4 xl:col-span-2'>
           <div className='rounded-2xl border border-[#ff2a00]/35 bg-[#ff2a00]/10 p-5'>
-            <div className='text-xs font-semibold uppercase tracking-[0.18em] text-[#ffd6cf]'>
+            <div className='text-xs font-semibold tracking-[0.18em] text-[#ffd6cf] uppercase'>
               Current Match
             </div>
             {primaryCurrent ? (
@@ -234,14 +271,20 @@ function ArcadeOpsBroadcastPage() {
                   {primaryCurrent.rightName}
                 </div>
                 <div className='mt-3 text-xs text-white/70 md:text-sm'>
-                  Winner: <span className='font-bold text-white'>{matchWinnerLabel(primaryCurrent)}</span>
+                  Winner:{' '}
+                  <span className='font-bold text-white'>
+                    {matchWinnerLabel(primaryCurrent)}
+                  </span>
                 </div>
                 <div className='mt-1 text-[11px] text-white/55'>
-                  {primaryCurrent.leftEntryId || '-'} / {primaryCurrent.rightEntryId || '-'}
+                  {primaryCurrent.leftEntryId || '-'} /{' '}
+                  {primaryCurrent.rightEntryId || '-'}
                 </div>
               </>
             ) : (
-              <div className='mt-3 text-sm text-white/75'>진행중인 경기가 없습니다.</div>
+              <div className='mt-3 text-sm text-white/75'>
+                진행중인 경기가 없습니다.
+              </div>
             )}
           </div>
 
@@ -253,7 +296,9 @@ function ArcadeOpsBroadcastPage() {
 
         <section className='space-y-4'>
           <div className='rounded-2xl border border-white/15 bg-white/[0.04] p-4'>
-            <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>진행률</h3>
+            <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>
+              진행률
+            </h3>
             <div className='mt-3 space-y-2 text-xs md:text-sm'>
               <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
                 <div className='text-white/55'>Swiss</div>
@@ -275,13 +320,18 @@ function ArcadeOpsBroadcastPage() {
           </div>
 
           <div className='rounded-2xl border border-white/15 bg-white/[0.04] p-4'>
-            <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>Pending Queue</h3>
+            <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>
+              Pending Queue
+            </h3>
             <div className='mt-2 text-[11px] text-white/60'>
-              Swiss remaining {swissPending.length} / Top8 remaining {finalsPending.length}
+              Swiss remaining {swissPending.length} / Top8 remaining{' '}
+              {finalsPending.length}
             </div>
 
             {pendingQueue.length === 0 ? (
-              <div className='mt-3 text-xs text-white/60'>No pending matches.</div>
+              <div className='mt-3 text-xs text-white/60'>
+                No pending matches.
+              </div>
             ) : (
               <div className='mt-3 space-y-1.5 text-xs'>
                 {pendingQueue.slice(0, 6).map((match) => (
@@ -289,7 +339,9 @@ function ArcadeOpsBroadcastPage() {
                     key={match.id}
                     className='rounded-md border border-white/10 bg-black/25 px-2.5 py-2'
                   >
-                    <div className='font-semibold text-white/85'>{match.label}</div>
+                    <div className='font-semibold text-white/85'>
+                      {match.label}
+                    </div>
                     <div className='text-white/65'>
                       {match.leftName} vs {match.rightName}
                     </div>
@@ -300,7 +352,9 @@ function ArcadeOpsBroadcastPage() {
           </div>
 
           <div className='rounded-2xl border border-white/15 bg-white/[0.04] p-4'>
-            <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>지역 결선 진출</h3>
+            <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>
+              지역 결선 진출
+            </h3>
             <div className='mt-3 space-y-2 text-xs md:text-sm'>
               <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/8 px-3 py-2'>
                 <span className='text-white/55'>A그룹</span>{' '}
@@ -322,11 +376,15 @@ function ArcadeOpsBroadcastPage() {
           </div>
 
           <div className='rounded-2xl border border-white/15 bg-white/[0.04] p-4'>
-            <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>현재 포커스</h3>
+            <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>
+              현재 포커스
+            </h3>
             <div className='mt-3 text-xs text-white/70'>
               {primaryCurrent ? (
                 <div>
-                  <div className='font-semibold text-white/90'>{primaryCurrent.label}</div>
+                  <div className='font-semibold text-white/90'>
+                    {primaryCurrent.label}
+                  </div>
                   <div className='mt-1'>{matchName(primaryCurrent)}</div>
                 </div>
               ) : (
@@ -338,7 +396,9 @@ function ArcadeOpsBroadcastPage() {
       </div>
 
       <section className='rounded-2xl border border-white/15 bg-white/[0.04] p-4 md:p-5'>
-        <h2 className='text-lg font-bold text-[#ff2a00] md:text-2xl'>지역 순위 (Top 8)</h2>
+        <h2 className='text-lg font-bold text-[#ff2a00] md:text-2xl'>
+          지역 순위 (Top 8)
+        </h2>
         {finalRanking.length === 0 ? (
           <p className='mt-3 text-sm text-white/60'>순위 데이터 입력 대기</p>
         ) : (
@@ -359,17 +419,22 @@ function ArcadeOpsBroadcastPage() {
                       {row.rank}
                     </td>
                     <td className='px-3 py-2'>
-                      <div className='font-semibold text-white'>{row.nickname}</div>
+                      <div className='font-semibold text-white'>
+                        {row.nickname}
+                      </div>
                       <div className='font-mono text-[10px] text-white/45 md:text-xs'>
                         {row.entryId}
                       </div>
                     </td>
-                    <td className='px-3 py-2 text-right font-semibold tabular-nums text-white/75'>
-                      {typeof row.wins === 'number' && typeof row.losses === 'number'
+                    <td className='px-3 py-2 text-right font-semibold text-white/75 tabular-nums'>
+                      {typeof row.wins === 'number' &&
+                      typeof row.losses === 'number'
                         ? `${row.wins}-${row.losses}`
                         : '-'}
                     </td>
-                    <td className='px-3 py-2 text-white/70'>{row.statusLabel}</td>
+                    <td className='px-3 py-2 text-white/70'>
+                      {row.statusLabel}
+                    </td>
                   </tr>
                 ))}
               </tbody>

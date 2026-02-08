@@ -236,7 +236,8 @@ function normalizeOnlineRow(
     score1,
     score2,
     total,
-    submittedAt: toStringValue(record.submittedAt) ?? toStringValue(record.entryAt),
+    submittedAt:
+      toStringValue(record.submittedAt) ?? toStringValue(record.entryAt),
     advanced: Boolean(record.advanced),
   }
 }
@@ -261,10 +262,16 @@ function normalizeSwissMatch(
   const record = toRecord(value)
   if (!record) return undefined
 
-  const player1 = normalizeParticipant(record.player1 ?? record.left, fallbackIndex)
+  const player1 = normalizeParticipant(
+    record.player1 ?? record.left,
+    fallbackIndex
+  )
   if (!player1) return undefined
 
-  const player2 = normalizeParticipant(record.player2 ?? record.right, fallbackIndex + 1)
+  const player2 = normalizeParticipant(
+    record.player2 ?? record.right,
+    fallbackIndex + 1
+  )
 
   const games = toArray(record.games)
     .map((game) => normalizeSwissGame(game))
@@ -274,7 +281,8 @@ function normalizeSwissMatch(
     round: toNumberValue(record.round) ?? 1,
     table: toNumberValue(record.table),
     highSeedEntryId:
-      toStringValue(record.highSeedEntryId) ?? toStringValue(record.sideSelector),
+      toStringValue(record.highSeedEntryId) ??
+      toStringValue(record.sideSelector),
     player1,
     player2,
     games,
@@ -293,13 +301,17 @@ function normalizeStandingRow(
   if (!record) return undefined
 
   const entryId =
-    toStringValue(record.entryId) ?? toStringValue(record.id) ?? `E-UNK-${fallbackIndex + 1}`
+    toStringValue(record.entryId) ??
+    toStringValue(record.id) ??
+    `E-UNK-${fallbackIndex + 1}`
   const nickname =
     toStringValue(record.nickname) ?? toStringValue(record.name) ?? entryId
   const statusText = toStringValue(record.status)?.toLowerCase()
 
   const status: ArcadeStandingRow['status'] =
-    statusText === 'qualified' || statusText === 'decider' || statusText === 'eliminated'
+    statusText === 'qualified' ||
+    statusText === 'decider' ||
+    statusText === 'eliminated'
       ? statusText
       : 'alive'
 
@@ -368,7 +380,9 @@ function normalizeRegionArchive(
       : toArray(toRecord(record.seeding)?.rows)
 
   const qualifiersRecord =
-    toRecord(record.qualifiers) ?? toRecord(toRecord(record.seeding)?.qualifiers) ?? {}
+    toRecord(record.qualifiers) ??
+    toRecord(toRecord(record.seeding)?.qualifiers) ??
+    {}
 
   return {
     ...base,
@@ -541,7 +555,9 @@ function pickArchivePayload(source: unknown): Record<string, unknown> | null {
   return null
 }
 
-export function resolveArcadeSeasonArchive(source: unknown): ArcadeSeasonArchive {
+export function resolveArcadeSeasonArchive(
+  source: unknown
+): ArcadeSeasonArchive {
   const fallback = buildEmptyArchive()
   const payload = pickArchivePayload(source)
   if (!payload) return fallback
@@ -550,13 +566,17 @@ export function resolveArcadeSeasonArchive(source: unknown): ArcadeSeasonArchive
   const regionMap = new Map<ArcadeRegionKey, ArcadeRegionArchive>()
 
   for (const rawRegion of rawRegions) {
-    const key = normalizeRegionKey(toRecord(rawRegion)?.key ?? toRecord(rawRegion)?.region)
+    const key = normalizeRegionKey(
+      toRecord(rawRegion)?.key ?? toRecord(rawRegion)?.region
+    )
     if (!key) continue
     regionMap.set(key, normalizeRegionArchive(key, rawRegion))
   }
 
   const normalizedRegions = REGION_DEFINITIONS.map((def) => {
-    return regionMap.get(def.key) ?? fallback.regions.find((r) => r.key === def.key)!
+    return (
+      regionMap.get(def.key) ?? fallback.regions.find((r) => r.key === def.key)!
+    )
   })
 
   const finalsRecord =
@@ -582,13 +602,21 @@ export function resolveArcadeSeasonArchive(source: unknown): ArcadeSeasonArchive
 
   const parsedGroupASeeds = groupASource
     .map((row, index) =>
-      normalizeFinalSeedRow(row, index + 1, REGION_DEFINITIONS[index]?.key ?? 'seoul')
+      normalizeFinalSeedRow(
+        row,
+        index + 1,
+        REGION_DEFINITIONS[index]?.key ?? 'seoul'
+      )
     )
     .filter((row): row is ArcadeFinalSeedRow => Boolean(row))
 
   const parsedGroupBSeeds = groupBSource
     .map((row, index) =>
-      normalizeFinalSeedRow(row, index + 1, REGION_DEFINITIONS[index]?.key ?? 'seoul')
+      normalizeFinalSeedRow(
+        row,
+        index + 1,
+        REGION_DEFINITIONS[index]?.key ?? 'seoul'
+      )
     )
     .filter((row): row is ArcadeFinalSeedRow => Boolean(row))
 
@@ -609,13 +637,17 @@ export function resolveArcadeSeasonArchive(source: unknown): ArcadeSeasonArchive
     updatedAt: toStringValue(payload.updatedAt),
     songs: {
       online1:
-        toStringValue(toRecord(payload.songs)?.online1) ?? fallback.songs.online1,
+        toStringValue(toRecord(payload.songs)?.online1) ??
+        fallback.songs.online1,
       online2:
-        toStringValue(toRecord(payload.songs)?.online2) ?? fallback.songs.online2,
+        toStringValue(toRecord(payload.songs)?.online2) ??
+        fallback.songs.online2,
       decider31:
-        toStringValue(toRecord(payload.songs)?.decider31) ?? fallback.songs.decider31,
+        toStringValue(toRecord(payload.songs)?.decider31) ??
+        fallback.songs.decider31,
       seeding:
-        toStringValue(toRecord(payload.songs)?.seeding) ?? fallback.songs.seeding,
+        toStringValue(toRecord(payload.songs)?.seeding) ??
+        fallback.songs.seeding,
     },
     regions: normalizedRegions,
     finals: {

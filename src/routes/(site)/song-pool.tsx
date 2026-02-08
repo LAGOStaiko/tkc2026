@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
-import { cn } from '@/lib/utils'
 import { useSongPools } from '@/lib/api'
-import { LevelBadge } from '@/components/tkc/level-badge'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { LevelBadge } from '@/components/tkc/level-badge'
 
 export const Route = createFileRoute('/(site)/song-pool')({
   component: SongPoolPage,
@@ -89,9 +89,7 @@ function SongPoolPage() {
         <p className='text-sm text-white/60'>선곡풀을 불러오는 중...</p>
       ) : arcadeFinals.length === 0 && arcadeSwiss.length === 0 ? (
         <div className='rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-8 text-center'>
-          <p className='text-sm text-white/50'>
-            표시할 선곡풀이 없습니다.
-          </p>
+          <p className='text-sm text-white/50'>표시할 선곡풀이 없습니다.</p>
           <p className='mt-1 text-xs text-white/30'>
             시트 데이터 또는 difficulty 값(oni/ura)을 확인해 주세요.
           </p>
@@ -130,7 +128,11 @@ function SongPoolSection({
   return (
     <div>
       <div className='mb-4 flex items-center gap-3 md:mb-6'>
-        <img src={iconSrc} alt='' className='h-7 w-7 rounded-lg object-contain' />
+        <img
+          src={iconSrc}
+          alt=''
+          className='h-7 w-7 rounded-lg object-contain'
+        />
         <h2 className='text-xl font-bold text-white md:text-2xl'>{label}</h2>
         <span className='ml-auto text-sm text-white/50'>{pool.length}곡</span>
       </div>
@@ -149,7 +151,7 @@ function SongPoolSection({
           >
             {song.revealed ? (
               <>
-                <p className='font-medium leading-relaxed break-words text-white'>
+                <p className='leading-relaxed font-medium break-words text-white'>
                   {song.title}
                 </p>
                 <div className='mt-2 flex items-center gap-4'>
@@ -174,15 +176,29 @@ function SongPoolSection({
                 </div>
               </>
             ) : (
-              <div className='flex items-center gap-2'>
-                <span className='text-lg font-bold tracking-widest text-white/30'>???</span>
-                <Badge
-                  variant='outline'
-                  className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[#ff8c66]'
-                >
-                  추후 공지
-                </Badge>
-              </div>
+              <>
+                <p className='leading-relaxed font-medium text-white/30'>
+                  <span className='font-bold tracking-widest'>???</span>
+                  <Badge
+                    variant='outline'
+                    className='ml-2 border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[#ff8c66]'
+                  >
+                    추후 공지
+                  </Badge>
+                </p>
+                <div className='mt-2 flex items-center gap-4'>
+                  <div className='flex items-center gap-1.5'>
+                    <span className='text-xs text-white/50'>귀신</span>
+                    <span className='text-xs text-white/40'>—</span>
+                  </div>
+                  {hasUra && (
+                    <div className='flex items-center gap-1.5'>
+                      <span className='text-xs text-white/50'>뒷보면</span>
+                      <span className='text-xs text-white/40'>—</span>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
         ))}
@@ -193,7 +209,7 @@ function SongPoolSection({
         <table className='w-full text-sm md:text-base'>
           <caption className='sr-only'>{label} 선곡풀</caption>
           <thead>
-            <tr className='border-b border-white/10 text-left text-xs font-semibold uppercase tracking-wider text-white/50'>
+            <tr className='border-b border-white/10 text-left text-xs font-semibold tracking-wider text-white/50 uppercase'>
               <th className='px-4 py-3 text-center'>#</th>
               <th className='px-4 py-3'>곡명</th>
               <th className='px-4 py-3 text-center'>귀신</th>
@@ -215,7 +231,7 @@ function SongPoolSection({
                 </td>
                 {song.revealed ? (
                   <>
-                    <td className='px-4 py-3 font-medium leading-relaxed break-words text-white'>
+                    <td className='px-4 py-3 leading-relaxed font-medium break-words text-white'>
                       {song.title}
                     </td>
                     <td className='px-4 py-3 text-center'>
@@ -236,20 +252,27 @@ function SongPoolSection({
                     )}
                   </>
                 ) : (
-                  <td
-                    colSpan={hasUra ? 3 : 2}
-                    className='px-4 py-3'
-                  >
-                    <div className='flex items-center gap-2'>
-                      <span className='font-bold tracking-widest text-white/30'>???</span>
-                      <Badge
-                        variant='outline'
-                        className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[#ff8c66]'
-                      >
-                        추후 공지
-                      </Badge>
-                    </div>
-                  </td>
+                  <>
+                    <td className='px-4 py-3 leading-relaxed font-medium text-white/30'>
+                      <div className='flex items-center gap-2'>
+                        <span className='font-bold tracking-widest'>???</span>
+                        <Badge
+                          variant='outline'
+                          className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[#ff8c66]'
+                        >
+                          추후 공지
+                        </Badge>
+                      </div>
+                    </td>
+                    <td className='px-4 py-3 text-center'>
+                      <span className='text-white/20'>—</span>
+                    </td>
+                    {hasUra && (
+                      <td className='px-4 py-3 text-center'>
+                        <span className='text-white/20'>—</span>
+                      </td>
+                    )}
+                  </>
                 )}
               </tr>
             ))}
@@ -259,4 +282,3 @@ function SongPoolSection({
     </div>
   )
 }
-

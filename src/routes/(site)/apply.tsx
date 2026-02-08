@@ -3,11 +3,11 @@ import { z } from 'zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
-import { ChevronDown, Download } from 'lucide-react'
+import { parseSongOption, parseSongTitle } from '@/content/swiss-song-pool'
 import { t } from '@/text'
+import { ChevronDown, Download } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRegister, useSite, useSongPools } from '@/lib/api'
-import { parseSongOption, parseSongTitle } from '@/content/swiss-song-pool'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -242,8 +242,7 @@ function ApplyPage() {
     return entries
       .filter(
         (e): e is SongPoolEntry & { level: number } =>
-          e.level != null &&
-          (e.difficulty === 'oni' || e.difficulty === 'ura')
+          e.level != null && (e.difficulty === 'oni' || e.difficulty === 'ura')
       )
       .map((e) => `${e.title}|${e.difficulty}|${e.level}`)
   }, [poolsData?.arcadeSwiss])
@@ -607,7 +606,7 @@ function ApplyPage() {
                         {t('apply.field.videoLinkGuideTitle')}
                       </CollapsibleTrigger>
                       <CollapsibleContent className='mt-2 rounded-lg border border-white/10 bg-white/5 p-3'>
-                        <p className='whitespace-pre-line text-xs leading-relaxed text-white/60'>
+                        <p className='text-xs leading-relaxed whitespace-pre-line text-white/60'>
                           {t('apply.field.videoLinkGuide')}
                         </p>
                       </CollapsibleContent>
@@ -683,12 +682,14 @@ function ApplyPage() {
                         </p>
                       ) : (
                         <div className='grid gap-3 md:grid-cols-2'>
-                          {([
-                            'offlineSong1',
-                            'offlineSong2',
-                            'offlineSong3',
-                            'offlineSong4',
-                          ] as const).map((fieldName, index) => (
+                          {(
+                            [
+                              'offlineSong1',
+                              'offlineSong2',
+                              'offlineSong3',
+                              'offlineSong4',
+                            ] as const
+                          ).map((fieldName, index) => (
                             <FormField
                               key={fieldName}
                               control={form.control}
@@ -815,7 +816,7 @@ function ApplyPage() {
                         개인정보 수집 및 이용 세부사항
                       </CollapsibleTrigger>
                       <CollapsibleContent className='mt-2 rounded-lg border border-white/10 bg-white/5 p-3'>
-                        <p className='whitespace-pre-line text-xs leading-relaxed text-white/60'>
+                        <p className='text-xs leading-relaxed whitespace-pre-line text-white/60'>
                           {t('apply.field.privacyDetail')}
                         </p>
                       </CollapsibleContent>

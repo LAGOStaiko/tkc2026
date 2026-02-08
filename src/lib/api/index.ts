@@ -20,7 +20,9 @@ type PersistedCache<T> = {
 }
 
 function canUseStorage() {
-  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+  return (
+    typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+  )
 }
 
 function readPersistedCache<T>(key: string): PersistedCache<T> | null {
@@ -31,7 +33,11 @@ function readPersistedCache<T>(key: string): PersistedCache<T> | null {
     if (!raw) return null
 
     const parsed = JSON.parse(raw) as Partial<PersistedCache<T>>
-    if (!parsed || typeof parsed.updatedAt !== 'number' || !('data' in parsed)) {
+    if (
+      !parsed ||
+      typeof parsed.updatedAt !== 'number' ||
+      !('data' in parsed)
+    ) {
       return null
     }
 
@@ -52,7 +58,10 @@ function writePersistedCache<T>(key: string, data: T) {
       data,
       updatedAt: Date.now(),
     }
-    window.localStorage.setItem(`${PERSIST_PREFIX}${key}`, JSON.stringify(payload))
+    window.localStorage.setItem(
+      `${PERSIST_PREFIX}${key}`,
+      JSON.stringify(payload)
+    )
   } catch {
     // Ignore storage quota/private mode errors.
   }

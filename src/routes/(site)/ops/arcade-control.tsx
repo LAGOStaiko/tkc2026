@@ -1,15 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   buildCurrentFinalMatchDraft,
   buildCurrentSwissMatchDraft,
@@ -32,6 +22,16 @@ import {
   getRegionByKey,
   resolveArcadeSeasonArchive,
 } from '@/lib/arcade-results-archive'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/ops/arcade-control')({
@@ -78,7 +78,9 @@ async function requestOpsApi(
     headers,
     body: method === 'GET' ? undefined : JSON.stringify(body),
   })
-  const payload = (await response.json().catch(() => null)) as ApiEnvelope | null
+  const payload = (await response
+    .json()
+    .catch(() => null)) as ApiEnvelope | null
 
   if (!response.ok || !payload?.ok) {
     throw new Error(
@@ -90,8 +92,10 @@ async function requestOpsApi(
 }
 
 function statusBadgeClass(status: 'pending' | 'live' | 'done') {
-  if (status === 'done') return 'border-emerald-300/25 bg-emerald-500/10 text-emerald-200'
-  if (status === 'live') return 'border-[#ff2a00]/35 bg-[#ff2a00]/10 text-[#ffd6cf]'
+  if (status === 'done')
+    return 'border-emerald-300/25 bg-emerald-500/10 text-emerald-200'
+  if (status === 'live')
+    return 'border-[#ff2a00]/35 bg-[#ff2a00]/10 text-[#ffd6cf]'
   return 'border-white/20 bg-white/[0.06] text-white/70'
 }
 
@@ -117,40 +121,40 @@ function parseBulkSwissLines(source: string): BulkSwissSeedRow[] {
   const rows: BulkSwissSeedRow[] = []
   const usedTables = new Set<number>()
 
-  source
-    .split(/\r?\n/g)
-    .forEach((line, index) => {
-      const text = line.trim()
-      if (!text || text.startsWith('#')) return
+  source.split(/\r?\n/g).forEach((line, index) => {
+    const text = line.trim()
+    if (!text || text.startsWith('#')) return
 
-      const parts = (text.includes(',') ? text.split(',') : text.split(/\s+/g))
-        .map((part) => part.trim())
-        .filter((part) => part.length > 0)
+    const parts = (text.includes(',') ? text.split(',') : text.split(/\s+/g))
+      .map((part) => part.trim())
+      .filter((part) => part.length > 0)
 
-      if (parts.length < 3) {
-        throw new Error(`Invalid line ${index + 1}. Use: table,p1EntryId,p2EntryId[,note]`)
-      }
+    if (parts.length < 3) {
+      throw new Error(
+        `Invalid line ${index + 1}. Use: table,p1EntryId,p2EntryId[,note]`
+      )
+    }
 
-      const table = Number(parts[0])
-      if (!Number.isInteger(table) || table <= 0) {
-        throw new Error(`Invalid table number at line ${index + 1}`)
-      }
-      if (usedTables.has(table)) {
-        throw new Error(`Duplicate table ${table} in pre-draw lines`)
-      }
-      usedTables.add(table)
+    const table = Number(parts[0])
+    if (!Number.isInteger(table) || table <= 0) {
+      throw new Error(`Invalid table number at line ${index + 1}`)
+    }
+    if (usedTables.has(table)) {
+      throw new Error(`Duplicate table ${table} in pre-draw lines`)
+    }
+    usedTables.add(table)
 
-      const p1EntryId = parts[1]
-      const p2Token = parts[2]
-      const isBye = p2Token === '-' || p2Token.toLowerCase() === 'bye'
+    const p1EntryId = parts[1]
+    const p2Token = parts[2]
+    const isBye = p2Token === '-' || p2Token.toLowerCase() === 'bye'
 
-      rows.push({
-        table,
-        p1EntryId,
-        p2EntryId: isBye ? undefined : p2Token,
-        note: parts.length > 3 ? parts.slice(3).join(', ') : undefined,
-      })
+    rows.push({
+      table,
+      p1EntryId,
+      p2EntryId: isBye ? undefined : p2Token,
+      note: parts.length > 3 ? parts.slice(3).join(', ') : undefined,
     })
+  })
 
   if (rows.length === 0) {
     throw new Error('No pre-draw lines found')
@@ -196,13 +200,22 @@ function ArcadeOpsControlPage() {
   const stageDef = OPS_STAGE_DEFINITIONS[stage]
 
   const archive = useMemo(() => resolveArcadeSeasonArchive(feedRaw), [feedRaw])
-  const weekStatuses = useMemo(() => buildRegionWeekStatuses(archive), [archive])
-  const regionArchive = useMemo(() => getRegionByKey(archive, region), [archive, region])
+  const weekStatuses = useMemo(
+    () => buildRegionWeekStatuses(archive),
+    [archive]
+  )
+  const regionArchive = useMemo(
+    () => getRegionByKey(archive, region),
+    [archive, region]
+  )
   const finalRanking = useMemo(() => {
     if (!regionArchive) return []
     return buildRegionFinalRanking(regionArchive)
   }, [regionArchive])
-  const swissProgress = useMemo(() => buildSwissProgress(regionArchive), [regionArchive])
+  const swissProgress = useMemo(
+    () => buildSwissProgress(regionArchive),
+    [regionArchive]
+  )
   const finalsProgress = useMemo(() => buildFinalsProgress(archive), [archive])
   const regionParticipants = useMemo(
     () => buildRegionParticipants(regionArchive),
@@ -211,23 +224,36 @@ function ArcadeOpsControlPage() {
 
   const participantByEntryId = useMemo(() => {
     return new Map(
-      regionParticipants.map((participant) => [participant.entryId, participant] as const)
+      regionParticipants.map(
+        (participant) => [participant.entryId, participant] as const
+      )
     )
   }, [regionParticipants])
 
   const isSequentialStage = stage === 'swissMatch' || stage === 'finalMatch'
-  const stageCurrent = stage === 'swissMatch'
-    ? swissProgress.current
-    : (stage === 'finalMatch' ? finalsProgress.current : undefined)
-  const stageNext = stage === 'swissMatch'
-    ? swissProgress.next
-    : (stage === 'finalMatch' ? finalsProgress.next : undefined)
-  const stagePrevious = stage === 'swissMatch'
-    ? swissProgress.previous
-    : (stage === 'finalMatch' ? finalsProgress.previous : undefined)
+  const stageCurrent =
+    stage === 'swissMatch'
+      ? swissProgress.current
+      : stage === 'finalMatch'
+        ? finalsProgress.current
+        : undefined
+  const stageNext =
+    stage === 'swissMatch'
+      ? swissProgress.next
+      : stage === 'finalMatch'
+        ? finalsProgress.next
+        : undefined
+  const stagePrevious =
+    stage === 'swissMatch'
+      ? swissProgress.previous
+      : stage === 'finalMatch'
+        ? finalsProgress.previous
+        : undefined
   const currentSwissRound = useMemo(() => {
     if (!regionArchive || regionArchive.swissMatches.length === 0) return null
-    const unresolved = regionArchive.swissMatches.find((match) => !match.winnerEntryId)
+    const unresolved = regionArchive.swissMatches.find(
+      (match) => !match.winnerEntryId
+    )
     if (unresolved) return unresolved.round
 
     const rounds = regionArchive.swissMatches.map((match) => match.round)
@@ -251,11 +277,13 @@ function ArcadeOpsControlPage() {
       return [
         {
           entryId: draft.leftEntryId?.trim() ?? '',
-          nickname: draft.leftNickname?.trim() ?? draft.leftEntryId?.trim() ?? '',
+          nickname:
+            draft.leftNickname?.trim() ?? draft.leftEntryId?.trim() ?? '',
         },
         {
           entryId: draft.rightEntryId?.trim() ?? '',
-          nickname: draft.rightNickname?.trim() ?? draft.rightEntryId?.trim() ?? '',
+          nickname:
+            draft.rightNickname?.trim() ?? draft.rightEntryId?.trim() ?? '',
         },
       ].filter((row) => row.entryId)
     }
@@ -263,7 +291,8 @@ function ArcadeOpsControlPage() {
   }, [draft, stage])
 
   const broadcastUrl = useMemo(
-    () => `/ops/arcade-broadcast?season=${encodeURIComponent(season)}&region=${region}`,
+    () =>
+      `/ops/arcade-broadcast?season=${encodeURIComponent(season)}&region=${region}`,
     [season, region]
   )
 
@@ -271,12 +300,15 @@ function ArcadeOpsControlPage() {
     setDraft((prev) => ({ ...prev, [name]: value }))
   }
 
-  const applyTemplate = useCallback((template: Record<string, string>) => {
-    setDraft({
-      ...buildInitialDraft(stage),
-      ...template,
-    })
-  }, [stage])
+  const applyTemplate = useCallback(
+    (template: Record<string, string>) => {
+      setDraft({
+        ...buildInitialDraft(stage),
+        ...template,
+      })
+    },
+    [stage]
+  )
 
   const resetDraft = useCallback(() => {
     setDraft(buildInitialDraft(stage))
@@ -321,7 +353,9 @@ function ArcadeOpsControlPage() {
         method: 'GET',
         headers: { Accept: 'application/json' },
       })
-      const payload = (await response.json().catch(() => null)) as ApiEnvelope | null
+      const payload = (await response
+        .json()
+        .catch(() => null)) as ApiEnvelope | null
 
       if (!response.ok || !payload?.ok) {
         throw new Error(
@@ -450,8 +484,10 @@ function ArcadeOpsControlPage() {
     const activePlayers = regionParticipants
       .filter((player) => player.status !== 'eliminated')
       .sort((a, b) => {
-        const aSeed = typeof a.seed === 'number' ? a.seed : Number.MAX_SAFE_INTEGER
-        const bSeed = typeof b.seed === 'number' ? b.seed : Number.MAX_SAFE_INTEGER
+        const aSeed =
+          typeof a.seed === 'number' ? a.seed : Number.MAX_SAFE_INTEGER
+        const bSeed =
+          typeof b.seed === 'number' ? b.seed : Number.MAX_SAFE_INTEGER
         if (aSeed !== bSeed) return aSeed - bSeed
         return a.entryId.localeCompare(b.entryId)
       })
@@ -473,7 +509,9 @@ function ArcadeOpsControlPage() {
     setBulkRound(String(suggestedRound))
     setBulkLines(lines.join('\n'))
     setErrorMessage('')
-    setInfoMessage(`Generated ${lines.length} tables from current participant list`)
+    setInfoMessage(
+      `Generated ${lines.length} tables from current participant list`
+    )
   }
 
   const handleBulkSeedRound = async () => {
@@ -495,7 +533,9 @@ function ArcadeOpsControlPage() {
 
       for (const row of rows) {
         const p1 = participantByEntryId.get(row.p1EntryId)
-        const p2 = row.p2EntryId ? participantByEntryId.get(row.p2EntryId) : undefined
+        const p2 = row.p2EntryId
+          ? participantByEntryId.get(row.p2EntryId)
+          : undefined
         const bye = !row.p2EntryId
 
         const p1Seed = p1?.seed
@@ -547,11 +587,16 @@ function ArcadeOpsControlPage() {
       const fresh = await fetchFeed()
       const nextArchive = resolveArcadeSeasonArchive(fresh)
       const nextRegion = getRegionByKey(nextArchive, region)
-      applyTemplate(buildCurrentSwissMatchDraft(nextRegion) ?? buildNextSwissMatchDraft(nextRegion))
+      applyTemplate(
+        buildCurrentSwissMatchDraft(nextRegion) ??
+          buildNextSwissMatchDraft(nextRegion)
+      )
 
       setInfoMessage(`Round ${round} pre-draw saved (${rows.length} tables)`)
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : 'Round pre-draw save failed')
+      setErrorMessage(
+        err instanceof Error ? err.message : 'Round pre-draw save failed'
+      )
     } finally {
       setIsBulkSeeding(false)
     }
@@ -596,7 +641,12 @@ function ArcadeOpsControlPage() {
       setIsInitRunning(true)
       setErrorMessage('')
       setInfoMessage('')
-      await requestOpsApi('/api/ops/init', 'POST', { scope: 'ops' }, operatorKey)
+      await requestOpsApi(
+        '/api/ops/init',
+        'POST',
+        { scope: 'ops' },
+        operatorKey
+      )
       setInfoMessage('운영 DB 탭 초기화 완료')
       await fetchFeed()
     } catch (err) {
@@ -607,19 +657,23 @@ function ArcadeOpsControlPage() {
   }
 
   const handleExportRegion = async () => {
-    if (exportReplaceMode && !confirm('해당 지역 시즌 데이터만 정리 후 재송출합니다. 결선 시트는 유지됩니다. 계속하시겠습니까?')) return
+    if (
+      exportReplaceMode &&
+      !confirm(
+        '해당 지역 시즌 데이터만 정리 후 재송출합니다. 결선 시트는 유지됩니다. 계속하시겠습니까?'
+      )
+    )
+      return
     try {
       setIsExportRegionRunning(true)
       setErrorMessage('')
       setInfoMessage('')
-      const payload: Record<string, string> = { season: season.trim() || DEFAULT_SEASON, region }
+      const payload: Record<string, string> = {
+        season: season.trim() || DEFAULT_SEASON,
+        region,
+      }
       if (exportReplaceMode) payload.mode = 'replace'
-      await requestOpsApi(
-        '/api/ops/export',
-        'POST',
-        payload,
-        operatorKey
-      )
+      await requestOpsApi('/api/ops/export', 'POST', payload, operatorKey)
       setInfoMessage(
         exportReplaceMode
           ? '이번 주 지역 결과를 클린 송출했습니다. (지역 스코프 시트만 초기화 후 재송출)'
@@ -645,25 +699,31 @@ function ArcadeOpsControlPage() {
       )
       setInfoMessage('Ops guide sheet has been written. (ops_sheet_guide)')
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : 'Failed to write ops guide sheet')
+      setErrorMessage(
+        err instanceof Error ? err.message : 'Failed to write ops guide sheet'
+      )
     } finally {
       setIsGuideRunning(false)
     }
   }
   const handleExportAll = async () => {
-    if (exportReplaceMode && !confirm('시즌 전체 아카이브를 정리 후 재송출합니다 (결선 포함). 계속하시겠습니까?')) return
+    if (
+      exportReplaceMode &&
+      !confirm(
+        '시즌 전체 아카이브를 정리 후 재송출합니다 (결선 포함). 계속하시겠습니까?'
+      )
+    )
+      return
     try {
       setIsExportAllRunning(true)
       setErrorMessage('')
       setInfoMessage('')
-      const payload: Record<string, string> = { season: season.trim() || DEFAULT_SEASON, region: 'all' }
+      const payload: Record<string, string> = {
+        season: season.trim() || DEFAULT_SEASON,
+        region: 'all',
+      }
       if (exportReplaceMode) payload.mode = 'replace'
-      await requestOpsApi(
-        '/api/ops/export',
-        'POST',
-        payload,
-        operatorKey
-      )
+      await requestOpsApi('/api/ops/export', 'POST', payload, operatorKey)
       setInfoMessage(
         exportReplaceMode
           ? `시즌 ${season || DEFAULT_SEASON} 전체 클린 송출 완료 (결선 포함, 고아 데이터 제거됨)`
@@ -686,7 +746,9 @@ function ArcadeOpsControlPage() {
       <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
         <div className='grid gap-3 md:grid-cols-4'>
           <div className='space-y-1.5 md:col-span-2'>
-            <label className='text-xs font-semibold text-white/70'>운영자 키</label>
+            <label className='text-xs font-semibold text-white/70'>
+              운영자 키
+            </label>
             <Input
               type='password'
               value={operatorKey}
@@ -706,7 +768,9 @@ function ArcadeOpsControlPage() {
           </div>
 
           <div className='space-y-1.5'>
-            <label className='text-xs font-semibold text-white/70'>현재 지역</label>
+            <label className='text-xs font-semibold text-white/70'>
+              현재 지역
+            </label>
             <Select
               value={region}
               onValueChange={(value) => setRegion(value as OpsRegionKey)}
@@ -759,9 +823,12 @@ function ArcadeOpsControlPage() {
 
       <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
         <div className='space-y-1.5'>
-          <h2 className='text-base font-bold text-white'>주간 지역 운영 보드</h2>
+          <h2 className='text-base font-bold text-white'>
+            주간 지역 운영 보드
+          </h2>
           <p className='text-xs text-white/60'>
-            1주차부터 4주차까지 지역을 순서대로 운영합니다. 카드를 눌러 현재 주차 지역을 즉시 전환할 수 있습니다.
+            1주차부터 4주차까지 지역을 순서대로 운영합니다. 카드를 눌러 현재
+            주차 지역을 즉시 전환할 수 있습니다.
           </p>
         </div>
 
@@ -790,7 +857,8 @@ function ArcadeOpsControlPage() {
 
               <p className='mt-2 text-sm font-bold text-white'>{week.label}</p>
               <p className='mt-2 text-[11px] text-white/60'>
-                온라인 {week.onlineEntries}명 / Swiss {week.swissCompleted}/{week.swissTotal} / 결선확정 {week.qualifierCount}/2
+                온라인 {week.onlineEntries}명 / Swiss {week.swissCompleted}/
+                {week.swissTotal} / 결선확정 {week.qualifierCount}/2
               </p>
             </button>
           ))}
@@ -806,7 +874,9 @@ function ArcadeOpsControlPage() {
         </div>
 
         <div className='mt-4 space-y-1.5'>
-          <label className='text-xs font-semibold text-white/70'>입력 스테이지</label>
+          <label className='text-xs font-semibold text-white/70'>
+            입력 스테이지
+          </label>
           <Select
             value={stage}
             onValueChange={(value) => setStage(value as OpsStageKey)}
@@ -833,15 +903,21 @@ function ArcadeOpsControlPage() {
             <div className='mt-2 grid gap-2 text-xs md:grid-cols-3'>
               <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
                 <div className='text-white/50'>현재 경기</div>
-                <div className='mt-1 font-medium text-white/85'>{matchLine(stageCurrent)}</div>
+                <div className='mt-1 font-medium text-white/85'>
+                  {matchLine(stageCurrent)}
+                </div>
               </div>
               <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
                 <div className='text-white/50'>다음 경기</div>
-                <div className='mt-1 font-medium text-white/85'>{matchLine(stageNext)}</div>
+                <div className='mt-1 font-medium text-white/85'>
+                  {matchLine(stageNext)}
+                </div>
               </div>
               <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
                 <div className='text-white/50'>직전 결과</div>
-                <div className='mt-1 font-medium text-white/85'>{matchLine(stagePrevious)}</div>
+                <div className='mt-1 font-medium text-white/85'>
+                  {matchLine(stagePrevious)}
+                </div>
               </div>
             </div>
 
@@ -853,11 +929,7 @@ function ArcadeOpsControlPage() {
               >
                 현재 경기 불러오기
               </Button>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={handleLoadNextMatch}
-              >
+              <Button variant='outline' size='sm' onClick={handleLoadNextMatch}>
                 다음 경기 슬롯
               </Button>
             </div>
@@ -876,7 +948,8 @@ function ArcadeOpsControlPage() {
             </div>
 
             <p className='mt-1 text-[11px] text-white/55'>
-              Format: `table,p1EntryId,p2EntryId[,note]` one line each. Use `BYE` or `-` for no opponent.
+              Format: `table,p1EntryId,p2EntryId[,note]` one line each. Use
+              `BYE` or `-` for no opponent.
             </p>
 
             <div className='mt-3 grid gap-2 md:grid-cols-3'>
@@ -887,11 +960,15 @@ function ArcadeOpsControlPage() {
                   inputMode='numeric'
                   value={bulkRound}
                   onChange={(event) => setBulkRound(event.target.value)}
-                  placeholder={currentSwissRound ? String(currentSwissRound) : '1'}
+                  placeholder={
+                    currentSwissRound ? String(currentSwissRound) : '1'
+                  }
                 />
               </div>
               <div className='space-y-1'>
-                <label className='text-[11px] text-white/60'>song1 / level1</label>
+                <label className='text-[11px] text-white/60'>
+                  song1 / level1
+                </label>
                 <div className='grid grid-cols-3 gap-2'>
                   <Input
                     className='col-span-2'
@@ -907,7 +984,9 @@ function ArcadeOpsControlPage() {
                 </div>
               </div>
               <div className='space-y-1'>
-                <label className='text-[11px] text-white/60'>song2 / level2</label>
+                <label className='text-[11px] text-white/60'>
+                  song2 / level2
+                </label>
                 <div className='grid grid-cols-3 gap-2'>
                   <Input
                     className='col-span-2'
@@ -926,7 +1005,9 @@ function ArcadeOpsControlPage() {
 
             <div className='mt-2 grid gap-2 md:grid-cols-3'>
               <div className='space-y-1 md:col-span-1'>
-                <label className='text-[11px] text-white/60'>song3 / level3 (optional)</label>
+                <label className='text-[11px] text-white/60'>
+                  song3 / level3 (optional)
+                </label>
                 <div className='grid grid-cols-3 gap-2'>
                   <Input
                     className='col-span-2'
@@ -989,7 +1070,9 @@ function ArcadeOpsControlPage() {
               <div key={field.name} className='space-y-1'>
                 <label className='text-xs text-white/70'>
                   {field.label}
-                  {field.required ? <span className='ml-1 text-[#ff2a00]'>*</span> : null}
+                  {field.required ? (
+                    <span className='ml-1 text-[#ff2a00]'>*</span>
+                  ) : null}
                 </label>
 
                 {type === 'select' ? (
@@ -1062,11 +1145,7 @@ function ArcadeOpsControlPage() {
           <Button onClick={handleSaveRow} disabled={isSaving}>
             {isSaving ? '저장 중..' : 'DB 저장'}
           </Button>
-          <Button
-            variant='outline'
-            onClick={resetDraft}
-            disabled={isSaving}
-          >
+          <Button variant='outline' onClick={resetDraft} disabled={isSaving}>
             입력 초기화
           </Button>
         </div>
@@ -1076,7 +1155,8 @@ function ArcadeOpsControlPage() {
         <div className='space-y-1.5'>
           <h2 className='text-base font-bold text-white'>송출 반영</h2>
           <p className='text-xs text-white/60'>
-            경기 종료 직후 현재 지역만 송출하면, 방송/제어 페이지가 실시간으로 최신 결과를 반영합니다.
+            경기 종료 직후 현재 지역만 송출하면, 방송/제어 페이지가 실시간으로
+            최신 결과를 반영합니다.
           </p>
         </div>
 
@@ -1098,10 +1178,7 @@ function ArcadeOpsControlPage() {
           >
             {isInitRunning ? '초기화 중..' : '운영 DB 탭 초기화'}
           </Button>
-          <Button
-            onClick={handleExportRegion}
-            disabled={isExportRegionRunning}
-          >
+          <Button onClick={handleExportRegion} disabled={isExportRegionRunning}>
             {isExportRegionRunning ? '송출 중..' : '이번 주 지역 송출'}
           </Button>
           <Button
@@ -1125,7 +1202,11 @@ function ArcadeOpsControlPage() {
         <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
           <div className='flex items-center justify-between'>
             <h3 className='text-sm font-bold text-white'>
-              {OPS_REGION_OPTIONS.find((option) => option.value === region)?.label} 지역 순위 미리보기
+              {
+                OPS_REGION_OPTIONS.find((option) => option.value === region)
+                  ?.label
+              }{' '}
+              지역 순위 미리보기
             </h3>
             <span className='text-[11px] text-white/45'>
               {lastFeedAt ? `DB ${lastFeedAt} 갱신` : '갱신 대기'}
@@ -1139,7 +1220,9 @@ function ArcadeOpsControlPage() {
           ) : null}
 
           {finalRanking.length === 0 ? (
-            <p className='mt-3 text-xs text-white/60'>운영 DB에 순위 데이터가 없습니다.</p>
+            <p className='mt-3 text-xs text-white/60'>
+              운영 DB에 순위 데이터가 없습니다.
+            </p>
           ) : (
             <div className='mt-3 overflow-x-auto rounded-lg border border-white/10'>
               <table className='min-w-full text-left text-xs'>
@@ -1154,19 +1237,24 @@ function ArcadeOpsControlPage() {
                 <tbody className='divide-y divide-white/[0.07]'>
                   {finalRanking.slice(0, 8).map((row) => (
                     <tr key={`${row.entryId}-${row.rank}`}>
-                      <td className='px-3 py-2 font-bold text-[#ff2a00]'>{row.rank}</td>
+                      <td className='px-3 py-2 font-bold text-[#ff2a00]'>
+                        {row.rank}
+                      </td>
                       <td className='px-3 py-2 text-white/85'>
                         {row.nickname}
                         <span className='ml-1 font-mono text-[10px] text-white/45'>
                           ({row.entryId})
                         </span>
                       </td>
-                      <td className='px-3 py-2 tabular-nums text-white/70'>
-                        {typeof row.wins === 'number' && typeof row.losses === 'number'
+                      <td className='px-3 py-2 text-white/70 tabular-nums'>
+                        {typeof row.wins === 'number' &&
+                        typeof row.losses === 'number'
                           ? `${row.wins}-${row.losses}`
                           : '-'}
                       </td>
-                      <td className='px-3 py-2 text-white/65'>{row.statusLabel}</td>
+                      <td className='px-3 py-2 text-white/65'>
+                        {row.statusLabel}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

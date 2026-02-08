@@ -20,7 +20,9 @@ export function standingStatusLabel(status: ArcadeStandingRow['status']) {
   return '진행중'
 }
 
-export function buildRegionFinalRanking(region: ArcadeRegionArchive): RegionFinalRank[] {
+export function buildRegionFinalRanking(
+  region: ArcadeRegionArchive
+): RegionFinalRank[] {
   const rows: RegionFinalRank[] = []
   const used = new Set<string>()
 
@@ -32,13 +34,16 @@ export function buildRegionFinalRanking(region: ArcadeRegionArchive): RegionFina
   ) => {
     if (!entryId || used.has(entryId)) return
 
-    const standing = region.swissStandings.find((row) => row.entryId === entryId)
+    const standing = region.swissStandings.find(
+      (row) => row.entryId === entryId
+    )
     const online = region.onlineRows.find((row) => row.entryId === entryId)
 
     rows.push({
       rank: forcedRank ?? rows.length + 1,
       entryId,
-      nickname: nicknameOverride ?? standing?.nickname ?? online?.nickname ?? entryId,
+      nickname:
+        nicknameOverride ?? standing?.nickname ?? online?.nickname ?? entryId,
       seed: standing?.seed,
       wins: standing?.wins,
       losses: standing?.losses,
@@ -47,8 +52,10 @@ export function buildRegionFinalRanking(region: ArcadeRegionArchive): RegionFina
     used.add(entryId)
   }
 
-  const qualifierA = region.qualifiers.groupA ?? region.seedingRows.find((row) => row.rank === 1)
-  const qualifierB = region.qualifiers.groupB ?? region.seedingRows.find((row) => row.rank === 2)
+  const qualifierA =
+    region.qualifiers.groupA ?? region.seedingRows.find((row) => row.rank === 1)
+  const qualifierB =
+    region.qualifiers.groupB ?? region.seedingRows.find((row) => row.rank === 2)
 
   pushRow(qualifierA?.entryId, '지역 1위 (A그룹)', 1, qualifierA?.nickname)
   pushRow(qualifierB?.entryId, '지역 2위 (B그룹)', 2, qualifierB?.nickname)

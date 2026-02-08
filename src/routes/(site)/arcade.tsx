@@ -1,13 +1,13 @@
 import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import ReactMarkdown, { type Components } from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import {
   FALLBACK_ARCADE_SECTIONS,
   type ArcadeSection,
 } from '@/content/arcade-guide'
-import { useContent } from '@/lib/api'
 import { t } from '@/text'
+import ReactMarkdown, { type Components } from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { useContent } from '@/lib/api'
 import {
   Table,
   TableBody,
@@ -163,9 +163,7 @@ const markdownComponents: Components = {
     const rest = omitNode(props)
     return (
       <div className='-mx-4 overflow-x-auto px-4'>
-        <Table className='text-sm md:text-base'>
-          {rest.children}
-        </Table>
+        <Table className='text-sm md:text-base'>{rest.children}</Table>
       </div>
     )
   },
@@ -180,7 +178,10 @@ const markdownComponents: Components = {
   tr: (props) => {
     const rest = omitNode(props)
     return (
-      <TableRow className='border-white/[0.07] hover:bg-white/[0.04]' {...rest} />
+      <TableRow
+        className='border-white/[0.07] hover:bg-white/[0.04]'
+        {...rest}
+      />
     )
   },
   th: (props) => {

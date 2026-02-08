@@ -37,4 +37,3 @@ export function extractController(detail?: string) {
   }
   return ''
 }
-

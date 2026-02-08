@@ -45,9 +45,10 @@ function ResultsHubPage() {
         region.deciderRows.length > 0 ||
         region.seedingRows.length > 0
 
-      const qualifierCount = [region.qualifiers.groupA, region.qualifiers.groupB].filter(
-        Boolean
-      ).length
+      const qualifierCount = [
+        region.qualifiers.groupA,
+        region.qualifiers.groupB,
+      ].filter(Boolean).length
 
       return {
         ...region,
@@ -92,8 +93,8 @@ function ResultsHubPage() {
             {archive.season} 시즌 아카이브
           </h2>
           <p className='mt-2.5 text-sm leading-relaxed text-white/75'>
-            온라인 예선, Swiss Stage, 3-1 선발전, 시드전, Top 8 결선을
-            단계별로 조회할 수 있습니다.
+            온라인 예선, Swiss Stage, 3-1 선발전, 시드전, Top 8 결선을 단계별로
+            조회할 수 있습니다.
           </p>
           <div className='mt-5 flex flex-wrap gap-2'>
             <StatChip label='지역 확정' value={`${finalizedRegionCount}/4`} />
@@ -112,7 +113,9 @@ function ResultsHubPage() {
           <div className='text-[11px] font-bold tracking-widest text-white/50 uppercase'>
             CONSOLE ARCHIVE
           </div>
-          <h2 className='mt-2 text-2xl font-bold text-white/90'>콘솔 아카이브</h2>
+          <h2 className='mt-2 text-2xl font-bold text-white/90'>
+            콘솔 아카이브
+          </h2>
           <p className='mt-2.5 text-sm leading-relaxed text-white/65'>
             콘솔 결과 아카이브는 별도 구조로 확장 예정입니다.
           </p>
@@ -124,7 +127,9 @@ function ResultsHubPage() {
 
       <section className='space-y-4'>
         <div className='flex items-center justify-between'>
-          <h3 className='text-lg font-bold text-white'>아케이드 지역별 바로가기</h3>
+          <h3 className='text-lg font-bold text-white'>
+            아케이드 지역별 바로가기
+          </h3>
           <a
             href='/arcade-results/2026/finals'
             className='text-sm font-semibold text-[#ff2a00] hover:underline'
@@ -140,9 +145,12 @@ function ResultsHubPage() {
               href={`/arcade-results/2026/${region.key}`}
               className='rounded-xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-[#ff2a00]/30 hover:bg-white/[0.06]'
             >
-              <div className='text-base font-bold text-white'>{region.label}</div>
+              <div className='text-base font-bold text-white'>
+                {region.label}
+              </div>
               <div className='mt-2 text-sm text-white/65'>
-                온라인 {region.onlineRows.length}명 · Swiss {region.swissMatches.length}매치
+                온라인 {region.onlineRows.length}명 · Swiss{' '}
+                {region.swissMatches.length}매치
               </div>
               <div className='mt-3 flex flex-wrap gap-2'>
                 <StatChip
@@ -156,7 +164,11 @@ function ResultsHubPage() {
                 />
                 <StatChip
                   label='진출'
-                  value={region.qualifierCount > 0 ? `${region.qualifierCount}명` : '미확정'}
+                  value={
+                    region.qualifierCount > 0
+                      ? `${region.qualifierCount}명`
+                      : '미확정'
+                  }
                 />
               </div>
             </a>

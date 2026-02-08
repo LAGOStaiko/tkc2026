@@ -3,9 +3,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSongs } from '@/lib/api'
 import { cn } from '@/lib/utils'
-import { LevelBadge } from '@/components/tkc/level-badge'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 import { Badge } from '@/components/ui/badge'
+import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { LevelBadge } from '@/components/tkc/level-badge'
 
 export const Route = createFileRoute('/(site)/songs')({
   component: SongsPage,
@@ -51,10 +51,7 @@ function SongsPage() {
 
   return (
     <TkcSection className='space-y-8'>
-      <TkcPageHeader
-        title={title}
-        subtitle='결승전까지 가는 여정 —'
-      />
+      <TkcPageHeader title={title} subtitle='결승전까지 가는 여정 —' />
 
       {isError && (
         <p className='text-sm text-destructive'>
@@ -103,14 +100,18 @@ function DivisionTimeline({
     <div>
       {/* Division header */}
       <div className='mb-6 flex items-center gap-3 md:mb-8'>
-        <img src={iconSrc} alt='' className='h-7 w-7 rounded-lg object-contain' />
+        <img
+          src={iconSrc}
+          alt=''
+          className='h-7 w-7 rounded-lg object-contain'
+        />
         <h2 className='text-xl font-bold text-white md:text-2xl'>{label}</h2>
       </div>
 
       {songs.length > 0 ? (
         <div className='relative pl-5 md:pl-8'>
           {/* Vertical connector line */}
-          <div className='absolute left-[9px] top-2 bottom-2 w-px bg-gradient-to-b from-[#ff2a00]/60 via-white/15 to-[#ff2a00]/80 md:left-[15px]' />
+          <div className='absolute top-2 bottom-2 left-[9px] w-px bg-gradient-to-b from-[#ff2a00]/60 via-white/15 to-[#ff2a00]/80 md:left-[15px]' />
 
           {/* Stage nodes */}
           <div className='space-y-5 md:space-y-6'>
@@ -165,7 +166,7 @@ function TimelineNode({
           )}
         />
         {isFinals && (
-          <div className='absolute -inset-1 motion-safe:animate-pulse rounded-full border border-[#ff2a00]/40' />
+          <div className='absolute -inset-1 rounded-full border border-[#ff2a00]/40 motion-safe:animate-pulse' />
         )}
       </div>
 
@@ -184,7 +185,7 @@ function TimelineNode({
         <div className='flex items-center gap-2.5'>
           <span
             className={cn(
-              'text-sm font-bold break-keep leading-tight md:text-base',
+              'text-sm leading-tight font-bold break-keep md:text-base',
               isFinals ? 'text-[#ff2a00]' : 'text-[#ff8c66]'
             )}
           >
@@ -207,7 +208,7 @@ function TimelineNode({
               <div className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
                 <span
                   className={cn(
-                    'font-bold leading-relaxed break-words text-white',
+                    'leading-relaxed font-bold break-words text-white',
                     isFinals ? 'text-base md:text-xl' : 'text-base md:text-lg'
                   )}
                 >
@@ -215,11 +216,18 @@ function TimelineNode({
                 </span>
                 {song.difficulty && (
                   <span className='text-sm text-white/70 md:text-base'>
-                    {song.difficulty === 'ura' ? '뒷보면' : song.difficulty === 'oni' ? '귀신' : song.difficulty}
+                    {song.difficulty === 'ura'
+                      ? '뒷보면'
+                      : song.difficulty === 'oni'
+                        ? '귀신'
+                        : song.difficulty}
                   </span>
                 )}
                 {song.level != null && (
-                  <LevelBadge level={song.level} isUra={song.difficulty === 'ura'} />
+                  <LevelBadge
+                    level={song.level}
+                    isUra={song.difficulty === 'ura'}
+                  />
                 )}
               </div>
               {song.descriptionMd && (

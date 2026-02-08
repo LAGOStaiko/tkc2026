@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { formatSongLabel } from '@/content/arcade-songs'
 import { t } from '@/text'
 import { useResults } from '@/lib/api'
 import {
@@ -10,9 +11,8 @@ import {
   type ArcadeSwissMatch,
 } from '@/lib/arcade-results-archive'
 import { buildRegionFinalRanking } from '@/lib/arcade-results-ranking'
-import { formatSongLabel } from '@/content/arcade-songs'
-import { LevelBadge, parseLevelNumber } from '@/components/tkc/level-badge'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { LevelBadge, parseLevelNumber } from '@/components/tkc/level-badge'
 
 export const Route = createFileRoute('/(site)/arcade-results/2026/$region')({
   component: ArcadeRegionDetailPage,
@@ -35,7 +35,9 @@ function StageTitle({ title, subtitle }: { title: string; subtitle?: string }) {
         <span className='inline-block h-4 w-1 rounded-full bg-[#ff2a00]' />
         {title}
       </h2>
-      {subtitle ? <p className='pl-3.5 text-sm text-white/60'>{subtitle}</p> : null}
+      {subtitle ? (
+        <p className='pl-3.5 text-sm text-white/60'>{subtitle}</p>
+      ) : null}
     </div>
   )
 }
@@ -147,13 +149,20 @@ function SwissRoundCard({
                     >
                       <span className='inline-flex items-center gap-1.5 text-white/55'>
                         {game.song}
-                        {game.level ? (() => {
-                          const n = parseLevelNumber(game.level)
-                          return n != null ? <LevelBadge level={n} /> : ` ${game.level}`
-                        })() : null}
+                        {game.level
+                          ? (() => {
+                              const n = parseLevelNumber(game.level)
+                              return n != null ? (
+                                <LevelBadge level={n} />
+                              ) : (
+                                ` ${game.level}`
+                              )
+                            })()
+                          : null}
                       </span>
-                      <span className='tabular-nums font-medium text-white/80'>
-                        {formatScore(game.p1Score)} : {formatScore(game.p2Score)}
+                      <span className='font-medium text-white/80 tabular-nums'>
+                        {formatScore(game.p1Score)} :{' '}
+                        {formatScore(game.p2Score)}
                       </span>
                     </div>
                   ))}
@@ -220,10 +229,16 @@ function ArcadeRegionDetailPage() {
   if (!regionData) {
     return (
       <TkcSection className='space-y-8'>
-        <a href='/arcade-results/2026' className='text-sm text-white/60 hover:text-[#ff2a00] transition-colors'>
+        <a
+          href='/arcade-results/2026'
+          className='text-sm text-white/60 transition-colors hover:text-[#ff2a00]'
+        >
           ← 아케이드 시즌 페이지로 돌아가기
         </a>
-        <TkcPageHeader title='지역을 찾을 수 없습니다' subtitle='유효한 지역 키: seoul, daejeon, gwangju, busan' />
+        <TkcPageHeader
+          title='지역을 찾을 수 없습니다'
+          subtitle='유효한 지역 키: seoul, daejeon, gwangju, busan'
+        />
       </TkcSection>
     )
   }
@@ -241,7 +256,10 @@ function ArcadeRegionDetailPage() {
   return (
     <TkcSection className='space-y-8 md:space-y-10'>
       <div className='space-y-3'>
-        <a href='/arcade-results/2026' className='text-sm text-white/60 hover:text-[#ff2a00] transition-colors'>
+        <a
+          href='/arcade-results/2026'
+          className='text-sm text-white/60 transition-colors hover:text-[#ff2a00]'
+        >
           ← 아케이드 시즌 페이지로 돌아가기
         </a>
         <TkcPageHeader
@@ -270,19 +288,34 @@ function ArcadeRegionDetailPage() {
                       <div className='text-[11px] font-bold tracking-widest text-[#ff2a00] uppercase'>
                         {row.statusLabel}
                       </div>
-                      <div className='text-xl font-bold text-white md:text-2xl'>{row.nickname}</div>
-                      <div className='font-mono text-xs text-white/45'>{row.entryId}</div>
+                      <div className='text-xl font-bold text-white md:text-2xl'>
+                        {row.nickname}
+                      </div>
+                      <div className='font-mono text-xs text-white/45'>
+                        {row.entryId}
+                      </div>
                     </div>
                     <div className='flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-[#ff2a00]/30 bg-[#ff2a00]/15 text-xl font-bold text-[#ff2a00]'>
                       {row.rank}
                     </div>
                   </div>
-                  {(typeof row.wins === 'number' && typeof row.losses === 'number') && (
-                    <div className='mt-4 flex gap-5 text-xs text-white/60'>
-                      <span>시드 <span className='font-medium text-white/80'>{row.seed ?? '-'}</span></span>
-                      <span>전적 <span className='font-medium text-white/80'>{row.wins}-{row.losses}</span></span>
-                    </div>
-                  )}
+                  {typeof row.wins === 'number' &&
+                    typeof row.losses === 'number' && (
+                      <div className='mt-4 flex gap-5 text-xs text-white/60'>
+                        <span>
+                          시드{' '}
+                          <span className='font-medium text-white/80'>
+                            {row.seed ?? '-'}
+                          </span>
+                        </span>
+                        <span>
+                          전적{' '}
+                          <span className='font-medium text-white/80'>
+                            {row.wins}-{row.losses}
+                          </span>
+                        </span>
+                      </div>
+                    )}
                 </div>
               ))}
           </div>
@@ -291,8 +324,12 @@ function ArcadeRegionDetailPage() {
         <div className='grid gap-5 md:grid-cols-2'>
           <div className='space-y-3'>
             <div className='flex flex-wrap items-baseline gap-x-2 gap-y-0.5'>
-              <span className='text-sm font-bold text-white'>3-1 추가 진출자 선발전</span>
-              <span className='text-xs text-white/45'>{formatSongLabel('decider31')}</span>
+              <span className='text-sm font-bold text-white'>
+                3-1 추가 진출자 선발전
+              </span>
+              <span className='text-xs text-white/45'>
+                {formatSongLabel('decider31')}
+              </span>
             </div>
 
             {sortedDeciderRows.length === 0 ? (
@@ -304,19 +341,30 @@ function ArcadeRegionDetailPage() {
                 <table className='w-full min-w-[320px] text-left text-sm'>
                   <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                     <tr>
-                      <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
-                      <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
-                      <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
-                      <th className='whitespace-nowrap px-4 py-2.5 text-right'>점수</th>
+                      <th className='px-4 py-2.5 whitespace-nowrap'>순위</th>
+                      <th className='px-4 py-2.5 whitespace-nowrap'>엔트리</th>
+                      <th className='px-4 py-2.5 whitespace-nowrap'>닉네임</th>
+                      <th className='px-4 py-2.5 text-right whitespace-nowrap'>
+                        점수
+                      </th>
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-white/[0.07]'>
                     {sortedDeciderRows.map((row) => (
-                      <tr key={`dec-${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
-                        <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
-                        <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                        <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                        <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>
+                      <tr
+                        key={`dec-${row.entryId}-${row.rank}`}
+                        className='transition-colors hover:bg-white/[0.03]'
+                      >
+                        <td className='px-4 py-3 font-bold whitespace-nowrap text-[#ff2a00]'>
+                          {row.rank}
+                        </td>
+                        <td className='px-4 py-3 font-mono text-xs whitespace-nowrap text-white/60'>
+                          {row.entryId}
+                        </td>
+                        <td className='px-4 py-3 font-semibold whitespace-nowrap text-white'>
+                          {row.nickname}
+                        </td>
+                        <td className='px-4 py-3 text-right font-bold whitespace-nowrap text-white tabular-nums'>
                           {formatScore(row.score)}
                         </td>
                       </tr>
@@ -328,15 +376,20 @@ function ArcadeRegionDetailPage() {
 
             {regionData.deciderWinnerEntryId ? (
               <div className='rounded-lg border border-emerald-300/30 bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-200'>
-                선발전 통과: {renderParticipant(regionData, regionData.deciderWinnerEntryId)}
+                선발전 통과:{' '}
+                {renderParticipant(regionData, regionData.deciderWinnerEntryId)}
               </div>
             ) : null}
           </div>
 
           <div className='space-y-3'>
             <div className='flex flex-wrap items-baseline gap-x-2 gap-y-0.5'>
-              <span className='text-sm font-bold text-white'>결선 시드 배정전</span>
-              <span className='text-xs text-white/45'>{formatSongLabel('seeding')}</span>
+              <span className='text-sm font-bold text-white'>
+                결선 시드 배정전
+              </span>
+              <span className='text-xs text-white/45'>
+                {formatSongLabel('seeding')}
+              </span>
             </div>
 
             {sortedSeedingRows.length === 0 ? (
@@ -348,19 +401,30 @@ function ArcadeRegionDetailPage() {
                 <table className='w-full min-w-[320px] text-left text-sm'>
                   <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                     <tr>
-                      <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
-                      <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
-                      <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
-                      <th className='whitespace-nowrap px-4 py-2.5 text-right'>점수</th>
+                      <th className='px-4 py-2.5 whitespace-nowrap'>순위</th>
+                      <th className='px-4 py-2.5 whitespace-nowrap'>엔트리</th>
+                      <th className='px-4 py-2.5 whitespace-nowrap'>닉네임</th>
+                      <th className='px-4 py-2.5 text-right whitespace-nowrap'>
+                        점수
+                      </th>
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-white/[0.07]'>
                     {sortedSeedingRows.map((row) => (
-                      <tr key={`seed-${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
-                        <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
-                        <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                        <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                        <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>
+                      <tr
+                        key={`seed-${row.entryId}-${row.rank}`}
+                        className='transition-colors hover:bg-white/[0.03]'
+                      >
+                        <td className='px-4 py-3 font-bold whitespace-nowrap text-[#ff2a00]'>
+                          {row.rank}
+                        </td>
+                        <td className='px-4 py-3 font-mono text-xs whitespace-nowrap text-white/60'>
+                          {row.entryId}
+                        </td>
+                        <td className='px-4 py-3 font-semibold whitespace-nowrap text-white'>
+                          {row.nickname}
+                        </td>
+                        <td className='px-4 py-3 text-right font-bold whitespace-nowrap text-white tabular-nums'>
                           {formatScore(row.score)}
                         </td>
                       </tr>
@@ -398,11 +462,15 @@ function ArcadeRegionDetailPage() {
               <table className='w-full min-w-[480px] text-left text-sm'>
                 <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                   <tr>
-                    <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
-                    <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
-                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>시드</th>
-                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>전적</th>
-                    <th className='whitespace-nowrap px-4 py-2.5'>상태</th>
+                    <th className='px-4 py-2.5 whitespace-nowrap'>순위</th>
+                    <th className='px-4 py-2.5 whitespace-nowrap'>닉네임</th>
+                    <th className='px-4 py-2.5 text-right whitespace-nowrap'>
+                      시드
+                    </th>
+                    <th className='px-4 py-2.5 text-right whitespace-nowrap'>
+                      전적
+                    </th>
+                    <th className='px-4 py-2.5 whitespace-nowrap'>상태</th>
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-white/[0.07]'>
@@ -418,22 +486,34 @@ function ArcadeRegionDetailPage() {
                               ? 'border-red-300/20 bg-red-500/10 text-red-300/80'
                               : 'border-white/15 bg-white/5 text-white/60'
                       return (
-                        <tr key={`final-rank-${row.entryId}-${row.rank}`} className='transition-colors hover:bg-white/[0.03]'>
-                          <td className='whitespace-nowrap px-4 py-3 font-bold text-white/60'>{row.rank}</td>
-                          <td className='whitespace-nowrap px-4 py-3'>
-                            <span className='font-semibold text-white'>{row.nickname}</span>
-                            <span className='ml-2 font-mono text-[11px] text-white/40'>{row.entryId}</span>
+                        <tr
+                          key={`final-rank-${row.entryId}-${row.rank}`}
+                          className='transition-colors hover:bg-white/[0.03]'
+                        >
+                          <td className='px-4 py-3 font-bold whitespace-nowrap text-white/60'>
+                            {row.rank}
                           </td>
-                          <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
+                          <td className='px-4 py-3 whitespace-nowrap'>
+                            <span className='font-semibold text-white'>
+                              {row.nickname}
+                            </span>
+                            <span className='ml-2 font-mono text-[11px] text-white/40'>
+                              {row.entryId}
+                            </span>
+                          </td>
+                          <td className='px-4 py-3 text-right whitespace-nowrap text-white/75 tabular-nums'>
                             {typeof row.seed === 'number' ? row.seed : '-'}
                           </td>
-                          <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
-                            {typeof row.wins === 'number' && typeof row.losses === 'number'
+                          <td className='px-4 py-3 text-right whitespace-nowrap text-white/75 tabular-nums'>
+                            {typeof row.wins === 'number' &&
+                            typeof row.losses === 'number'
                               ? `${row.wins}-${row.losses}`
                               : '-'}
                           </td>
-                          <td className='whitespace-nowrap px-4 py-3'>
-                            <span className={`inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}>
+                          <td className='px-4 py-3 whitespace-nowrap'>
+                            <span
+                              className={`inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}
+                            >
                               {row.statusLabel}
                             </span>
                           </td>
@@ -462,18 +542,34 @@ function ArcadeRegionDetailPage() {
                       key={`m-final-${row.entryId}-${row.rank}`}
                       className='flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3'
                     >
-                      <span className='w-6 text-center text-sm font-bold text-white/50'>{row.rank}</span>
+                      <span className='w-6 text-center text-sm font-bold text-white/50'>
+                        {row.rank}
+                      </span>
                       <div className='min-w-0 flex-1'>
                         <div className='flex items-baseline gap-1.5'>
-                          <span className='font-semibold text-white'>{row.nickname}</span>
-                          <span className='font-mono text-[11px] text-white/35'>{row.entryId}</span>
+                          <span className='font-semibold text-white'>
+                            {row.nickname}
+                          </span>
+                          <span className='font-mono text-[11px] text-white/35'>
+                            {row.entryId}
+                          </span>
                         </div>
                         <div className='mt-1 flex items-center gap-3 text-xs text-white/55'>
-                          <span>시드 {typeof row.seed === 'number' ? row.seed : '-'}</span>
-                          <span>전적 {typeof row.wins === 'number' && typeof row.losses === 'number' ? `${row.wins}-${row.losses}` : '-'}</span>
+                          <span>
+                            시드 {typeof row.seed === 'number' ? row.seed : '-'}
+                          </span>
+                          <span>
+                            전적{' '}
+                            {typeof row.wins === 'number' &&
+                            typeof row.losses === 'number'
+                              ? `${row.wins}-${row.losses}`
+                              : '-'}
+                          </span>
                         </div>
                       </div>
-                      <span className={`flex-shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}>
+                      <span
+                        className={`flex-shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}
+                      >
                         {row.statusLabel}
                       </span>
                     </div>
@@ -491,7 +587,9 @@ function ArcadeRegionDetailPage() {
         />
 
         {sortedOnlineRows.length === 0 ? (
-          <EmptyMessage>온라인 예선 결과가 아직 입력되지 않았습니다.</EmptyMessage>
+          <EmptyMessage>
+            온라인 예선 결과가 아직 입력되지 않았습니다.
+          </EmptyMessage>
         ) : (
           <>
             {/* Desktop table */}
@@ -499,12 +597,18 @@ function ArcadeRegionDetailPage() {
               <table className='w-full min-w-[560px] text-left text-sm'>
                 <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                   <tr>
-                    <th className='whitespace-nowrap px-4 py-2.5'>순위</th>
-                    <th className='whitespace-nowrap px-4 py-2.5'>엔트리</th>
-                    <th className='whitespace-nowrap px-4 py-2.5'>닉네임</th>
-                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>과제곡 1</th>
-                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>과제곡 2</th>
-                    <th className='whitespace-nowrap px-4 py-2.5 text-right'>합산</th>
+                    <th className='px-4 py-2.5 whitespace-nowrap'>순위</th>
+                    <th className='px-4 py-2.5 whitespace-nowrap'>엔트리</th>
+                    <th className='px-4 py-2.5 whitespace-nowrap'>닉네임</th>
+                    <th className='px-4 py-2.5 text-right whitespace-nowrap'>
+                      과제곡 1
+                    </th>
+                    <th className='px-4 py-2.5 text-right whitespace-nowrap'>
+                      과제곡 2
+                    </th>
+                    <th className='px-4 py-2.5 text-right whitespace-nowrap'>
+                      합산
+                    </th>
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-white/[0.07]'>
@@ -513,16 +617,22 @@ function ArcadeRegionDetailPage() {
                       key={`${row.entryId}-${row.rank}`}
                       className={`transition-colors hover:bg-white/[0.03] ${row.advanced ? 'bg-emerald-500/5' : ''}`}
                     >
-                      <td className='whitespace-nowrap px-4 py-3 font-bold text-[#ff2a00]'>{row.rank}</td>
-                      <td className='whitespace-nowrap px-4 py-3 font-mono text-xs text-white/60'>{row.entryId}</td>
-                      <td className='whitespace-nowrap px-4 py-3 font-semibold text-white'>{row.nickname}</td>
-                      <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
+                      <td className='px-4 py-3 font-bold whitespace-nowrap text-[#ff2a00]'>
+                        {row.rank}
+                      </td>
+                      <td className='px-4 py-3 font-mono text-xs whitespace-nowrap text-white/60'>
+                        {row.entryId}
+                      </td>
+                      <td className='px-4 py-3 font-semibold whitespace-nowrap text-white'>
+                        {row.nickname}
+                      </td>
+                      <td className='px-4 py-3 text-right whitespace-nowrap text-white/75 tabular-nums'>
                         {formatScore(row.score1)}
                       </td>
-                      <td className='whitespace-nowrap px-4 py-3 text-right tabular-nums text-white/75'>
+                      <td className='px-4 py-3 text-right whitespace-nowrap text-white/75 tabular-nums'>
                         {formatScore(row.score2)}
                       </td>
-                      <td className='whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums text-white'>
+                      <td className='px-4 py-3 text-right font-bold whitespace-nowrap text-white tabular-nums'>
                         {formatScore(row.total)}
                       </td>
                     </tr>
@@ -540,8 +650,12 @@ function ArcadeRegionDetailPage() {
                 >
                   <div className='flex items-start justify-between gap-3'>
                     <div className='min-w-0'>
-                      <div className='text-base font-bold text-white'>{row.nickname}</div>
-                      <div className='mt-0.5 font-mono text-xs text-white/45'>{row.entryId}</div>
+                      <div className='text-base font-bold text-white'>
+                        {row.nickname}
+                      </div>
+                      <div className='mt-0.5 font-mono text-xs text-white/45'>
+                        {row.entryId}
+                      </div>
                     </div>
                     <div className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#ff2a00]/15 text-sm font-bold text-[#ff2a00]'>
                       {row.rank}
@@ -550,15 +664,21 @@ function ArcadeRegionDetailPage() {
                   <div className='mt-3 grid grid-cols-3 gap-2 text-xs'>
                     <div className='rounded-lg bg-white/[0.05] px-2.5 py-2 text-center'>
                       <div className='text-white/45'>과제곡 1</div>
-                      <div className='mt-0.5 font-bold tabular-nums text-white/80'>{formatScore(row.score1)}</div>
+                      <div className='mt-0.5 font-bold text-white/80 tabular-nums'>
+                        {formatScore(row.score1)}
+                      </div>
                     </div>
                     <div className='rounded-lg bg-white/[0.05] px-2.5 py-2 text-center'>
                       <div className='text-white/45'>과제곡 2</div>
-                      <div className='mt-0.5 font-bold tabular-nums text-white/80'>{formatScore(row.score2)}</div>
+                      <div className='mt-0.5 font-bold text-white/80 tabular-nums'>
+                        {formatScore(row.score2)}
+                      </div>
                     </div>
                     <div className='rounded-lg bg-[#ff2a00]/10 px-2.5 py-2 text-center'>
                       <div className='text-[#ff2a00]/60'>합산</div>
-                      <div className='mt-0.5 font-bold tabular-nums text-white'>{formatScore(row.total)}</div>
+                      <div className='mt-0.5 font-bold text-white tabular-nums'>
+                        {formatScore(row.total)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -575,7 +695,9 @@ function ArcadeRegionDetailPage() {
         />
 
         {swissByRound.length === 0 ? (
-          <EmptyMessage>Swiss 경기 로그가 아직 입력되지 않았습니다.</EmptyMessage>
+          <EmptyMessage>
+            Swiss 경기 로그가 아직 입력되지 않았습니다.
+          </EmptyMessage>
         ) : (
           <div className='space-y-6'>
             {swissByRound.map((block) => (
@@ -588,9 +710,7 @@ function ArcadeRegionDetailPage() {
             ))}
           </div>
         )}
-
       </section>
-
     </TkcSection>
   )
 }

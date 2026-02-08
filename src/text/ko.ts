@@ -21,7 +21,8 @@ export const ko = {
     '수집 항목: 이름, 전화번호, 이메일, 닉네임, 남코 아이디\n수집 목적: 대회 참가 접수, 본인 확인, 대회 안내 연락\n보유 기간: 대회 종료 후 3개월 이내 파기\n동의를 거부할 수 있으나, 거부 시 대회 참가가 불가합니다.',
   'apply.field.qualifierRegion': '온라인 예선 차수',
   'apply.field.offlineSongs': '오프라인 예선곡 선택',
-  'apply.field.offlineSongsHelp': '곡 풀에서 4곡을 선택해 주세요. 중복 선택은 불가합니다.',
+  'apply.field.offlineSongsHelp':
+    '곡 풀에서 4곡을 선택해 주세요. 중복 선택은 불가합니다.',
   'apply.field.offlineSongLabel': '예선곡',
   'apply.field.offlineSongPlaceholder': '곡을 선택해 주세요',
   'apply.field.spectator': '직관 참여 여부',
@@ -55,11 +56,9 @@ export const ko = {
   'apply.title': '대회 신청',
   'apply.completed': '신청이 완료되었습니다.',
   'apply.submitFailed': '신청에 실패했습니다. 다시 시도해 주세요.',
-  'apply.validation.consentRequired':
-    '미성년자는 동의서 링크가 필요합니다.',
+  'apply.validation.consentRequired': '미성년자는 동의서 링크가 필요합니다.',
   'apply.validation.divisionRequired': '부문을 선택해 주세요.',
-  'apply.validation.dohirobaNoRequired':
-    '북번호를 입력해 주세요.',
+  'apply.validation.dohirobaNoRequired': '북번호를 입력해 주세요.',
   'apply.validation.emailRequired': '이메일을 입력해 주세요.',
   'apply.validation.emailInvalid': '올바른 이메일 형식이 아닙니다.',
   'apply.validation.namcoIdRequired': '남코 아이디를 입력해 주세요.',
@@ -68,12 +67,10 @@ export const ko = {
   'apply.validation.offlineSongsRequired':
     '오프라인 예선곡 4곡을 모두 선택해 주세요.',
   'apply.validation.phoneRequired': '전화번호를 입력해 주세요.',
-  'apply.validation.privacyRequired':
-    '개인정보 수집 및 이용에 동의해 주세요.',
+  'apply.validation.privacyRequired': '개인정보 수집 및 이용에 동의해 주세요.',
   'apply.validation.qualifierRegionRequired':
     '온라인 예선 차수를 선택해 주세요.',
-  'apply.validation.videoLinkRequired':
-    '동영상 링크를 입력해 주세요.',
+  'apply.validation.videoLinkRequired': '동영상 링크를 입력해 주세요.',
   'common.close': '\uB2EB\uAE30',
   'common.loadFailed':
     '\uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',

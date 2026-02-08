@@ -21,7 +21,9 @@ function StageRuleCard({
   return (
     <div className='rounded-xl border border-white/10 bg-white/[0.03] p-5'>
       <div className='text-sm font-bold text-[#ff2a00]'>{title}</div>
-      <p className='mt-1.5 text-sm leading-relaxed text-white/75'>{description}</p>
+      <p className='mt-1.5 text-sm leading-relaxed text-white/75'>
+        {description}
+      </p>
       <p className='mt-2 text-xs text-white/50'>{detail}</p>
     </div>
   )
@@ -32,7 +34,9 @@ function ArcadeResults2026Page() {
   const archive = useMemo(() => resolveArcadeSeasonArchive(data), [data])
 
   const finalizedRegionCount = archive.regions.filter((region) => {
-    return Boolean(region.qualifiers.groupA) && Boolean(region.qualifiers.groupB)
+    return (
+      Boolean(region.qualifiers.groupA) && Boolean(region.qualifiers.groupB)
+    )
   }).length
 
   useEffect(() => {
@@ -42,7 +46,10 @@ function ArcadeResults2026Page() {
   return (
     <TkcSection className='space-y-8 md:space-y-10'>
       <div className='space-y-3'>
-        <a href='/results' className='text-sm text-white/60 hover:text-[#ff2a00] transition-colors'>
+        <a
+          href='/results'
+          className='text-sm text-white/60 transition-colors hover:text-[#ff2a00]'
+        >
           ← 결과 아카이브로 돌아가기
         </a>
         <TkcPageHeader
@@ -134,10 +141,34 @@ function ArcadeResults2026Page() {
                   </span>
                 </div>
                 <div className='mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-white/70'>
-                  <div>온라인: <span className='font-medium text-white/90'>{region.onlineRows.length}</span>명</div>
-                  <div>Swiss: <span className='font-medium text-white/90'>{region.swissMatches.length}</span>매치</div>
-                  <div>3-1: <span className='font-medium text-white/90'>{region.deciderRows.length}</span>명</div>
-                  <div>시드전: <span className='font-medium text-white/90'>{region.seedingRows.length}</span>명</div>
+                  <div>
+                    온라인:{' '}
+                    <span className='font-medium text-white/90'>
+                      {region.onlineRows.length}
+                    </span>
+                    명
+                  </div>
+                  <div>
+                    Swiss:{' '}
+                    <span className='font-medium text-white/90'>
+                      {region.swissMatches.length}
+                    </span>
+                    매치
+                  </div>
+                  <div>
+                    3-1:{' '}
+                    <span className='font-medium text-white/90'>
+                      {region.deciderRows.length}
+                    </span>
+                    명
+                  </div>
+                  <div>
+                    시드전:{' '}
+                    <span className='font-medium text-white/90'>
+                      {region.seedingRows.length}
+                    </span>
+                    명
+                  </div>
                 </div>
               </a>
             )
