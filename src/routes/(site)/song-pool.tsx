@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSongPools } from '@/lib/api'
@@ -59,14 +59,49 @@ function SongPoolPage() {
   const { data, isLoading, isError } = useSongPools<SongPoolsData>()
   const title = t('nav.songPool')
 
-  const arcadeFinals = useMemo(
-    () => groupByTitle(data?.arcadeFinals ?? []),
-    [data?.arcadeFinals]
-  )
   const arcadeSwiss = useMemo(
     () => groupByTitle(data?.arcadeSwiss ?? []),
     [data?.arcadeSwiss]
   )
+  const arcadeFinals = useMemo(
+    () => groupByTitle(data?.arcadeFinals ?? []),
+    [data?.arcadeFinals]
+  )
+  const consoleFinals = useMemo(
+    () => groupByTitle(data?.consoleFinals ?? []),
+    [data?.consoleFinals]
+  )
+
+  const tabs = useMemo(
+    () =>
+      [
+        {
+          key: 'arcadeSwiss',
+          label: '아케이드 스위스',
+          iconSrc: '/branding/arcade-icon.png',
+          pool: arcadeSwiss,
+        },
+        {
+          key: 'arcadeFinals',
+          label: '아케이드 결선',
+          iconSrc: '/branding/arcade-icon.png',
+          pool: arcadeFinals,
+        },
+        {
+          key: 'consoleFinals',
+          label: '콘솔 결선',
+          iconSrc: '/branding/console-icon.png',
+          pool: consoleFinals,
+        },
+      ] as const,
+    [arcadeSwiss, arcadeFinals, consoleFinals]
+  )
+
+  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]['key']>(
+    tabs[0].key
+  )
+  const active = tabs.find((t) => t.key === activeTab) ?? tabs[0]
+  const isEmpty = tabs.every((t) => t.pool.length === 0)
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${title}`
@@ -87,7 +122,7 @@ function SongPoolPage() {
 
       {isLoading && !data ? (
         <p className='text-sm text-white/60'>선곡풀을 불러오는 중...</p>
-      ) : arcadeFinals.length === 0 && arcadeSwiss.length === 0 ? (
+      ) : isEmpty ? (
         <div className='rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-8 text-center'>
           <p className='text-sm text-white/50'>표시할 선곡풀이 없습니다.</p>
           <p className='mt-1 text-xs text-white/30'>
@@ -95,16 +130,36 @@ function SongPoolPage() {
           </p>
         </div>
       ) : (
-        <div className='space-y-8 md:space-y-14'>
+        <div className='space-y-6'>
+          {/* Tab buttons */}
+          <div className='flex gap-2 overflow-x-auto'>
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                type='button'
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  'flex shrink-0 items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors',
+                  activeTab === tab.key
+                    ? 'border-[#ff2a00]/40 bg-[#ff2a00]/10 text-white'
+                    : 'border-white/10 bg-white/[0.03] text-white/50 hover:bg-white/[0.06] hover:text-white/70'
+                )}
+              >
+                <img
+                  src={tab.iconSrc}
+                  alt=''
+                  className='h-5 w-5 rounded object-contain'
+                />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Active pool content */}
           <SongPoolSection
-            label='아케이드 결선'
-            iconSrc='/branding/arcade-icon.png'
-            pool={arcadeFinals}
-          />
-          <SongPoolSection
-            label='아케이드 스위스 스테이지'
-            iconSrc='/branding/arcade-icon.png'
-            pool={arcadeSwiss}
+            label={active.label}
+            iconSrc={active.iconSrc}
+            pool={active.pool}
           />
         </div>
       )}
