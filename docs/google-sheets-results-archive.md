@@ -439,3 +439,42 @@ Response includes `clearedScope` field:
 **Bypass & limits:**
 - `noCache` query param bypasses the cache for forced refresh.
 - If the payload exceeds CacheService's 100KB per-value limit, the cache write silently fails and subsequent requests recompute.
+
+### Publish / Rollback / Backup Log Structure
+
+**`ops_backup_snapshots` tab:**
+
+| Column | Description |
+|--------|-------------|
+| `snapshotId` | `SNAP-yyyyMMddHHmmss-XXXX` — unique per snapshot |
+| `createdAt` | ISO timestamp of snapshot creation |
+| `publishId` | Associated publish ID (e.g., `PUB-...`) |
+| `sheetName` | Source pub_* tab name |
+| `rowIndex` | Row index within the source tab |
+| `rowJson` | JSON-serialized row data (headers as keys) |
+
+**Retention:** 3 most recent snapshots kept; older ones auto-purged on each `opsPublish`.
+
+**Publish pipeline flow:**
+
+```
+opsPublish
+  ├─ 1. handleOpsValidate_  → abort if valid=false
+  ├─ 2. createSnapshot_     → backup all 21 pub_* tabs
+  ├─ 3. handleOpsExport_    → ops_db_* → pub_* export
+  ├─ 4. purgeOldSnapshots_  → keep latest 3
+  └─ 5. purgeApiCache_ + purgeOpsFeedCache_
+```
+
+**`pub_publish_log` mode values:**
+
+| mode | Origin |
+|------|--------|
+| `upsert` | Standard `opsExport` (default mode) |
+| `replace` | `opsExport` with `mode: 'replace'` |
+| `commit` | `pubCommit` — manual commit marker |
+| `rollback` | `opsRollback` — snapshot restoration |
+
+**Cache invalidation on publish/rollback:**
+- Both `opsPublish` and `opsRollback` call `purgeApiCache_()` + `purgeOpsFeedCache_()` on success.
+- `opsRoundClose` does NOT go through the publish pipeline — it uses direct `opsExport` internally for rapid live operations.

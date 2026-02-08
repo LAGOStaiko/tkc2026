@@ -175,9 +175,28 @@ function ArcadeOpsControlPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [isInitRunning, setIsInitRunning] = useState(false)
   const [isGuideRunning, setIsGuideRunning] = useState(false)
-  const [isExportRegionRunning, setIsExportRegionRunning] = useState(false)
-  const [isExportAllRunning, setIsExportAllRunning] = useState(false)
   const [exportReplaceMode, setExportReplaceMode] = useState(false)
+
+  const [isValidating, setIsValidating] = useState(false)
+  const [validationResult, setValidationResult] = useState<{
+    valid: boolean
+    errors: { sheet: string; rule: string; message: string; row?: number }[]
+    warnings: { sheet: string; rule: string; message: string; row?: number }[]
+    summary: { sheet: string; target: string; rows: number }[]
+  } | null>(null)
+  const [isPublishing, setIsPublishing] = useState(false)
+  const [isRollingBack, setIsRollingBack] = useState(false)
+  const [snapshots, setSnapshots] = useState<
+    {
+      snapshotId: string
+      createdAt: string
+      publishId: string
+      totalRows: number
+      sheets: { sheet: string; rows: number }[]
+    }[]
+  >([])
+  const [selectedSnapshotId, setSelectedSnapshotId] = useState('')
+  const [isLoadingSnapshots, setIsLoadingSnapshots] = useState(false)
   const [isBulkSeeding, setIsBulkSeeding] = useState(false)
 
   const [bulkRound, setBulkRound] = useState('1')
@@ -656,33 +675,131 @@ function ArcadeOpsControlPage() {
     }
   }
 
-  const handleExportRegion = async () => {
+  const handleValidate = async () => {
+    try {
+      setIsValidating(true)
+      setErrorMessage('')
+      setInfoMessage('')
+      setValidationResult(null)
+      const data = (await requestOpsApi(
+        '/api/ops/validate',
+        'POST',
+        { season: season.trim() || DEFAULT_SEASON, region: 'all' },
+        operatorKey
+      )) as {
+        valid: boolean
+        errors: { sheet: string; rule: string; message: string; row?: number }[]
+        warnings: {
+          sheet: string
+          rule: string
+          message: string
+          row?: number
+        }[]
+        summary: { sheet: string; target: string; rows: number }[]
+      }
+      setValidationResult(data)
+      setInfoMessage(data.valid ? '검증 통과' : '검증 실패 — 오류를 확인하세요')
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : '검증 실패')
+    } finally {
+      setIsValidating(false)
+    }
+  }
+
+  const handlePublish = async () => {
+    const modeLabel = exportReplaceMode ? 'replace (초기화 후 재송출)' : 'upsert'
     if (
-      exportReplaceMode &&
       !confirm(
-        '해당 지역 시즌 데이터만 정리 후 재송출합니다. 결선 시트는 유지됩니다. 계속하시겠습니까?'
+        `시즌 ${season || DEFAULT_SEASON} 전체를 ${modeLabel} 모드로 송출합니다.\n\n자동으로 검증 → 백업 → 송출이 실행됩니다. 계속하시겠습니까?`
       )
     )
       return
     try {
-      setIsExportRegionRunning(true)
+      setIsPublishing(true)
       setErrorMessage('')
       setInfoMessage('')
-      const payload: Record<string, string> = {
+      setValidationResult(null)
+      const payload: Record<string, unknown> = {
         season: season.trim() || DEFAULT_SEASON,
-        region,
+        region: 'all',
       }
       if (exportReplaceMode) payload.mode = 'replace'
-      await requestOpsApi('/api/ops/export', 'POST', payload, operatorKey)
+      const data = (await requestOpsApi(
+        '/api/ops/publish',
+        'POST',
+        payload,
+        operatorKey
+      )) as { publishId?: string; snapshotId?: string; totalRows?: number }
       setInfoMessage(
-        exportReplaceMode
-          ? '이번 주 지역 결과를 클린 송출했습니다. (지역 스코프 시트만 초기화 후 재송출)'
-          : '이번 주 지역 결과를 송출용 아카이브로 반영했습니다.'
+        `송출 완료 — publishId: ${data.publishId ?? '?'}, 백업: ${data.snapshotId ?? '?'}, 총 ${data.totalRows ?? 0}행`
       )
+      await fetchFeed()
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '지역 송출 실패')
+      setErrorMessage(err instanceof Error ? err.message : '송출 실패')
     } finally {
-      setIsExportRegionRunning(false)
+      setIsPublishing(false)
+    }
+  }
+
+  const loadSnapshots = async () => {
+    try {
+      setIsLoadingSnapshots(true)
+      setErrorMessage('')
+      const data = (await requestOpsApi(
+        '/api/ops/snapshots',
+        'POST',
+        {},
+        operatorKey
+      )) as {
+        snapshotId: string
+        createdAt: string
+        publishId: string
+        totalRows: number
+        sheets: { sheet: string; rows: number }[]
+      }[]
+      setSnapshots(Array.isArray(data) ? data : [])
+      if (Array.isArray(data) && data.length > 0 && !selectedSnapshotId) {
+        setSelectedSnapshotId(data[0].snapshotId)
+      }
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error ? err.message : '스냅샷 목록 조회 실패'
+      )
+    } finally {
+      setIsLoadingSnapshots(false)
+    }
+  }
+
+  const handleRollback = async () => {
+    if (!selectedSnapshotId) {
+      setErrorMessage('롤백할 스냅샷을 선택하세요')
+      return
+    }
+    const snap = snapshots.find((s) => s.snapshotId === selectedSnapshotId)
+    if (
+      !confirm(
+        `스냅샷 "${selectedSnapshotId}"(으)로 롤백합니다.\n\n생성: ${snap?.createdAt ?? '?'}\npublishId: ${snap?.publishId ?? '?'}\n\n현재 pub_* 데이터가 모두 교체됩니다. 계속하시겠습니까?`
+      )
+    )
+      return
+    try {
+      setIsRollingBack(true)
+      setErrorMessage('')
+      setInfoMessage('')
+      const data = (await requestOpsApi(
+        '/api/ops/rollback',
+        'POST',
+        { snapshotId: selectedSnapshotId },
+        operatorKey
+      )) as { rollbackId?: string; restoredRows?: number }
+      setInfoMessage(
+        `롤백 완료 — rollbackId: ${data.rollbackId ?? '?'}, 복원 행: ${data.restoredRows ?? 0}`
+      )
+      await fetchFeed()
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : '롤백 실패')
+    } finally {
+      setIsRollingBack(false)
     }
   }
 
@@ -704,35 +821,6 @@ function ArcadeOpsControlPage() {
       )
     } finally {
       setIsGuideRunning(false)
-    }
-  }
-  const handleExportAll = async () => {
-    if (
-      exportReplaceMode &&
-      !confirm(
-        '시즌 전체 아카이브를 정리 후 재송출합니다 (결선 포함). 계속하시겠습니까?'
-      )
-    )
-      return
-    try {
-      setIsExportAllRunning(true)
-      setErrorMessage('')
-      setInfoMessage('')
-      const payload: Record<string, string> = {
-        season: season.trim() || DEFAULT_SEASON,
-        region: 'all',
-      }
-      if (exportReplaceMode) payload.mode = 'replace'
-      await requestOpsApi('/api/ops/export', 'POST', payload, operatorKey)
-      setInfoMessage(
-        exportReplaceMode
-          ? `시즌 ${season || DEFAULT_SEASON} 전체 클린 송출 완료 (결선 포함, 고아 데이터 제거됨)`
-          : `시즌 ${season || DEFAULT_SEASON} 전체 송출 완료`
-      )
-    } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '전체 송출 실패')
-    } finally {
-      setIsExportAllRunning(false)
     }
   }
 
@@ -1151,45 +1239,162 @@ function ArcadeOpsControlPage() {
         </div>
       </section>
 
-      <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
+      <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5 space-y-5'>
         <div className='space-y-1.5'>
-          <h2 className='text-base font-bold text-white'>송출 반영</h2>
+          <h2 className='text-base font-bold text-white'>
+            검증 → 송출 → 롤백
+          </h2>
           <p className='text-xs text-white/60'>
-            경기 종료 직후 현재 지역만 송출하면, 방송/제어 페이지가 실시간으로
-            최신 결과를 반영합니다.
+            데이터 검증 후 안전하게 송출하고, 문제 발생 시 스냅샷으로 롤백할 수
+            있습니다.
           </p>
         </div>
 
-        <label className='mt-4 flex items-center gap-2 text-xs text-white/70'>
-          <input
-            type='checkbox'
-            checked={exportReplaceMode}
-            onChange={(e) => setExportReplaceMode(e.target.checked)}
-            className='accent-[#ff2a00]'
-          />
-          기존 아카이브 초기화 후 재송출 (고아 데이터 제거)
-        </label>
-
-        <div className='mt-3 flex flex-wrap gap-2'>
+        {/* ── 1단계: 검증 ── */}
+        <div className='space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-3'>
+          <h3 className='text-sm font-bold text-white'>1. 데이터 검증</h3>
           <Button
             variant='outline'
+            onClick={handleValidate}
+            disabled={isValidating}
+          >
+            {isValidating ? '검증 중..' : '데이터 검증 실행'}
+          </Button>
+
+          {validationResult ? (
+            <div className='space-y-2'>
+              <p
+                className={`text-xs font-semibold ${validationResult.valid ? 'text-emerald-300' : 'text-red-300'}`}
+              >
+                {validationResult.valid
+                  ? '검증 통과 — 송출 가능합니다.'
+                  : `검증 실패 — 오류 ${validationResult.errors.length}건`}
+              </p>
+
+              {validationResult.errors.length > 0 ? (
+                <div className='max-h-40 overflow-y-auto rounded-lg border border-red-300/25 bg-red-500/10 p-2 text-xs text-red-100'>
+                  {validationResult.errors.map((e, i) => (
+                    <div key={i} className='py-0.5'>
+                      <span className='font-mono text-red-300'>
+                        [{e.sheet}]
+                      </span>{' '}
+                      {e.rule}: {e.message}
+                      {e.row != null ? ` (행 ${e.row})` : ''}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {validationResult.warnings.length > 0 ? (
+                <div className='max-h-32 overflow-y-auto rounded-lg border border-yellow-300/25 bg-yellow-500/10 p-2 text-xs text-yellow-100'>
+                  {validationResult.warnings.map((w, i) => (
+                    <div key={i} className='py-0.5'>
+                      <span className='font-mono text-yellow-300'>
+                        [{w.sheet}]
+                      </span>{' '}
+                      {w.rule}: {w.message}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {validationResult.summary.length > 0 ? (
+                <details className='text-xs text-white/60'>
+                  <summary className='cursor-pointer hover:text-white/80'>
+                    탭별 행 수 요약 ({validationResult.summary.length}개 탭)
+                  </summary>
+                  <div className='mt-1 grid grid-cols-2 gap-x-4 gap-y-0.5 font-mono md:grid-cols-3'>
+                    {validationResult.summary.map((s, i) => (
+                      <span key={i}>
+                        {s.target}: {s.rows}행
+                      </span>
+                    ))}
+                  </div>
+                </details>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+
+        {/* ── 2단계: 송출 ── */}
+        <div className='space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-3'>
+          <h3 className='text-sm font-bold text-white'>2. 안전 송출</h3>
+          <p className='text-[11px] text-white/50'>
+            자동으로 검증 → 백업(스냅샷) → 송출 → 캐시 초기화가 실행됩니다.
+          </p>
+          <label className='flex items-center gap-2 text-xs text-white/70'>
+            <input
+              type='checkbox'
+              checked={exportReplaceMode}
+              onChange={(e) => setExportReplaceMode(e.target.checked)}
+              className='accent-[#ff2a00]'
+            />
+            replace 모드 (기존 아카이브 초기화 후 재송출)
+          </label>
+          <Button onClick={handlePublish} disabled={isPublishing}>
+            {isPublishing ? '송출 중..' : '검증 + 백업 + 송출'}
+          </Button>
+        </div>
+
+        {/* ── 3단계: 롤백 ── */}
+        <div className='space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-3'>
+          <h3 className='text-sm font-bold text-white'>3. 롤백</h3>
+          <div className='flex flex-wrap items-end gap-2'>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={loadSnapshots}
+              disabled={isLoadingSnapshots}
+            >
+              {isLoadingSnapshots ? '조회 중..' : '스냅샷 조회'}
+            </Button>
+            {snapshots.length > 0 ? (
+              <Select
+                value={selectedSnapshotId}
+                onValueChange={setSelectedSnapshotId}
+              >
+                <SelectTrigger className='w-64'>
+                  <SelectValue placeholder='스냅샷 선택' />
+                </SelectTrigger>
+                <SelectContent>
+                  {snapshots.map((snap) => (
+                    <SelectItem
+                      key={snap.snapshotId}
+                      value={snap.snapshotId}
+                    >
+                      {snap.snapshotId} ({snap.createdAt})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : null}
+          </div>
+          {snapshots.length > 0 && selectedSnapshotId ? (
+            <Button
+              variant='destructive'
+              onClick={handleRollback}
+              disabled={isRollingBack}
+            >
+              {isRollingBack
+                ? '롤백 중..'
+                : `"${selectedSnapshotId}" 롤백 실행`}
+            </Button>
+          ) : null}
+        </div>
+
+        {/* ── 유틸리티 ── */}
+        <div className='flex flex-wrap gap-2 border-t border-white/10 pt-3'>
+          <Button
+            variant='outline'
+            size='sm'
             onClick={handleInitOpsTabs}
             disabled={isInitRunning}
           >
             {isInitRunning ? '초기화 중..' : '운영 DB 탭 초기화'}
           </Button>
-          <Button onClick={handleExportRegion} disabled={isExportRegionRunning}>
-            {isExportRegionRunning ? '송출 중..' : '이번 주 지역 송출'}
-          </Button>
-          <Button
-            variant='secondary'
-            onClick={handleExportAll}
-            disabled={isExportAllRunning}
-          >
-            {isExportAllRunning ? '송출 중..' : '시즌 전체 송출'}
-          </Button>
           <Button
             variant='outline'
+            size='sm'
             onClick={handleWriteOpsGuide}
             disabled={isGuideRunning}
           >

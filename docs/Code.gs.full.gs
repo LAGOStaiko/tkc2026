@@ -2068,6 +2068,18 @@ function doPost(e) {
       if (commitResult.ok) purgeApiCache_();
       return json_(commitResult);
     }
+    if (action === 'opsValidate') return json_(handleOpsValidate_(payload || params));
+    if (action === 'opsPublish') {
+      var publishResult = handleOpsPublish_(payload || params);
+      if (publishResult.ok) { purgeApiCache_(); purgeOpsFeedCache_(); }
+      return json_(publishResult);
+    }
+    if (action === 'opsRollback') {
+      var rollbackResult = handleOpsRollback_(payload || params);
+      if (rollbackResult.ok) { purgeApiCache_(); purgeOpsFeedCache_(); }
+      return json_(rollbackResult);
+    }
+    if (action === 'opsListSnapshots') return json_(handleOpsListSnapshots_());
     if (action === 'register') return json_(handleRegister_(payload));
 
     return json_({ ok:false, error:'알 수 없는 action입니다.' });
@@ -2151,6 +2163,10 @@ function getOpsSheetSchemas_() {
     {
       name: 'ops_registrations',
       headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'cardNo', 'dohirobaNo', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo']
+    },
+    {
+      name: 'ops_backup_snapshots',
+      headers: ['snapshotId', 'createdAt', 'publishId', 'sheetName', 'rowIndex', 'rowJson']
     }
   ];
 }
@@ -3704,7 +3720,7 @@ function handleOpsExport_(payload) {
 
   // --- Publish log ---
   var tz = Session.getScriptTimeZone();
-  var publishId = 'PUB-' + Utilities.formatDate(new Date(), tz, 'yyyyMMddHHmmss') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+  var publishId = trim_(payload.publishId) || ('PUB-' + Utilities.formatDate(new Date(), tz, 'yyyyMMddHHmmss') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase());
 
   var logHeaders = ['publishId', 'publishedAt', 'publishedBy', 'season', 'region', 'mode', 'totalRows', 'totalCleared', 'detail'];
   ensureSheetSchema_(ss, 'pub_publish_log', logHeaders);
@@ -4069,6 +4085,492 @@ function menuPubCommit_() {
   } else {
     ui.alert('커밋 실패', result.error || '알 수 없는 오류', ui.ButtonSet.OK);
   }
+}
+
+// --- Snapshot / Backup Helpers ---
+
+function createSnapshot_(publishId) {
+  var ss = getSs_();
+  var tz = Session.getScriptTimeZone();
+  var now = new Date();
+  var snapshotId = 'SNAP-' + Utilities.formatDate(now, tz, 'yyyyMMddHHmmss') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+
+  var backupHeaders = ['snapshotId', 'createdAt', 'publishId', 'sheetName', 'rowIndex', 'rowJson'];
+  ensureSheetSchema_(ss, 'ops_backup_snapshots', backupHeaders);
+  var backupSheet = ss.getSheetByName('ops_backup_snapshots');
+
+  var schemas = getSheetSchemas_('all');
+  var totalRows = 0;
+  var sheetSummary = [];
+  var allBackupRows = [];
+
+  for (var i = 0; i < schemas.length; i++) {
+    var schema = schemas[i];
+    var table = readOptionalTable_(schema.name);
+    var rows = table.rows;
+
+    for (var r = 0; r < rows.length; r++) {
+      allBackupRows.push([
+        snapshotId,
+        now,
+        publishId || '',
+        schema.name,
+        r,
+        JSON.stringify(rows[r])
+      ]);
+    }
+
+    totalRows += rows.length;
+    sheetSummary.push({ sheet: schema.name, rows: rows.length });
+  }
+
+  if (allBackupRows.length > 0) {
+    var startRow = backupSheet.getLastRow() + 1;
+    backupSheet.getRange(startRow, 1, allBackupRows.length, backupHeaders.length)
+      .setValues(allBackupRows);
+  }
+
+  return {
+    snapshotId: snapshotId,
+    createdAt: isoDateTime_(now),
+    publishId: publishId || '',
+    totalRows: totalRows,
+    sheets: sheetSummary
+  };
+}
+
+function purgeOldSnapshots_(keepCount) {
+  keepCount = keepCount || 3;
+  var ss = getSs_();
+  var backupSheet = ss.getSheetByName('ops_backup_snapshots');
+  if (!backupSheet) return { purged: 0 };
+
+  var lastRow = backupSheet.getLastRow();
+  if (lastRow <= 1) return { purged: 0 };
+
+  var idCol = backupSheet.getRange(2, 1, lastRow - 1, 1).getValues();
+
+  var seen = {};
+  var orderedIds = [];
+  for (var i = 0; i < idCol.length; i++) {
+    var id = String(idCol[i][0]).trim();
+    if (id && !seen[id]) {
+      seen[id] = true;
+      orderedIds.push(id);
+    }
+  }
+
+  if (orderedIds.length <= keepCount) return { purged: 0 };
+
+  var toRemove = orderedIds.slice(0, orderedIds.length - keepCount);
+  var toRemoveSet = {};
+  for (var j = 0; j < toRemove.length; j++) toRemoveSet[toRemove[j]] = true;
+
+  var purgedCount = 0;
+  for (var r = lastRow - 1; r >= 1; r--) {
+    var rowId = String(idCol[r - 1][0]).trim();
+    if (toRemoveSet[rowId]) {
+      backupSheet.deleteRow(r + 1);
+      purgedCount++;
+    }
+  }
+
+  return { purged: purgedCount, removedSnapshots: toRemove };
+}
+
+function handleOpsListSnapshots_() {
+  var table = readOptionalTable_('ops_backup_snapshots');
+  if (!table.rows.length) {
+    return { ok: true, data: { snapshots: [] } };
+  }
+
+  var map = {};
+  var order = [];
+  for (var i = 0; i < table.rows.length; i++) {
+    var row = table.rows[i];
+    var id = trim_(row.snapshotId);
+    if (!id) continue;
+    if (!map[id]) {
+      map[id] = {
+        snapshotId: id,
+        createdAt: row.createdAt ? isoDateTime_(row.createdAt instanceof Date ? row.createdAt : new Date(row.createdAt)) : '',
+        publishId: trim_(row.publishId),
+        totalRows: 0,
+        sheets: {}
+      };
+      order.push(id);
+    }
+    map[id].totalRows++;
+    var sheetName = trim_(row.sheetName);
+    if (sheetName) {
+      map[id].sheets[sheetName] = (map[id].sheets[sheetName] || 0) + 1;
+    }
+  }
+
+  var snapshots = order.map(function(id) {
+    var s = map[id];
+    var sheetSummary = [];
+    for (var name in s.sheets) {
+      sheetSummary.push({ sheet: name, rows: s.sheets[name] });
+    }
+    return {
+      snapshotId: s.snapshotId,
+      createdAt: s.createdAt,
+      publishId: s.publishId,
+      totalRows: s.totalRows,
+      sheets: sheetSummary
+    };
+  }).reverse();
+
+  return { ok: true, data: { snapshots: snapshots } };
+}
+
+function restoreSnapshot_(snapshotId) {
+  if (!snapshotId) throw new Error('snapshotId가 필요합니다.');
+
+  var table = readOptionalTable_('ops_backup_snapshots');
+  var snapshotRows = table.rows.filter(function(r) {
+    return trim_(r.snapshotId) === snapshotId;
+  });
+
+  if (snapshotRows.length === 0) {
+    throw new Error('스냅샷을 찾을 수 없습니다: ' + snapshotId);
+  }
+
+  var bySheet = {};
+  for (var i = 0; i < snapshotRows.length; i++) {
+    var row = snapshotRows[i];
+    var sheetName = trim_(row.sheetName);
+    if (!bySheet[sheetName]) bySheet[sheetName] = [];
+    bySheet[sheetName].push(JSON.parse(row.rowJson));
+  }
+
+  var ss = getSs_();
+  var schemas = getSheetSchemas_('all');
+  var restored = [];
+
+  for (var s = 0; s < schemas.length; s++) {
+    var schema = schemas[s];
+    var backedUpRows = bySheet[schema.name] || [];
+    replaceTableRows_(ss, schema.name, schema.headers, backedUpRows);
+    restored.push({ sheet: schema.name, rows: backedUpRows.length });
+  }
+
+  return {
+    restoredSheets: restored.length,
+    totalRows: snapshotRows.length,
+    sheets: restored
+  };
+}
+
+// --- Validate / Publish / Rollback Pipeline ---
+
+function handleOpsValidate_(payload) {
+  payload = payload || {};
+  var season = trim_(payload.season) || '2026';
+  var region = trim_(payload.region || 'all').toLowerCase();
+  if (region !== 'all') {
+    region = normalizeRegionKey_(region);
+    if (!region) return { ok: true, data: { valid: false, errors: [{ sheet: '', rule: 'param', message: 'region 값이 올바르지 않습니다: ' + String(payload.region) }], warnings: [], summary: [] } };
+  }
+
+  var errors = [];
+  var warnings = [];
+  var summary = [];
+
+  var exportDefs = [
+    { from: 'ops_db_online', to: 'pub_arcade_online', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
+    { from: 'ops_db_swiss_matches', to: 'pub_arcade_swiss_matches', keyFields: ['season', 'region', 'round', 'table'], regionScoped: true },
+    { from: 'ops_db_swiss_standings', to: 'pub_arcade_swiss_standings', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
+    { from: 'ops_db_decider', to: 'pub_arcade_decider', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
+    { from: 'ops_db_seeding', to: 'pub_arcade_seeding', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
+    { from: 'ops_db_qualifiers', to: 'pub_arcade_qualifiers', keyFields: ['season', 'region', 'group'], regionScoped: true },
+    { from: 'ops_db_finals_a', to: 'pub_arcade_finals_a', keyFields: ['season', 'seed'], regionScoped: false },
+    { from: 'ops_db_finals_b', to: 'pub_arcade_finals_b', keyFields: ['season', 'seed'], regionScoped: false },
+    { from: 'ops_db_finals_matches', to: 'pub_arcade_finals_matches', keyFields: ['season', 'matchNo'], regionScoped: false }
+  ];
+
+  var allData = {};
+  for (var i = 0; i < exportDefs.length; i++) {
+    var def = exportDefs[i];
+    var source = readOptionalTable_(def.from);
+    var filtered = filterOpsRows_(source.rows, season, region, def.regionScoped);
+    allData[def.from] = filtered;
+    summary.push({ sheet: def.from, target: def.to, rows: filtered.length });
+  }
+
+  // V1: Required field checks
+  var requiredFieldMap = {
+    ops_db_online: ['entryId', 'nickname'],
+    ops_db_swiss_matches: ['round', 'table', 'p1EntryId'],
+    ops_db_swiss_standings: ['entryId', 'nickname'],
+    ops_db_decider: ['entryId', 'nickname'],
+    ops_db_seeding: ['entryId', 'nickname'],
+    ops_db_qualifiers: ['group', 'entryId', 'nickname'],
+    ops_db_finals_a: ['seed', 'entryId', 'nickname'],
+    ops_db_finals_b: ['seed', 'entryId', 'nickname'],
+    ops_db_finals_matches: ['matchNo']
+  };
+
+  for (var sheet in requiredFieldMap) {
+    var fields = requiredFieldMap[sheet];
+    var rows = allData[sheet] || [];
+    for (var r = 0; r < rows.length; r++) {
+      for (var f = 0; f < fields.length; f++) {
+        if (!trim_(rows[r][fields[f]])) {
+          errors.push({ sheet: sheet, rule: 'V1', message: fields[f] + ' 필수값 누락', row: r + 1 });
+        }
+      }
+    }
+  }
+
+  // V2: Key uniqueness checks
+  for (var d = 0; d < exportDefs.length; d++) {
+    var def2 = exportDefs[d];
+    var rows2 = allData[def2.from] || [];
+    var keySet = {};
+    for (var r2 = 0; r2 < rows2.length; r2++) {
+      var keyParts = def2.keyFields.map(function(k) { return trim_(rows2[r2][k]); });
+      var compositeKey = keyParts.join('|');
+      if (keySet[compositeKey]) {
+        errors.push({ sheet: def2.from, rule: 'V2', message: '키 중복 [' + def2.keyFields.join('+') + '] = ' + compositeKey, row: r2 + 1 });
+      }
+      keySet[compositeKey] = true;
+    }
+  }
+
+  // V3: Swiss match referential integrity
+  var swissMatches = allData['ops_db_swiss_matches'] || [];
+  for (var sm = 0; sm < swissMatches.length; sm++) {
+    var m = swissMatches[sm];
+    var winner = trim_(m.winnerEntryId);
+    if (winner && !toBool_(m.bye)) {
+      var p1 = trim_(m.p1EntryId);
+      var p2 = trim_(m.p2EntryId);
+      if (winner !== p1 && winner !== p2) {
+        errors.push({ sheet: 'ops_db_swiss_matches', rule: 'V3', message: 'R' + m.round + 'T' + m.table + ': winnerEntryId "' + winner + '" 가 참가자에 없음 (p1=' + p1 + ', p2=' + p2 + ')', row: sm + 1 });
+      }
+    }
+  }
+
+  // V4: Finals match referential integrity
+  var finalsMatches = allData['ops_db_finals_matches'] || [];
+  var finalsAIds = {};
+  var finalsBIds = {};
+  (allData['ops_db_finals_a'] || []).forEach(function(r) { finalsAIds[trim_(r.entryId)] = true; });
+  (allData['ops_db_finals_b'] || []).forEach(function(r) { finalsBIds[trim_(r.entryId)] = true; });
+  var allFinalistIds = {};
+  var aKey; for (aKey in finalsAIds) allFinalistIds[aKey] = true;
+  var bKey; for (bKey in finalsBIds) allFinalistIds[bKey] = true;
+
+  for (var fm = 0; fm < finalsMatches.length; fm++) {
+    var fmRow = finalsMatches[fm];
+    var leftId = trim_(fmRow.leftEntryId);
+    var rightId = trim_(fmRow.rightEntryId);
+    var fmWinner = trim_(fmRow.winnerEntryId);
+
+    if (leftId && !allFinalistIds[leftId]) {
+      warnings.push({ sheet: 'ops_db_finals_matches', rule: 'V4', message: '#' + fmRow.matchNo + ': leftEntryId "' + leftId + '" 가 결선 시드에 없음' });
+    }
+    if (rightId && !allFinalistIds[rightId]) {
+      warnings.push({ sheet: 'ops_db_finals_matches', rule: 'V4', message: '#' + fmRow.matchNo + ': rightEntryId "' + rightId + '" 가 결선 시드에 없음' });
+    }
+    if (fmWinner && fmWinner !== leftId && fmWinner !== rightId) {
+      errors.push({ sheet: 'ops_db_finals_matches', rule: 'V5', message: '#' + fmRow.matchNo + ': winnerEntryId "' + fmWinner + '" 가 좌/우 참가자에 없음', row: fm + 1 });
+    }
+  }
+
+  // V5: Empty sheet warnings
+  for (var s = 0; s < exportDefs.length; s++) {
+    var defS = exportDefs[s];
+    if ((allData[defS.from] || []).length === 0) {
+      if (defS.regionScoped || region === 'all') {
+        warnings.push({ sheet: defS.from, rule: 'V6', message: '내보낼 행이 없습니다.' });
+      }
+    }
+  }
+
+  var valid = errors.length === 0;
+
+  return {
+    ok: true,
+    data: {
+      valid: valid,
+      errors: errors,
+      warnings: warnings,
+      summary: summary,
+      season: season,
+      region: region
+    }
+  };
+}
+
+function handleOpsPublish_(payload) {
+  payload = payload || {};
+
+  var season = trim_(payload.season) || '2026';
+  var region = trim_(payload.region || 'all').toLowerCase();
+  if (region !== 'all') {
+    region = normalizeRegionKey_(region);
+    if (!region) return { ok: false, error: 'region 값이 올바르지 않습니다.' };
+  }
+
+  var mode = trim_(payload.mode || 'replace').toLowerCase();
+  if (mode !== 'replace') mode = 'upsert';
+
+  var skipValidation = toBool_(payload.skipValidation);
+
+  // Step 1: Validate
+  if (!skipValidation) {
+    var validateResult = handleOpsValidate_({ season: season, region: region });
+    if (!validateResult.ok) return validateResult;
+    if (!validateResult.data.valid) {
+      return {
+        ok: false,
+        error: '검증 실패: ' + validateResult.data.errors.length + '건의 오류',
+        data: {
+          phase: 'validate',
+          errors: validateResult.data.errors,
+          warnings: validateResult.data.warnings
+        }
+      };
+    }
+  }
+
+  // Step 2: Create backup snapshot
+  var tz = Session.getScriptTimeZone();
+  var publishId = 'PUB-' + Utilities.formatDate(new Date(), tz, 'yyyyMMddHHmmss') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+
+  var snapshot;
+  try {
+    snapshot = createSnapshot_(publishId);
+  } catch (snapErr) {
+    return {
+      ok: false,
+      error: '백업 스냅샷 생성 실패: ' + String(snapErr),
+      data: { phase: 'backup' }
+    };
+  }
+
+  // Step 3: Execute export
+  var exportResult;
+  try {
+    exportResult = handleOpsExport_({ season: season, region: region, mode: mode, publishId: publishId });
+  } catch (exportErr) {
+    return {
+      ok: false,
+      error: 'Export 실행 실패: ' + String(exportErr),
+      data: {
+        phase: 'export',
+        snapshotId: snapshot.snapshotId,
+        hint: '롤백 가능: snapshotId=' + snapshot.snapshotId
+      }
+    };
+  }
+
+  if (!exportResult.ok) {
+    return {
+      ok: false,
+      error: 'Export 실패: ' + (exportResult.error || '알 수 없는 오류'),
+      data: {
+        phase: 'export',
+        snapshotId: snapshot.snapshotId,
+        hint: '롤백 가능: snapshotId=' + snapshot.snapshotId
+      }
+    };
+  }
+
+  // Step 4: Purge old snapshots
+  try {
+    purgeOldSnapshots_(3);
+  } catch (purgeErr) {
+    // Non-fatal
+  }
+
+  // Step 5: Purge caches
+  if (typeof purgeApiCache_ === 'function') {
+    try { purgeApiCache_(); } catch (err) {}
+  }
+  purgeOpsFeedCache_(season, region);
+
+  return {
+    ok: true,
+    data: {
+      publishId: exportResult.data.publishId,
+      snapshotId: snapshot.snapshotId,
+      season: season,
+      region: region,
+      mode: mode,
+      totalRows: exportResult.data.totalRows,
+      totalCleared: exportResult.data.totalCleared,
+      backupRows: snapshot.totalRows,
+      sheets: exportResult.data.sheets
+    }
+  };
+}
+
+function handleOpsRollback_(payload) {
+  payload = payload || {};
+
+  var snapshotId = trim_(payload.snapshotId);
+  if (!snapshotId) {
+    return { ok: false, error: 'snapshotId가 필요합니다.' };
+  }
+
+  var restoreResult;
+  try {
+    restoreResult = restoreSnapshot_(snapshotId);
+  } catch (err) {
+    return { ok: false, error: '롤백 실패: ' + String(err) };
+  }
+
+  appendOpsEvent_('rollback', '', '', '', 'Rollback to snapshot: ' + snapshotId);
+
+  var ss = getSs_();
+  var tz = Session.getScriptTimeZone();
+  var now = new Date();
+  var rollbackId = 'RBK-' + Utilities.formatDate(now, tz, 'yyyyMMddHHmmss') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+
+  var logHeaders = ['publishId', 'publishedAt', 'publishedBy', 'season', 'region', 'mode', 'totalRows', 'totalCleared', 'detail'];
+  ensureSheetSchema_(ss, 'pub_publish_log', logHeaders);
+  var logSheet = ss.getSheetByName('pub_publish_log');
+  upsertSheetRow_(logSheet, logHeaders, ['publishId'], {
+    publishId: rollbackId,
+    publishedAt: now,
+    publishedBy: 'ops-operator',
+    season: '',
+    region: 'all',
+    mode: 'rollback',
+    totalRows: restoreResult.totalRows,
+    totalCleared: 0,
+    detail: 'Rollback from snapshot: ' + snapshotId
+  });
+
+  var metaHeaders = ['key', 'value', 'updatedAt'];
+  ensureSheetSchema_(ss, 'pub_meta', metaHeaders);
+  var metaSheet = ss.getSheetByName('pub_meta');
+  upsertSheetRow_(metaSheet, metaHeaders, ['key'], {
+    key: 'lastPublishId', value: rollbackId, updatedAt: now
+  });
+  upsertSheetRow_(metaSheet, metaHeaders, ['key'], {
+    key: 'lastPublishedAt', value: now, updatedAt: now
+  });
+
+  if (typeof purgeApiCache_ === 'function') {
+    try { purgeApiCache_(); } catch (err) {}
+  }
+  purgeOpsFeedCache_();
+
+  return {
+    ok: true,
+    data: {
+      rollbackId: rollbackId,
+      snapshotId: snapshotId,
+      restoredSheets: restoreResult.restoredSheets,
+      totalRows: restoreResult.totalRows,
+      sheets: restoreResult.sheets
+    }
+  };
 }
 
 /**

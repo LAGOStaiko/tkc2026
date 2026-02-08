@@ -141,6 +141,11 @@
 - `opsSwissNextRound`
 - `opsRoundClose`
 - `opsExport`
+- `opsValidate` — 운영 DB 데이터 검증 (필수값, 키 중복, 참조 무결성)
+- `opsPublish` — 검증 → 백업 → 송출 → 캐시 초기화 파이프라인
+- `opsRollback` — 스냅샷 기반 pub_* 전체 복원
+- `opsListSnapshots` — 백업 스냅샷 목록 조회
+- `pubCommit` — pub_* 수동 편집 후 커밋 기록
 - `opsFeed` — `executeCachedAction_` 래핑 (15초 TTL, `season:region` 키)
 
 > **opsFeed 캐시 원칙:** opsFeed 캐시는 시즌/지역 단위로 생성되며, 데이터 변경(opsUpsert, opsExport, opsRoundClose 등) 직후 자동 무효화됩니다. `purgeOpsFeedCache_(season, region)` 헬퍼가 해당 시즌/지역의 캐시만 삭제합니다.
@@ -244,7 +249,71 @@ Swiss 매치 업서트:
 - **지역 replace는 결선 시트를 지우지 않음** — 지역 단위 재송출 시 finals_a/finals_b/finals_matches는 보호된다.
 - **전체 replace만 결선 포함 정리** — "시즌 전체 송출" + replace 체크 시에만 결선 시트가 초기화 후 재작성된다.
 
-## 12. 선곡풀 관리
+## 12. 검증, 송출, 롤백 파이프라인
+
+### 12-1. 검증 (Validate)
+
+운영 콘솔의 **"데이터 검증 실행"** 버튼 또는 API `opsValidate`로 실행합니다.
+
+**검사 항목:**
+
+| 규칙 | 대상 | 심각도 |
+|------|------|--------|
+| V1: 필수값 누락 | entryId, nickname 등 시트별 | error |
+| V2: 키 중복 | exportDefs의 keyFields 조합 | error |
+| V3: Swiss 승자 참조 | winnerEntryId ∈ {p1, p2} | error |
+| V4: Finals 참가자 참조 | left/rightEntryId ∈ finals_a ∪ finals_b | warning |
+| V5: Finals 승자 참조 | winnerEntryId ∈ {left, right} | error |
+| V6: 빈 시트 경고 | 내보낼 행 0개 | warning |
+
+- `errors` = 차단 (송출 불가), `warnings` = 참고 정보
+- 결과: `{ valid: true/false, errors: [...], warnings: [...], summary: [...] }`
+
+### 12-2. 안전 송출 (Publish)
+
+운영 콘솔의 **"검증 + 백업 + 송출"** 버튼 또는 API `opsPublish`로 실행합니다.
+
+**자동 실행 순서:**
+1. `handleOpsValidate_` → valid=false면 즉시 중단
+2. `createSnapshot_` → 현재 pub_* 전체 21개 탭 백업
+3. `handleOpsExport_` → ops_db → pub_* 내보내기
+4. `purgeOldSnapshots_(3)` → 오래된 스냅샷 정리 (최근 3개 유지)
+5. 캐시 초기화 (API + opsFeed)
+
+- `skipValidation: true` 옵션으로 검증 단계 건너뛰기 가능 (긴급 상황)
+- 전체 소요: ~65초 (GAS 6분 제한 이내)
+
+### 12-3. 롤백 (Rollback)
+
+운영 콘솔의 **"롤백 실행"** 버튼 또는 API `opsRollback`으로 실행합니다.
+
+**사용법:**
+1. "스냅샷 조회" 버튼으로 백업 목록 로드
+2. 복원할 스냅샷 선택
+3. "롤백 실행" 버튼 클릭 (확인 대화상자 표시)
+
+**주의사항:**
+- 롤백은 pub_* 전체 21개 탭을 스냅샷 시점으로 되돌립니다
+- 롤백 후 `pub_publish_log`에 mode='rollback' 항목이 자동 추가됩니다
+- 감사 추적이 유지되므로 언제/누가 롤백했는지 확인 가능합니다
+
+### 12-4. 백업 시트 구조
+
+`ops_backup_snapshots` 탭에 스냅샷이 행 단위로 누적됩니다.
+
+| 컬럼 | 설명 |
+|------|------|
+| `snapshotId` | `SNAP-yyyyMMddHHmmss-XXXX` |
+| `createdAt` | 생성 시각 |
+| `publishId` | 연관 발행 ID |
+| `sheetName` | 원본 탭명 (예: `pub_arcade_online`) |
+| `rowIndex` | 원본 탭 내 행 번호 |
+| `rowJson` | 행 데이터 JSON 직렬화 |
+
+- 보존 정책: 최근 3개 스냅샷 자동 유지, 초과분 자동 삭제
+- 스냅샷 1개 ≈ 500행 (21탭 합계), 3개 ≈ 1,500행
+
+## 13. 선곡풀 관리
 
 ### 단일 소스 원칙
 
@@ -279,8 +348,14 @@ Swiss 매치 업서트:
 
 신청 폼(`/apply`)의 "오프라인 선곡" 드롭다운은 `song_pool_arcade_swiss` 시트에서 자동 로드됩니다. 정적 상수가 아닌 API 기반이므로 시트 수정만으로 옵션이 변경됩니다.
 
-## 13. 변경 이력
+## 14. 변경 이력
 
+- 2026-02-08
+  - 검증(`opsValidate`), 안전 송출(`opsPublish`), 롤백(`opsRollback`) 파이프라인 추가
+  - `ops_backup_snapshots` 백업 탭 도입 (최근 3개 스냅샷 유지)
+  - 운영 콘솔 UI: 기존 Export 섹션 → 검증/송출/롤백 3단계로 교체
+  - `opsListSnapshots` 스냅샷 목록 조회 액션 추가
+  - `handleOpsExport_`에 외부 `publishId` 주입 옵션 추가
 - 2026-02-08
   - `normalizeDifficulty_()` 헬퍼 추가: `difficulty` 값을 `oni`/`ura`로 엄격 정규화
   - `handleSongPools_`에서 `title` 비어 있거나 `difficulty` 무효인 행 자동 제외
