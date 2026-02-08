@@ -68,12 +68,14 @@ function SongsPage() {
       <div className='grid gap-12 md:gap-14 lg:grid-cols-2'>
         <DivisionTimeline
           label='콘솔 부문'
+          iconSrc='/branding/console-icon.png'
           songs={consoleSongs}
           emptyText='콘솔 과제곡이 아직 준비되지 않았습니다.'
           isLoading={isLoading}
         />
         <DivisionTimeline
           label='아케이드 부문'
+          iconSrc='/branding/arcade-icon.png'
           songs={arcadeSongs}
           emptyText='아케이드 과제곡이 아직 준비되지 않았습니다.'
           isLoading={isLoading}
@@ -85,11 +87,13 @@ function SongsPage() {
 
 function DivisionTimeline({
   label,
+  iconSrc,
   songs,
   emptyText,
   isLoading,
 }: {
   label: string
+  iconSrc: string
   songs: SongStage[]
   emptyText: string
   isLoading: boolean
@@ -99,6 +103,7 @@ function DivisionTimeline({
       {/* Division header */}
       <div className='mb-8 flex items-center gap-3'>
         <span className='inline-block h-6 w-1 rounded-full bg-[#ff2a00]' />
+        <img src={iconSrc} alt='' className='h-7 w-7 object-contain' />
         <h2 className='text-xl font-bold text-white md:text-2xl'>{label}</h2>
       </div>
 
