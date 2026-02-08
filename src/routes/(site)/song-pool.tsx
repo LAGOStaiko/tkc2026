@@ -62,7 +62,7 @@ function SongPoolPage() {
   }, [title])
 
   return (
-    <TkcSection>
+    <TkcSection className='space-y-8'>
       <TkcPageHeader
         title={title}
         subtitle='대회에서 사용되는 선곡풀 목록입니다.'
@@ -86,7 +86,7 @@ function SongPoolPage() {
           </p>
         </div>
       ) : (
-        <div className='space-y-14'>
+        <div className='space-y-8 md:space-y-14'>
           <SongPoolSection
             label='아케이드 결선'
             iconSrc='/branding/arcade-icon.png'
@@ -118,14 +118,50 @@ function SongPoolSection({
 
   return (
     <div>
-      <div className='mb-6 flex items-center gap-3'>
+      <div className='mb-4 flex items-center gap-3 md:mb-6'>
         <img src={iconSrc} alt='' className='h-7 w-7 rounded-lg object-contain' />
         <h2 className='text-xl font-bold text-white md:text-2xl'>{label}</h2>
         <span className='ml-auto text-sm text-white/50'>{pool.length}곡</span>
       </div>
 
-      <div className='overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.03]'>
+      {/* Mobile: Card list */}
+      <div className='space-y-2.5 md:hidden'>
+        {pool.map((song, index) => (
+          <div
+            key={`m-${song.title}-${index}`}
+            className='rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3'
+          >
+            <p className='font-medium leading-relaxed break-words text-white'>
+              {song.title}
+            </p>
+            <div className='mt-2 flex items-center gap-4'>
+              <div className='flex items-center gap-1.5'>
+                <span className='text-xs text-white/50'>귀신</span>
+                {song.oni != null ? (
+                  <LevelBadge level={song.oni} />
+                ) : (
+                  <span className='text-xs text-white/40'>—</span>
+                )}
+              </div>
+              {hasUra && (
+                <div className='flex items-center gap-1.5'>
+                  <span className='text-xs text-white/50'>뒷보면</span>
+                  {song.ura != null ? (
+                    <LevelBadge level={song.ura} isUra />
+                  ) : (
+                    <span className='text-xs text-white/40'>—</span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: Table */}
+      <div className='hidden overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.03] md:block'>
         <table className='w-full text-sm md:text-base'>
+          <caption className='sr-only'>{label} 선곡풀</caption>
           <thead>
             <tr className='border-b border-white/10 text-left text-xs font-semibold uppercase tracking-wider text-white/50'>
               <th className='px-4 py-3 text-center'>#</th>
@@ -146,7 +182,7 @@ function SongPoolSection({
                 <td className='px-4 py-3 text-center text-white/40'>
                   {index + 1}
                 </td>
-                <td className='px-4 py-3 font-medium break-keep text-white'>
+                <td className='px-4 py-3 font-medium leading-relaxed break-words text-white'>
                   {song.title}
                 </td>
                 <td className='px-4 py-3 text-center'>

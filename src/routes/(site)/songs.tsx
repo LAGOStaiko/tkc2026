@@ -50,7 +50,7 @@ function SongsPage() {
   }, [title])
 
   return (
-    <TkcSection>
+    <TkcSection className='space-y-8'>
       <TkcPageHeader
         title={title}
         subtitle='결승전까지 가는 여정 —'
@@ -66,7 +66,7 @@ function SongsPage() {
         <p className='text-sm text-white/60'>과제곡을 불러오는 중...</p>
       ) : null}
 
-      <div className='grid gap-12 md:gap-14 lg:grid-cols-2'>
+      <div className='grid gap-8 md:gap-14 lg:grid-cols-2'>
         <DivisionTimeline
           label='콘솔 부문'
           iconSrc='/branding/console-icon.png'
@@ -102,15 +102,15 @@ function DivisionTimeline({
   return (
     <div>
       {/* Division header */}
-      <div className='mb-8 flex items-center gap-3'>
+      <div className='mb-6 flex items-center gap-3 md:mb-8'>
         <img src={iconSrc} alt='' className='h-7 w-7 rounded-lg object-contain' />
         <h2 className='text-xl font-bold text-white md:text-2xl'>{label}</h2>
       </div>
 
       {songs.length > 0 ? (
-        <div className='relative pl-6 md:pl-8'>
+        <div className='relative pl-5 md:pl-8'>
           {/* Vertical connector line */}
-          <div className='absolute left-[11px] top-2 bottom-2 w-px bg-gradient-to-b from-[#ff2a00]/60 via-white/15 to-[#ff2a00]/80 md:left-[15px]' />
+          <div className='absolute left-[9px] top-2 bottom-2 w-px bg-gradient-to-b from-[#ff2a00]/60 via-white/15 to-[#ff2a00]/80 md:left-[15px]' />
 
           {/* Stage nodes */}
           <div className='space-y-5 md:space-y-6'>
@@ -148,10 +148,10 @@ function TimelineNode({
       {/* Timeline dot */}
       <div
         className={cn(
-          'absolute top-4 z-10',
+          'absolute top-3.5 z-10 md:top-4',
           isFinals
-            ? '-left-6 -ml-[4px] md:-left-8 md:-ml-[4px]'
-            : '-left-6 -ml-[1px] md:-left-8 md:-ml-[1px]'
+            ? '-left-5 -ml-[3px] md:-left-8 md:-ml-[4px]'
+            : '-left-5 -ml-[1px] md:-left-8 md:-ml-[1px]'
         )}
       >
         <div
@@ -165,14 +165,14 @@ function TimelineNode({
           )}
         />
         {isFinals && (
-          <div className='absolute -inset-1 animate-pulse rounded-full border border-[#ff2a00]/40' />
+          <div className='absolute -inset-1 motion-safe:animate-pulse rounded-full border border-[#ff2a00]/40' />
         )}
       </div>
 
       {/* Card */}
       <div
         className={cn(
-          'rounded-2xl border p-5 transition-colors duration-300 md:p-6',
+          'rounded-2xl border p-4 transition-colors duration-300 md:p-6',
           isFinals
             ? 'border-[#ff2a00]/30 bg-[#ff2a00]/[0.06] shadow-[0_0_30px_rgba(255,42,0,0.08)]'
             : isRevealed
@@ -184,7 +184,7 @@ function TimelineNode({
         <div className='flex items-center gap-2.5'>
           <span
             className={cn(
-              'text-sm font-bold whitespace-nowrap md:text-base',
+              'text-sm font-bold break-keep leading-tight md:text-base',
               isFinals ? 'text-[#ff2a00]' : 'text-[#ff8c66]'
             )}
           >
@@ -207,8 +207,8 @@ function TimelineNode({
               <div className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
                 <span
                   className={cn(
-                    'font-bold text-white',
-                    isFinals ? 'text-lg md:text-xl' : 'text-base md:text-lg'
+                    'font-bold leading-relaxed break-words text-white',
+                    isFinals ? 'text-base md:text-xl' : 'text-base md:text-lg'
                   )}
                 >
                   {song.songTitle}
