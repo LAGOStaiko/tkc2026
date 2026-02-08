@@ -220,7 +220,7 @@ function TimelineNode({
                   </span>
                 )}
                 {song.level != null && (
-                  <LevelBadge level={song.level} isUra={song.difficulty === 'ura'} />
+                  <LevelBadge level={song.level} isUra={song.difficulty === 'ura' || song.difficulty === '뒷보면'} />
                 )}
               </div>
               {song.descriptionMd && (
