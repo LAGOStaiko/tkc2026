@@ -142,7 +142,8 @@ function getSheetSchemas_(scope) {
     { name: 'schedule', headers: ['order', 'division', 'title', 'startDate', 'endDate', 'dateText', 'location', 'status', 'note'] },
     { name: 'results_stage', headers: ['division', 'stageKey', 'stageLabel', 'order', 'status', 'updatedAt', 'note'] },
     { name: 'results_rows', headers: ['division', 'stageKey', 'rank', 'nickname', 'score', 'detail', 'updatedAt'] },
-    { name: 'registrations', headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'cardNo', 'dohirobaNo', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo'] }
+    { name: 'registrations', headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'cardNo', 'dohirobaNo', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo'] },
+    { name: 'showcase_songs', headers: ['division', 'stageKey', 'stageLabel', 'order', 'songTitle', 'difficulty', 'level', 'descriptionMd', 'revealed'] }
   ];
 
   var archive = [
@@ -331,6 +332,7 @@ function getApiCacheTtlSec_(action) {
   if (action === 'schedule') return 90;   // 90s
   if (action === 'results') return 20;    // 20s (results update sensitivity)
   if (action === 'opsFeed') return 15;    // 15s (ops 라이브 데이터, 폴링 빈도 대응)
+  if (action === 'showcaseSongs') return 180; // 3m
   return 60;
 }
 
@@ -364,7 +366,8 @@ function getApiCacheKeys_() {
   var keys = [
     getApiCacheKey_('site', {}),
     getApiCacheKey_('schedule', {}),
-    getApiCacheKey_('results', {})
+    getApiCacheKey_('results', {}),
+    getApiCacheKey_('showcaseSongs', {})
   ];
   for (var i = 0; i < CONTENT_PAGE_KEYS_.length; i++) {
     keys.push(getApiCacheKey_('content', { page: CONTENT_PAGE_KEYS_[i] }));
@@ -1657,6 +1660,26 @@ function handleSite_() {
   return { ok: true, data: data };
 }
 
+function handleShowcaseSongs_() {
+  var rows = readTable_('showcase_songs').rows
+    .sort(function(a,b){ return Number(a.order||0) - Number(b.order||0); })
+    .map(function(r){
+      var revealed = toBool_(r.revealed);
+      return {
+        division: String(r.division||'').trim(),
+        stageKey: String(r.stageKey||'').trim(),
+        stageLabel: String(r.stageLabel||'').trim(),
+        order: Number(r.order||0),
+        revealed: revealed,
+        songTitle: revealed ? String(r.songTitle||'').trim() : '',
+        difficulty: revealed ? String(r.difficulty||'').trim() : '',
+        level: revealed ? (r.level ? Number(r.level) : null) : null,
+        descriptionMd: revealed ? String(r.descriptionMd||'') : ''
+      };
+    });
+  return { ok:true, data:{ songs:rows } };
+}
+
 function handleSchedule_() {
   var rows = readTable_('schedule').rows
     .sort(function(a,b){ return Number(a.order||0) - Number(b.order||0); })
@@ -1907,6 +1930,11 @@ function doPost(e) {
     if (action === 'results') {
       return json_(executeCachedAction_('results', params, function(){
         return handleResults_();
+      }));
+    }
+    if (action === 'showcaseSongs') {
+      return json_(executeCachedAction_('showcaseSongs', params, function(){
+        return handleShowcaseSongs_();
       }));
     }
 

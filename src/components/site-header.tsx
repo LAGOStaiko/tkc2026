@@ -32,6 +32,7 @@ const navItems: NavItem[] = [
   { label: t('nav.console'), to: '/console' },
   { label: t('nav.arcade'), to: '/arcade' },
   { label: t('nav.schedule'), to: '/schedule' },
+  { label: t('nav.songs'), to: '/songs' },
   { label: t('nav.results'), to: '/results' },
   { label: t('nav.apply'), to: '/apply', emphasis: true },
   { label: t('nav.contact'), to: '/contact' },

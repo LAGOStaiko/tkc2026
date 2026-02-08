@@ -8,6 +8,7 @@ export type GasAction =
   | "schedule"
   | "results"
   | "content"
+  | "showcaseSongs"
   | "register"
   | "opsFeed"
   | "opsUpsert"

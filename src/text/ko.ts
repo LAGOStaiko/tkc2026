@@ -141,6 +141,7 @@ export const ko = {
   'nav.openMenu': '\uBA54\uB274 \uC5F4\uAE30',
   'nav.results': '\uC21C\uC704 \uBC0F \uACB0\uACFC',
   'nav.schedule': '\uC77C\uC815',
+  'nav.songs': '\uACFC\uC81C\uACE1',
   'results.empty': '\uACB0\uACFC\uAC00 \uC544\uC9C1 \uC5C6\uC2B5\uB2C8\uB2E4.',
   'results.failed':
     '\uACB0\uACFC\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',

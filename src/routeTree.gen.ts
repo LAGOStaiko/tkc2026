@@ -14,6 +14,7 @@ import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as siteRouteRouteImport } from './routes/(site)/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as siteIndexRouteImport } from './routes/(site)/index'
+import { Route as siteSongsRouteImport } from './routes/(site)/songs'
 import { Route as siteScheduleRouteImport } from './routes/(site)/schedule'
 import { Route as siteResultsRouteImport } from './routes/(site)/results'
 import { Route as siteContactRouteImport } from './routes/(site)/contact'
@@ -75,6 +76,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const siteIndexRoute = siteIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => siteRouteRoute,
+} as any)
+const siteSongsRoute = siteSongsRouteImport.update({
+  id: '/songs',
+  path: '/songs',
   getParentRoute: () => siteRouteRoute,
 } as any)
 const siteScheduleRoute = siteScheduleRouteImport.update({
@@ -291,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof siteContactRoute
   '/results': typeof siteResultsRoute
   '/schedule': typeof siteScheduleRoute
+  '/songs': typeof siteSongsRoute
   '/': typeof siteIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
@@ -331,6 +338,7 @@ export interface FileRoutesByTo {
   '/contact': typeof siteContactRoute
   '/results': typeof siteResultsRoute
   '/schedule': typeof siteScheduleRoute
+  '/songs': typeof siteSongsRoute
   '/': typeof siteIndexRoute
   '/admin': typeof AdminIndexRoute
   '/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
@@ -377,6 +385,7 @@ export interface FileRoutesById {
   '/(site)/contact': typeof siteContactRoute
   '/(site)/results': typeof siteResultsRoute
   '/(site)/schedule': typeof siteScheduleRoute
+  '/(site)/songs': typeof siteSongsRoute
   '/(site)/': typeof siteIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/(site)/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
@@ -421,6 +430,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/results'
     | '/schedule'
+    | '/songs'
     | '/'
     | '/admin/'
     | '/ops/arcade-broadcast'
@@ -461,6 +471,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/results'
     | '/schedule'
+    | '/songs'
     | '/'
     | '/admin'
     | '/ops/arcade-broadcast'
@@ -506,6 +517,7 @@ export interface FileRouteTypes {
     | '/(site)/contact'
     | '/(site)/results'
     | '/(site)/schedule'
+    | '/(site)/songs'
     | '/(site)/'
     | '/admin/'
     | '/(site)/ops/arcade-broadcast'
@@ -580,6 +592,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof siteIndexRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
+    '/(site)/songs': {
+      id: '/(site)/songs'
+      path: '/songs'
+      fullPath: '/songs'
+      preLoaderRoute: typeof siteSongsRouteImport
       parentRoute: typeof siteRouteRoute
     }
     '/(site)/schedule': {
@@ -858,6 +877,7 @@ interface siteRouteRouteChildren {
   siteContactRoute: typeof siteContactRoute
   siteResultsRoute: typeof siteResultsRoute
   siteScheduleRoute: typeof siteScheduleRoute
+  siteSongsRoute: typeof siteSongsRoute
   siteIndexRoute: typeof siteIndexRoute
   siteOpsArcadeBroadcastRoute: typeof siteOpsArcadeBroadcastRoute
   siteOpsArcadeControlRoute: typeof siteOpsArcadeControlRoute
@@ -873,6 +893,7 @@ const siteRouteRouteChildren: siteRouteRouteChildren = {
   siteContactRoute: siteContactRoute,
   siteResultsRoute: siteResultsRoute,
   siteScheduleRoute: siteScheduleRoute,
+  siteSongsRoute: siteSongsRoute,
   siteIndexRoute: siteIndexRoute,
   siteOpsArcadeBroadcastRoute: siteOpsArcadeBroadcastRoute,
   siteOpsArcadeControlRoute: siteOpsArcadeControlRoute,
