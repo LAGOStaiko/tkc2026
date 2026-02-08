@@ -121,8 +121,6 @@ function SongPoolSection({
   iconSrc: string
   pool: GroupedSong[]
 }) {
-  const hasUra = pool.some((s) => s.ura !== undefined)
-
   if (pool.length === 0) return null
 
   return (
@@ -163,16 +161,14 @@ function SongPoolSection({
                       <span className='text-xs text-white/40'>—</span>
                     )}
                   </div>
-                  {hasUra && (
-                    <div className='flex items-center gap-1.5'>
-                      <span className='text-xs text-white/50'>뒷보면</span>
-                      {song.ura != null ? (
-                        <LevelBadge level={song.ura} isUra />
-                      ) : (
-                        <span className='text-xs text-white/40'>—</span>
-                      )}
-                    </div>
-                  )}
+                  <div className='flex items-center gap-1.5'>
+                    <span className='text-xs text-white/50'>뒷보면</span>
+                    {song.ura != null ? (
+                      <LevelBadge level={song.ura} isUra />
+                    ) : (
+                      <span className='text-xs text-white/40'>—</span>
+                    )}
+                  </div>
                 </div>
               </>
             ) : (
@@ -191,12 +187,10 @@ function SongPoolSection({
                     <span className='text-xs text-white/50'>귀신</span>
                     <span className='text-xs text-white/40'>—</span>
                   </div>
-                  {hasUra && (
-                    <div className='flex items-center gap-1.5'>
-                      <span className='text-xs text-white/50'>뒷보면</span>
-                      <span className='text-xs text-white/40'>—</span>
-                    </div>
-                  )}
+                  <div className='flex items-center gap-1.5'>
+                    <span className='text-xs text-white/50'>뒷보면</span>
+                    <span className='text-xs text-white/40'>—</span>
+                  </div>
                 </div>
               </>
             )}
@@ -213,7 +207,7 @@ function SongPoolSection({
               <th className='px-4 py-3 text-center'>#</th>
               <th className='px-4 py-3'>곡명</th>
               <th className='px-4 py-3 text-center'>귀신</th>
-              {hasUra && <th className='px-4 py-3 text-center'>뒷보면</th>}
+              <th className='px-4 py-3 text-center'>뒷보면</th>
             </tr>
           </thead>
           <tbody>
@@ -241,15 +235,13 @@ function SongPoolSection({
                         <span className='text-white/20'>—</span>
                       )}
                     </td>
-                    {hasUra && (
-                      <td className='px-4 py-3 text-center'>
-                        {song.ura != null ? (
-                          <LevelBadge level={song.ura} isUra />
-                        ) : (
-                          <span className='text-white/20'>—</span>
-                        )}
-                      </td>
-                    )}
+                    <td className='px-4 py-3 text-center'>
+                      {song.ura != null ? (
+                        <LevelBadge level={song.ura} isUra />
+                      ) : (
+                        <span className='text-white/20'>—</span>
+                      )}
+                    </td>
                   </>
                 ) : (
                   <>
@@ -267,11 +259,9 @@ function SongPoolSection({
                     <td className='px-4 py-3 text-center'>
                       <span className='text-white/20'>—</span>
                     </td>
-                    {hasUra && (
-                      <td className='px-4 py-3 text-center'>
-                        <span className='text-white/20'>—</span>
-                      </td>
-                    )}
+                    <td className='px-4 py-3 text-center'>
+                      <span className='text-white/20'>—</span>
+                    </td>
                   </>
                 )}
               </tr>
