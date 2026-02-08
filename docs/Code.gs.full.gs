@@ -5,25 +5,33 @@
  * - SHEET_ID : the Spreadsheet ID (from the URL)
  * - API_KEY  : shared secret (same as Cloudflare env GAS_API_KEY)
  *
- * Sheets expected (tabs):
- * - site_config (key, value, note, updatedAt)
- * - partners (order, name, logoUrl, href, enabled)
- * - content_sections (page, sectionKey, order, title, bodyMd, imageUrl, enabled)
- * - schedule (order, division, title, startDate, endDate, dateText, location, status, note)
- * - results_stage (division, stageKey, stageLabel, order, status, updatedAt, note)
- * - results_rows (division, stageKey, rank, nickname, score, detail, updatedAt)
- * - registrations (createdAt, receiptId, division, name, phone, email, nickname, cardNo, dohirobaNo, spectator, isMinor, consentLink, privacyAgree, status, memo)
+ * Public sheets (pub_* prefix — read by public/broadcast APIs):
+ * - pub_site_config (key, value, note, updatedAt)
+ * - pub_partners (order, name, logoUrl, href, enabled)
+ * - pub_content_sections (page, sectionKey, order, title, bodyMd, imageUrl, enabled)
+ * - pub_schedule (order, division, title, startDate, endDate, dateText, location, status, note)
+ * - pub_results_stage (division, stageKey, stageLabel, order, status, updatedAt, note)
+ * - pub_results_rows (division, stageKey, rank, nickname, score, detail, updatedAt)
+ * - pub_showcase_songs (division, stageKey, stageLabel, order, songTitle, difficulty, level, descriptionMd, revealed)
+ * - pub_song_pool_console_finals (order, title, difficulty, level, note, revealed)
+ * - pub_song_pool_arcade_finals (order, title, difficulty, level, note, revealed)
+ * - pub_song_pool_arcade_swiss (order, title, difficulty, level, note, revealed)
+ * - pub_meta (key, value, updatedAt)
+ * - pub_publish_log (publishId, publishedAt, publishedBy, season, region, mode, totalRows, totalCleared, detail)
  *
- * Optional archive tabs (for /results arcadeArchive2026):
- * - arcade_archive_online
- * - arcade_archive_swiss_matches
- * - arcade_archive_swiss_standings
- * - arcade_archive_decider
- * - arcade_archive_seeding
- * - arcade_archive_qualifiers
- * - arcade_archive_finals_a
- * - arcade_archive_finals_b
- * - arcade_archive_finals_matches
+ * Published archive tabs (written by opsExport, read by public APIs):
+ * - pub_arcade_online
+ * - pub_arcade_swiss_matches
+ * - pub_arcade_swiss_standings
+ * - pub_arcade_decider
+ * - pub_arcade_seeding
+ * - pub_arcade_qualifiers
+ * - pub_arcade_finals_a
+ * - pub_arcade_finals_b
+ * - pub_arcade_finals_matches
+ *
+ * Operational data (non-public):
+ * - ops_registrations (createdAt, receiptId, division, name, phone, email, nickname, cardNo, dohirobaNo, spectator, isMinor, consentLink, privacyAgree, status, memo)
  */
 
 function json_(obj) {
@@ -136,29 +144,30 @@ function ensureSheetSchema_(ss, name, headers) {
 
 function getSheetSchemas_(scope) {
   var core = [
-    { name: 'site_config', headers: ['key', 'value', 'note', 'updatedAt'] },
-    { name: 'partners', headers: ['order', 'name', 'logoUrl', 'href', 'enabled'] },
-    { name: 'content_sections', headers: ['page', 'sectionKey', 'order', 'title', 'bodyMd', 'imageUrl', 'enabled'] },
-    { name: 'schedule', headers: ['order', 'division', 'title', 'startDate', 'endDate', 'dateText', 'location', 'status', 'note'] },
-    { name: 'results_stage', headers: ['division', 'stageKey', 'stageLabel', 'order', 'status', 'updatedAt', 'note'] },
-    { name: 'results_rows', headers: ['division', 'stageKey', 'rank', 'nickname', 'score', 'detail', 'updatedAt'] },
-    { name: 'registrations', headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'cardNo', 'dohirobaNo', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo'] },
-    { name: 'showcase_songs', headers: ['division', 'stageKey', 'stageLabel', 'order', 'songTitle', 'difficulty', 'level', 'descriptionMd', 'revealed'] },
-    { name: 'song_pool_console_finals', headers: ['order', 'title', 'difficulty', 'level', 'note', 'revealed'] },
-    { name: 'song_pool_arcade_finals', headers: ['order', 'title', 'difficulty', 'level', 'note', 'revealed'] },
-    { name: 'song_pool_arcade_swiss', headers: ['order', 'title', 'difficulty', 'level', 'note', 'revealed'] }
+    { name: 'pub_site_config', headers: ['key', 'value', 'note', 'updatedAt'] },
+    { name: 'pub_partners', headers: ['order', 'name', 'logoUrl', 'href', 'enabled'] },
+    { name: 'pub_content_sections', headers: ['page', 'sectionKey', 'order', 'title', 'bodyMd', 'imageUrl', 'enabled'] },
+    { name: 'pub_schedule', headers: ['order', 'division', 'title', 'startDate', 'endDate', 'dateText', 'location', 'status', 'note'] },
+    { name: 'pub_results_stage', headers: ['division', 'stageKey', 'stageLabel', 'order', 'status', 'updatedAt', 'note'] },
+    { name: 'pub_results_rows', headers: ['division', 'stageKey', 'rank', 'nickname', 'score', 'detail', 'updatedAt'] },
+    { name: 'pub_showcase_songs', headers: ['division', 'stageKey', 'stageLabel', 'order', 'songTitle', 'difficulty', 'level', 'descriptionMd', 'revealed'] },
+    { name: 'pub_song_pool_console_finals', headers: ['order', 'title', 'difficulty', 'level', 'note', 'revealed'] },
+    { name: 'pub_song_pool_arcade_finals', headers: ['order', 'title', 'difficulty', 'level', 'note', 'revealed'] },
+    { name: 'pub_song_pool_arcade_swiss', headers: ['order', 'title', 'difficulty', 'level', 'note', 'revealed'] },
+    { name: 'pub_meta', headers: ['key', 'value', 'updatedAt'] },
+    { name: 'pub_publish_log', headers: ['publishId', 'publishedAt', 'publishedBy', 'season', 'region', 'mode', 'totalRows', 'totalCleared', 'detail'] }
   ];
 
   var archive = [
-    { name: 'arcade_archive_online', headers: ['season', 'region', 'rank', 'entryId', 'nickname', 'score1', 'score2', 'total', 'submittedAt', 'advanced'] },
-    { name: 'arcade_archive_swiss_matches', headers: ['season', 'region', 'round', 'table', 'highSeedEntryId', 'p1EntryId', 'p1Nickname', 'p1Seed', 'p2EntryId', 'p2Nickname', 'p2Seed', 'song1', 'level1', 'p1Score1', 'p2Score1', 'song2', 'level2', 'p1Score2', 'p2Score2', 'song3', 'level3', 'p1Score3', 'p2Score3', 'winnerEntryId', 'tieBreakerSong', 'bye', 'note'] },
-    { name: 'arcade_archive_swiss_standings', headers: ['season', 'region', 'entryId', 'nickname', 'seed', 'wins', 'losses', 'status'] },
-    { name: 'arcade_archive_decider', headers: ['season', 'region', 'rank', 'entryId', 'nickname', 'score', 'winner', 'winnerEntryId', 'note'] },
-    { name: 'arcade_archive_seeding', headers: ['season', 'region', 'rank', 'entryId', 'nickname', 'score', 'note'] },
-    { name: 'arcade_archive_qualifiers', headers: ['season', 'region', 'group', 'entryId', 'nickname', 'seed'] },
-    { name: 'arcade_archive_finals_a', headers: ['season', 'seed', 'region', 'regionLabel', 'entryId', 'nickname', 'score'] },
-    { name: 'arcade_archive_finals_b', headers: ['season', 'seed', 'region', 'regionLabel', 'entryId', 'nickname', 'score'] },
-    { name: 'arcade_archive_finals_matches', headers: ['season', 'matchNo', 'leftSeed', 'leftRegion', 'leftRegionLabel', 'leftEntryId', 'leftNickname', 'rightSeed', 'rightRegion', 'rightRegionLabel', 'rightEntryId', 'rightNickname', 'winnerEntryId', 'note'] }
+    { name: 'pub_arcade_online', headers: ['season', 'region', 'rank', 'entryId', 'nickname', 'score1', 'score2', 'total', 'submittedAt', 'advanced'] },
+    { name: 'pub_arcade_swiss_matches', headers: ['season', 'region', 'round', 'table', 'highSeedEntryId', 'p1EntryId', 'p1Nickname', 'p1Seed', 'p2EntryId', 'p2Nickname', 'p2Seed', 'song1', 'level1', 'p1Score1', 'p2Score1', 'song2', 'level2', 'p1Score2', 'p2Score2', 'song3', 'level3', 'p1Score3', 'p2Score3', 'winnerEntryId', 'tieBreakerSong', 'bye', 'note'] },
+    { name: 'pub_arcade_swiss_standings', headers: ['season', 'region', 'entryId', 'nickname', 'seed', 'wins', 'losses', 'status'] },
+    { name: 'pub_arcade_decider', headers: ['season', 'region', 'rank', 'entryId', 'nickname', 'score', 'winner', 'winnerEntryId', 'note'] },
+    { name: 'pub_arcade_seeding', headers: ['season', 'region', 'rank', 'entryId', 'nickname', 'score', 'note'] },
+    { name: 'pub_arcade_qualifiers', headers: ['season', 'region', 'group', 'entryId', 'nickname', 'seed'] },
+    { name: 'pub_arcade_finals_a', headers: ['season', 'seed', 'region', 'regionLabel', 'entryId', 'nickname', 'score'] },
+    { name: 'pub_arcade_finals_b', headers: ['season', 'seed', 'region', 'regionLabel', 'entryId', 'nickname', 'score'] },
+    { name: 'pub_arcade_finals_matches', headers: ['season', 'matchNo', 'leftSeed', 'leftRegion', 'leftRegionLabel', 'leftEntryId', 'leftNickname', 'rightSeed', 'rightRegion', 'rightRegionLabel', 'rightEntryId', 'rightNickname', 'winnerEntryId', 'note'] }
   ];
 
   if (scope === 'archive') return archive;
@@ -219,6 +228,108 @@ function initializeSpreadsheetTabs() {
 
 function initializeArchiveTabs() {
   return handleInitSheets_({ scope: 'archive' });
+}
+
+function handleVerifyMigration_() {
+  var ss = getSs_();
+  var schemas = getSheetSchemas_('all');
+
+  if (typeof getOpsSheetSchemas_ === 'function') {
+    schemas = schemas.concat(getOpsSheetSchemas_());
+  }
+
+  var results = [];
+  var allPassed = true;
+
+  for (var i = 0; i < schemas.length; i++) {
+    var schema = schemas[i];
+    var entry = {
+      sheet: schema.name,
+      exists: false,
+      headerMatch: false,
+      dataRows: 0,
+      passed: false,
+      errors: []
+    };
+
+    var sh = ss.getSheetByName(schema.name);
+    if (!sh) {
+      entry.errors.push('Tab does not exist');
+      allPassed = false;
+      results.push(entry);
+      continue;
+    }
+    entry.exists = true;
+
+    var lastCol = sh.getLastColumn();
+    if (lastCol < schema.headers.length) {
+      entry.errors.push('Column count mismatch: expected ' + schema.headers.length + ', got ' + lastCol);
+      allPassed = false;
+    } else {
+      var currentHeaders = sh.getRange(1, 1, 1, schema.headers.length).getValues()[0].map(function(v) {
+        return String(v || '').trim();
+      });
+      var mismatch = [];
+      for (var h = 0; h < schema.headers.length; h++) {
+        if (currentHeaders[h] !== schema.headers[h]) {
+          mismatch.push('col' + (h + 1) + ': expected "' + schema.headers[h] + '", got "' + currentHeaders[h] + '"');
+        }
+      }
+      if (mismatch.length > 0) {
+        entry.errors.push('Header mismatch: ' + mismatch.join('; '));
+        allPassed = false;
+      } else {
+        entry.headerMatch = true;
+      }
+    }
+
+    var lastRow = sh.getLastRow();
+    entry.dataRows = Math.max(0, lastRow - 1);
+    entry.passed = entry.exists && entry.headerMatch;
+    results.push(entry);
+  }
+
+  var staleSheet = ss.getSheetByName('pub_registrations');
+  if (staleSheet) {
+    results.push({
+      sheet: 'pub_registrations',
+      exists: true,
+      headerMatch: false,
+      dataRows: Math.max(0, staleSheet.getLastRow() - 1),
+      passed: false,
+      errors: ['Stale tab: pub_registrations should be renamed to ops_registrations']
+    });
+    allPassed = false;
+  }
+
+  return {
+    ok: true,
+    data: {
+      allPassed: allPassed,
+      total: results.length,
+      passed: results.filter(function(r) { return r.passed; }).length,
+      failed: results.filter(function(r) { return !r.passed; }).length,
+      sheets: results
+    }
+  };
+}
+
+function menuVerifyMigration_() {
+  var result = handleVerifyMigration_();
+  var ui = SpreadsheetApp.getUi();
+  if (result.data.allPassed) {
+    ui.alert('마이그레이션 검증 완료',
+      '모든 탭 검증 통과 (' + result.data.passed + '/' + result.data.total + ')',
+      ui.ButtonSet.OK);
+  } else {
+    var failedSheets = result.data.sheets
+      .filter(function(s) { return !s.passed; })
+      .map(function(s) { return s.sheet + ': ' + s.errors.join(', '); })
+      .join('\n');
+    ui.alert('마이그레이션 검증 실패',
+      result.data.failed + '개 탭에 문제 발견:\n\n' + failedSheets,
+      ui.ButtonSet.OK);
+  }
 }
 
 var API_CACHE_VERSION_ = '2026-02-07';
@@ -616,7 +727,7 @@ function menuSeedArchiveSample_() {
   var ui = SpreadsheetApp.getUi();
   var button = ui.alert(
     '아카이브 샘플 데이터를 채울까요?',
-    'arcade_archive_* 탭의 기존 행이 모두 덮어써집니다.',
+    'pub_arcade_* 탭의 기존 행이 모두 덮어써집니다.',
     ui.ButtonSet.YES_NO
   );
   if (button !== ui.Button.YES) return;
@@ -799,6 +910,8 @@ function onOpen() {
     .addItem('아카이브 행 비우기', 'menuClearArchiveRows_')
     .addSeparator()
     .addItem('API 캐시 비우기', 'menuPurgeApiCache_')
+    .addItem('마이그레이션 검증', 'menuVerifyMigration_')
+    .addItem('수동 커밋 기록', 'menuPubCommit_')
     .addItem('SHEET_ID 현재 시트로 바인딩', 'menuBindSheetIdToActive_')
     .addSeparator()
     .addItem('운영 시작 세팅(원클릭)', 'menuOpsFirstTimeSetup_')
@@ -847,15 +960,15 @@ function buildArchiveFinishedSample2026_() {
   ];
 
   var data = {
-    arcade_archive_online: [],
-    arcade_archive_swiss_matches: [],
-    arcade_archive_swiss_standings: [],
-    arcade_archive_decider: [],
-    arcade_archive_seeding: [],
-    arcade_archive_qualifiers: [],
-    arcade_archive_finals_a: [],
-    arcade_archive_finals_b: [],
-    arcade_archive_finals_matches: []
+    pub_arcade_online: [],
+    pub_arcade_swiss_matches: [],
+    pub_arcade_swiss_standings: [],
+    pub_arcade_decider: [],
+    pub_arcade_seeding: [],
+    pub_arcade_qualifiers: [],
+    pub_arcade_finals_a: [],
+    pub_arcade_finals_b: [],
+    pub_arcade_finals_matches: []
   };
 
   var qualifierMap = {};
@@ -878,7 +991,7 @@ function buildArchiveFinishedSample2026_() {
       var p = getP(rank);
       var score1 = 996000 - rank * 320 - regionIndex * 25;
       var score2 = 994000 - rank * 300 - regionIndex * 20;
-      data.arcade_archive_online.push({
+      data.pub_arcade_online.push({
         season: season,
         region: region.key,
         rank: rank,
@@ -951,7 +1064,7 @@ function buildArchiveFinishedSample2026_() {
           row.note = '동점으로 타이브레이커 1회 진행';
         }
 
-        data.arcade_archive_swiss_matches.push(row);
+        data.pub_arcade_swiss_matches.push(row);
       });
     });
 
@@ -974,7 +1087,7 @@ function buildArchiveFinishedSample2026_() {
       [16, 0, 2, 'eliminated']
     ].forEach(function(row){
       var p = getP(row[0]);
-      data.arcade_archive_swiss_standings.push({
+      data.pub_arcade_swiss_standings.push({
         season: season,
         region: region.key,
         entryId: p.entryId,
@@ -989,7 +1102,7 @@ function buildArchiveFinishedSample2026_() {
     var deciderSeeds = [2, 3, 4, 5];
     deciderSeeds.forEach(function(seed, idx){
       var p = getP(seed);
-      data.arcade_archive_decider.push({
+      data.pub_arcade_decider.push({
         season: season,
         region: region.key,
         rank: idx + 1,
@@ -1007,7 +1120,7 @@ function buildArchiveFinishedSample2026_() {
     var groupAScore = 997500 - regionIndex * 140;
     var groupBScore = 995900 - regionIndex * 130;
 
-    data.arcade_archive_seeding.push({
+    data.pub_arcade_seeding.push({
       season: season,
       region: region.key,
       rank: 1,
@@ -1016,7 +1129,7 @@ function buildArchiveFinishedSample2026_() {
       score: groupAScore,
       note: '지역 1위(A그룹)'
     });
-    data.arcade_archive_seeding.push({
+    data.pub_arcade_seeding.push({
       season: season,
       region: region.key,
       rank: 2,
@@ -1026,7 +1139,7 @@ function buildArchiveFinishedSample2026_() {
       note: '지역 2위(B그룹)'
     });
 
-    data.arcade_archive_qualifiers.push({
+    data.pub_arcade_qualifiers.push({
       season: season,
       region: region.key,
       group: 'A',
@@ -1034,7 +1147,7 @@ function buildArchiveFinishedSample2026_() {
       nickname: groupA.nickname,
       seed: 1
     });
-    data.arcade_archive_qualifiers.push({
+    data.pub_arcade_qualifiers.push({
       season: season,
       region: region.key,
       group: 'B',
@@ -1054,7 +1167,7 @@ function buildArchiveFinishedSample2026_() {
 
   groupAOrder.forEach(function(regionKey, idx){
     var q = qualifierMap[regionKey].groupA;
-    data.arcade_archive_finals_a.push({
+    data.pub_arcade_finals_a.push({
       season: season,
       seed: idx + 1,
       region: regionKey,
@@ -1067,7 +1180,7 @@ function buildArchiveFinishedSample2026_() {
 
   groupBOrder.forEach(function(regionKey, idx){
     var q = qualifierMap[regionKey].groupB;
-    data.arcade_archive_finals_b.push({
+    data.pub_arcade_finals_b.push({
       season: season,
       seed: idx + 1,
       region: regionKey,
@@ -1078,8 +1191,8 @@ function buildArchiveFinishedSample2026_() {
     });
   });
 
-  var aRows = data.arcade_archive_finals_a;
-  var bRows = data.arcade_archive_finals_b;
+  var aRows = data.pub_arcade_finals_a;
+  var bRows = data.pub_arcade_finals_b;
   var finals = [
     { matchNo: 1, left: aRows[0], right: bRows[3], winner: 'left' },
     { matchNo: 2, left: aRows[1], right: bRows[2], winner: 'left' },
@@ -1088,7 +1201,7 @@ function buildArchiveFinishedSample2026_() {
   ];
 
   finals.forEach(function(m){
-    data.arcade_archive_finals_matches.push({
+    data.pub_arcade_finals_matches.push({
       season: season,
       matchNo: m.matchNo,
       leftSeed: m.left.seed,
@@ -1297,7 +1410,7 @@ function buildArcadeArchive2026_() {
     return key && regionMap[key] ? key : '';
   }
 
-  readOptionalTable_('arcade_archive_online').rows.forEach(function(r){
+  readOptionalTable_('pub_arcade_online').rows.forEach(function(r){
     var rowSeason = trim_(r.season);
     if (rowSeason && rowSeason !== season) return;
 
@@ -1320,7 +1433,7 @@ function buildArcadeArchive2026_() {
     });
   });
 
-  readOptionalTable_('arcade_archive_swiss_matches').rows.forEach(function(r, idx){
+  readOptionalTable_('pub_arcade_swiss_matches').rows.forEach(function(r, idx){
     var rowSeason = trim_(r.season);
     if (rowSeason && rowSeason !== season) return;
 
@@ -1381,7 +1494,7 @@ function buildArcadeArchive2026_() {
     regionMap[key].swissMatches.push(match);
   });
 
-  readOptionalTable_('arcade_archive_swiss_standings').rows.forEach(function(r, idx){
+  readOptionalTable_('pub_arcade_swiss_standings').rows.forEach(function(r, idx){
     var rowSeason = trim_(r.season);
     if (rowSeason && rowSeason !== season) return;
 
@@ -1404,7 +1517,7 @@ function buildArcadeArchive2026_() {
     });
   });
 
-  readOptionalTable_('arcade_archive_decider').rows.forEach(function(r){
+  readOptionalTable_('pub_arcade_decider').rows.forEach(function(r){
     var rowSeason = trim_(r.season);
     if (rowSeason && rowSeason !== season) return;
 
@@ -1427,7 +1540,7 @@ function buildArcadeArchive2026_() {
     }
   });
 
-  readOptionalTable_('arcade_archive_seeding').rows.forEach(function(r){
+  readOptionalTable_('pub_arcade_seeding').rows.forEach(function(r){
     var rowSeason = trim_(r.season);
     if (rowSeason && rowSeason !== season) return;
 
@@ -1446,7 +1559,7 @@ function buildArcadeArchive2026_() {
     });
   });
 
-  readOptionalTable_('arcade_archive_qualifiers').rows.forEach(function(r, idx){
+  readOptionalTable_('pub_arcade_qualifiers').rows.forEach(function(r, idx){
     var rowSeason = trim_(r.season);
     if (rowSeason && rowSeason !== season) return;
 
@@ -1462,7 +1575,7 @@ function buildArcadeArchive2026_() {
     }
   });
 
-  var groupASeeds = readOptionalTable_('arcade_archive_finals_a').rows.map(function(r, idx){
+  var groupASeeds = readOptionalTable_('pub_arcade_finals_a').rows.map(function(r, idx){
     var regionKey = resolveRegion_(r.region) || regionDefs[Math.min(idx, regionDefs.length - 1)].key;
     var seed = toNumber_(r.seed, idx + 1);
     var entryId = trim_(r.entryId) || ('E-UNK-A' + seed);
@@ -1478,7 +1591,7 @@ function buildArcadeArchive2026_() {
     return row;
   });
 
-  var groupBSeeds = readOptionalTable_('arcade_archive_finals_b').rows.map(function(r, idx){
+  var groupBSeeds = readOptionalTable_('pub_arcade_finals_b').rows.map(function(r, idx){
     var regionKey = resolveRegion_(r.region) || regionDefs[Math.min(idx, regionDefs.length - 1)].key;
     var seed = toNumber_(r.seed, idx + 1);
     var entryId = trim_(r.entryId) || ('E-UNK-B' + seed);
@@ -1494,7 +1607,7 @@ function buildArcadeArchive2026_() {
     return row;
   });
 
-  var crossMatches = readOptionalTable_('arcade_archive_finals_matches').rows.map(function(r, idx){
+  var crossMatches = readOptionalTable_('pub_arcade_finals_matches').rows.map(function(r, idx){
     var leftRegionKey = resolveRegion_(r.leftRegion) || 'seoul';
     var rightRegionKey = resolveRegion_(r.rightRegion) || 'busan';
 
@@ -1550,7 +1663,7 @@ function buildArcadeArchive2026_() {
 }
 
 function handleSite_() {
-  var cfg = readTable_('site_config').rows;
+  var cfg = readTable_('pub_site_config').rows;
   var map = {};
   cfg.forEach(function(r){
     var key = String(r.key || '').trim();
@@ -1558,7 +1671,7 @@ function handleSite_() {
     map[key] = r.value;
   });
 
-  var partnersRows = readTable_('partners').rows
+  var partnersRows = readTable_('pub_partners').rows
     .filter(function(r){ return toBool_(r.enabled); })
     .sort(function(a,b){ return Number(a.order||0) - Number(b.order||0); })
     .map(function(r){
@@ -1607,14 +1720,14 @@ function handleSongPools_() {
       })
       .filter(function(r){ return !r.revealed || (r.title && r.difficulty); });
   }
-  var consoleFinals = readPool('song_pool_console_finals', 'console');
-  var arcadeFinals = readPool('song_pool_arcade_finals', 'arcade');
-  var arcadeSwiss = readPool('song_pool_arcade_swiss', 'arcade');
+  var consoleFinals = readPool('pub_song_pool_console_finals', 'console');
+  var arcadeFinals = readPool('pub_song_pool_arcade_finals', 'arcade');
+  var arcadeSwiss = readPool('pub_song_pool_arcade_swiss', 'arcade');
   return { ok: true, data: { consoleFinals: consoleFinals, arcadeFinals: arcadeFinals, arcadeSwiss: arcadeSwiss } };
 }
 
 function handleShowcaseSongs_() {
-  var rows = readTable_('showcase_songs').rows
+  var rows = readTable_('pub_showcase_songs').rows
     .sort(function(a,b){ return Number(a.order||0) - Number(b.order||0); })
     .map(function(r){
       var revealed = toBool_(r.revealed);
@@ -1634,7 +1747,7 @@ function handleShowcaseSongs_() {
 }
 
 function handleSchedule_() {
-  var rows = readTable_('schedule').rows
+  var rows = readTable_('pub_schedule').rows
     .sort(function(a,b){ return Number(a.order||0) - Number(b.order||0); })
     .map(function(r){
       return {
@@ -1657,7 +1770,7 @@ function handleContent_(params) {
   var allowed = { home:true, console:true, arcade:true, contact:true };
   if (!allowed[page]) return { ok:false, error: 'Invalid page' };
 
-  var rows = readTable_('content_sections').rows
+  var rows = readTable_('pub_content_sections').rows
     .filter(function(r){ return String(r.page||'').trim() === page; })
     .filter(function(r){ return toBool_(r.enabled); })
     .sort(function(a,b){ return Number(a.order||0) - Number(b.order||0); })
@@ -1676,7 +1789,7 @@ function handleContent_(params) {
 }
 
 function handleResults_() {
-  var stages = readTable_('results_stage').rows
+  var stages = readTable_('pub_results_stage').rows
     .sort(function(a,b){
       var da = String(a.division||'');
       var db = String(b.division||'');
@@ -1696,7 +1809,7 @@ function handleResults_() {
       };
     });
 
-  var rows = readTable_('results_rows').rows
+  var rows = readTable_('pub_results_rows').rows
     .map(function(r){
       return {
         division: String(r.division||'').trim(),
@@ -1793,7 +1906,7 @@ function handleRegister_(payload) {
   var lock = LockService.getScriptLock();
   lock.waitLock(15000);
   try {
-    var sh = getSheet_('registrations');
+    var sh = getSheet_('ops_registrations');
 
     // Ensure header exists
     if (sh.getLastRow() < 1) {
@@ -1949,6 +2062,12 @@ function doPost(e) {
       return json_(roundCloseResult);
     }
     if (action === 'purgeCache') return json_(purgeApiCache_());
+    if (action === 'verifyMigration') return json_(handleVerifyMigration_());
+    if (action === 'pubCommit') {
+      var commitResult = handlePubCommit_(payload);
+      if (commitResult.ok) purgeApiCache_();
+      return json_(commitResult);
+    }
     if (action === 'register') return json_(handleRegister_(payload));
 
     return json_({ ok:false, error:'알 수 없는 action입니다.' });
@@ -1966,7 +2085,7 @@ function doPost(e) {
  * - opsFirstTimeSetup : one-click setup for first operators
  * - opsUpsert : write/update one row into ops_db_*  → purgeApiCache_ + purgeOpsFeedCache_
  * - opsSwissRebuildStandings : rebuild swiss_standings → purgeApiCache_ + purgeOpsFeedCache_
- * - opsExport : copy ops_db_* -> arcade_archive_*   → purgeApiCache_ (내부) + purgeOpsFeedCache_
+ * - opsExport : copy ops_db_* -> pub_arcade_*   → purgeApiCache_ (내부) + purgeOpsFeedCache_
  * - opsFeed   : build archive payload (executeCachedAction_ 래핑, 15s TTL, season:region 키)
  * - opsSwissNextRound : generate next swiss round    → purgeApiCache_ + purgeOpsFeedCache_
  * - opsRoundClose     : rebuild + nextRound + export → purgeOpsFeedCache_ (내부 + doPost)
@@ -2028,6 +2147,10 @@ function getOpsSheetSchemas_() {
     {
       name: 'ops_db_events',
       headers: ['createdAt', 'stage', 'season', 'region', 'entryId', 'message']
+    },
+    {
+      name: 'ops_registrations',
+      headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'cardNo', 'dohirobaNo', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo']
     }
   ];
 }
@@ -3495,15 +3618,15 @@ function handleOpsExport_(payload) {
   if (mode !== 'replace') mode = 'upsert';
 
   var exportDefs = [
-    { from: 'ops_db_online', to: 'arcade_archive_online', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
-    { from: 'ops_db_swiss_matches', to: 'arcade_archive_swiss_matches', keyFields: ['season', 'region', 'round', 'table'], regionScoped: true },
-    { from: 'ops_db_swiss_standings', to: 'arcade_archive_swiss_standings', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
-    { from: 'ops_db_decider', to: 'arcade_archive_decider', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
-    { from: 'ops_db_seeding', to: 'arcade_archive_seeding', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
-    { from: 'ops_db_qualifiers', to: 'arcade_archive_qualifiers', keyFields: ['season', 'region', 'group'], regionScoped: true },
-    { from: 'ops_db_finals_a', to: 'arcade_archive_finals_a', keyFields: ['season', 'seed'], regionScoped: false },
-    { from: 'ops_db_finals_b', to: 'arcade_archive_finals_b', keyFields: ['season', 'seed'], regionScoped: false },
-    { from: 'ops_db_finals_matches', to: 'arcade_archive_finals_matches', keyFields: ['season', 'matchNo'], regionScoped: false }
+    { from: 'ops_db_online', to: 'pub_arcade_online', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
+    { from: 'ops_db_swiss_matches', to: 'pub_arcade_swiss_matches', keyFields: ['season', 'region', 'round', 'table'], regionScoped: true },
+    { from: 'ops_db_swiss_standings', to: 'pub_arcade_swiss_standings', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
+    { from: 'ops_db_decider', to: 'pub_arcade_decider', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
+    { from: 'ops_db_seeding', to: 'pub_arcade_seeding', keyFields: ['season', 'region', 'entryId'], regionScoped: true },
+    { from: 'ops_db_qualifiers', to: 'pub_arcade_qualifiers', keyFields: ['season', 'region', 'group'], regionScoped: true },
+    { from: 'ops_db_finals_a', to: 'pub_arcade_finals_a', keyFields: ['season', 'seed'], regionScoped: false },
+    { from: 'ops_db_finals_b', to: 'pub_arcade_finals_b', keyFields: ['season', 'seed'], regionScoped: false },
+    { from: 'ops_db_finals_matches', to: 'pub_arcade_finals_matches', keyFields: ['season', 'matchNo'], regionScoped: false }
   ];
 
   var archiveSchemas = {};
@@ -3579,9 +3702,39 @@ function handleOpsExport_(payload) {
     'mode=' + mode + ', scope=' + clearedScope + ', exported rows=' + totalWritten + (mode === 'replace' ? ', cleared=' + totalCleared : '')
   );
 
+  // --- Publish log ---
+  var tz = Session.getScriptTimeZone();
+  var publishId = 'PUB-' + Utilities.formatDate(new Date(), tz, 'yyyyMMddHHmmss') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+
+  var logHeaders = ['publishId', 'publishedAt', 'publishedBy', 'season', 'region', 'mode', 'totalRows', 'totalCleared', 'detail'];
+  ensureSheetSchema_(ss, 'pub_publish_log', logHeaders);
+  var logSheet = ss.getSheetByName('pub_publish_log');
+  upsertSheetRow_(logSheet, logHeaders, ['publishId'], {
+    publishId: publishId,
+    publishedAt: new Date(),
+    publishedBy: 'ops-operator',
+    season: season,
+    region: region,
+    mode: mode,
+    totalRows: totalWritten,
+    totalCleared: totalCleared,
+    detail: JSON.stringify(resultSheets)
+  });
+
+  var metaHeaders = ['key', 'value', 'updatedAt'];
+  ensureSheetSchema_(ss, 'pub_meta', metaHeaders);
+  var metaSheet = ss.getSheetByName('pub_meta');
+  upsertSheetRow_(metaSheet, metaHeaders, ['key'], {
+    key: 'lastPublishId', value: publishId, updatedAt: new Date()
+  });
+  upsertSheetRow_(metaSheet, metaHeaders, ['key'], {
+    key: 'lastPublishedAt', value: new Date(), updatedAt: new Date()
+  });
+
   return {
     ok: true,
     data: {
+      publishId: publishId,
       season: season,
       region: region,
       mode: mode,
@@ -3847,6 +4000,77 @@ function initializeOpsTabs() {
   return handleOpsInit_({});
 }
 
+function handlePubCommit_(payload) {
+  payload = payload || {};
+
+  var message = trim_(payload.message) || '';
+  var ss = getSs_();
+  var tz = Session.getScriptTimeZone();
+  var now = new Date();
+
+  var commitId = 'CMT-' + Utilities.formatDate(now, tz, 'yyyyMMddHHmmss') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+
+  var metaHeaders = ['key', 'value', 'updatedAt'];
+  ensureSheetSchema_(ss, 'pub_meta', metaHeaders);
+  var metaSheet = ss.getSheetByName('pub_meta');
+
+  upsertSheetRow_(metaSheet, metaHeaders, ['key'], {
+    key: 'lastCommitId', value: commitId, updatedAt: now
+  });
+  upsertSheetRow_(metaSheet, metaHeaders, ['key'], {
+    key: 'lastCommittedAt', value: now, updatedAt: now
+  });
+  if (message) {
+    upsertSheetRow_(metaSheet, metaHeaders, ['key'], {
+      key: 'lastCommitMessage', value: message, updatedAt: now
+    });
+  }
+
+  var logHeaders = ['publishId', 'publishedAt', 'publishedBy', 'season', 'region', 'mode', 'totalRows', 'totalCleared', 'detail'];
+  ensureSheetSchema_(ss, 'pub_publish_log', logHeaders);
+  var logSheet = ss.getSheetByName('pub_publish_log');
+
+  upsertSheetRow_(logSheet, logHeaders, ['publishId'], {
+    publishId: commitId,
+    publishedAt: now,
+    publishedBy: 'ops-operator',
+    season: '2026',
+    region: 'all',
+    mode: 'commit',
+    totalRows: 0,
+    totalCleared: 0,
+    detail: message || 'Manual commit'
+  });
+
+  if (typeof purgeApiCache_ === 'function') {
+    try { purgeApiCache_(); } catch (err) {}
+  }
+
+  return {
+    ok: true,
+    data: {
+      commitId: commitId,
+      committedAt: isoDateTime_(now),
+      message: message
+    }
+  };
+}
+
+function menuPubCommit_() {
+  var ui = SpreadsheetApp.getUi();
+  var response = ui.prompt('수동 커밋', '커밋 메시지를 입력하세요 (선택사항):', ui.ButtonSet.OK_CANCEL);
+  if (response.getSelectedButton() !== ui.Button.OK) return;
+
+  var message = response.getResponseText().trim();
+  var result = handlePubCommit_({ message: message });
+
+  if (result.ok) {
+    ui.alert('커밋 완료', 'Commit ID: ' + result.data.commitId, ui.ButtonSet.OK);
+  } else {
+    ui.alert('커밋 실패', result.error || '알 수 없는 오류', ui.ButtonSet.OK);
+  }
+}
+
 /**
  * Required additions in doPost(e):
  *
@@ -3861,5 +4085,7 @@ function initializeOpsTabs() {
  * if (action === 'opsFeed') return json_(handleOpsFeed_(params));
  * if (action === 'opsSwissNextRound') return json_(handleOpsSwissNextRound_(payload || params));
  * if (action === 'opsRoundClose') return json_(handleOpsRoundClose_(payload || params));
+ * if (action === 'verifyMigration') return json_(handleVerifyMigration_());
+ * if (action === 'pubCommit') { ... }
  */
 

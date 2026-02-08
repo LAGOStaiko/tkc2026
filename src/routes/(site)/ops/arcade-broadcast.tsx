@@ -40,14 +40,9 @@ function normalizeRegionKey(value: string | null): OpsRegionKey {
 }
 
 function readSearchDefaults() {
-  if (typeof window === 'undefined') {
-    return { season: DEFAULT_SEASON, region: DEFAULT_REGION }
-  }
+  if (typeof window === 'undefined') return { region: DEFAULT_REGION }
   const params = new URLSearchParams(window.location.search)
-  return {
-    season: params.get('season')?.trim() || DEFAULT_SEASON,
-    region: normalizeRegionKey(params.get('region')),
-  }
+  return { region: normalizeRegionKey(params.get('region')) }
 }
 
 function statusLabel(status: 'pending' | 'live' | 'done') {
@@ -120,7 +115,7 @@ function MatchCard({
 
 function ArcadeOpsBroadcastPage() {
   const defaults = readSearchDefaults()
-  const [season] = useState(defaults.season)
+  const season = DEFAULT_SEASON
   const [region] = useState<OpsRegionKey>(defaults.region)
   const [feedRaw, setFeedRaw] = useState<unknown>(null)
   const [error, setError] = useState('')
@@ -179,8 +174,7 @@ function ArcadeOpsBroadcastPage() {
   const fetchFeed = useCallback(async () => {
     try {
       setError('')
-      const params = new URLSearchParams({ season, region })
-      const response = await fetch(`/api/ops/feed?${params.toString()}`, {
+      const response = await fetch('/api/broadcast', {
         method: 'GET',
         headers: { Accept: 'application/json' },
       })
@@ -207,7 +201,7 @@ function ArcadeOpsBroadcastPage() {
           : '송출 데이터를 불러오지 못했습니다.'
       )
     }
-  }, [region, season])
+  }, [region])
 
   useEffect(() => {
     void fetchFeed()

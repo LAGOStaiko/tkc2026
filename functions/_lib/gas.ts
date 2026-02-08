@@ -11,6 +11,7 @@ export type GasAction =
   | "showcaseSongs"
   | "songPools"
   | "register"
+  | "pubCommit"
   | "opsFeed"
   | "opsUpsert"
   | "opsExport"
