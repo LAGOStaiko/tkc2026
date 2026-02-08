@@ -80,14 +80,14 @@ export const SWISS_SONG_POOL: SwissSongEntry[] = [
 export type SwissSongOption = {
   /** Select value: "曲名|oni|5" 또는 "曲名|ura|8" */
   value: string
-  /** UI 표시: "曲名 (おに ★5)" */
+  /** UI 표시: "曲名 (귀신 ★5)" */
   label: string
   title: string
   difficulty: 'oni' | 'ura'
   level: number
 }
 
-const DIFF_LABEL = { oni: 'おに', ura: '裏おに' } as const
+const DIFF_LABEL = { oni: '귀신', ura: '뒷보면' } as const
 
 export function buildSongOptions(pool: SwissSongEntry[]): SwissSongOption[] {
   const options: SwissSongOption[] = []

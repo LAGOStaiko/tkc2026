@@ -125,8 +125,8 @@ function SongPoolSection({
             <tr className='border-b border-white/10 text-left text-xs font-semibold uppercase tracking-wider text-white/50'>
               <th className='px-4 py-3 text-center'>#</th>
               <th className='px-4 py-3'>곡명</th>
-              <th className='px-4 py-3 text-center'>おに</th>
-              {hasUra && <th className='px-4 py-3 text-center'>裏おに</th>}
+              <th className='px-4 py-3 text-center'>귀신</th>
+              {hasUra && <th className='px-4 py-3 text-center'>뒷보면</th>}
             </tr>
           </thead>
           <tbody>
