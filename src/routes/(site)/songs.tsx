@@ -103,8 +103,7 @@ function DivisionTimeline({
     <div>
       {/* Division header */}
       <div className='mb-8 flex items-center gap-3'>
-        <span className='inline-block h-6 w-1 rounded-full bg-[#ff2a00]' />
-        <img src={iconSrc} alt='' className='h-7 w-7 object-contain' />
+        <img src={iconSrc} alt='' className='h-7 w-7 rounded-lg object-contain' />
         <h2 className='text-xl font-bold text-white md:text-2xl'>{label}</h2>
       </div>
 
