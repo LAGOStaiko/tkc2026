@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { cn } from '@/lib/utils'
 import { useSongPools } from '@/lib/api'
+import { LevelBadge } from '@/components/tkc/level-badge'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/song-pool')({
@@ -113,8 +114,7 @@ function SongPoolSection({
   return (
     <div>
       <div className='mb-6 flex items-center gap-3'>
-        <span className='inline-block h-6 w-1 rounded-full bg-[#ff2a00]' />
-        <img src={iconSrc} alt='' className='h-7 w-7 object-contain' />
+        <img src={iconSrc} alt='' className='h-7 w-7 rounded-lg object-contain' />
         <h2 className='text-xl font-bold text-white md:text-2xl'>{label}</h2>
         <span className='ml-auto text-sm text-white/50'>{pool.length}곡</span>
       </div>
@@ -169,23 +169,3 @@ function SongPoolSection({
   )
 }
 
-function LevelBadge({
-  level,
-  isUra,
-}: {
-  level: number
-  isUra?: boolean
-}) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
-        isUra
-          ? 'bg-purple-500/15 text-purple-400'
-          : 'bg-[#ff2a00]/10 text-[#ff8c66]'
-      )}
-    >
-      ★{level}
-    </span>
-  )
-}

@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSongs } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { LevelBadge } from '@/components/tkc/level-badge'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 import { Badge } from '@/components/ui/badge'
 
@@ -219,9 +220,7 @@ function TimelineNode({
                   </span>
                 )}
                 {song.level != null && (
-                  <span className='inline-flex items-center rounded-full bg-[#ff2a00]/10 px-2.5 py-0.5 text-xs font-semibold text-[#ff8c66]'>
-                    Lv.{song.level}
-                  </span>
+                  <LevelBadge level={song.level} />
                 )}
               </div>
               {song.descriptionMd && (

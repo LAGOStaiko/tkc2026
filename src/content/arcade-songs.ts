@@ -7,8 +7,8 @@ export const ARCADE_SONGS = {
 
 export type ArcadeSongKey = keyof typeof ARCADE_SONGS
 
-/** "曲名 (Lv.N)" 형식 문자열 생성 */
+/** "曲名 (★N)" 형식 문자열 생성 */
 export function formatSongLabel(key: ArcadeSongKey): string {
   const s = ARCADE_SONGS[key]
-  return `${s.title} (Lv.${s.level})`
+  return `${s.title} (★${s.level})`
 }

@@ -11,6 +11,7 @@ import {
 } from '@/lib/arcade-results-archive'
 import { buildRegionFinalRanking } from '@/lib/arcade-results-ranking'
 import { formatSongLabel } from '@/content/arcade-songs'
+import { LevelBadge, parseLevelNumber } from '@/components/tkc/level-badge'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/arcade-results/2026/$region')({
@@ -144,9 +145,12 @@ function SwissRoundCard({
                       key={gi}
                       className='flex flex-col gap-0.5 text-xs sm:flex-row sm:items-center sm:justify-between sm:gap-3'
                     >
-                      <span className='text-white/55'>
+                      <span className='inline-flex items-center gap-1.5 text-white/55'>
                         {game.song}
-                        {game.level ? ` ${game.level}` : ''}
+                        {game.level ? (() => {
+                          const n = parseLevelNumber(game.level)
+                          return n != null ? <LevelBadge level={n} /> : ` ${game.level}`
+                        })() : null}
                       </span>
                       <span className='tabular-nums font-medium text-white/80'>
                         {formatScore(game.p1Score)} : {formatScore(game.p2Score)}
