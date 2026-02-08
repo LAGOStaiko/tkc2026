@@ -6,7 +6,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ChevronDown, Download } from 'lucide-react'
 import { t } from '@/text'
 import { toast } from 'sonner'
-import { useRegister, useSite } from '@/lib/api'
+import { useRegister, useSite, useSongPools } from '@/lib/api'
 import { parseSongOption, parseSongTitle } from '@/content/swiss-song-pool'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -60,7 +60,16 @@ export const Route = createFileRoute('/(site)/apply')({
 
 type SiteData = {
   applyOpen?: boolean
-  arcadeSongPool?: string[]
+}
+
+type SongPoolEntry = {
+  title: string
+  difficulty: string
+  level: number | null
+}
+
+type SongPoolsData = {
+  arcadeSwiss?: SongPoolEntry[]
 }
 
 type RegisterResponse = {
@@ -225,8 +234,19 @@ const defaultValues: ApplyFormValues = {
 
 function ApplyPage() {
   const { data, isError } = useSite<SiteData>()
+  const { data: poolsData } = useSongPools<SongPoolsData>()
   const applyOpen = data?.applyOpen
-  const songPool = data?.arcadeSongPool ?? []
+
+  const songPool = React.useMemo(() => {
+    const entries = poolsData?.arcadeSwiss ?? []
+    return entries
+      .filter(
+        (e): e is SongPoolEntry & { level: number } =>
+          e.level != null &&
+          (e.difficulty === 'oni' || e.difficulty === 'ura')
+      )
+      .map((e) => `${e.title}|${e.difficulty}|${e.level}`)
+  }, [poolsData?.arcadeSwiss])
   const registerMutation = useRegister<RegisterResponse, RegisterPayload>()
   const [receiptId, setReceiptId] = React.useState<string | null>(null)
   const turnstileRef = React.useRef<HTMLDivElement | null>(null)

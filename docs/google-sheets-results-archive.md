@@ -170,6 +170,29 @@ Recommended core columns:
 - 사용 시점: 신청 폼 접수 시 자동 누적
 - 비고: 수기 편집보다 상태값(`status`) 관리 위주로 사용
 
+### 선곡풀 시트 (`song_pool_*`) - 단일 소스
+
+선곡풀은 `song_pool_*` 시트가 유일한 데이터 소스입니다. 프론트엔드의 선곡풀 페이지(`/song-pool`)와 신청 페이지(`/apply`)가 모두 이 시트에서 데이터를 읽습니다.
+
+#### `song_pool_console_finals`
+- 목적: 콘솔 결선 선곡풀
+- 핵심 컬럼: `order`, `title`, `difficulty`, `level`, `note`
+
+#### `song_pool_arcade_finals`
+- 목적: 아케이드 결선 선곡풀
+- 핵심 컬럼: `order`, `title`, `difficulty`, `level`, `note`
+
+#### `song_pool_arcade_swiss`
+- 목적: 아케이드 스위스 스테이지 선곡풀
+- 핵심 컬럼: `order`, `title`, `difficulty`, `level`, `note`
+- 비고: 신청 폼의 "오프라인 선곡" 드롭다운 옵션 소스
+
+공통 규칙:
+- `difficulty`: 소문자 `oni` 또는 `ura`만 허용 (대소문자/공백 자동 보정, 그 외 값은 API에서 제외)
+- 하나의 곡이 oni/ura 모두 있으면 행 2개로 입력
+- `title`이 비어 있거나 `difficulty`가 무효인 행은 API 응답에서 자동 제외
+- 캐시 반영 지연: GAS 최대 15초, CDN 없음, 브라우저 최대 30초
+
 ### Ops tabs (`ops_db_*`) - 운영 입력 원본
 
 #### `ops_db_online`

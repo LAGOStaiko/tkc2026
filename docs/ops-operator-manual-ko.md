@@ -230,6 +230,9 @@ Swiss 매치 업서트:
   - `opsExport` 반영 후 공개 화면 확인
 - 종료 후:
   - `ops_db_events` 로그로 누가/언제 실행했는지 감사 추적
+- 선곡풀 릴리즈 전:
+  - `song_pool_arcade_swiss`의 `difficulty` 오탈자 검사 (`oni`/`ura` 이외 값 없는지 확인)
+  - `song_pool_arcade_finals`, `song_pool_console_finals`도 동일 검사
 
 ## 11. 권장 실무 원칙
 
@@ -241,7 +244,57 @@ Swiss 매치 업서트:
 - **지역 replace는 결선 시트를 지우지 않음** — 지역 단위 재송출 시 finals_a/finals_b/finals_matches는 보호된다.
 - **전체 replace만 결선 포함 정리** — "시즌 전체 송출" + replace 체크 시에만 결선 시트가 초기화 후 재작성된다.
 
-## 12. 변경 이력
+## 12. 선곡풀 관리
+
+### 단일 소스 원칙
+
+선곡풀은 **`song_pool_*` 시트가 유일한 소스**입니다.
+
+| 시트 | 용도 |
+|---|---|
+| `song_pool_console_finals` | 콘솔 결선 선곡풀 |
+| `song_pool_arcade_finals` | 아케이드 결선 선곡풀 |
+| `song_pool_arcade_swiss` | 아케이드 스위스 스테이지 선곡풀 |
+
+### 시트 헤더
+
+모든 선곡풀 시트는 동일 헤더를 사용합니다:
+
+`order | title | difficulty | level | note`
+
+- `difficulty`: 소문자 `oni` 또는 `ura`만 허용 (대소문자/공백은 자동 보정되지만, 그 외 값은 API에서 제외됨)
+- `level`: 숫자 (★ 레벨)
+- `title`이 비어 있거나 `difficulty`가 무효인 행은 API 응답에서 자동 제외
+- 하나의 곡이 oni/ura 모두 있으면 **행 2개**로 입력
+
+### 캐시 반영 지연
+
+- GAS 캐시: **최대 15초**
+- CDN 캐시: **없음** (`private, no-store`)
+- 브라우저: **최대 30초** (탭 포커스 시 자동 refetch)
+
+**시트 수정 후 최대 15초 이내 사이트 반영.** 즉시 확인하려면 GAS에서 `purgeApiCache_()` 실행 후 브라우저 새로고침.
+
+### 신청 페이지 연동
+
+신청 폼(`/apply`)의 "오프라인 선곡" 드롭다운은 `song_pool_arcade_swiss` 시트에서 자동 로드됩니다. 정적 상수가 아닌 API 기반이므로 시트 수정만으로 옵션이 변경됩니다.
+
+## 13. 변경 이력
+
+- 2026-02-08
+  - `normalizeDifficulty_()` 헬퍼 추가: `difficulty` 값을 `oni`/`ura`로 엄격 정규화
+  - `handleSongPools_`에서 `title` 비어 있거나 `difficulty` 무효인 행 자동 제외
+  - 신청 페이지(`/apply`) 선곡 필터에 `difficulty` 재검증 추가
+  - 선곡풀 페이지(`/song-pool`)에 전체 빈 상태 UI 추가
+  - 운영 품질 체크리스트에 선곡풀 `difficulty` 오탈자 검사 항목 추가
+  - 선곡풀 단일 소스 전환: `song_pool_*` 시트 → `songPools` API → 프론트엔드
+  - `song_pool_arcade_swiss` 시트 스키마 추가
+  - GAS `SWISS_SONG_POOL_` 상수 + `buildArcadeSongPoolOptions_()` 제거
+  - `handleSite_`에서 `arcadeSongPool` 필드 제거
+  - `handleSongPools_`가 `consoleFinals`, `arcadeFinals`, `arcadeSwiss` 3개 풀 반환
+  - 선곡풀/과제곡 캐시 정책 통일 (GAS 15초, CDN 없음, 브라우저 30초)
+  - 신청 페이지(`/apply`) 선곡 드롭다운을 `useSongPools()` API 기반으로 전환
+  - 선곡풀 페이지(`/song-pool`)를 정적 상수에서 API 기반으로 전환
 
 - 2026-02-07
   - `opsExport`에 `mode: 'replace'` 옵션 추가 (고아 데이터 제거)

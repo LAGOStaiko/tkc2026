@@ -145,7 +145,8 @@ function getSheetSchemas_(scope) {
     { name: 'registrations', headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'cardNo', 'dohirobaNo', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo'] },
     { name: 'showcase_songs', headers: ['division', 'stageKey', 'stageLabel', 'order', 'songTitle', 'difficulty', 'level', 'descriptionMd', 'revealed'] },
     { name: 'song_pool_console_finals', headers: ['order', 'title', 'difficulty', 'level', 'note'] },
-    { name: 'song_pool_arcade_finals', headers: ['order', 'title', 'difficulty', 'level', 'note'] }
+    { name: 'song_pool_arcade_finals', headers: ['order', 'title', 'difficulty', 'level', 'note'] },
+    { name: 'song_pool_arcade_swiss', headers: ['order', 'title', 'difficulty', 'level', 'note'] }
   ];
 
   var archive = [
@@ -231,89 +232,6 @@ var ARCADE_SONGS_ = {
   seeding: 'タイコロール (Lv.10)'
 };
 
-var SWISS_SONG_POOL_ = [
-  { title: 'きみのあかり', oni: 5, ura: 8 },
-  { title: '鏡の国のアリス', oni: 6, ura: 8 },
-  { title: 'タイムトラベラー', oni: 6 },
-  { title: 'ナツモノ☆', oni: 6 },
-  { title: 'Growing Up', oni: 6 },
-  { title: '虹色・夢色・太鼓色', oni: 6 },
-  { title: '想いを手に願いを込めて', oni: 7 },
-  { title: 'さいたま2000', oni: 7 },
-  { title: 'Mood Swing', oni: 7 },
-  { title: 'Aloft in the wind', oni: 7 },
-  { title: 'Emma', oni: 7 },
-  { title: 'Hello, Worldooon!!', oni: 7 },
-  { title: 'Fly again!', oni: 7 },
-  { title: 'フリフリ♪ノリノリ♪', oni: 7, ura: 9 },
-  { title: '願いはエスペラント', oni: 7 },
-  { title: 'ねぇ教えて', oni: 7 },
-  { title: '駄々っ子モンスター', oni: 7 },
-  { title: 'ゴーゴー・キッチン', oni: 7 },
-  { title: 'Fly away', oni: 7 },
-  { title: '季曲', oni: 7, ura: 8 },
-  { title: '黒神クロニクル', oni: 7 },
-  { title: 'スポーツダイジェスドン', oni: 7, ura: 9 },
-  { title: '伝説の祭り', oni: 7 },
-  { title: 'メカデス。', oni: 7 },
-  { title: 'カラメルタイム☆', oni: 8 },
-  { title: '東京特許キョ許可局局長!!', oni: 8 },
-  { title: 'Phantom Rider', oni: 8, ura: 9 },
-  { title: '月影SASURAI', oni: 8, ura: 9 },
-  { title: '化物月夜', oni: 8 },
-  { title: 'エリンギのエクボ', oni: 8 },
-  { title: 'オレサマパイレーツ', oni: 8 },
-  { title: 'Amanda', oni: 8 },
-  { title: 'Donder Time', oni: 8 },
-  { title: "The Magician's Dream", oni: 8 },
-  { title: 'エンジェル ドリーム', oni: 8 },
-  { title: 'Day by Day!', oni: 8 },
-  { title: 'がしゃどくろ', oni: 8 },
-  { title: '恋幻想(Love Fantasy)', oni: 8 },
-  { title: 'めたるぽりす', oni: 9, ura: 9 },
-  { title: '氷竜 ～Kooryu～', oni: 9 },
-  { title: 'ユースフルコースター', oni: 9 },
-  { title: 'よくでる2000', oni: 9 },
-  { title: '少女の神の粒子', oni: 9 },
-  { title: "GO GET'EM!", oni: 9, ura: 9 },
-  { title: 'Turquoise Tachometer', oni: 9 },
-  { title: 'DIMENSIONS', oni: 9 },
-  { title: '女帝 ～インバラトゥーラ～', oni: 9 },
-  { title: 'Amber Light', oni: 9 },
-  { title: '電子ドラムの達人', oni: 9 },
-  { title: 'Solitude Star', oni: 9 },
-  { title: 'パラレルロリポップ', oni: 9 },
-  { title: '初音ミクの消失‐劇場版‐', oni: 9 },
-  { title: '歌劇「リコレクトブルー', oni: 9 },
-  { title: 'リトルホワイトウィッチ', oni: 9 },
-  { title: '天妖ノ舞', oni: 9 },
-  { title: '秋竜 ～Shiuryu～', oni: 9 },
-  { title: '魔方陣 ‐サモン・デルタ‐', oni: 9 },
-  { title: '亜空間遊泳ac12.5', oni: 9 },
-  { title: 'はやさいたま2000', oni: 9 },
-  { title: 'EDY ‐エレクトリカルダンシングヨガ‐', oni: 9 },
-  { title: 'メヌエット', oni: 9 },
-  { title: 'いっそこのままで', oni: 9 },
-  { title: 'サラえる', oni: 9 },
-  { title: '凛', oni: 9 },
-  { title: '太鼓乱舞 皆伝', oni: 8 },
-  { title: '黄泉のイザナミ', oni: 8 },
-  { title: 'LOVE戦!!', oni: 8, ura: 9 },
-  { title: 'Choco Chiptune.', oni: 8 },
-  { title: 'クルクルクロックル', oni: 8 },
-  { title: '夢色コースター', oni: 8 }
-];
-
-function buildArcadeSongPoolOptions_() {
-  var options = [];
-  for (var i = 0; i < SWISS_SONG_POOL_.length; i++) {
-    var s = SWISS_SONG_POOL_[i];
-    options.push(s.title + '|oni|' + s.oni);
-    if (s.ura) options.push(s.title + '|ura|' + s.ura);
-  }
-  return options;
-}
-
 function getApiCacheKey_(action, params) {
   var base = 'tkc2026:' + API_CACHE_VERSION_ + ':' + String(action || '').trim();
   if (action === 'content') {
@@ -335,7 +253,7 @@ function getApiCacheTtlSec_(action) {
   if (action === 'results') return 20;    // 20s (results update sensitivity)
   if (action === 'opsFeed') return 15;    // 15s (ops 라이브 데이터, 폴링 빈도 대응)
   if (action === 'showcaseSongs') return 15;  // 15s (revealed 즉시 반영)
-  if (action === 'songPools') return 180;     // 3m
+  if (action === 'songPools') return 15;      // 15s (시트 변경 즉시 반영)
   return 60;
 }
 
@@ -1301,6 +1219,12 @@ function toNumber_(value, fallback) {
   return isNaN(n) ? fallback : n;
 }
 
+function normalizeDifficulty_(value) {
+  var s = String(value || '').trim().toLowerCase();
+  if (s === 'oni' || s === 'ura') return s;
+  return '';
+}
+
 function normalizeRegionKey_(value) {
   var s = trim_(value).toLowerCase();
   if (!s) return '';
@@ -1657,8 +1581,7 @@ function handleSite_() {
     applyNotice: String(map.applyNotice || ''),
     footerInfoMd: String(map.footerInfoMd || ''),
     rulesLastUpdated: String(map.rulesLastUpdated || ''),
-    partners: partnersRows,
-    arcadeSongPool: buildArcadeSongPoolOptions_()
+    partners: partnersRows
   };
 
   return { ok: true, data: data };
@@ -1674,15 +1597,17 @@ function handleSongPools_() {
         return {
           division: division,
           title: String(r.title||'').trim(),
-          difficulty: String(r.difficulty||'').trim(),
+          difficulty: normalizeDifficulty_(r.difficulty),
           level: toNumber_(r.level, null),
           note: String(r.note||'').trim()
         };
-      });
+      })
+      .filter(function(r){ return r.title && r.difficulty; });
   }
   var consoleFinals = readPool('song_pool_console_finals', 'console');
   var arcadeFinals = readPool('song_pool_arcade_finals', 'arcade');
-  return { ok: true, data: { consoleFinals: consoleFinals, arcadeFinals: arcadeFinals } };
+  var arcadeSwiss = readPool('song_pool_arcade_swiss', 'arcade');
+  return { ok: true, data: { consoleFinals: consoleFinals, arcadeFinals: arcadeFinals, arcadeSwiss: arcadeSwiss } };
 }
 
 function handleShowcaseSongs_() {

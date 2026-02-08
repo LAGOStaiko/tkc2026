@@ -2,7 +2,7 @@ import { ok, serverError } from "../_lib/response";
 import { callGasJson } from "../_lib/gas";
 
 const CACHE_HEADERS = {
-  "Cache-Control": "public, max-age=60, s-maxage=180, stale-while-revalidate=300",
+  "Cache-Control": "private, no-store",
 };
 
 export const onRequestGet = async ({ env }) => {

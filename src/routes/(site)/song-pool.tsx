@@ -1,18 +1,60 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { cn } from '@/lib/utils'
+import { useSongPools } from '@/lib/api'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
-import type { SwissSongEntry } from '@/content/swiss-song-pool'
-import { SWISS_SONG_POOL } from '@/content/swiss-song-pool'
-import { ARCADE_FINALS_SONG_POOL } from '@/content/arcade-finals-song-pool'
 
 export const Route = createFileRoute('/(site)/song-pool')({
   component: SongPoolPage,
 })
 
+type PoolEntry = {
+  title: string
+  difficulty: string
+  level: number | null
+  note: string
+}
+
+type SongPoolsData = {
+  consoleFinals?: PoolEntry[]
+  arcadeFinals?: PoolEntry[]
+  arcadeSwiss?: PoolEntry[]
+}
+
+type GroupedSong = {
+  title: string
+  oni?: number
+  ura?: number
+}
+
+function groupByTitle(entries: PoolEntry[]): GroupedSong[] {
+  const map = new Map<string, { oni?: number; ura?: number }>()
+  const order: string[] = []
+  for (const e of entries) {
+    if (!map.has(e.title)) {
+      map.set(e.title, {})
+      order.push(e.title)
+    }
+    const grouped = map.get(e.title)!
+    if (e.difficulty === 'oni' && e.level != null) grouped.oni = e.level
+    if (e.difficulty === 'ura' && e.level != null) grouped.ura = e.level
+  }
+  return order.map((title) => ({ title, ...map.get(title)! }))
+}
+
 function SongPoolPage() {
+  const { data, isLoading, isError } = useSongPools<SongPoolsData>()
   const title = t('nav.songPool')
+
+  const arcadeFinals = useMemo(
+    () => groupByTitle(data?.arcadeFinals ?? []),
+    [data?.arcadeFinals]
+  )
+  const arcadeSwiss = useMemo(
+    () => groupByTitle(data?.arcadeSwiss ?? []),
+    [data?.arcadeSwiss]
+  )
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${title}`
@@ -25,18 +67,32 @@ function SongPoolPage() {
         subtitle='대회에서 사용되는 선곡풀 목록입니다.'
       />
 
-      <div className='space-y-14'>
-        <SongPoolSection
-          label='아케이드 결선'
-          iconSrc='/branding/arcade-icon.png'
-          pool={ARCADE_FINALS_SONG_POOL}
-        />
-        <SongPoolSection
-          label='아케이드 스위스 스테이지'
-          iconSrc='/branding/arcade-icon.png'
-          pool={SWISS_SONG_POOL}
-        />
-      </div>
+      {isError && (
+        <p className='text-sm text-destructive'>
+          선곡풀을 불러오지 못했습니다.
+        </p>
+      )}
+
+      {isLoading && !data ? (
+        <p className='text-sm text-white/60'>선곡풀을 불러오는 중...</p>
+      ) : arcadeFinals.length === 0 && arcadeSwiss.length === 0 ? (
+        <p className='text-sm text-white/40'>
+          표시할 선곡풀이 없습니다.
+        </p>
+      ) : (
+        <div className='space-y-14'>
+          <SongPoolSection
+            label='아케이드 결선'
+            iconSrc='/branding/arcade-icon.png'
+            pool={arcadeFinals}
+          />
+          <SongPoolSection
+            label='아케이드 스위스 스테이지'
+            iconSrc='/branding/arcade-icon.png'
+            pool={arcadeSwiss}
+          />
+        </div>
+      )}
     </TkcSection>
   )
 }
@@ -48,9 +104,11 @@ function SongPoolSection({
 }: {
   label: string
   iconSrc: string
-  pool: SwissSongEntry[]
+  pool: GroupedSong[]
 }) {
   const hasUra = pool.some((s) => s.ura !== undefined)
+
+  if (pool.length === 0) return null
 
   return (
     <div>
@@ -87,11 +145,15 @@ function SongPoolSection({
                   {song.title}
                 </td>
                 <td className='px-4 py-3 text-center'>
-                  <LevelBadge level={song.oni} />
+                  {song.oni != null ? (
+                    <LevelBadge level={song.oni} />
+                  ) : (
+                    <span className='text-white/20'>—</span>
+                  )}
                 </td>
                 {hasUra && (
                   <td className='px-4 py-3 text-center'>
-                    {song.ura !== undefined ? (
+                    {song.ura != null ? (
                       <LevelBadge level={song.ura} isUra />
                     ) : (
                       <span className='text-white/20'>—</span>
