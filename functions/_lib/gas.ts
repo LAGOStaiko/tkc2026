@@ -9,6 +9,7 @@ export type GasAction =
   | "results"
   | "content"
   | "showcaseSongs"
+  | "songPools"
   | "register"
   | "opsFeed"
   | "opsUpsert"

@@ -143,7 +143,9 @@ function getSheetSchemas_(scope) {
     { name: 'results_stage', headers: ['division', 'stageKey', 'stageLabel', 'order', 'status', 'updatedAt', 'note'] },
     { name: 'results_rows', headers: ['division', 'stageKey', 'rank', 'nickname', 'score', 'detail', 'updatedAt'] },
     { name: 'registrations', headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'cardNo', 'dohirobaNo', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo'] },
-    { name: 'showcase_songs', headers: ['division', 'stageKey', 'stageLabel', 'order', 'songTitle', 'difficulty', 'level', 'descriptionMd', 'revealed'] }
+    { name: 'showcase_songs', headers: ['division', 'stageKey', 'stageLabel', 'order', 'songTitle', 'difficulty', 'level', 'descriptionMd', 'revealed'] },
+    { name: 'song_pool_console_finals', headers: ['order', 'title', 'difficulty', 'level', 'note'] },
+    { name: 'song_pool_arcade_finals', headers: ['order', 'title', 'difficulty', 'level', 'note'] }
   ];
 
   var archive = [
@@ -333,6 +335,7 @@ function getApiCacheTtlSec_(action) {
   if (action === 'results') return 20;    // 20s (results update sensitivity)
   if (action === 'opsFeed') return 15;    // 15s (ops 라이브 데이터, 폴링 빈도 대응)
   if (action === 'showcaseSongs') return 180; // 3m
+  if (action === 'songPools') return 180;     // 3m
   return 60;
 }
 
@@ -367,7 +370,8 @@ function getApiCacheKeys_() {
     getApiCacheKey_('site', {}),
     getApiCacheKey_('schedule', {}),
     getApiCacheKey_('results', {}),
-    getApiCacheKey_('showcaseSongs', {})
+    getApiCacheKey_('showcaseSongs', {}),
+    getApiCacheKey_('songPools', {})
   ];
   for (var i = 0; i < CONTENT_PAGE_KEYS_.length; i++) {
     keys.push(getApiCacheKey_('content', { page: CONTENT_PAGE_KEYS_[i] }));
@@ -1660,6 +1664,27 @@ function handleSite_() {
   return { ok: true, data: data };
 }
 
+function handleSongPools_() {
+  function readPool(sheetName, division) {
+    var table = readOptionalTable_(sheetName);
+    if (!table) return [];
+    return table.rows
+      .sort(function(a,b){ return toNumber_(a.order, 0) - toNumber_(b.order, 0); })
+      .map(function(r){
+        return {
+          division: division,
+          title: String(r.title||'').trim(),
+          difficulty: String(r.difficulty||'').trim(),
+          level: toNumber_(r.level, null),
+          note: String(r.note||'').trim()
+        };
+      });
+  }
+  var consoleFinals = readPool('song_pool_console_finals', 'console');
+  var arcadeFinals = readPool('song_pool_arcade_finals', 'arcade');
+  return { ok: true, data: { consoleFinals: consoleFinals, arcadeFinals: arcadeFinals } };
+}
+
 function handleShowcaseSongs_() {
   var rows = readTable_('showcase_songs').rows
     .sort(function(a,b){ return Number(a.order||0) - Number(b.order||0); })
@@ -1935,6 +1960,11 @@ function doPost(e) {
     if (action === 'showcaseSongs') {
       return json_(executeCachedAction_('showcaseSongs', params, function(){
         return handleShowcaseSongs_();
+      }));
+    }
+    if (action === 'songPools') {
+      return json_(executeCachedAction_('songPools', params, function(){
+        return handleSongPools_();
       }));
     }
 
