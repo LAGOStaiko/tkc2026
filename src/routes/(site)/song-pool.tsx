@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { useSongPools } from '@/lib/api'
 import { LevelBadge } from '@/components/tkc/level-badge'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { Badge } from '@/components/ui/badge'
 
 export const Route = createFileRoute('/(site)/song-pool')({
   component: SongPoolPage,
@@ -15,6 +16,7 @@ type PoolEntry = {
   difficulty: string
   level: number | null
   note: string
+  revealed?: boolean
 }
 
 type SongPoolsData = {
@@ -27,12 +29,18 @@ type GroupedSong = {
   title: string
   oni?: number
   ura?: number
+  revealed: boolean
 }
 
 function groupByTitle(entries: PoolEntry[]): GroupedSong[] {
   const map = new Map<string, { oni?: number; ura?: number }>()
   const order: string[] = []
+  const hidden: GroupedSong[] = []
   for (const e of entries) {
+    if (e.revealed === false) {
+      hidden.push({ title: '', revealed: false })
+      continue
+    }
     if (!map.has(e.title)) {
       map.set(e.title, {})
       order.push(e.title)
@@ -41,7 +49,10 @@ function groupByTitle(entries: PoolEntry[]): GroupedSong[] {
     if (e.difficulty === 'oni' && e.level != null) grouped.oni = e.level
     if (e.difficulty === 'ura' && e.level != null) grouped.ura = e.level
   }
-  return order.map((title) => ({ title, ...map.get(title)! }))
+  return [
+    ...order.map((title) => ({ title, revealed: true, ...map.get(title)! })),
+    ...hidden,
+  ]
 }
 
 function SongPoolPage() {
@@ -128,32 +139,51 @@ function SongPoolSection({
       <div className='space-y-2.5 md:hidden'>
         {pool.map((song, index) => (
           <div
-            key={`m-${song.title}-${index}`}
-            className='rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3'
+            key={`m-${song.title || `hidden-${index}`}-${index}`}
+            className={cn(
+              'rounded-xl border px-4 py-3',
+              song.revealed
+                ? 'border-white/10 bg-white/[0.03]'
+                : 'border-white/[0.06] bg-white/[0.015]'
+            )}
           >
-            <p className='font-medium leading-relaxed break-words text-white'>
-              {song.title}
-            </p>
-            <div className='mt-2 flex items-center gap-4'>
-              <div className='flex items-center gap-1.5'>
-                <span className='text-xs text-white/50'>귀신</span>
-                {song.oni != null ? (
-                  <LevelBadge level={song.oni} />
-                ) : (
-                  <span className='text-xs text-white/40'>—</span>
-                )}
-              </div>
-              {hasUra && (
-                <div className='flex items-center gap-1.5'>
-                  <span className='text-xs text-white/50'>뒷보면</span>
-                  {song.ura != null ? (
-                    <LevelBadge level={song.ura} isUra />
-                  ) : (
-                    <span className='text-xs text-white/40'>—</span>
+            {song.revealed ? (
+              <>
+                <p className='font-medium leading-relaxed break-words text-white'>
+                  {song.title}
+                </p>
+                <div className='mt-2 flex items-center gap-4'>
+                  <div className='flex items-center gap-1.5'>
+                    <span className='text-xs text-white/50'>귀신</span>
+                    {song.oni != null ? (
+                      <LevelBadge level={song.oni} />
+                    ) : (
+                      <span className='text-xs text-white/40'>—</span>
+                    )}
+                  </div>
+                  {hasUra && (
+                    <div className='flex items-center gap-1.5'>
+                      <span className='text-xs text-white/50'>뒷보면</span>
+                      {song.ura != null ? (
+                        <LevelBadge level={song.ura} isUra />
+                      ) : (
+                        <span className='text-xs text-white/40'>—</span>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              </>
+            ) : (
+              <div className='flex items-center gap-2'>
+                <span className='text-lg font-bold tracking-widest text-white/30'>???</span>
+                <Badge
+                  variant='outline'
+                  className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[#ff8c66]'
+                >
+                  추후 공지
+                </Badge>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -173,32 +203,52 @@ function SongPoolSection({
           <tbody>
             {pool.map((song, index) => (
               <tr
-                key={`${song.title}-${index}`}
+                key={`${song.title || `hidden-${index}`}-${index}`}
                 className={cn(
-                  'border-b border-white/[0.06] transition-colors hover:bg-white/[0.04]',
+                  'border-b border-white/[0.06] transition-colors',
+                  song.revealed && 'hover:bg-white/[0.04]',
                   index === pool.length - 1 && 'border-b-0'
                 )}
               >
                 <td className='px-4 py-3 text-center text-white/40'>
                   {index + 1}
                 </td>
-                <td className='px-4 py-3 font-medium leading-relaxed break-words text-white'>
-                  {song.title}
-                </td>
-                <td className='px-4 py-3 text-center'>
-                  {song.oni != null ? (
-                    <LevelBadge level={song.oni} />
-                  ) : (
-                    <span className='text-white/20'>—</span>
-                  )}
-                </td>
-                {hasUra && (
-                  <td className='px-4 py-3 text-center'>
-                    {song.ura != null ? (
-                      <LevelBadge level={song.ura} isUra />
-                    ) : (
-                      <span className='text-white/20'>—</span>
+                {song.revealed ? (
+                  <>
+                    <td className='px-4 py-3 font-medium leading-relaxed break-words text-white'>
+                      {song.title}
+                    </td>
+                    <td className='px-4 py-3 text-center'>
+                      {song.oni != null ? (
+                        <LevelBadge level={song.oni} />
+                      ) : (
+                        <span className='text-white/20'>—</span>
+                      )}
+                    </td>
+                    {hasUra && (
+                      <td className='px-4 py-3 text-center'>
+                        {song.ura != null ? (
+                          <LevelBadge level={song.ura} isUra />
+                        ) : (
+                          <span className='text-white/20'>—</span>
+                        )}
+                      </td>
                     )}
+                  </>
+                ) : (
+                  <td
+                    colSpan={hasUra ? 3 : 2}
+                    className='px-4 py-3'
+                  >
+                    <div className='flex items-center gap-2'>
+                      <span className='font-bold tracking-widest text-white/30'>???</span>
+                      <Badge
+                        variant='outline'
+                        className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[#ff8c66]'
+                      >
+                        추후 공지
+                      </Badge>
+                    </div>
                   </td>
                 )}
               </tr>

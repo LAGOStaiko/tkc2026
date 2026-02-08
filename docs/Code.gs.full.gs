@@ -144,9 +144,9 @@ function getSheetSchemas_(scope) {
     { name: 'results_rows', headers: ['division', 'stageKey', 'rank', 'nickname', 'score', 'detail', 'updatedAt'] },
     { name: 'registrations', headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'cardNo', 'dohirobaNo', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo'] },
     { name: 'showcase_songs', headers: ['division', 'stageKey', 'stageLabel', 'order', 'songTitle', 'difficulty', 'level', 'descriptionMd', 'revealed'] },
-    { name: 'song_pool_console_finals', headers: ['order', 'title', 'difficulty', 'level', 'note'] },
-    { name: 'song_pool_arcade_finals', headers: ['order', 'title', 'difficulty', 'level', 'note'] },
-    { name: 'song_pool_arcade_swiss', headers: ['order', 'title', 'difficulty', 'level', 'note'] }
+    { name: 'song_pool_console_finals', headers: ['order', 'title', 'difficulty', 'level', 'note', 'revealed'] },
+    { name: 'song_pool_arcade_finals', headers: ['order', 'title', 'difficulty', 'level', 'note', 'revealed'] },
+    { name: 'song_pool_arcade_swiss', headers: ['order', 'title', 'difficulty', 'level', 'note', 'revealed'] }
   ];
 
   var archive = [
@@ -1595,15 +1595,17 @@ function handleSongPools_() {
     return table.rows
       .sort(function(a,b){ return toNumber_(a.order, 0) - toNumber_(b.order, 0); })
       .map(function(r){
+        var revealed = r.revealed === undefined ? true : toBool_(r.revealed);
         return {
           division: division,
-          title: String(r.title||'').trim(),
-          difficulty: normalizeDifficulty_(r.difficulty),
-          level: toNumber_(r.level, null),
-          note: String(r.note||'').trim()
+          title: revealed ? String(r.title||'').trim() : '',
+          difficulty: revealed ? normalizeDifficulty_(r.difficulty) : '',
+          level: revealed ? toNumber_(r.level, null) : null,
+          note: String(r.note||'').trim(),
+          revealed: revealed
         };
       })
-      .filter(function(r){ return r.title && r.difficulty; });
+      .filter(function(r){ return !r.revealed || (r.title && r.difficulty); });
   }
   var consoleFinals = readPool('song_pool_console_finals', 'console');
   var arcadeFinals = readPool('song_pool_arcade_finals', 'arcade');
