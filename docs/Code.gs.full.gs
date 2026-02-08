@@ -1221,7 +1221,8 @@ function toNumber_(value, fallback) {
 
 function normalizeDifficulty_(value) {
   var s = String(value || '').trim().toLowerCase();
-  if (s === 'oni' || s === 'ura') return s;
+  if (s === 'oni' || s === 'おに' || s === '귀신') return 'oni';
+  if (s === 'ura' || s === '裏おに' || s === '裏' || s === '뒷보면') return 'ura';
   return '';
 }
 
@@ -1622,7 +1623,7 @@ function handleShowcaseSongs_() {
         order: Number(r.order||0),
         revealed: revealed,
         songTitle: revealed ? String(r.songTitle||'').trim() : '',
-        difficulty: revealed ? String(r.difficulty||'').trim() : '',
+        difficulty: revealed ? normalizeDifficulty_(r.difficulty) : '',
         level: revealed ? (r.level ? Number(r.level) : null) : null,
         descriptionMd: revealed ? String(r.descriptionMd||'') : ''
       };

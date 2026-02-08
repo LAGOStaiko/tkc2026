@@ -216,11 +216,11 @@ function TimelineNode({
                 </span>
                 {song.difficulty && (
                   <span className='text-sm text-white/70 md:text-base'>
-                    {song.difficulty}
+                    {song.difficulty === 'ura' ? '뒷보면' : song.difficulty === 'oni' ? '귀신' : song.difficulty}
                   </span>
                 )}
                 {song.level != null && (
-                  <LevelBadge level={song.level} isUra={song.difficulty === 'ura' || song.difficulty === '뒷보면'} />
+                  <LevelBadge level={song.level} isUra={song.difficulty === 'ura'} />
                 )}
               </div>
               {song.descriptionMd && (

@@ -77,9 +77,14 @@ function SongPoolPage() {
       {isLoading && !data ? (
         <p className='text-sm text-white/60'>선곡풀을 불러오는 중...</p>
       ) : arcadeFinals.length === 0 && arcadeSwiss.length === 0 ? (
-        <p className='text-sm text-white/40'>
-          표시할 선곡풀이 없습니다.
-        </p>
+        <div className='rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-8 text-center'>
+          <p className='text-sm text-white/50'>
+            표시할 선곡풀이 없습니다.
+          </p>
+          <p className='mt-1 text-xs text-white/30'>
+            시트 데이터 또는 difficulty 값(oni/ura)을 확인해 주세요.
+          </p>
+        </div>
       ) : (
         <div className='space-y-14'>
           <SongPoolSection
