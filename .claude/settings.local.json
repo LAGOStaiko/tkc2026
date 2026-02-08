@@ -10,7 +10,10 @@
       "Bash(pnpm format:check:*)",
       "Bash(pnpm knip:*)",
       "Bash(pnpm build:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(xargs cat:*)"
     ]
   }
 }
