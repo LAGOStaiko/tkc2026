@@ -15,6 +15,7 @@ import { Route as siteRouteRouteImport } from './routes/(site)/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as siteIndexRouteImport } from './routes/(site)/index'
 import { Route as siteSongsRouteImport } from './routes/(site)/songs'
+import { Route as siteSongPoolRouteImport } from './routes/(site)/song-pool'
 import { Route as siteScheduleRouteImport } from './routes/(site)/schedule'
 import { Route as siteResultsRouteImport } from './routes/(site)/results'
 import { Route as siteContactRouteImport } from './routes/(site)/contact'
@@ -81,6 +82,11 @@ const siteIndexRoute = siteIndexRouteImport.update({
 const siteSongsRoute = siteSongsRouteImport.update({
   id: '/songs',
   path: '/songs',
+  getParentRoute: () => siteRouteRoute,
+} as any)
+const siteSongPoolRoute = siteSongPoolRouteImport.update({
+  id: '/song-pool',
+  path: '/song-pool',
   getParentRoute: () => siteRouteRoute,
 } as any)
 const siteScheduleRoute = siteScheduleRouteImport.update({
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof siteContactRoute
   '/results': typeof siteResultsRoute
   '/schedule': typeof siteScheduleRoute
+  '/song-pool': typeof siteSongPoolRoute
   '/songs': typeof siteSongsRoute
   '/': typeof siteIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -338,6 +345,7 @@ export interface FileRoutesByTo {
   '/contact': typeof siteContactRoute
   '/results': typeof siteResultsRoute
   '/schedule': typeof siteScheduleRoute
+  '/song-pool': typeof siteSongPoolRoute
   '/songs': typeof siteSongsRoute
   '/': typeof siteIndexRoute
   '/admin': typeof AdminIndexRoute
@@ -385,6 +393,7 @@ export interface FileRoutesById {
   '/(site)/contact': typeof siteContactRoute
   '/(site)/results': typeof siteResultsRoute
   '/(site)/schedule': typeof siteScheduleRoute
+  '/(site)/song-pool': typeof siteSongPoolRoute
   '/(site)/songs': typeof siteSongsRoute
   '/(site)/': typeof siteIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -430,6 +439,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/results'
     | '/schedule'
+    | '/song-pool'
     | '/songs'
     | '/'
     | '/admin/'
@@ -471,6 +481,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/results'
     | '/schedule'
+    | '/song-pool'
     | '/songs'
     | '/'
     | '/admin'
@@ -517,6 +528,7 @@ export interface FileRouteTypes {
     | '/(site)/contact'
     | '/(site)/results'
     | '/(site)/schedule'
+    | '/(site)/song-pool'
     | '/(site)/songs'
     | '/(site)/'
     | '/admin/'
@@ -599,6 +611,13 @@ declare module '@tanstack/react-router' {
       path: '/songs'
       fullPath: '/songs'
       preLoaderRoute: typeof siteSongsRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
+    '/(site)/song-pool': {
+      id: '/(site)/song-pool'
+      path: '/song-pool'
+      fullPath: '/song-pool'
+      preLoaderRoute: typeof siteSongPoolRouteImport
       parentRoute: typeof siteRouteRoute
     }
     '/(site)/schedule': {
@@ -877,6 +896,7 @@ interface siteRouteRouteChildren {
   siteContactRoute: typeof siteContactRoute
   siteResultsRoute: typeof siteResultsRoute
   siteScheduleRoute: typeof siteScheduleRoute
+  siteSongPoolRoute: typeof siteSongPoolRoute
   siteSongsRoute: typeof siteSongsRoute
   siteIndexRoute: typeof siteIndexRoute
   siteOpsArcadeBroadcastRoute: typeof siteOpsArcadeBroadcastRoute
@@ -893,6 +913,7 @@ const siteRouteRouteChildren: siteRouteRouteChildren = {
   siteContactRoute: siteContactRoute,
   siteResultsRoute: siteResultsRoute,
   siteScheduleRoute: siteScheduleRoute,
+  siteSongPoolRoute: siteSongPoolRoute,
   siteSongsRoute: siteSongsRoute,
   siteIndexRoute: siteIndexRoute,
   siteOpsArcadeBroadcastRoute: siteOpsArcadeBroadcastRoute,
