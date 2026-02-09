@@ -155,7 +155,7 @@ function RSection({
         </span>
         <div>
           <h2 className='text-[17px] font-extrabold text-[#f0f0f0]'>{title}</h2>
-          <span className='font-mono text-[10px] tracking-wider text-white/40'>
+          <span className='font-mono text-xs tracking-wider text-white/40'>
             {titleEn}
           </span>
         </div>
@@ -257,7 +257,7 @@ function TournamentFlow() {
           {/* Timeline */}
           <div className='flex w-8 shrink-0 flex-col items-center'>
             <div
-              className='flex size-7 items-center justify-center rounded-full font-mono text-[10px] font-bold'
+              className='flex size-7 items-center justify-center rounded-full font-mono text-xs font-bold'
               style={{
                 background: `${s.accent}18`,
                 border: `2px solid ${s.accent}55`,
@@ -311,7 +311,7 @@ const CHECKLIST_ITEMS = [
 function PlayerChecklist() {
   return (
     <div className='mb-8 rounded-[14px] border border-[#E63B2E]/10 bg-[#E63B2E]/[0.04] px-4 py-5 motion-safe:animate-[tkc-slide-up_0.5s_ease_0.2s_both]'>
-      <div className='mb-1.5 font-mono text-[10px] tracking-[3px] text-[#E63B2E] uppercase opacity-60'>
+      <div className='mb-1.5 font-mono text-xs tracking-[3px] text-[#E63B2E] uppercase opacity-60'>
         Player Checklist
       </div>
       <p className='mb-3.5 text-xs leading-[1.7] break-keep text-white/55'>
@@ -325,7 +325,7 @@ function PlayerChecklist() {
               {item.text}
             </span>
             <span
-              className={`shrink-0 rounded px-2 py-0.5 font-mono text-[10px] tracking-wide ${
+              className={`shrink-0 rounded px-2 py-0.5 font-mono text-xs tracking-wide ${
                 item.tag === '주의'
                   ? 'border border-[#E63B2E]/20 bg-[#E63B2E]/10 text-[#E63B2E]'
                   : 'border border-white/[0.06] bg-white/[0.04] text-white/40'
@@ -379,7 +379,7 @@ function MatchVisual() {
     <div className='flex flex-col items-center gap-2'>
       <div className='flex w-full gap-2'>
         <div className='flex-1 rounded-[10px] border border-[#E63B2E]/[0.12] bg-[#E63B2E]/[0.06] px-3.5 py-4 text-center'>
-          <div className='mb-2 font-mono text-[10px] tracking-widest text-[#E63B2E]'>
+          <div className='mb-2 font-mono text-xs tracking-widest text-[#E63B2E]'>
             SONG 1
           </div>
           <div className='mb-1 text-[22px]'>🥁</div>
@@ -389,7 +389,7 @@ function MatchVisual() {
           <div className='mt-1 text-xs text-white/50'>내가 사이드 선택</div>
         </div>
         <div className='flex-1 rounded-[10px] border border-[#3B8BE6]/[0.12] bg-[#3B8BE6]/[0.06] px-3.5 py-4 text-center'>
-          <div className='mb-2 font-mono text-[10px] tracking-widest text-[#3B8BE6]'>
+          <div className='mb-2 font-mono text-xs tracking-widest text-[#3B8BE6]'>
             SONG 2
           </div>
           <div className='mb-1 text-[22px]'>🥁</div>
@@ -483,7 +483,7 @@ function SwissGroupRow({
       <span className='font-mono text-sm font-bold' style={{ color: g.color }}>
         {g.record}
       </span>
-      <span className='text-[10px] opacity-65' style={{ color: g.color }}>
+      <span className='text-xs opacity-65' style={{ color: g.color }}>
         {g.status}
       </span>
     </div>
@@ -565,7 +565,7 @@ function SeedingMatchTable() {
               key={m.match}
               className='rounded-lg border border-white/[0.04] bg-white/[0.012] p-3'
             >
-              <div className='mb-2 text-center text-[10px] font-bold tracking-wider text-[#E63B2E]'>
+              <div className='mb-2 text-center text-xs font-bold tracking-wider text-[#E63B2E]'>
                 {m.match}
               </div>
               {m.pairs.map((p) => (
@@ -588,7 +588,7 @@ function SeedingMatchTable() {
             {SEEDING_MATCHES.map((m, i) => (
               <div
                 key={m.match}
-                className={`px-1.5 py-2 text-center font-mono text-[10px] font-bold tracking-wider text-[#E63B2E] ${
+                className={`px-1.5 py-2 text-center font-mono text-xs font-bold tracking-wider text-[#E63B2E] ${
                   i < 3 ? 'border-r border-white/[0.03]' : ''
                 }`}
               >
@@ -749,7 +749,7 @@ function BracketVisual() {
           key={m.qf}
           className='flex items-center gap-2.5 rounded-[10px] border border-white/[0.04] bg-white/[0.012] px-3.5 py-3'
         >
-          <div className='w-7 shrink-0 text-center font-mono text-[10px] tracking-wider text-white/40'>
+          <div className='w-7 shrink-0 text-center font-mono text-xs tracking-wider text-white/40'>
             {m.qf}
           </div>
 
@@ -760,7 +760,7 @@ function BracketVisual() {
             </span>
           </div>
 
-          <span className='font-mono text-xs text-white/30'>vs</span>
+          <span className='font-mono text-xs text-white/50'>vs</span>
 
           <div className='flex flex-1 items-center gap-2'>
             <span className='min-w-9 rounded-md bg-[#3B8BE6]/10 px-2.5 py-1 text-center font-mono text-[15px] font-bold text-[#3B8BE6]'>
@@ -789,13 +789,13 @@ function SideAndTiebreakRules() {
       <CompactRuleCard icon='🎮' title='사이드(자리) 규칙'>
         <div className='flex gap-2'>
           <div className='flex-1 rounded-lg bg-[#E63B2E]/5 px-3 py-2.5 text-center'>
-            <div className='mb-1 font-mono text-[10px] tracking-wider text-[#E63B2E]'>
+            <div className='mb-1 font-mono text-xs tracking-wider text-[#E63B2E]'>
               내 곡
             </div>
             <div className='text-xs font-semibold text-white/65'>내가 선택</div>
           </div>
           <div className='flex-1 rounded-lg bg-[#3B8BE6]/5 px-3 py-2.5 text-center'>
-            <div className='mb-1 font-mono text-[10px] tracking-wider text-[#3B8BE6]'>
+            <div className='mb-1 font-mono text-xs tracking-wider text-[#3B8BE6]'>
               상대 곡
             </div>
             <div className='text-xs font-semibold text-white/65'>
@@ -899,7 +899,7 @@ function BanPickProcedure() {
     <div className='flex flex-col gap-2.5'>
       {/* 공통 순서 */}
       <div className='rounded-[10px] border border-white/[0.04] bg-white/[0.012] p-4'>
-        <div className='mb-2.5 font-mono text-[10px] tracking-[3px] text-[#E63B2E] uppercase opacity-60'>
+        <div className='mb-2.5 font-mono text-xs tracking-[3px] text-[#E63B2E] uppercase opacity-60'>
           Common Order
         </div>
         <div className='flex items-center justify-center gap-1.5'>
@@ -908,7 +908,7 @@ function BanPickProcedure() {
               <span className='rounded-md bg-white/[0.06] px-2.5 py-1.5 text-xs font-semibold text-white/65'>
                 {step}
               </span>
-              {i < 3 && <span className='text-xs text-white/30'>→</span>}
+              {i < 3 && <span className='text-xs text-white/50'>→</span>}
             </div>
           ))}
         </div>
@@ -985,7 +985,7 @@ function OperationsRules() {
 /* ================================================================== */
 
 const TAB_TRIGGER_CLASS =
-  'flex-1 py-3 min-h-11 text-sm font-medium transition-all data-[state=active]:bg-[#E63B2E]/10 data-[state=active]:text-[#f0f0f0] data-[state=active]:border data-[state=active]:border-[#E63B2E]/20 text-white/30 rounded-lg'
+  'flex-1 py-3 min-h-11 text-sm font-medium transition-all data-[state=active]:bg-[#E63B2E]/10 data-[state=active]:text-[#f0f0f0] data-[state=active]:border data-[state=active]:border-[#E63B2E]/20 text-white/50 rounded-lg'
 
 function ArcadePage() {
   const title = t('nav.arcade')

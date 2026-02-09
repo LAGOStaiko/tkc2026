@@ -188,7 +188,7 @@ function ArcadeFinals2026Page() {
                         className={`flex items-baseline gap-2 text-sm ${isLeftWinner ? 'font-bold text-[#ff2a00]' : 'text-white'}`}
                       >
                         <span>{leftName}</span>
-                        <span className='font-mono text-[11px] text-white/45'>
+                        <span className='font-mono text-xs text-white/45'>
                           {leftId}
                         </span>
                       </div>
@@ -197,7 +197,7 @@ function ArcadeFinals2026Page() {
                         className={`flex items-baseline gap-2 text-sm ${isRightWinner ? 'font-bold text-[#ff2a00]' : 'text-white'}`}
                       >
                         <span>{rightName}</span>
-                        <span className='font-mono text-[11px] text-white/45'>
+                        <span className='font-mono text-xs text-white/45'>
                           {rightId}
                         </span>
                       </div>

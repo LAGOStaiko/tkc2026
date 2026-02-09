@@ -86,7 +86,7 @@ function ResultsHubPage() {
           href='/arcade-results/2026'
           className='rounded-2xl border border-white/15 bg-white/[0.03] p-6 transition hover:border-[#ff2a00]/40 hover:bg-white/[0.06]'
         >
-          <div className='text-[11px] font-bold tracking-widest text-[#ff2a00] uppercase'>
+          <div className='text-xs font-bold tracking-widest text-[#ff2a00] uppercase'>
             ARCADE ARCHIVE
           </div>
           <h2 className='mt-2 text-2xl font-bold text-white'>
@@ -110,7 +110,7 @@ function ResultsHubPage() {
         </a>
 
         <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-6'>
-          <div className='text-[11px] font-bold tracking-widest text-white/50 uppercase'>
+          <div className='text-xs font-bold tracking-widest text-white/50 uppercase'>
             CONSOLE ARCHIVE
           </div>
           <h2 className='mt-2 text-2xl font-bold text-white/90'>

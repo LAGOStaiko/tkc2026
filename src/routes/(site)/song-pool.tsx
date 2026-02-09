@@ -125,7 +125,7 @@ function SongPoolPage() {
       ) : isEmpty ? (
         <div className='rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-8 text-center'>
           <p className='text-sm text-white/50'>표시할 선곡풀이 없습니다.</p>
-          <p className='mt-1 text-xs text-white/30'>
+          <p className='mt-1 text-xs text-white/50'>
             시트 데이터 또는 difficulty 값(oni/ura)을 확인해 주세요.
           </p>
         </div>
@@ -228,7 +228,7 @@ function SongPoolSection({
               </>
             ) : (
               <>
-                <p className='leading-relaxed font-medium text-white/30'>
+                <p className='leading-relaxed font-medium text-white/50'>
                   <span className='font-bold tracking-widest'>???</span>
                   <Badge
                     variant='outline'
@@ -287,20 +287,20 @@ function SongPoolSection({
                       {song.oni != null ? (
                         <LevelBadge level={song.oni} />
                       ) : (
-                        <span className='text-white/20'>—</span>
+                        <span className='text-white/50'>—</span>
                       )}
                     </td>
                     <td className='px-4 py-3 text-center'>
                       {song.ura != null ? (
                         <LevelBadge level={song.ura} isUra />
                       ) : (
-                        <span className='text-white/20'>—</span>
+                        <span className='text-white/50'>—</span>
                       )}
                     </td>
                   </>
                 ) : (
                   <>
-                    <td className='px-4 py-3 leading-relaxed font-medium text-white/30'>
+                    <td className='px-4 py-3 leading-relaxed font-medium text-white/50'>
                       <div className='flex items-center gap-2'>
                         <span className='font-bold tracking-widest'>???</span>
                         <Badge
@@ -312,10 +312,10 @@ function SongPoolSection({
                       </div>
                     </td>
                     <td className='px-4 py-3 text-center'>
-                      <span className='text-white/20'>—</span>
+                      <span className='text-white/50'>—</span>
                     </td>
                     <td className='px-4 py-3 text-center'>
-                      <span className='text-white/20'>—</span>
+                      <span className='text-white/50'>—</span>
                     </td>
                   </>
                 )}

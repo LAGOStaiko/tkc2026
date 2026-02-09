@@ -355,7 +355,7 @@ function ConsolePage() {
         <aside className='hidden lg:block'>
           <div className='sticky top-24'>
             <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-lg backdrop-blur-md'>
-              <p className='text-[11px] font-bold tracking-widest text-[#ff2a00] uppercase'>
+              <p className='text-xs font-bold tracking-widest text-[#ff2a00] uppercase'>
                 {t('console.tocTitle')}
               </p>
               <nav

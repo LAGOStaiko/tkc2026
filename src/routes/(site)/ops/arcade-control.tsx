@@ -1000,7 +1000,7 @@ function ArcadeOpsControlPage() {
             {publishMeta?.lastPublishId || '—'}
           </span>
         </div>
-        <div className='flex items-center gap-4 text-xs text-white/30'>
+        <div className='flex items-center gap-4 text-xs text-white/50'>
           <span>
             {publishMeta?.lastPublishedAt
               ? new Date(publishMeta.lastPublishedAt).toLocaleString('ko-KR')
@@ -1176,17 +1176,17 @@ function ArcadeOpsControlPage() {
                 </summary>
                 <div className='mt-3 rounded-xl border border-white/10 bg-black/20 p-3'>
                   <div className='flex flex-wrap items-center justify-between gap-2'>
-                    <span className='text-[11px] text-white/55'>
+                    <span className='text-xs text-white/55'>
                       players loaded: {regionParticipants.length}
                     </span>
                   </div>
-                  <p className='mt-1 text-[11px] text-white/55'>
+                  <p className='mt-1 text-xs text-white/55'>
                     Format: table,p1EntryId,p2EntryId[,note] — Use BYE or - for
                     no opponent.
                   </p>
                   <div className='mt-3 grid gap-2 md:grid-cols-3'>
                     <div className='space-y-1'>
-                      <label className='text-[11px] text-white/60'>round</label>
+                      <label className='text-xs text-white/60'>round</label>
                       <Input
                         type='number'
                         inputMode='numeric'
@@ -1198,7 +1198,7 @@ function ArcadeOpsControlPage() {
                       />
                     </div>
                     <div className='space-y-1'>
-                      <label className='text-[11px] text-white/60'>
+                      <label className='text-xs text-white/60'>
                         song1 / level1
                       </label>
                       <div className='grid grid-cols-3 gap-2'>
@@ -1218,7 +1218,7 @@ function ArcadeOpsControlPage() {
                       </div>
                     </div>
                     <div className='space-y-1'>
-                      <label className='text-[11px] text-white/60'>
+                      <label className='text-xs text-white/60'>
                         song2 / level2
                       </label>
                       <div className='grid grid-cols-3 gap-2'>
@@ -1240,7 +1240,7 @@ function ArcadeOpsControlPage() {
                   </div>
                   <div className='mt-2 grid gap-2 md:grid-cols-3'>
                     <div className='space-y-1 md:col-span-1'>
-                      <label className='text-[11px] text-white/60'>
+                      <label className='text-xs text-white/60'>
                         song3 / level3 (optional)
                       </label>
                       <div className='grid grid-cols-3 gap-2'>
@@ -1528,7 +1528,7 @@ function ArcadeOpsControlPage() {
                   }{' '}
                   지역 순위
                 </h3>
-                <span className='text-[11px] text-white/45'>
+                <span className='text-xs text-white/45'>
                   {lastFeedAt ? `DB ${lastFeedAt} 갱신` : '갱신 대기'}
                 </span>
               </div>
@@ -1562,7 +1562,7 @@ function ArcadeOpsControlPage() {
                           </td>
                           <td className='px-3 py-2 text-white/85'>
                             {row.nickname}
-                            <span className='ml-1 font-mono text-[10px] text-white/45'>
+                            <span className='ml-1 font-mono text-xs text-white/45'>
                               ({row.entryId})
                             </span>
                           </td>
@@ -1676,12 +1676,12 @@ function ArcadeOpsControlPage() {
                               : 'text-blue-300 bg-blue-500/10 border-blue-300/25'
                       return (
                         <tr key={i}>
-                          <td className='px-3 py-2 font-mono text-[11px] text-white/80'>
+                          <td className='px-3 py-2 font-mono text-xs text-white/80'>
                             {String(entry.publishId ?? '')}
                           </td>
                           <td className='px-3 py-2'>
                             <span
-                              className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${modeColor}`}
+                              className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${modeColor}`}
                             >
                               {mode || '?'}
                             </span>

@@ -143,7 +143,7 @@ function ScheduleEventCard({
         {statusLabel ? (
           <span
             className={cn(
-              'h-fit shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold',
+              'h-fit shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold',
               isFeatured
                 ? 'bg-white/20 text-white'
                 : 'bg-slate-100 text-slate-700'

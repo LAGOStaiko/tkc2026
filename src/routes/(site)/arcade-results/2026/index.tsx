@@ -131,7 +131,7 @@ function ArcadeResults2026Page() {
                     {region.label}
                   </h3>
                   <span
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                    className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                       hasAny
                         ? 'border border-emerald-300/30 bg-emerald-500/10 text-emerald-100'
                         : 'border border-white/15 bg-white/5 text-white/55'

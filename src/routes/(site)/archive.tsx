@@ -84,13 +84,13 @@ function PhotoCell({
       )}
 
       {/* index badge */}
-      <span className='absolute top-2 right-2 rounded bg-black/55 px-1.5 py-0.5 font-mono text-[9px] tracking-wider text-white/40 backdrop-blur-sm'>
+      <span className='absolute top-2 right-2 rounded bg-black/55 px-1.5 py-0.5 font-mono text-xs tracking-wider text-white/50 backdrop-blur-sm'>
         {String(index + 1).padStart(2, '0')}
       </span>
 
       {/* caption gradient */}
       <span className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent px-2.5 pt-5 pb-2'>
-        <span className='text-[10.5px] break-keep text-white/60'>
+        <span className='text-xs break-keep text-white/65'>
           {photo.caption}
         </span>
       </span>
@@ -117,13 +117,17 @@ function Lightbox({
 }) {
   useEffect(() => {
     if (index === null) return
+    document.body.style.overflow = 'hidden'
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
       if (e.key === 'ArrowLeft') onNav(-1)
       if (e.key === 'ArrowRight') onNav(1)
     }
     window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handler)
+    }
   }, [index, onClose, onNav])
 
   if (index === null) return null
@@ -132,9 +136,20 @@ function Lightbox({
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
+      role='dialog'
+      aria-modal='true'
       onClick={onClose}
-      className='fixed inset-0 z-[9999] flex animate-[tkc-fade-in_0.2s_ease] flex-col items-center justify-center bg-black/92 backdrop-blur-2xl'
+      className='fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/92 backdrop-blur-2xl motion-safe:animate-[tkc-fade-in_0.2s_ease]'
     >
+      {/* close button */}
+      <button
+        type='button'
+        onClick={onClose}
+        className='absolute top-4 right-4 z-10 flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-lg text-white transition hover:bg-white/10'
+        aria-label='닫기'
+      >
+        ✕
+      </button>
       {/* image area */}
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
@@ -156,7 +171,7 @@ function Lightbox({
         ) : (
           <div className='text-center opacity-25'>
             <div className='mb-2 text-4xl'>📷</div>
-            <div className='text-sm break-keep text-white/50'>{p.caption}</div>
+            <div className='text-sm break-keep text-white/60'>{p.caption}</div>
           </div>
         )}
       </div>
@@ -174,7 +189,7 @@ function Lightbox({
         >
           ‹
         </button>
-        <span className='font-mono text-xs tracking-widest text-white/30'>
+        <span className='font-mono text-xs tracking-widest text-white/50'>
           {index + 1} / {photos.length}
         </span>
         <button
@@ -190,7 +205,7 @@ function Lightbox({
         </button>
       </div>
 
-      <p className='mt-2.5 text-sm break-keep text-white/35'>{p.caption}</p>
+      <p className='mt-2.5 text-sm break-keep text-white/55'>{p.caption}</p>
     </div>
   )
 }
@@ -199,13 +214,7 @@ function Lightbox({
 /*  TournamentCard                                                     */
 /* ------------------------------------------------------------------ */
 
-function TournamentCard({
-  tournament: tm,
-  index,
-}: {
-  tournament: PastTournament
-  index: number
-}) {
+function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
   const [lbIdx, setLbIdx] = useState<number | null>(null)
 
   const handleNav = useCallback(
@@ -230,10 +239,7 @@ function TournamentCard({
 
   return (
     <>
-      <article
-        className='animate-[tkc-slide-up_0.65s_cubic-bezier(0.16,1,0.3,1)_both]'
-        style={{ animationDelay: `${index * 0.15}s` }}
-      >
+      <article className='motion-safe:animate-[tkc-slide-up_0.65s_cubic-bezier(0.16,1,0.3,1)_both]'>
         {/* ── Year & Title ── */}
         <div className='mb-7'>
           <div className='flex items-baseline gap-3.5'>
@@ -244,10 +250,10 @@ function TournamentCard({
               {tm.year}
             </span>
             <div>
-              <h2 className='text-sm font-normal tracking-wider break-keep text-white/35'>
+              <h2 className='text-sm font-normal tracking-wider break-keep text-white/60'>
                 {tm.titleKr}
               </h2>
-              <h3 className='mt-0.5 font-mono text-[10px] font-normal tracking-wider text-white/[0.18] uppercase'>
+              <h3 className='mt-0.5 font-mono text-xs font-normal tracking-wider text-white/40 uppercase'>
                 {tm.title}
               </h3>
             </div>
@@ -257,9 +263,9 @@ function TournamentCard({
             {meta.map((m) => (
               <span
                 key={m.value}
-                className='flex items-center gap-1 text-[11.5px] text-white/[0.28]'
+                className='flex items-center gap-1 text-xs text-white/50'
               >
-                <span className='text-[10px]'>{m.icon}</span>
+                <span className='text-xs'>{m.icon}</span>
                 {m.value}
               </span>
             ))}
@@ -267,7 +273,7 @@ function TournamentCard({
         </div>
 
         {/* ── Champion / Runner-up ── */}
-        <div className='mb-4 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-white/[0.03]'>
+        <div className='mb-4 grid grid-cols-1 gap-px overflow-hidden rounded-xl bg-white/[0.03] sm:grid-cols-2'>
           {/* Champion */}
           <div
             className='relative overflow-hidden px-6 py-7 md:px-7 md:py-8'
@@ -282,7 +288,7 @@ function TournamentCard({
               🏆
             </div>
             <div
-              className='mb-3.5 font-mono text-[9px] tracking-[3px] uppercase opacity-65'
+              className='mb-3.5 font-mono text-xs tracking-[3px] uppercase opacity-65'
               style={{ color: tm.accent }}
             >
               Champion
@@ -291,7 +297,7 @@ function TournamentCard({
             <div className='text-xl font-extrabold text-[#f0f0f0]'>
               {tm.champion.name}
             </div>
-            <div className='mt-0.5 text-[11px] text-white/[0.28]'>
+            <div className='mt-0.5 text-xs text-white/50'>
               {tm.champion.title}
             </div>
           </div>
@@ -304,21 +310,21 @@ function TournamentCard({
             >
               🥈
             </div>
-            <div className='mb-3.5 font-mono text-[9px] tracking-[3px] text-white/[0.28] uppercase'>
+            <div className='mb-3.5 font-mono text-xs tracking-[3px] text-white/40 uppercase'>
               Runner-up
             </div>
             <div className='mb-2.5 text-[42px]'>🥈</div>
             <div className='text-xl font-extrabold text-[#B0B0B0]'>
               {tm.runnerUp.name}
             </div>
-            <div className='mt-0.5 text-[11px] text-white/[0.22]'>
+            <div className='mt-0.5 text-xs text-white/50'>
               {tm.runnerUp.title}
             </div>
           </div>
         </div>
 
         {/* ── 3rd / 4th ── */}
-        <div className='mb-8 grid grid-cols-2 gap-2'>
+        <div className='mb-8 grid grid-cols-1 gap-2 sm:grid-cols-2'>
           {tm.top4.map((p) => (
             <div
               key={p.rank}
@@ -334,7 +340,7 @@ function TournamentCard({
                 >
                   {p.name}
                 </div>
-                <div className='font-mono text-[9px] tracking-wider text-white/[0.18]'>
+                <div className='font-mono text-xs tracking-wider text-white/40'>
                   {p.rank === 3 ? '3RD PLACE' : '4TH PLACE'}
                 </div>
               </div>
@@ -349,16 +355,16 @@ function TournamentCard({
               className='h-px w-[18px]'
               style={{ background: `${tm.accent}33` }}
             />
-            <span className='font-mono text-[9px] tracking-[3px] text-white/[0.22] uppercase'>
+            <span className='font-mono text-xs tracking-[3px] text-white/40 uppercase'>
               Gallery
             </span>
             <div className='h-px flex-1 bg-white/[0.035]' />
-            <span className='font-mono text-[9px] tracking-wider text-white/[0.13]'>
+            <span className='font-mono text-xs tracking-wider text-white/40'>
               {tm.photos.length} photos
             </span>
           </div>
 
-          <div className='grid grid-cols-2 gap-1.5 md:grid-cols-3'>
+          <div className='grid grid-cols-1 gap-1.5 sm:grid-cols-2 md:grid-cols-3'>
             {tm.photos.map((photo, i) => (
               <PhotoCell
                 key={photo.id}
@@ -390,17 +396,17 @@ function TournamentCard({
 function ComingNext() {
   return (
     <GlassCard
-      className='animate-[tkc-slide-up_0.6s_ease_0.3s_both] border-[#E63B2E]/[0.07] p-10 text-center'
+      className='border-[#E63B2E]/[0.07] p-10 text-center motion-safe:animate-[tkc-slide-up_0.6s_ease_0.3s_both]'
       style={{
         background:
           'linear-gradient(135deg, rgba(230,59,46,0.045), rgba(230,59,46,0.01))',
       }}
     >
-      <div className='mb-3.5 font-mono text-[9px] tracking-[4px] text-[#E63B2E] uppercase opacity-55'>
+      <div className='mb-3.5 font-mono text-xs tracking-[4px] text-[#E63B2E] uppercase opacity-55'>
         Coming Next
       </div>
       <h2 className='text-2xl font-extrabold text-[#f0f0f0]'>TKC 2026</h2>
-      <p className='mt-2 text-sm text-white/25 italic'>현실에서 기적으로 —</p>
+      <p className='mt-2 text-sm text-white/50 italic'>현실에서 기적으로 —</p>
     </GlassCard>
   )
 }
@@ -427,13 +433,9 @@ function ArchivePage() {
           subtitle='꿈의 시작부터, 현실에서 기적으로 — 우리가 함께 만들어온 무대의 기록'
         />
 
-        <div className='space-y-16 md:space-y-20'>
-          {PAST_TOURNAMENTS.map((tournament, i) => (
-            <TournamentCard
-              key={tournament.id}
-              tournament={tournament}
-              index={i}
-            />
+        <div className='space-y-10 md:space-y-16'>
+          {PAST_TOURNAMENTS.map((tournament) => (
+            <TournamentCard key={tournament.id} tournament={tournament} />
           ))}
         </div>
 

@@ -93,7 +93,7 @@ function SwissRoundCard({
               key={`${match.round}-${match.table ?? index}`}
               className='rounded-xl border border-white/10 bg-white/[0.03] p-4 md:p-5'
             >
-              <div className='flex items-center justify-between text-[11px] text-white/50'>
+              <div className='flex items-center justify-between text-xs text-white/50'>
                 <span>Table {match.table ?? index + 1}</span>
                 {match.highSeedEntryId ? (
                   <span>진영 선택 {match.highSeedEntryId}</span>
@@ -105,16 +105,16 @@ function SwissRoundCard({
                   className={`flex items-baseline gap-2 text-sm ${isP1Winner ? 'text-[#ff2a00]' : 'text-white'}`}
                 >
                   <span className='font-bold'>{p1Name}</span>
-                  <span className='font-mono text-[11px] text-white/40'>
+                  <span className='font-mono text-xs text-white/40'>
                     {p1Id}
                   </span>
                   {isP1Winner ? (
-                    <span className='text-[10px] font-medium text-emerald-300'>
+                    <span className='text-xs font-medium text-emerald-300'>
                       WIN
                     </span>
                   ) : null}
                 </div>
-                <div className='text-[10px] font-bold tracking-widest text-white/25'>
+                <div className='text-xs font-bold tracking-widest text-white/50'>
                   VS
                 </div>
                 <div
@@ -122,12 +122,12 @@ function SwissRoundCard({
                 >
                   <span className='font-bold'>{p2Name}</span>
                   {p2Id ? (
-                    <span className='font-mono text-[11px] text-white/40'>
+                    <span className='font-mono text-xs text-white/40'>
                       {p2Id}
                     </span>
                   ) : null}
                   {isP2Winner ? (
-                    <span className='text-[10px] font-medium text-emerald-300'>
+                    <span className='text-xs font-medium text-emerald-300'>
                       WIN
                     </span>
                   ) : null}
@@ -285,7 +285,7 @@ function ArcadeRegionDetailPage() {
                 >
                   <div className='flex items-start justify-between gap-3'>
                     <div className='space-y-1.5'>
-                      <div className='text-[11px] font-bold tracking-widest text-[#ff2a00] uppercase'>
+                      <div className='text-xs font-bold tracking-widest text-[#ff2a00] uppercase'>
                         {row.statusLabel}
                       </div>
                       <div className='text-xl font-bold text-white md:text-2xl'>
@@ -497,7 +497,7 @@ function ArcadeRegionDetailPage() {
                             <span className='font-semibold text-white'>
                               {row.nickname}
                             </span>
-                            <span className='ml-2 font-mono text-[11px] text-white/40'>
+                            <span className='ml-2 font-mono text-xs text-white/40'>
                               {row.entryId}
                             </span>
                           </td>
@@ -512,7 +512,7 @@ function ArcadeRegionDetailPage() {
                           </td>
                           <td className='px-4 py-3 whitespace-nowrap'>
                             <span
-                              className={`inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}
+                              className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusStyle}`}
                             >
                               {row.statusLabel}
                             </span>
@@ -550,7 +550,7 @@ function ArcadeRegionDetailPage() {
                           <span className='font-semibold text-white'>
                             {row.nickname}
                           </span>
-                          <span className='font-mono text-[11px] text-white/35'>
+                          <span className='font-mono text-xs text-white/50'>
                             {row.entryId}
                           </span>
                         </div>
@@ -568,7 +568,7 @@ function ArcadeRegionDetailPage() {
                         </div>
                       </div>
                       <span
-                        className={`flex-shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${statusStyle}`}
+                        className={`flex-shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusStyle}`}
                       >
                         {row.statusLabel}
                       </span>

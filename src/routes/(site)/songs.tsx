@@ -237,7 +237,7 @@ function TimelineNode({
               )}
             </div>
           ) : (
-            <div className='flex items-center gap-2 text-white/30'>
+            <div className='flex items-center gap-2 text-white/50'>
               <span className='text-2xl font-bold tracking-widest'>???</span>
               <span className='text-sm'>추후 공개 예정입니다.</span>
             </div>

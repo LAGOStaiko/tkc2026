@@ -234,7 +234,7 @@ function ArcadeOpsBroadcastPage() {
           </span>
           {weekStatus ? (
             <span
-              className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${statusBadgeClass(weekStatus.status)}`}
+              className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(weekStatus.status)}`}
             >
               {weekStatus.weekNo}주차 {statusLabel(weekStatus.status)}
             </span>
@@ -270,7 +270,7 @@ function ArcadeOpsBroadcastPage() {
                     {matchWinnerLabel(primaryCurrent)}
                   </span>
                 </div>
-                <div className='mt-1 text-[11px] text-white/55'>
+                <div className='mt-1 text-xs text-white/55'>
                   {primaryCurrent.leftEntryId || '-'} /{' '}
                   {primaryCurrent.rightEntryId || '-'}
                 </div>
@@ -317,7 +317,7 @@ function ArcadeOpsBroadcastPage() {
             <h3 className='text-sm font-bold text-[#ff2a00] md:text-base'>
               Pending Queue
             </h3>
-            <div className='mt-2 text-[11px] text-white/60'>
+            <div className='mt-2 text-xs text-white/60'>
               Swiss remaining {swissPending.length} / Top8 remaining{' '}
               {finalsPending.length}
             </div>
@@ -416,7 +416,7 @@ function ArcadeOpsBroadcastPage() {
                       <div className='font-semibold text-white'>
                         {row.nickname}
                       </div>
-                      <div className='font-mono text-[10px] text-white/45 md:text-xs'>
+                      <div className='font-mono text-xs text-white/45 md:text-xs'>
                         {row.entryId}
                       </div>
                     </td>
