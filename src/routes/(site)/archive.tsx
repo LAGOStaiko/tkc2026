@@ -84,13 +84,13 @@ function PhotoCell({
       )}
 
       {/* index badge */}
-      <span className='absolute top-2 right-2 rounded bg-black/55 px-1.5 py-0.5 font-mono text-xs tracking-wider text-white/50 backdrop-blur-sm'>
+      <span className='absolute top-2.5 right-2.5 rounded bg-black/55 px-2 py-0.5 font-mono text-xs tracking-wider text-white/55 backdrop-blur-sm'>
         {String(index + 1).padStart(2, '0')}
       </span>
 
       {/* caption gradient */}
-      <span className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent px-2.5 pt-5 pb-2'>
-        <span className='text-xs break-keep text-white/70'>
+      <span className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 pt-6 pb-2.5'>
+        <span className='text-sm break-keep text-white/75'>
           {photo.caption}
         </span>
       </span>
@@ -145,7 +145,7 @@ function Lightbox({
       <button
         type='button'
         onClick={onClose}
-        className='absolute top-4 right-4 z-10 flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-lg text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none'
+        className='absolute top-4 right-4 z-10 flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-lg text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none'
         aria-label='닫기'
       >
         ✕
@@ -154,7 +154,7 @@ function Lightbox({
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className='flex aspect-[4/3] w-[min(82vw,680px)] items-center justify-center overflow-hidden rounded-xl'
+        className='flex aspect-[4/3] w-[min(88vw,720px)] items-center justify-center overflow-hidden rounded-xl'
         style={{
           background: p.url
             ? '#111'
@@ -170,26 +170,28 @@ function Lightbox({
           />
         ) : (
           <div className='text-center opacity-25'>
-            <div className='mb-2 text-4xl'>📷</div>
-            <div className='text-sm break-keep text-white/60'>{p.caption}</div>
+            <div className='mb-2 text-5xl'>📷</div>
+            <div className='text-base break-keep text-white/60'>
+              {p.caption}
+            </div>
           </div>
         )}
       </div>
 
       {/* nav controls */}
-      <div className='mt-4 flex items-center gap-5'>
+      <div className='mt-5 flex items-center gap-6'>
         <button
           type='button'
           onClick={(e) => {
             e.stopPropagation()
             onNav(-1)
           }}
-          className='flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none'
+          className='flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-lg text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none'
           aria-label='이전'
         >
           ‹
         </button>
-        <span className='font-mono text-xs tracking-widest text-white/50'>
+        <span className='font-mono text-sm tracking-widest text-white/55'>
           {index + 1} / {photos.length}
         </span>
         <button
@@ -198,14 +200,14 @@ function Lightbox({
             e.stopPropagation()
             onNav(1)
           }}
-          className='flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none'
+          className='flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-lg text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none'
           aria-label='다음'
         >
           ›
         </button>
       </div>
 
-      <p className='mt-2.5 text-sm break-keep text-white/60'>{p.caption}</p>
+      <p className='mt-3 text-base break-keep text-white/65'>{p.caption}</p>
     </div>
   )
 }
@@ -241,31 +243,32 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
     <>
       <article className='motion-safe:animate-[tkc-slide-up_0.65s_cubic-bezier(0.16,1,0.3,1)_both]'>
         {/* ── Year & Title ── */}
-        <div className='mb-6'>
-          <div className='flex items-baseline gap-3.5'>
+        <div className='mb-8'>
+          <div className='flex items-baseline gap-4'>
             <span
-              className='font-mono text-5xl leading-none font-bold opacity-15 md:text-6xl'
-              style={{ color: tm.accent, letterSpacing: -2 }}
+              className='font-mono text-6xl leading-none font-extrabold tracking-[-3px] opacity-12 select-none md:text-7xl'
+              style={{ color: tm.accent }}
             >
               {tm.year}
             </span>
             <div>
-              <h2 className='text-sm font-normal tracking-wider break-keep text-white/70'>
+              <h2 className='text-lg font-bold tracking-tight break-keep text-white/85 md:text-xl'>
                 {tm.titleKr}
               </h2>
-              <h3 className='mt-0.5 font-mono text-xs font-normal tracking-wider text-white/55 uppercase'>
+              <p className='mt-0.5 font-mono text-sm tracking-wider text-white/55 uppercase'>
                 {tm.title}
-              </h3>
+              </p>
+              <p className='mt-1 text-sm text-white/40 italic'>{tm.subtitle}</p>
             </div>
           </div>
 
-          <div className='mt-3 flex flex-wrap gap-x-5 gap-y-1 pl-0.5'>
+          <div className='mt-4 flex flex-wrap gap-x-6 gap-y-1.5 pl-0.5'>
             {meta.map((m) => (
               <span
                 key={m.value}
-                className='flex items-center gap-1 text-xs text-white/50'
+                className='flex items-center gap-1.5 text-sm text-white/55'
               >
-                <span className='text-xs'>{m.icon}</span>
+                <span className='text-sm'>{m.icon}</span>
                 {m.value}
               </span>
             ))}
@@ -273,74 +276,74 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
         </div>
 
         {/* ── Champion / Runner-up ── */}
-        <div className='mb-4 grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-white/[0.03] sm:grid-cols-2'>
+        <div className='mb-6 grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-white/[0.03] sm:grid-cols-2'>
           {/* Champion */}
           <div
-            className='relative overflow-hidden px-6 py-7 md:px-7 md:py-8'
+            className='relative overflow-hidden px-7 py-8 md:px-8 md:py-10'
             style={{
               background: `linear-gradient(155deg, ${tm.accent}12, ${tm.accent}04)`,
             }}
           >
             <div
-              className='absolute -top-4 -right-1.5 text-[90px] leading-none opacity-[0.035]'
+              className='absolute -top-4 -right-1.5 text-[100px] leading-none opacity-[0.035]'
               aria-hidden
             >
               🏆
             </div>
             <div
-              className='mb-3.5 font-mono text-xs tracking-[3px] uppercase opacity-65'
+              className='mb-4 font-mono text-sm tracking-[3px] uppercase opacity-65'
               style={{ color: tm.accent }}
             >
               Champion
             </div>
-            <div className='mb-2.5 text-[42px]'>🥇</div>
-            <div className='text-xl font-extrabold text-[#f0f0f0]'>
+            <div className='mb-3 text-5xl'>🥇</div>
+            <div className='text-2xl font-extrabold text-[#f0f0f0]'>
               {tm.champion.name}
             </div>
-            <div className='mt-0.5 text-xs text-white/50'>
+            <div className='mt-1 text-sm text-white/60'>
               {tm.champion.title}
             </div>
           </div>
 
           {/* Runner-up */}
-          <div className='relative overflow-hidden bg-white/[0.03] px-6 py-7 md:px-7 md:py-8'>
+          <div className='relative overflow-hidden bg-white/[0.03] px-7 py-8 md:px-8 md:py-10'>
             <div
-              className='absolute -top-4 -right-1.5 text-[90px] leading-none opacity-[0.025]'
+              className='absolute -top-4 -right-1.5 text-[100px] leading-none opacity-[0.025]'
               aria-hidden
             >
               🥈
             </div>
-            <div className='mb-3.5 font-mono text-xs tracking-[3px] text-white/55 uppercase'>
+            <div className='mb-4 font-mono text-sm tracking-[3px] text-white/55 uppercase'>
               Runner-up
             </div>
-            <div className='mb-2.5 text-[42px]'>🥈</div>
-            <div className='text-xl font-extrabold text-[#B0B0B0]'>
+            <div className='mb-3 text-5xl'>🥈</div>
+            <div className='text-2xl font-extrabold text-[#B0B0B0]'>
               {tm.runnerUp.name}
             </div>
-            <div className='mt-0.5 text-xs text-white/50'>
+            <div className='mt-1 text-sm text-white/60'>
               {tm.runnerUp.title}
             </div>
           </div>
         </div>
 
         {/* ── 3rd / 4th ── */}
-        <div className='mb-6 grid grid-cols-1 gap-2 sm:grid-cols-2'>
+        <div className='mb-8 grid grid-cols-1 gap-2.5 sm:grid-cols-2'>
           {tm.top4.map((p) => (
             <div
               key={p.rank}
-              className='flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3'
+              className='flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4'
             >
-              <span className='text-xl'>{p.rank === 3 ? '🥉' : '4️⃣'}</span>
+              <span className='text-2xl'>{p.rank === 3 ? '🥉' : '4️⃣'}</span>
               <div>
                 <div
-                  className='text-sm font-bold'
+                  className='text-base font-bold'
                   style={{
-                    color: p.rank === 3 ? '#CD7F32' : 'rgba(255,255,255,0.4)',
+                    color: p.rank === 3 ? '#CD7F32' : 'rgba(255,255,255,0.55)',
                   }}
                 >
                   {p.name}
                 </div>
-                <div className='font-mono text-xs tracking-wider text-white/55'>
+                <div className='font-mono text-sm tracking-wider text-white/55'>
                   {p.rank === 3 ? '3RD PLACE' : '4TH PLACE'}
                 </div>
               </div>
@@ -350,21 +353,21 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
 
         {/* ── Gallery ── */}
         <div>
-          <div className='mb-4 flex items-center gap-2.5'>
+          <div className='mb-5 flex items-center gap-3'>
             <div
-              className='h-px w-[18px]'
-              style={{ background: `${tm.accent}33` }}
+              className='h-px w-5'
+              style={{ background: `${tm.accent}44` }}
             />
-            <span className='font-mono text-xs tracking-[3px] text-white/55 uppercase'>
+            <span className='font-mono text-sm tracking-[3px] text-white/55 uppercase'>
               Gallery
             </span>
-            <div className='h-px flex-1 bg-white/[0.035]' />
-            <span className='font-mono text-xs tracking-wider text-white/55'>
+            <div className='h-px flex-1 bg-white/[0.05]' />
+            <span className='font-mono text-sm tracking-wider text-white/55'>
               {tm.photos.length} photos
             </span>
           </div>
 
-          <div className='grid grid-cols-1 gap-1.5 sm:grid-cols-2 md:grid-cols-3'>
+          <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3'>
             {tm.photos.map((photo, i) => (
               <PhotoCell
                 key={photo.id}
@@ -396,17 +399,19 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
 function ComingNext() {
   return (
     <GlassCard
-      className='border-[#E63B2E]/[0.07] p-10 text-center motion-safe:animate-[tkc-slide-up_0.5s_ease_both]'
+      className='border-[#ff2a00]/[0.08] p-12 text-center motion-safe:animate-[tkc-slide-up_0.5s_ease_both]'
       style={{
         background:
-          'linear-gradient(135deg, rgba(230,59,46,0.045), rgba(230,59,46,0.01))',
+          'linear-gradient(135deg, rgba(255,42,0,0.04), rgba(255,42,0,0.01))',
       }}
     >
-      <div className='mb-3.5 font-mono text-xs tracking-[4px] text-[#E63B2E] uppercase opacity-55'>
+      <div className='mb-4 font-mono text-sm tracking-[4px] text-[#ff2a00] uppercase opacity-65'>
         Coming Next
       </div>
-      <h2 className='text-2xl font-extrabold text-[#f0f0f0]'>TKC 2026</h2>
-      <p className='mt-2 text-sm text-white/50 italic'>현실에서 기적으로 —</p>
+      <h2 className='text-3xl font-extrabold text-[#f0f0f0]'>TKC 2026</h2>
+      <p className='mt-2.5 text-base text-white/55 italic'>
+        현실에서 기적으로 —
+      </p>
     </GlassCard>
   )
 }
@@ -427,7 +432,7 @@ function ArchivePage() {
         subtitle='꿈의 시작부터, 현실에서 기적으로 — 우리가 함께 만들어온 무대의 기록'
       />
 
-      <div className='space-y-10 md:space-y-16'>
+      <div className='space-y-16 md:space-y-24'>
         {PAST_TOURNAMENTS.map((tournament) => (
           <TournamentCard key={tournament.id} tournament={tournament} />
         ))}
