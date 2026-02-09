@@ -84,13 +84,13 @@ function PhotoCell({
       )}
 
       {/* index badge */}
-      <span className='absolute top-2.5 right-2.5 rounded bg-black/55 px-2 py-0.5 font-mono text-xs tracking-wider text-white/55 backdrop-blur-sm'>
+      <span className='absolute top-2.5 right-2.5 rounded bg-black/55 px-2 py-0.5 font-mono text-xs tracking-wider text-white/60 backdrop-blur-sm'>
         {String(index + 1).padStart(2, '0')}
       </span>
 
       {/* caption gradient */}
       <span className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 pt-6 pb-2.5'>
-        <span className='text-sm break-keep text-white/75'>
+        <span className='text-sm break-keep text-white/80'>
           {photo.caption}
         </span>
       </span>
@@ -171,7 +171,7 @@ function Lightbox({
         ) : (
           <div className='text-center opacity-25'>
             <div className='mb-2 text-5xl'>📷</div>
-            <div className='text-base break-keep text-white/60'>
+            <div className='text-base break-keep text-white/65'>
               {p.caption}
             </div>
           </div>
@@ -191,7 +191,7 @@ function Lightbox({
         >
           ‹
         </button>
-        <span className='font-mono text-sm tracking-widest text-white/55'>
+        <span className='font-mono text-sm tracking-widest text-white/60'>
           {index + 1} / {photos.length}
         </span>
         <button
@@ -207,7 +207,7 @@ function Lightbox({
         </button>
       </div>
 
-      <p className='mt-3 text-base break-keep text-white/65'>{p.caption}</p>
+      <p className='mt-3 text-base break-keep text-white/70'>{p.caption}</p>
     </div>
   )
 }
@@ -236,7 +236,7 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
     { icon: '📅', value: tm.date },
     { icon: '📍', value: tm.venue },
     { icon: '👥', value: `${tm.participants}명` },
-    { icon: '🎵', value: tm.finalSong },
+    ...(tm.finalSong ? [{ icon: '🎵', value: tm.finalSong }] : []),
   ]
 
   return (
@@ -252,13 +252,17 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
               {tm.year}
             </span>
             <div>
-              <h2 className='text-lg font-bold tracking-tight break-keep text-white/85 md:text-xl'>
+              <h2 className='text-lg font-bold tracking-tight break-keep text-white/90 md:text-xl'>
                 {tm.titleKr}
               </h2>
-              <p className='mt-0.5 font-mono text-sm tracking-wider text-white/55 uppercase'>
+              <p className='mt-0.5 font-mono text-sm tracking-wider text-white/65 uppercase'>
                 {tm.title}
               </p>
-              <p className='mt-1 text-sm text-white/40 italic'>{tm.subtitle}</p>
+              {tm.subtitle && (
+                <p className='mt-1 text-sm text-white/50 italic'>
+                  {tm.subtitle}
+                </p>
+              )}
             </div>
           </div>
 
@@ -266,7 +270,7 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
             {meta.map((m) => (
               <span
                 key={m.value}
-                className='flex items-center gap-1.5 text-sm text-white/55'
+                className='flex items-center gap-1.5 text-sm text-white/65'
               >
                 <span className='text-sm'>{m.icon}</span>
                 {m.value}
@@ -291,7 +295,7 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
               🏆
             </div>
             <div
-              className='mb-4 font-mono text-sm tracking-[3px] uppercase opacity-65'
+              className='mb-4 font-mono text-sm tracking-[3px] uppercase opacity-70'
               style={{ color: tm.accent }}
             >
               Champion
@@ -300,7 +304,7 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
             <div className='text-2xl font-extrabold text-[#f0f0f0]'>
               {tm.champion.name}
             </div>
-            <div className='mt-1 text-sm text-white/60'>
+            <div className='mt-1 text-sm text-white/70'>
               {tm.champion.title}
             </div>
           </div>
@@ -313,81 +317,67 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
             >
               🥈
             </div>
-            <div className='mb-4 font-mono text-sm tracking-[3px] text-white/55 uppercase'>
+            <div className='mb-4 font-mono text-sm tracking-[3px] text-white/65 uppercase'>
               Runner-up
             </div>
             <div className='mb-3 text-5xl'>🥈</div>
             <div className='text-2xl font-extrabold text-[#B0B0B0]'>
               {tm.runnerUp.name}
             </div>
-            <div className='mt-1 text-sm text-white/60'>
+            <div className='mt-1 text-sm text-white/70'>
               {tm.runnerUp.title}
             </div>
           </div>
         </div>
 
-        {/* ── 3rd / 4th ── */}
-        <div className='mb-8 grid grid-cols-1 gap-2.5 sm:grid-cols-2'>
-          {tm.top4.map((p) => (
-            <div
-              key={p.rank}
-              className='flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4'
-            >
-              <span className='text-2xl'>{p.rank === 3 ? '🥉' : '4️⃣'}</span>
-              <div>
-                <div
-                  className='text-base font-bold'
-                  style={{
-                    color: p.rank === 3 ? '#CD7F32' : 'rgba(255,255,255,0.55)',
-                  }}
-                >
-                  {p.name}
-                </div>
-                <div className='font-mono text-sm tracking-wider text-white/55'>
-                  {p.rank === 3 ? '3RD PLACE' : '4TH PLACE'}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* ── Note (e.g. team results) ── */}
+        {tm.note && (
+          <div className='mb-6 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4'>
+            <span className='text-base text-white/75'>{tm.note}</span>
+          </div>
+        )}
 
         {/* ── Gallery ── */}
-        <div>
-          <div className='mb-5 flex items-center gap-3'>
-            <div
-              className='h-px w-5'
-              style={{ background: `${tm.accent}44` }}
-            />
-            <span className='font-mono text-sm tracking-[3px] text-white/55 uppercase'>
-              Gallery
-            </span>
-            <div className='h-px flex-1 bg-white/[0.05]' />
-            <span className='font-mono text-sm tracking-wider text-white/55'>
-              {tm.photos.length} photos
-            </span>
-          </div>
-
-          <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3'>
-            {tm.photos.map((photo, i) => (
-              <PhotoCell
-                key={photo.id}
-                index={i}
-                photo={photo}
-                accent={tm.accent}
-                onClick={() => setLbIdx(i)}
+        {tm.photos.length > 0 && (
+          <div>
+            <div className='mb-5 flex items-center gap-3'>
+              <div
+                className='h-px w-5'
+                style={{ background: `${tm.accent}44` }}
               />
-            ))}
+              <span className='font-mono text-sm tracking-[3px] text-white/60 uppercase'>
+                Gallery
+              </span>
+              <div className='h-px flex-1 bg-white/[0.05]' />
+              <span className='font-mono text-sm tracking-wider text-white/60'>
+                {tm.photos.length} photos
+              </span>
+            </div>
+
+            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3'>
+              {tm.photos.map((photo, i) => (
+                <PhotoCell
+                  key={photo.id}
+                  index={i}
+                  photo={photo}
+                  accent={tm.accent}
+                  onClick={() => setLbIdx(i)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </article>
 
-      <Lightbox
-        photos={tm.photos}
-        index={lbIdx}
-        accent={tm.accent}
-        onClose={handleClose}
-        onNav={handleNav}
-      />
+      {tm.photos.length > 0 && (
+        <Lightbox
+          photos={tm.photos}
+          index={lbIdx}
+          accent={tm.accent}
+          onClose={handleClose}
+          onNav={handleNav}
+        />
+      )}
     </>
   )
 }
@@ -405,11 +395,11 @@ function ComingNext() {
           'linear-gradient(135deg, rgba(255,42,0,0.04), rgba(255,42,0,0.01))',
       }}
     >
-      <div className='mb-4 font-mono text-sm tracking-[4px] text-[#ff2a00] uppercase opacity-65'>
+      <div className='mb-4 font-mono text-sm tracking-[4px] text-[#ff2a00] uppercase opacity-70'>
         Coming Next
       </div>
       <h2 className='text-3xl font-extrabold text-[#f0f0f0]'>TKC 2026</h2>
-      <p className='mt-2.5 text-base text-white/55 italic'>
+      <p className='mt-2.5 text-base text-white/60 italic'>
         현실에서 기적으로 —
       </p>
     </GlassCard>
