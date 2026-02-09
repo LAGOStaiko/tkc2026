@@ -31,8 +31,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/ops/arcade-control')({
@@ -685,7 +685,12 @@ function ArcadeOpsControlPage() {
   }
 
   const handleValidate = async () => {
-    type ValidateItem = { sheet: string; rule: string; message: string; row?: number }
+    type ValidateItem = {
+      sheet: string
+      rule: string
+      message: string
+      row?: number
+    }
     const toValidateItem = (v: unknown): ValidateItem => {
       if (typeof v === 'string') return { sheet: '-', rule: '검증', message: v }
       if (v && typeof v === 'object') {
@@ -713,7 +718,9 @@ function ArcadeOpsControlPage() {
       const data = {
         valid: !!raw.valid,
         errors: Array.isArray(raw.errors) ? raw.errors.map(toValidateItem) : [],
-        warnings: Array.isArray(raw.warnings) ? raw.warnings.map(toValidateItem) : [],
+        warnings: Array.isArray(raw.warnings)
+          ? raw.warnings.map(toValidateItem)
+          : [],
         summary: Array.isArray(raw.summary)
           ? (raw.summary as { sheet: string; target: string; rows: number }[])
           : [],
@@ -728,7 +735,9 @@ function ArcadeOpsControlPage() {
   }
 
   const handlePublish = async () => {
-    const modeLabel = exportReplaceMode ? 'replace (초기화 후 재송출)' : 'upsert'
+    const modeLabel = exportReplaceMode
+      ? 'replace (초기화 후 재송출)'
+      : 'upsert'
     if (
       !confirm(
         `시즌 ${season || DEFAULT_SEASON} 전체를 ${modeLabel} 모드로 송출합니다.\n\n자동으로 검증 → 백업 → 송출이 실행됩니다. 계속하시겠습니까?`
@@ -855,7 +864,9 @@ function ArcadeOpsControlPage() {
         {},
         operatorKey
       )
-      setPublishLog(Array.isArray(data) ? (data as Record<string, unknown>[]) : [])
+      setPublishLog(
+        Array.isArray(data) ? (data as Record<string, unknown>[]) : []
+      )
     } catch (err) {
       setErrorMessage(
         err instanceof Error ? err.message : '발행 로그 조회 실패'
@@ -918,9 +929,7 @@ function ArcadeOpsControlPage() {
             type={type === 'number' ? 'number' : 'text'}
             inputMode={type === 'number' ? 'numeric' : undefined}
             value={value}
-            onChange={(event) =>
-              setDraftField(field.name, event.target.value)
-            }
+            onChange={(event) => setDraftField(field.name, event.target.value)}
             placeholder={field.placeholder}
           />
         )}
@@ -997,9 +1006,7 @@ function ArcadeOpsControlPage() {
               ? new Date(publishMeta.lastPublishedAt).toLocaleString('ko-KR')
               : ''}
           </span>
-          <span>
-            {lastFeedAt ? `DB ${lastFeedAt}` : ''}
-          </span>
+          <span>{lastFeedAt ? `DB ${lastFeedAt}` : ''}</span>
         </div>
       </div>
 
@@ -1017,9 +1024,7 @@ function ArcadeOpsControlPage() {
             }`}
           >
             {week.label}
-            <span className='ml-1.5 text-xs opacity-60'>
-              W{week.weekNo}
-            </span>
+            <span className='ml-1.5 text-xs opacity-60'>W{week.weekNo}</span>
             <span
               className={`ml-1 inline-block h-1.5 w-1.5 rounded-full ${
                 week.status === 'done'
@@ -1102,7 +1107,11 @@ function ArcadeOpsControlPage() {
                   >
                     현재 경기 불러오기
                   </Button>
-                  <Button variant='outline' size='sm' onClick={handleLoadNextMatch}>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={handleLoadNextMatch}
+                  >
                     다음 경기 슬롯
                   </Button>
                 </div>
@@ -1123,7 +1132,9 @@ function ArcadeOpsControlPage() {
                       key={option.entryId}
                       size='sm'
                       variant='outline'
-                      onClick={() => setDraftField('winnerEntryId', option.entryId)}
+                      onClick={() =>
+                        setDraftField('winnerEntryId', option.entryId)
+                      }
                     >
                       {option.nickname || option.entryId}
                     </Button>
@@ -1148,7 +1159,11 @@ function ArcadeOpsControlPage() {
               <Button onClick={handleSaveRow} disabled={isSaving}>
                 {isSaving ? '저장 중..' : 'DB 저장'}
               </Button>
-              <Button variant='outline' onClick={resetDraft} disabled={isSaving}>
+              <Button
+                variant='outline'
+                onClick={resetDraft}
+                disabled={isSaving}
+              >
                 입력 초기화
               </Button>
             </div>
@@ -1166,8 +1181,8 @@ function ArcadeOpsControlPage() {
                     </span>
                   </div>
                   <p className='mt-1 text-[11px] text-white/55'>
-                    Format: table,p1EntryId,p2EntryId[,note] — Use BYE or - for no
-                    opponent.
+                    Format: table,p1EntryId,p2EntryId[,note] — Use BYE or - for
+                    no opponent.
                   </p>
                   <div className='mt-3 grid gap-2 md:grid-cols-3'>
                     <div className='space-y-1'>
@@ -1195,7 +1210,9 @@ function ArcadeOpsControlPage() {
                         />
                         <Input
                           value={bulkLevel1}
-                          onChange={(event) => setBulkLevel1(event.target.value)}
+                          onChange={(event) =>
+                            setBulkLevel1(event.target.value)
+                          }
                           placeholder='Lv'
                         />
                       </div>
@@ -1213,7 +1230,9 @@ function ArcadeOpsControlPage() {
                         />
                         <Input
                           value={bulkLevel2}
-                          onChange={(event) => setBulkLevel2(event.target.value)}
+                          onChange={(event) =>
+                            setBulkLevel2(event.target.value)
+                          }
                           placeholder='Lv'
                         />
                       </div>
@@ -1233,7 +1252,9 @@ function ArcadeOpsControlPage() {
                         />
                         <Input
                           value={bulkLevel3}
-                          onChange={(event) => setBulkLevel3(event.target.value)}
+                          onChange={(event) =>
+                            setBulkLevel3(event.target.value)
+                          }
                           placeholder='Lv'
                         />
                       </div>
@@ -1243,7 +1264,9 @@ function ArcadeOpsControlPage() {
                     <Textarea
                       value={bulkLines}
                       onChange={(event) => setBulkLines(event.target.value)}
-                      placeholder={'1,SEO-01,SEO-16\n2,SEO-02,SEO-15\n3,SEO-03,BYE'}
+                      placeholder={
+                        '1,SEO-01,SEO-16\n2,SEO-02,SEO-15\n3,SEO-03,BYE'
+                      }
                       className='min-h-32 font-mono text-xs'
                     />
                   </div>
@@ -1269,7 +1292,9 @@ function ArcadeOpsControlPage() {
                       onClick={handleBulkSeedRound}
                       disabled={isBulkSeeding}
                     >
-                      {isBulkSeeding ? 'Saving pre-draw...' : 'Save round pre-draw'}
+                      {isBulkSeeding
+                        ? 'Saving pre-draw...'
+                        : 'Save round pre-draw'}
                     </Button>
                   </div>
                 </div>
@@ -1304,7 +1329,8 @@ function ArcadeOpsControlPage() {
             <div className='space-y-1.5'>
               <h2 className='text-base font-bold text-white'>데이터 검증</h2>
               <p className='text-xs text-white/60'>
-                운영 DB 데이터의 무결성을 확인합니다 (필수값, 키 중복, 참조 무결성).
+                운영 DB 데이터의 무결성을 확인합니다 (필수값, 키 중복, 참조
+                무결성).
               </p>
             </div>
 
@@ -1390,12 +1416,13 @@ function ArcadeOpsControlPage() {
 
             {!validationResult ? (
               <div className='rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-300'>
-                검증을 먼저 실행해 주세요. &quot;검증&quot; 탭에서 데이터 검증을 실행할 수 있습니다.
+                검증을 먼저 실행해 주세요. &quot;검증&quot; 탭에서 데이터 검증을
+                실행할 수 있습니다.
               </div>
             ) : !validationResult.valid ? (
               <div className='rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300'>
-                검증 실패 — 오류 {validationResult.errors.length}건을 수정 후 다시
-                검증해 주세요.
+                검증 실패 — 오류 {validationResult.errors.length}건을 수정 후
+                다시 검증해 주세요.
               </div>
             ) : (
               <div className='space-y-3'>
@@ -1449,10 +1476,7 @@ function ArcadeOpsControlPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {snapshots.map((snap) => (
-                      <SelectItem
-                        key={snap.snapshotId}
-                        value={snap.snapshotId}
-                      >
+                      <SelectItem key={snap.snapshotId} value={snap.snapshotId}>
                         {snap.snapshotId} ({snap.createdAt})
                       </SelectItem>
                     ))}
@@ -1498,7 +1522,10 @@ function ArcadeOpsControlPage() {
             <div className='rounded-xl border border-white/10 bg-white/[0.02] p-4'>
               <div className='flex items-center justify-between'>
                 <h3 className='text-sm font-bold text-white'>
-                  {OPS_REGION_OPTIONS.find((option) => option.value === region)?.label}{' '}
+                  {
+                    OPS_REGION_OPTIONS.find((option) => option.value === region)
+                      ?.label
+                  }{' '}
                   지역 순위
                 </h3>
                 <span className='text-[11px] text-white/45'>
