@@ -2080,6 +2080,7 @@ function doPost(e) {
       return json_(rollbackResult);
     }
     if (action === 'opsListSnapshots') return json_(handleOpsListSnapshots_());
+    if (action === 'opsPublishLog') return json_(handleOpsPublishLog_());
     if (action === 'register') return json_(handleRegister_(payload));
 
     return json_({ ok:false, error:'알 수 없는 action입니다.' });
@@ -4004,10 +4005,25 @@ function buildArcadeArchiveFromOps_(params) {
 }
 
 function handleOpsFeed_(params) {
+  var metaTable = readOptionalTable_('pub_meta');
+  var metaRows = metaTable.rows || [];
+  var metaMap = {};
+  for (var i = 0; i < metaRows.length; i++) {
+    var key = trim_(metaRows[i].key);
+    if (!key) continue;
+    metaMap[key] = metaRows[i].value;
+  }
+
   return {
     ok: true,
     data: {
-      arcadeArchive2026: buildArcadeArchiveFromOps_(params || {})
+      arcadeArchive2026: buildArcadeArchiveFromOps_(params || {}),
+      publishMeta: {
+        lastPublishId: metaMap.lastPublishId || '',
+        lastPublishedAt: metaMap.lastPublishedAt || '',
+        lastCommitId: metaMap.lastCommitId || '',
+        lastCommittedAt: metaMap.lastCommittedAt || ''
+      }
     }
   };
 }
@@ -4571,6 +4587,14 @@ function handleOpsRollback_(payload) {
       sheets: restoreResult.sheets
     }
   };
+}
+
+function handleOpsPublishLog_() {
+  var table = readOptionalTable_('pub_publish_log');
+  var rows = (table.rows || []).slice();
+  rows.reverse();
+  var entries = rows.slice(0, 50);
+  return { ok: true, data: { entries: entries } };
 }
 
 /**

@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/ops/arcade-control')({
@@ -89,20 +90,6 @@ async function requestOpsApi(
   }
 
   return payload.data
-}
-
-function statusBadgeClass(status: 'pending' | 'live' | 'done') {
-  if (status === 'done')
-    return 'border-emerald-300/25 bg-emerald-500/10 text-emerald-200'
-  if (status === 'live')
-    return 'border-[#ff2a00]/35 bg-[#ff2a00]/10 text-[#ffd6cf]'
-  return 'border-white/20 bg-white/[0.06] text-white/70'
-}
-
-function statusLabel(status: 'pending' | 'live' | 'done') {
-  if (status === 'done') return '완료'
-  if (status === 'live') return '진행중'
-  return '대기'
 }
 
 function matchLine(match?: OpsProgressMatch) {
@@ -215,6 +202,16 @@ function ArcadeOpsControlPage() {
   const [feedLoading, setFeedLoading] = useState(false)
   const [feedError, setFeedError] = useState('')
   const [lastFeedAt, setLastFeedAt] = useState('')
+
+  const [activeTab, setActiveTab] = useState('input')
+  const [publishMeta, setPublishMeta] = useState<{
+    lastPublishId: string
+    lastPublishedAt: string
+    lastCommitId: string
+    lastCommittedAt: string
+  } | null>(null)
+  const [publishLog, setPublishLog] = useState<Record<string, unknown>[]>([])
+  const [isLoadingLog, setIsLoadingLog] = useState(false)
 
   const stageDef = OPS_STAGE_DEFINITIONS[stage]
 
@@ -385,6 +382,17 @@ function ArcadeOpsControlPage() {
       const data = payload.data ?? null
       setFeedRaw(data)
       setLastFeedAt(new Date().toLocaleTimeString('ko-KR', { hour12: false }))
+      const feedData = data as Record<string, unknown> | null
+      if (feedData?.publishMeta) {
+        setPublishMeta(
+          feedData.publishMeta as {
+            lastPublishId: string
+            lastPublishedAt: string
+            lastCommitId: string
+            lastCommittedAt: string
+          }
+        )
+      }
       return data
     } catch (err) {
       setFeedError(err instanceof Error ? err.message : '송출 데이터 조회 실패')
@@ -636,6 +644,7 @@ function ArcadeOpsControlPage() {
       })
 
       await requestOpsApi('/api/ops/upsert', 'POST', payload, operatorKey)
+      setValidationResult(null)
       const fresh = await fetchFeed()
 
       if (stage === 'swissMatch') {
@@ -676,26 +685,38 @@ function ArcadeOpsControlPage() {
   }
 
   const handleValidate = async () => {
+    type ValidateItem = { sheet: string; rule: string; message: string; row?: number }
+    const toValidateItem = (v: unknown): ValidateItem => {
+      if (typeof v === 'string') return { sheet: '-', rule: '검증', message: v }
+      if (v && typeof v === 'object') {
+        const o = v as Record<string, unknown>
+        return {
+          sheet: String(o.sheet ?? '-'),
+          rule: String(o.rule ?? '검증'),
+          message: String(o.message ?? ''),
+          row: typeof o.row === 'number' ? o.row : undefined,
+        }
+      }
+      return { sheet: '-', rule: '검증', message: String(v ?? '') }
+    }
     try {
       setIsValidating(true)
       setErrorMessage('')
       setInfoMessage('')
       setValidationResult(null)
-      const data = (await requestOpsApi(
+      const raw = (await requestOpsApi(
         '/api/ops/validate',
         'POST',
         { season: season.trim() || DEFAULT_SEASON, region: 'all' },
         operatorKey
-      )) as {
-        valid: boolean
-        errors: { sheet: string; rule: string; message: string; row?: number }[]
-        warnings: {
-          sheet: string
-          rule: string
-          message: string
-          row?: number
-        }[]
-        summary: { sheet: string; target: string; rows: number }[]
+      )) as Record<string, unknown>
+      const data = {
+        valid: !!raw.valid,
+        errors: Array.isArray(raw.errors) ? raw.errors.map(toValidateItem) : [],
+        warnings: Array.isArray(raw.warnings) ? raw.warnings.map(toValidateItem) : [],
+        summary: Array.isArray(raw.summary)
+          ? (raw.summary as { sheet: string; target: string; rows: number }[])
+          : [],
       }
       setValidationResult(data)
       setInfoMessage(data.valid ? '검증 통과' : '검증 실패 — 오류를 확인하세요')
@@ -824,13 +845,97 @@ function ArcadeOpsControlPage() {
     }
   }
 
+  const loadPublishLog = async () => {
+    try {
+      setIsLoadingLog(true)
+      setErrorMessage('')
+      const data = await requestOpsApi(
+        '/api/ops/publish-log',
+        'POST',
+        {},
+        operatorKey
+      )
+      setPublishLog(Array.isArray(data) ? (data as Record<string, unknown>[]) : [])
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error ? err.message : '발행 로그 조회 실패'
+      )
+    } finally {
+      setIsLoadingLog(false)
+    }
+  }
+
+  const requiredFields = stageDef.fields.filter((f) => f.required)
+  const optionalFields = stageDef.fields.filter((f) => !f.required)
+
+  const renderFieldInput = (field: (typeof stageDef.fields)[number]) => {
+    const value = draft[field.name] ?? field.defaultValue ?? ''
+    const type = field.type ?? 'text'
+
+    return (
+      <div key={field.name} className='space-y-1'>
+        <label className='text-xs text-white/70'>
+          {field.label}
+          {field.required ? (
+            <span className='ml-1 text-[#ff2a00]'>*</span>
+          ) : null}
+        </label>
+
+        {type === 'select' ? (
+          <Select
+            value={value}
+            onValueChange={(next) => setDraftField(field.name, next)}
+          >
+            <SelectTrigger className='w-full'>
+              <SelectValue placeholder={field.placeholder || '선택'} />
+            </SelectTrigger>
+            <SelectContent>
+              {(field.options ?? []).map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : type === 'boolean' ? (
+          <Select
+            value={value || 'false'}
+            onValueChange={(next) => setDraftField(field.name, next)}
+          >
+            <SelectTrigger className='w-full'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(field.options ?? []).map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <Input
+            type={type === 'number' ? 'number' : 'text'}
+            inputMode={type === 'number' ? 'numeric' : undefined}
+            value={value}
+            onChange={(event) =>
+              setDraftField(field.name, event.target.value)
+            }
+            placeholder={field.placeholder}
+          />
+        )}
+      </div>
+    )
+  }
+
   return (
-    <TkcSection className='space-y-6 md:space-y-8'>
+    <TkcSection className='space-y-4 md:space-y-6'>
       <TkcPageHeader
         title='아케이드 운영 콘솔'
         subtitle='지역은 주간 단위로 전환하고, 경기는 한 매치씩 순차 입력/송출합니다.'
       />
 
+      {/* ── 인증 + 설정 ── */}
       <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
         <div className='grid gap-3 md:grid-cols-4'>
           <div className='space-y-1.5 md:col-span-2'>
@@ -845,7 +950,6 @@ function ArcadeOpsControlPage() {
               autoComplete='off'
             />
           </div>
-
           <div className='space-y-1.5'>
             <label className='text-xs font-semibold text-white/70'>시즌</label>
             <Input
@@ -854,46 +958,17 @@ function ArcadeOpsControlPage() {
               placeholder='2026'
             />
           </div>
-
-          <div className='space-y-1.5'>
-            <label className='text-xs font-semibold text-white/70'>
-              현재 지역
-            </label>
-            <Select
-              value={region}
-              onValueChange={(value) => setRegion(value as OpsRegionKey)}
+          <div className='flex items-end'>
+            <Button
+              variant='outline'
+              size='sm'
+              className='w-full'
+              onClick={fetchFeed}
+              disabled={feedLoading}
             >
-              <SelectTrigger className='w-full'>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {OPS_REGION_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {feedLoading ? '새로고침 중..' : 'DB 새로고침'}
+            </Button>
           </div>
-        </div>
-
-        <div className='mt-3 flex flex-wrap gap-2'>
-          <a
-            href={broadcastUrl}
-            target='_blank'
-            rel='noreferrer'
-            className='inline-flex h-9 items-center rounded-md border border-white/15 bg-white/[0.04] px-3 text-xs font-semibold text-white/80 transition-colors hover:bg-white/[0.08]'
-          >
-            실시간 송출 화면 열기
-          </a>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={fetchFeed}
-            disabled={feedLoading}
-          >
-            {feedLoading ? '새로고침 중..' : 'DB 새로고침'}
-          </Button>
         </div>
 
         {infoMessage ? (
@@ -901,7 +976,6 @@ function ArcadeOpsControlPage() {
             {infoMessage}
           </p>
         ) : null}
-
         {errorMessage ? (
           <p className='mt-3 rounded-md border border-red-300/25 bg-red-500/10 px-3 py-2 text-xs text-red-100'>
             {errorMessage}
@@ -909,612 +983,708 @@ function ArcadeOpsControlPage() {
         ) : null}
       </section>
 
-      <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-        <div className='space-y-1.5'>
-          <h2 className='text-base font-bold text-white'>
-            주간 지역 운영 보드
-          </h2>
-          <p className='text-xs text-white/60'>
-            1주차부터 4주차까지 지역을 순서대로 운영합니다. 카드를 눌러 현재
-            주차 지역을 즉시 전환할 수 있습니다.
-          </p>
+      {/* ── 현재 송출 버전 ── */}
+      <div className='flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm'>
+        <div className='flex items-center gap-3'>
+          <span className='text-white/40'>현재 송출</span>
+          <span className='font-mono text-[#ff8c66]'>
+            {publishMeta?.lastPublishId || '—'}
+          </span>
         </div>
+        <div className='flex items-center gap-4 text-xs text-white/30'>
+          <span>
+            {publishMeta?.lastPublishedAt
+              ? new Date(publishMeta.lastPublishedAt).toLocaleString('ko-KR')
+              : ''}
+          </span>
+          <span>
+            {lastFeedAt ? `DB ${lastFeedAt}` : ''}
+          </span>
+        </div>
+      </div>
 
-        <div className='mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4'>
-          {weekStatuses.map((week) => (
-            <button
-              key={week.key}
-              type='button'
-              onClick={() => setRegion(week.key)}
-              className={`rounded-xl border p-3 text-left transition ${
-                region === week.key
-                  ? 'border-[#ff2a00]/70 bg-[#ff2a00]/10'
-                  : 'border-white/10 bg-black/20 hover:border-white/25'
+      {/* ── 지역 셀렉터 (축소) ── */}
+      <div className='flex flex-wrap gap-2'>
+        {weekStatuses.map((week) => (
+          <button
+            key={week.key}
+            type='button'
+            onClick={() => setRegion(week.key)}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+              region === week.key
+                ? 'bg-[#ff2a00] text-white'
+                : 'bg-white/[0.06] text-white/60 hover:bg-white/10'
+            }`}
+          >
+            {week.label}
+            <span className='ml-1.5 text-xs opacity-60'>
+              W{week.weekNo}
+            </span>
+            <span
+              className={`ml-1 inline-block h-1.5 w-1.5 rounded-full ${
+                week.status === 'done'
+                  ? 'bg-emerald-400'
+                  : week.status === 'live'
+                    ? 'bg-[#ff2a00]'
+                    : 'bg-white/30'
               }`}
-            >
-              <div className='flex items-center justify-between gap-2'>
-                <span className='text-xs font-semibold text-white/70'>
-                  {week.weekNo}주차
-                </span>
-                <span
-                  className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${statusBadgeClass(week.status)}`}
-                >
-                  {statusLabel(week.status)}
-                </span>
-              </div>
-
-              <p className='mt-2 text-sm font-bold text-white'>{week.label}</p>
-              <p className='mt-2 text-[11px] text-white/60'>
-                온라인 {week.onlineEntries}명 / Swiss {week.swissCompleted}/
-                {week.swissTotal} / 결선확정 {week.qualifierCount}/2
-              </p>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-        <div className='space-y-1.5'>
-          <h2 className='text-base font-bold text-white'>순차 입력</h2>
-          <p className='text-xs text-white/60'>
-            한 경기씩 끝날 때마다 저장하고 다음 경기 슬롯으로 이동합니다.
-          </p>
-        </div>
-
-        <div className='mt-4 space-y-1.5'>
-          <label className='text-xs font-semibold text-white/70'>
-            입력 스테이지
-          </label>
-          <Select
-            value={stage}
-            onValueChange={(value) => setStage(value as OpsStageKey)}
-          >
-            <SelectTrigger className='w-full'>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {OPS_STAGE_ORDER.map((key) => (
-                <SelectItem key={key} value={key}>
-                  {OPS_STAGE_DEFINITIONS[key].label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className='text-xs text-white/55'>{stageDef.description}</p>
-        </div>
-
-        {isSequentialStage ? (
-          <div className='mt-4 rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/5 p-3'>
-            <p className='text-xs font-semibold text-[#ffd6cf]'>
-              순차 진행 가이드 ({stage === 'swissMatch' ? 'Swiss' : 'Top8'})
-            </p>
-            <div className='mt-2 grid gap-2 text-xs md:grid-cols-3'>
-              <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                <div className='text-white/50'>현재 경기</div>
-                <div className='mt-1 font-medium text-white/85'>
-                  {matchLine(stageCurrent)}
-                </div>
-              </div>
-              <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                <div className='text-white/50'>다음 경기</div>
-                <div className='mt-1 font-medium text-white/85'>
-                  {matchLine(stageNext)}
-                </div>
-              </div>
-              <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                <div className='text-white/50'>직전 결과</div>
-                <div className='mt-1 font-medium text-white/85'>
-                  {matchLine(stagePrevious)}
-                </div>
-              </div>
-            </div>
-
-            <div className='mt-3 flex flex-wrap gap-2'>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={handleLoadCurrentMatch}
-              >
-                현재 경기 불러오기
-              </Button>
-              <Button variant='outline' size='sm' onClick={handleLoadNextMatch}>
-                다음 경기 슬롯
-              </Button>
-            </div>
-          </div>
-        ) : null}
-
-        {stage === 'swissMatch' ? (
-          <div className='mt-4 rounded-xl border border-white/10 bg-black/20 p-3'>
-            <div className='flex flex-wrap items-center justify-between gap-2'>
-              <p className='text-xs font-semibold text-white/80'>
-                Round pre-draw (bulk schedule before start)
-              </p>
-              <span className='text-[11px] text-white/55'>
-                players loaded: {regionParticipants.length}
-              </span>
-            </div>
-
-            <p className='mt-1 text-[11px] text-white/55'>
-              Format: `table,p1EntryId,p2EntryId[,note]` one line each. Use
-              `BYE` or `-` for no opponent.
-            </p>
-
-            <div className='mt-3 grid gap-2 md:grid-cols-3'>
-              <div className='space-y-1'>
-                <label className='text-[11px] text-white/60'>round</label>
-                <Input
-                  type='number'
-                  inputMode='numeric'
-                  value={bulkRound}
-                  onChange={(event) => setBulkRound(event.target.value)}
-                  placeholder={
-                    currentSwissRound ? String(currentSwissRound) : '1'
-                  }
-                />
-              </div>
-              <div className='space-y-1'>
-                <label className='text-[11px] text-white/60'>
-                  song1 / level1
-                </label>
-                <div className='grid grid-cols-3 gap-2'>
-                  <Input
-                    className='col-span-2'
-                    value={bulkSong1}
-                    onChange={(event) => setBulkSong1(event.target.value)}
-                    placeholder='Song 1'
-                  />
-                  <Input
-                    value={bulkLevel1}
-                    onChange={(event) => setBulkLevel1(event.target.value)}
-                    placeholder='Lv'
-                  />
-                </div>
-              </div>
-              <div className='space-y-1'>
-                <label className='text-[11px] text-white/60'>
-                  song2 / level2
-                </label>
-                <div className='grid grid-cols-3 gap-2'>
-                  <Input
-                    className='col-span-2'
-                    value={bulkSong2}
-                    onChange={(event) => setBulkSong2(event.target.value)}
-                    placeholder='Song 2'
-                  />
-                  <Input
-                    value={bulkLevel2}
-                    onChange={(event) => setBulkLevel2(event.target.value)}
-                    placeholder='Lv'
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className='mt-2 grid gap-2 md:grid-cols-3'>
-              <div className='space-y-1 md:col-span-1'>
-                <label className='text-[11px] text-white/60'>
-                  song3 / level3 (optional)
-                </label>
-                <div className='grid grid-cols-3 gap-2'>
-                  <Input
-                    className='col-span-2'
-                    value={bulkSong3}
-                    onChange={(event) => setBulkSong3(event.target.value)}
-                    placeholder='Song 3'
-                  />
-                  <Input
-                    value={bulkLevel3}
-                    onChange={(event) => setBulkLevel3(event.target.value)}
-                    placeholder='Lv'
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className='mt-2'>
-              <Textarea
-                value={bulkLines}
-                onChange={(event) => setBulkLines(event.target.value)}
-                placeholder={'1,SEO-01,SEO-16\n2,SEO-02,SEO-15\n3,SEO-03,BYE'}
-                className='min-h-32 font-mono text-xs'
-              />
-            </div>
-
-            <div className='mt-3 flex flex-wrap gap-2'>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={handlePrefillRoundLines}
-                disabled={isBulkSeeding}
-              >
-                Load current round lines
-              </Button>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={handleGenerateSeedOrderLines}
-                disabled={isBulkSeeding}
-              >
-                Auto-generate by seed order
-              </Button>
-              <Button
-                size='sm'
-                onClick={handleBulkSeedRound}
-                disabled={isBulkSeeding}
-              >
-                {isBulkSeeding ? 'Saving pre-draw...' : 'Save round pre-draw'}
-              </Button>
-            </div>
-          </div>
-        ) : null}
-
-        <div className='mt-4 grid gap-3 md:grid-cols-2'>
-          {stageDef.fields.map((field) => {
-            const value = draft[field.name] ?? field.defaultValue ?? ''
-            const type = field.type ?? 'text'
-
-            return (
-              <div key={field.name} className='space-y-1'>
-                <label className='text-xs text-white/70'>
-                  {field.label}
-                  {field.required ? (
-                    <span className='ml-1 text-[#ff2a00]'>*</span>
-                  ) : null}
-                </label>
-
-                {type === 'select' ? (
-                  <Select
-                    value={value}
-                    onValueChange={(next) => setDraftField(field.name, next)}
-                  >
-                    <SelectTrigger className='w-full'>
-                      <SelectValue placeholder={field.placeholder || '선택'} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(field.options ?? []).map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : type === 'boolean' ? (
-                  <Select
-                    value={value || 'false'}
-                    onValueChange={(next) => setDraftField(field.name, next)}
-                  >
-                    <SelectTrigger className='w-full'>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(field.options ?? []).map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Input
-                    type={type === 'number' ? 'number' : 'text'}
-                    inputMode={type === 'number' ? 'numeric' : undefined}
-                    value={value}
-                    onChange={(event) =>
-                      setDraftField(field.name, event.target.value)
-                    }
-                    placeholder={field.placeholder}
-                  />
-                )}
-              </div>
-            )
-          })}
-        </div>
-
-        {winnerOptions.length > 0 ? (
-          <div className='mt-3 rounded-lg border border-white/10 bg-black/25 p-3'>
-            <p className='text-xs text-white/60'>승자 빠른 선택</p>
-            <div className='mt-2 flex flex-wrap gap-2'>
-              {winnerOptions.map((option) => (
-                <Button
-                  key={option.entryId}
-                  size='sm'
-                  variant='outline'
-                  onClick={() => setDraftField('winnerEntryId', option.entryId)}
-                >
-                  {option.nickname || option.entryId}
-                </Button>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        <div className='mt-4 flex flex-wrap gap-2'>
-          <Button onClick={handleSaveRow} disabled={isSaving}>
-            {isSaving ? '저장 중..' : 'DB 저장'}
-          </Button>
-          <Button variant='outline' onClick={resetDraft} disabled={isSaving}>
-            입력 초기화
-          </Button>
-        </div>
-      </section>
-
-      <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5 space-y-5'>
-        <div className='space-y-1.5'>
-          <h2 className='text-base font-bold text-white'>
-            검증 → 송출 → 롤백
-          </h2>
-          <p className='text-xs text-white/60'>
-            데이터 검증 후 안전하게 송출하고, 문제 발생 시 스냅샷으로 롤백할 수
-            있습니다.
-          </p>
-        </div>
-
-        {/* ── 1단계: 검증 ── */}
-        <div className='space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-3'>
-          <h3 className='text-sm font-bold text-white'>1. 데이터 검증</h3>
-          <Button
-            variant='outline'
-            onClick={handleValidate}
-            disabled={isValidating}
-          >
-            {isValidating ? '검증 중..' : '데이터 검증 실행'}
-          </Button>
-
-          {validationResult ? (
-            <div className='space-y-2'>
-              <p
-                className={`text-xs font-semibold ${validationResult.valid ? 'text-emerald-300' : 'text-red-300'}`}
-              >
-                {validationResult.valid
-                  ? '검증 통과 — 송출 가능합니다.'
-                  : `검증 실패 — 오류 ${validationResult.errors.length}건`}
-              </p>
-
-              {validationResult.errors.length > 0 ? (
-                <div className='max-h-40 overflow-y-auto rounded-lg border border-red-300/25 bg-red-500/10 p-2 text-xs text-red-100'>
-                  {validationResult.errors.map((e, i) => (
-                    <div key={i} className='py-0.5'>
-                      <span className='font-mono text-red-300'>
-                        [{e.sheet}]
-                      </span>{' '}
-                      {e.rule}: {e.message}
-                      {e.row != null ? ` (행 ${e.row})` : ''}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {validationResult.warnings.length > 0 ? (
-                <div className='max-h-32 overflow-y-auto rounded-lg border border-yellow-300/25 bg-yellow-500/10 p-2 text-xs text-yellow-100'>
-                  {validationResult.warnings.map((w, i) => (
-                    <div key={i} className='py-0.5'>
-                      <span className='font-mono text-yellow-300'>
-                        [{w.sheet}]
-                      </span>{' '}
-                      {w.rule}: {w.message}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {validationResult.summary.length > 0 ? (
-                <details className='text-xs text-white/60'>
-                  <summary className='cursor-pointer hover:text-white/80'>
-                    탭별 행 수 요약 ({validationResult.summary.length}개 탭)
-                  </summary>
-                  <div className='mt-1 grid grid-cols-2 gap-x-4 gap-y-0.5 font-mono md:grid-cols-3'>
-                    {validationResult.summary.map((s, i) => (
-                      <span key={i}>
-                        {s.target}: {s.rows}행
-                      </span>
-                    ))}
-                  </div>
-                </details>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-
-        {/* ── 2단계: 송출 ── */}
-        <div className='space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-3'>
-          <h3 className='text-sm font-bold text-white'>2. 안전 송출</h3>
-          <p className='text-[11px] text-white/50'>
-            자동으로 검증 → 백업(스냅샷) → 송출 → 캐시 초기화가 실행됩니다.
-          </p>
-          <label className='flex items-center gap-2 text-xs text-white/70'>
-            <input
-              type='checkbox'
-              checked={exportReplaceMode}
-              onChange={(e) => setExportReplaceMode(e.target.checked)}
-              className='accent-[#ff2a00]'
             />
-            replace 모드 (기존 아카이브 초기화 후 재송출)
-          </label>
-          <Button onClick={handlePublish} disabled={isPublishing}>
-            {isPublishing ? '송출 중..' : '검증 + 백업 + 송출'}
-          </Button>
-        </div>
+          </button>
+        ))}
+      </div>
 
-        {/* ── 3단계: 롤백 ── */}
-        <div className='space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-3'>
-          <h3 className='text-sm font-bold text-white'>3. 롤백</h3>
-          <div className='flex flex-wrap items-end gap-2'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={loadSnapshots}
-              disabled={isLoadingSnapshots}
-            >
-              {isLoadingSnapshots ? '조회 중..' : '스냅샷 조회'}
-            </Button>
-            {snapshots.length > 0 ? (
+      {/* ── 메인 탭 ── */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className='w-full'>
+          <TabsTrigger value='input'>입력</TabsTrigger>
+          <TabsTrigger value='validate'>검증</TabsTrigger>
+          <TabsTrigger value='publish'>발행</TabsTrigger>
+          <TabsTrigger value='rollback'>롤백</TabsTrigger>
+          <TabsTrigger value='broadcast'>송출확인</TabsTrigger>
+          <TabsTrigger value='log'>로그</TabsTrigger>
+        </TabsList>
+
+        {/* ════ 입력 탭 ════ */}
+        <TabsContent value='input'>
+          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
+            <div className='space-y-1.5'>
+              <label className='text-xs font-semibold text-white/70'>
+                입력 스테이지
+              </label>
               <Select
-                value={selectedSnapshotId}
-                onValueChange={setSelectedSnapshotId}
+                value={stage}
+                onValueChange={(value) => setStage(value as OpsStageKey)}
               >
-                <SelectTrigger className='w-64'>
-                  <SelectValue placeholder='스냅샷 선택' />
+                <SelectTrigger className='w-full'>
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {snapshots.map((snap) => (
-                    <SelectItem
-                      key={snap.snapshotId}
-                      value={snap.snapshotId}
-                    >
-                      {snap.snapshotId} ({snap.createdAt})
+                  {OPS_STAGE_ORDER.map((key) => (
+                    <SelectItem key={key} value={key}>
+                      {OPS_STAGE_DEFINITIONS[key].label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <p className='text-xs text-white/55'>{stageDef.description}</p>
+            </div>
+
+            {isSequentialStage ? (
+              <div className='rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/5 p-3'>
+                <p className='text-xs font-semibold text-[#ffd6cf]'>
+                  순차 진행 가이드 ({stage === 'swissMatch' ? 'Swiss' : 'Top8'})
+                </p>
+                <div className='mt-2 grid gap-2 text-xs md:grid-cols-3'>
+                  <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                    <div className='text-white/50'>현재 경기</div>
+                    <div className='mt-1 font-medium text-white/85'>
+                      {matchLine(stageCurrent)}
+                    </div>
+                  </div>
+                  <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                    <div className='text-white/50'>다음 경기</div>
+                    <div className='mt-1 font-medium text-white/85'>
+                      {matchLine(stageNext)}
+                    </div>
+                  </div>
+                  <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                    <div className='text-white/50'>직전 결과</div>
+                    <div className='mt-1 font-medium text-white/85'>
+                      {matchLine(stagePrevious)}
+                    </div>
+                  </div>
+                </div>
+                <div className='mt-3 flex flex-wrap gap-2'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={handleLoadCurrentMatch}
+                  >
+                    현재 경기 불러오기
+                  </Button>
+                  <Button variant='outline' size='sm' onClick={handleLoadNextMatch}>
+                    다음 경기 슬롯
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+
+            {/* 필수 필드 */}
+            <div className='grid gap-3 md:grid-cols-2'>
+              {requiredFields.map(renderFieldInput)}
+            </div>
+
+            {winnerOptions.length > 0 ? (
+              <div className='rounded-lg border border-white/10 bg-black/25 p-3'>
+                <p className='text-xs text-white/60'>승자 빠른 선택</p>
+                <div className='mt-2 flex flex-wrap gap-2'>
+                  {winnerOptions.map((option) => (
+                    <Button
+                      key={option.entryId}
+                      size='sm'
+                      variant='outline'
+                      onClick={() => setDraftField('winnerEntryId', option.entryId)}
+                    >
+                      {option.nickname || option.entryId}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {/* 선택 필드 */}
+            {optionalFields.length > 0 ? (
+              <details className='group'>
+                <summary className='cursor-pointer text-sm text-white/40 hover:text-white/60'>
+                  추가 필드 ({optionalFields.length}개)
+                </summary>
+                <div className='mt-3 grid gap-3 md:grid-cols-2'>
+                  {optionalFields.map(renderFieldInput)}
+                </div>
+              </details>
+            ) : null}
+
+            <div className='flex flex-wrap gap-2'>
+              <Button onClick={handleSaveRow} disabled={isSaving}>
+                {isSaving ? '저장 중..' : 'DB 저장'}
+              </Button>
+              <Button variant='outline' onClick={resetDraft} disabled={isSaving}>
+                입력 초기화
+              </Button>
+            </div>
+
+            {/* Swiss bulk seeding */}
+            {stage === 'swissMatch' ? (
+              <details className='group'>
+                <summary className='cursor-pointer text-sm text-white/40 hover:text-white/60'>
+                  Round pre-draw (bulk schedule)
+                </summary>
+                <div className='mt-3 rounded-xl border border-white/10 bg-black/20 p-3'>
+                  <div className='flex flex-wrap items-center justify-between gap-2'>
+                    <span className='text-[11px] text-white/55'>
+                      players loaded: {regionParticipants.length}
+                    </span>
+                  </div>
+                  <p className='mt-1 text-[11px] text-white/55'>
+                    Format: table,p1EntryId,p2EntryId[,note] — Use BYE or - for no
+                    opponent.
+                  </p>
+                  <div className='mt-3 grid gap-2 md:grid-cols-3'>
+                    <div className='space-y-1'>
+                      <label className='text-[11px] text-white/60'>round</label>
+                      <Input
+                        type='number'
+                        inputMode='numeric'
+                        value={bulkRound}
+                        onChange={(event) => setBulkRound(event.target.value)}
+                        placeholder={
+                          currentSwissRound ? String(currentSwissRound) : '1'
+                        }
+                      />
+                    </div>
+                    <div className='space-y-1'>
+                      <label className='text-[11px] text-white/60'>
+                        song1 / level1
+                      </label>
+                      <div className='grid grid-cols-3 gap-2'>
+                        <Input
+                          className='col-span-2'
+                          value={bulkSong1}
+                          onChange={(event) => setBulkSong1(event.target.value)}
+                          placeholder='Song 1'
+                        />
+                        <Input
+                          value={bulkLevel1}
+                          onChange={(event) => setBulkLevel1(event.target.value)}
+                          placeholder='Lv'
+                        />
+                      </div>
+                    </div>
+                    <div className='space-y-1'>
+                      <label className='text-[11px] text-white/60'>
+                        song2 / level2
+                      </label>
+                      <div className='grid grid-cols-3 gap-2'>
+                        <Input
+                          className='col-span-2'
+                          value={bulkSong2}
+                          onChange={(event) => setBulkSong2(event.target.value)}
+                          placeholder='Song 2'
+                        />
+                        <Input
+                          value={bulkLevel2}
+                          onChange={(event) => setBulkLevel2(event.target.value)}
+                          placeholder='Lv'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='mt-2 grid gap-2 md:grid-cols-3'>
+                    <div className='space-y-1 md:col-span-1'>
+                      <label className='text-[11px] text-white/60'>
+                        song3 / level3 (optional)
+                      </label>
+                      <div className='grid grid-cols-3 gap-2'>
+                        <Input
+                          className='col-span-2'
+                          value={bulkSong3}
+                          onChange={(event) => setBulkSong3(event.target.value)}
+                          placeholder='Song 3'
+                        />
+                        <Input
+                          value={bulkLevel3}
+                          onChange={(event) => setBulkLevel3(event.target.value)}
+                          placeholder='Lv'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='mt-2'>
+                    <Textarea
+                      value={bulkLines}
+                      onChange={(event) => setBulkLines(event.target.value)}
+                      placeholder={'1,SEO-01,SEO-16\n2,SEO-02,SEO-15\n3,SEO-03,BYE'}
+                      className='min-h-32 font-mono text-xs'
+                    />
+                  </div>
+                  <div className='mt-3 flex flex-wrap gap-2'>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={handlePrefillRoundLines}
+                      disabled={isBulkSeeding}
+                    >
+                      Load current round lines
+                    </Button>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={handleGenerateSeedOrderLines}
+                      disabled={isBulkSeeding}
+                    >
+                      Auto-generate by seed order
+                    </Button>
+                    <Button
+                      size='sm'
+                      onClick={handleBulkSeedRound}
+                      disabled={isBulkSeeding}
+                    >
+                      {isBulkSeeding ? 'Saving pre-draw...' : 'Save round pre-draw'}
+                    </Button>
+                  </div>
+                </div>
+              </details>
+            ) : null}
+
+            {/* 유틸리티 */}
+            <div className='flex flex-wrap gap-2 border-t border-white/10 pt-3'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handleInitOpsTabs}
+                disabled={isInitRunning}
+              >
+                {isInitRunning ? '초기화 중..' : '운영 DB 탭 초기화'}
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handleWriteOpsGuide}
+                disabled={isGuideRunning}
+              >
+                {isGuideRunning ? 'Writing guide..' : 'Write ops guide sheet'}
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* ════ 검증 탭 ════ */}
+        <TabsContent value='validate'>
+          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
+            <div className='space-y-1.5'>
+              <h2 className='text-base font-bold text-white'>데이터 검증</h2>
+              <p className='text-xs text-white/60'>
+                운영 DB 데이터의 무결성을 확인합니다 (필수값, 키 중복, 참조 무결성).
+              </p>
+            </div>
+
+            <Button
+              variant='outline'
+              onClick={handleValidate}
+              disabled={isValidating}
+            >
+              {isValidating ? '검증 중..' : '데이터 검증 실행'}
+            </Button>
+
+            {validationResult ? (
+              <div className='space-y-2'>
+                <p
+                  className={`text-xs font-semibold ${validationResult.valid ? 'text-emerald-300' : 'text-red-300'}`}
+                >
+                  {validationResult.valid
+                    ? '검증 통과 — 송출 가능합니다.'
+                    : `검증 실패 — 오류 ${validationResult.errors.length}건`}
+                </p>
+
+                {validationResult.errors.length > 0 ? (
+                  <div className='max-h-40 overflow-y-auto rounded-lg border border-red-300/25 bg-red-500/10 p-2 text-xs text-red-100'>
+                    {validationResult.errors.map((e, i) => (
+                      <div key={i} className='py-0.5'>
+                        <span className='font-mono text-red-300'>
+                          [{e.sheet}]
+                        </span>{' '}
+                        {e.rule}: {e.message}
+                        {e.row != null ? ` (행 ${e.row})` : ''}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                {validationResult.warnings.length > 0 ? (
+                  <div className='max-h-32 overflow-y-auto rounded-lg border border-yellow-300/25 bg-yellow-500/10 p-2 text-xs text-yellow-100'>
+                    {validationResult.warnings.map((w, i) => (
+                      <div key={i} className='py-0.5'>
+                        <span className='font-mono text-yellow-300'>
+                          [{w.sheet}]
+                        </span>{' '}
+                        {w.rule}: {w.message}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                {validationResult.summary.length > 0 ? (
+                  <details className='text-xs text-white/60'>
+                    <summary className='cursor-pointer hover:text-white/80'>
+                      탭별 행 수 요약 ({validationResult.summary.length}개 탭)
+                    </summary>
+                    <div className='mt-1 grid grid-cols-2 gap-x-4 gap-y-0.5 font-mono md:grid-cols-3'>
+                      {validationResult.summary.map((s, i) => (
+                        <span key={i}>
+                          {s.target}: {s.rows}행
+                        </span>
+                      ))}
+                    </div>
+                  </details>
+                ) : null}
+
+                {validationResult.valid ? (
+                  <p className='mt-2 text-sm text-emerald-400'>
+                    검증 통과 — &quot;발행&quot; 탭에서 송출할 수 있습니다.
+                  </p>
+                ) : null}
+              </div>
             ) : null}
           </div>
-          {snapshots.length > 0 && selectedSnapshotId ? (
-            <Button
-              variant='destructive'
-              onClick={handleRollback}
-              disabled={isRollingBack}
+        </TabsContent>
+
+        {/* ════ 발행 탭 ════ */}
+        <TabsContent value='publish'>
+          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
+            <div className='space-y-1.5'>
+              <h2 className='text-base font-bold text-white'>안전 송출</h2>
+              <p className='text-xs text-white/60'>
+                자동으로 검증 → 백업(스냅샷) → 송출 → 캐시 초기화가 실행됩니다.
+              </p>
+            </div>
+
+            {!validationResult ? (
+              <div className='rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-300'>
+                검증을 먼저 실행해 주세요. &quot;검증&quot; 탭에서 데이터 검증을 실행할 수 있습니다.
+              </div>
+            ) : !validationResult.valid ? (
+              <div className='rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300'>
+                검증 실패 — 오류 {validationResult.errors.length}건을 수정 후 다시
+                검증해 주세요.
+              </div>
+            ) : (
+              <div className='space-y-3'>
+                <div className='rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300'>
+                  검증 통과 — 송출할 수 있습니다.
+                </div>
+                <label className='flex items-center gap-2 text-xs text-white/70'>
+                  <input
+                    type='checkbox'
+                    checked={exportReplaceMode}
+                    onChange={(e) => setExportReplaceMode(e.target.checked)}
+                    className='accent-[#ff2a00]'
+                  />
+                  replace 모드 (기존 아카이브 초기화 후 재송출)
+                </label>
+                <Button onClick={handlePublish} disabled={isPublishing}>
+                  {isPublishing ? '송출 중..' : '검증 + 백업 + 송출'}
+                </Button>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* ════ 롤백 탭 ════ */}
+        <TabsContent value='rollback'>
+          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
+            <div className='space-y-1.5'>
+              <h2 className='text-base font-bold text-white'>롤백</h2>
+              <p className='text-xs text-white/60'>
+                이전 스냅샷으로 pub_* 전체를 복원합니다. 현재 공개 데이터가 모두
+                교체됩니다.
+              </p>
+            </div>
+
+            <div className='flex flex-wrap items-end gap-2'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={loadSnapshots}
+                disabled={isLoadingSnapshots}
+              >
+                {isLoadingSnapshots ? '조회 중..' : '스냅샷 조회'}
+              </Button>
+              {snapshots.length > 0 ? (
+                <Select
+                  value={selectedSnapshotId}
+                  onValueChange={setSelectedSnapshotId}
+                >
+                  <SelectTrigger className='w-64'>
+                    <SelectValue placeholder='스냅샷 선택' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {snapshots.map((snap) => (
+                      <SelectItem
+                        key={snap.snapshotId}
+                        value={snap.snapshotId}
+                      >
+                        {snap.snapshotId} ({snap.createdAt})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : null}
+            </div>
+
+            {snapshots.length > 0 && selectedSnapshotId ? (
+              <Button
+                variant='destructive'
+                onClick={handleRollback}
+                disabled={isRollingBack}
+              >
+                {isRollingBack
+                  ? '롤백 중..'
+                  : `"${selectedSnapshotId}" 롤백 실행`}
+              </Button>
+            ) : null}
+          </div>
+        </TabsContent>
+
+        {/* ════ 송출확인 탭 ════ */}
+        <TabsContent value='broadcast'>
+          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
+            <div className='space-y-1.5'>
+              <h2 className='text-base font-bold text-white'>송출 확인</h2>
+              <p className='text-xs text-white/60'>
+                현재 공개 중인 데이터의 요약과 실시간 송출 화면을 확인합니다.
+              </p>
+            </div>
+
+            <a
+              href={broadcastUrl}
+              target='_blank'
+              rel='noreferrer'
+              className='inline-flex h-9 items-center gap-2 rounded-md border border-[#ff2a00]/30 bg-[#ff2a00]/10 px-4 text-sm font-semibold text-[#ffd6cf] transition-colors hover:bg-[#ff2a00]/20'
             >
-              {isRollingBack
-                ? '롤백 중..'
-                : `"${selectedSnapshotId}" 롤백 실행`}
+              실시간 송출 화면 열기 &rarr;
+            </a>
+
+            {/* 순위 미리보기 */}
+            <div className='rounded-xl border border-white/10 bg-white/[0.02] p-4'>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-sm font-bold text-white'>
+                  {OPS_REGION_OPTIONS.find((option) => option.value === region)?.label}{' '}
+                  지역 순위
+                </h3>
+                <span className='text-[11px] text-white/45'>
+                  {lastFeedAt ? `DB ${lastFeedAt} 갱신` : '갱신 대기'}
+                </span>
+              </div>
+
+              {feedError ? (
+                <p className='mt-3 rounded-md border border-red-300/25 bg-red-500/10 px-3 py-2 text-xs text-red-100'>
+                  {feedError}
+                </p>
+              ) : null}
+
+              {finalRanking.length === 0 ? (
+                <p className='mt-3 text-xs text-white/60'>
+                  운영 DB에 순위 데이터가 없습니다.
+                </p>
+              ) : (
+                <div className='mt-3 overflow-x-auto rounded-lg border border-white/10'>
+                  <table className='min-w-full text-left text-xs'>
+                    <thead className='bg-white/[0.07] text-white/70'>
+                      <tr>
+                        <th className='px-3 py-2'>순위</th>
+                        <th className='px-3 py-2'>닉네임</th>
+                        <th className='px-3 py-2'>전적</th>
+                        <th className='px-3 py-2'>상태</th>
+                      </tr>
+                    </thead>
+                    <tbody className='divide-y divide-white/[0.07]'>
+                      {finalRanking.slice(0, 8).map((row) => (
+                        <tr key={`${row.entryId}-${row.rank}`}>
+                          <td className='px-3 py-2 font-bold text-[#ff2a00]'>
+                            {row.rank}
+                          </td>
+                          <td className='px-3 py-2 text-white/85'>
+                            {row.nickname}
+                            <span className='ml-1 font-mono text-[10px] text-white/45'>
+                              ({row.entryId})
+                            </span>
+                          </td>
+                          <td className='px-3 py-2 text-white/70 tabular-nums'>
+                            {typeof row.wins === 'number' &&
+                            typeof row.losses === 'number'
+                              ? `${row.wins}-${row.losses}`
+                              : '-'}
+                          </td>
+                          <td className='px-3 py-2 text-white/65'>
+                            {row.statusLabel}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* 경기 진행 요약 */}
+            <div className='rounded-xl border border-white/10 bg-white/[0.02] p-4'>
+              <h3 className='text-sm font-bold text-white'>경기 진행 요약</h3>
+              <div className='mt-3 grid gap-2 text-xs md:grid-cols-2'>
+                <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
+                  <span className='text-white/55'>Swiss 진행:</span>{' '}
+                  <span className='font-semibold text-white/80'>
+                    {swissProgress.completed}/{swissProgress.total}
+                  </span>
+                </div>
+                <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
+                  <span className='text-white/55'>Top8 진행:</span>{' '}
+                  <span className='font-semibold text-white/80'>
+                    {finalsProgress.completed}/{finalsProgress.total}
+                  </span>
+                </div>
+                <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                  <span className='text-white/55'>현재 Swiss:</span>{' '}
+                  <span className='font-semibold text-white/80'>
+                    {matchLine(swissProgress.current)}
+                  </span>
+                </div>
+                <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                  <span className='text-white/55'>현재 Top8:</span>{' '}
+                  <span className='font-semibold text-white/80'>
+                    {matchLine(finalsProgress.current)}
+                  </span>
+                </div>
+                <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                  <span className='text-white/55'>A그룹:</span>{' '}
+                  <span className='font-semibold text-white/80'>
+                    {regionArchive?.qualifiers.groupA
+                      ? `${regionArchive.qualifiers.groupA.nickname} (${regionArchive.qualifiers.groupA.entryId})`
+                      : '미확정'}
+                  </span>
+                </div>
+                <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
+                  <span className='text-white/55'>B그룹:</span>{' '}
+                  <span className='font-semibold text-white/80'>
+                    {regionArchive?.qualifiers.groupB
+                      ? `${regionArchive.qualifiers.groupB.nickname} (${regionArchive.qualifiers.groupB.entryId})`
+                      : '미확정'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* ════ 로그 탭 ════ */}
+        <TabsContent value='log'>
+          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
+            <div className='space-y-1.5'>
+              <h2 className='text-base font-bold text-white'>발행 로그</h2>
+              <p className='text-xs text-white/60'>
+                송출/롤백/커밋 이력을 확인합니다 (최근 50건).
+              </p>
+            </div>
+
+            <Button
+              variant='outline'
+              onClick={loadPublishLog}
+              disabled={isLoadingLog}
+            >
+              {isLoadingLog ? '조회 중..' : '발행 로그 조회'}
             </Button>
-          ) : null}
-        </div>
 
-        {/* ── 유틸리티 ── */}
-        <div className='flex flex-wrap gap-2 border-t border-white/10 pt-3'>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={handleInitOpsTabs}
-            disabled={isInitRunning}
-          >
-            {isInitRunning ? '초기화 중..' : '운영 DB 탭 초기화'}
-          </Button>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={handleWriteOpsGuide}
-            disabled={isGuideRunning}
-          >
-            {isGuideRunning ? 'Writing guide..' : 'Write ops guide sheet'}
-          </Button>
-        </div>
-      </section>
-
-      <section className='grid gap-4 lg:grid-cols-2'>
-        <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-          <div className='flex items-center justify-between'>
-            <h3 className='text-sm font-bold text-white'>
-              {
-                OPS_REGION_OPTIONS.find((option) => option.value === region)
-                  ?.label
-              }{' '}
-              지역 순위 미리보기
-            </h3>
-            <span className='text-[11px] text-white/45'>
-              {lastFeedAt ? `DB ${lastFeedAt} 갱신` : '갱신 대기'}
-            </span>
-          </div>
-
-          {feedError ? (
-            <p className='mt-3 rounded-md border border-red-300/25 bg-red-500/10 px-3 py-2 text-xs text-red-100'>
-              {feedError}
-            </p>
-          ) : null}
-
-          {finalRanking.length === 0 ? (
-            <p className='mt-3 text-xs text-white/60'>
-              운영 DB에 순위 데이터가 없습니다.
-            </p>
-          ) : (
-            <div className='mt-3 overflow-x-auto rounded-lg border border-white/10'>
-              <table className='min-w-full text-left text-xs'>
-                <thead className='bg-white/[0.07] text-white/70'>
-                  <tr>
-                    <th className='px-3 py-2'>순위</th>
-                    <th className='px-3 py-2'>닉네임</th>
-                    <th className='px-3 py-2'>전적</th>
-                    <th className='px-3 py-2'>상태</th>
-                  </tr>
-                </thead>
-                <tbody className='divide-y divide-white/[0.07]'>
-                  {finalRanking.slice(0, 8).map((row) => (
-                    <tr key={`${row.entryId}-${row.rank}`}>
-                      <td className='px-3 py-2 font-bold text-[#ff2a00]'>
-                        {row.rank}
-                      </td>
-                      <td className='px-3 py-2 text-white/85'>
-                        {row.nickname}
-                        <span className='ml-1 font-mono text-[10px] text-white/45'>
-                          ({row.entryId})
-                        </span>
-                      </td>
-                      <td className='px-3 py-2 text-white/70 tabular-nums'>
-                        {typeof row.wins === 'number' &&
-                        typeof row.losses === 'number'
-                          ? `${row.wins}-${row.losses}`
-                          : '-'}
-                      </td>
-                      <td className='px-3 py-2 text-white/65'>
-                        {row.statusLabel}
-                      </td>
+            {publishLog.length > 0 ? (
+              <div className='overflow-x-auto rounded-lg border border-white/10'>
+                <table className='min-w-full text-left text-xs'>
+                  <thead className='bg-white/[0.07] text-white/70'>
+                    <tr>
+                      <th className='px-3 py-2'>ID</th>
+                      <th className='px-3 py-2'>모드</th>
+                      <th className='px-3 py-2'>시각</th>
+                      <th className='px-3 py-2'>시즌</th>
+                      <th className='px-3 py-2'>지역</th>
+                      <th className='px-3 py-2'>행</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-          <h3 className='text-sm font-bold text-white'>경기 진행 요약</h3>
-
-          <div className='mt-3 grid gap-2 text-xs'>
-            <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
-              <span className='text-white/55'>Swiss 진행:</span>{' '}
-              <span className='font-semibold text-white/80'>
-                {swissProgress.completed}/{swissProgress.total}
-              </span>
-            </div>
-            <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
-              <span className='text-white/55'>Top8 진행:</span>{' '}
-              <span className='font-semibold text-white/80'>
-                {finalsProgress.completed}/{finalsProgress.total}
-              </span>
-            </div>
-            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-              <span className='text-white/55'>현재 Swiss:</span>{' '}
-              <span className='font-semibold text-white/80'>
-                {matchLine(swissProgress.current)}
-              </span>
-            </div>
-            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-              <span className='text-white/55'>현재 Top8:</span>{' '}
-              <span className='font-semibold text-white/80'>
-                {matchLine(finalsProgress.current)}
-              </span>
-            </div>
-            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-              <span className='text-white/55'>A그룹:</span>{' '}
-              <span className='font-semibold text-white/80'>
-                {regionArchive?.qualifiers.groupA
-                  ? `${regionArchive.qualifiers.groupA.nickname} (${regionArchive.qualifiers.groupA.entryId})`
-                  : '미확정'}
-              </span>
-            </div>
-            <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-              <span className='text-white/55'>B그룹:</span>{' '}
-              <span className='font-semibold text-white/80'>
-                {regionArchive?.qualifiers.groupB
-                  ? `${regionArchive.qualifiers.groupB.nickname} (${regionArchive.qualifiers.groupB.entryId})`
-                  : '미확정'}
-              </span>
-            </div>
+                  </thead>
+                  <tbody className='divide-y divide-white/[0.07]'>
+                    {publishLog.map((entry, i) => {
+                      const mode = String(entry.mode ?? '')
+                      const modeColor =
+                        mode === 'rollback'
+                          ? 'text-red-300 bg-red-500/10 border-red-300/25'
+                          : mode === 'replace'
+                            ? 'text-orange-300 bg-orange-500/10 border-orange-300/25'
+                            : mode === 'commit'
+                              ? 'text-white/60 bg-white/[0.06] border-white/15'
+                              : 'text-blue-300 bg-blue-500/10 border-blue-300/25'
+                      return (
+                        <tr key={i}>
+                          <td className='px-3 py-2 font-mono text-[11px] text-white/80'>
+                            {String(entry.publishId ?? '')}
+                          </td>
+                          <td className='px-3 py-2'>
+                            <span
+                              className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${modeColor}`}
+                            >
+                              {mode || '?'}
+                            </span>
+                          </td>
+                          <td className='px-3 py-2 text-white/60'>
+                            {entry.publishedAt
+                              ? new Date(
+                                  String(entry.publishedAt)
+                                ).toLocaleString('ko-KR')
+                              : ''}
+                          </td>
+                          <td className='px-3 py-2 text-white/60'>
+                            {String(entry.season ?? '')}
+                          </td>
+                          <td className='px-3 py-2 text-white/60'>
+                            {String(entry.region ?? '')}
+                          </td>
+                          <td className='px-3 py-2 text-white/60 tabular-nums'>
+                            {String(entry.totalRows ?? '')}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
           </div>
-        </div>
-      </section>
+        </TabsContent>
+      </Tabs>
     </TkcSection>
   )
 }
