@@ -35,6 +35,7 @@ const navItems: NavItem[] = [
   { label: t('nav.songs'), to: '/songs' },
   { label: t('nav.songPool'), to: '/song-pool' },
   { label: t('nav.results'), to: '/results' },
+  { label: t('nav.archive'), to: '/archive' },
   { label: t('nav.apply'), to: '/apply', emphasis: true },
   { label: t('nav.contact'), to: '/contact' },
 ]

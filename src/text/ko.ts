@@ -129,6 +129,7 @@ export const ko = {
   'home.heroEventLine': 'Taiko Korea Championship 2026',
   'home.heroTagline':
     '\uafc8\uc744 \ud604\uc2e4\ub85c, \ud604\uc2e4\uc744 \uae30\uc801\uc73c\ub85c.',
+  'nav.archive': '아카이브',
   'nav.apply': '\uB300\uD68C \uC2E0\uCCAD\uD558\uB7EC \uAC00\uAE30',
   'nav.arcade': '\uC544\uCF00\uC774\uB4DC',
   'nav.console': '\uCF58\uC194',

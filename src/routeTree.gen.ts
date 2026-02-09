@@ -20,6 +20,7 @@ import { Route as siteScheduleRouteImport } from './routes/(site)/schedule'
 import { Route as siteResultsRouteImport } from './routes/(site)/results'
 import { Route as siteContactRouteImport } from './routes/(site)/contact'
 import { Route as siteConsoleRouteImport } from './routes/(site)/console'
+import { Route as siteArchiveRouteImport } from './routes/(site)/archive'
 import { Route as siteArcadeRouteImport } from './routes/(site)/arcade'
 import { Route as siteApplyRouteImport } from './routes/(site)/apply'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
@@ -107,6 +108,11 @@ const siteContactRoute = siteContactRouteImport.update({
 const siteConsoleRoute = siteConsoleRouteImport.update({
   id: '/console',
   path: '/console',
+  getParentRoute: () => siteRouteRoute,
+} as any)
+const siteArchiveRoute = siteArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
   getParentRoute: () => siteRouteRoute,
 } as any)
 const siteArcadeRoute = siteArcadeRouteImport.update({
@@ -299,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503Route
   '/apply': typeof siteApplyRoute
   '/arcade': typeof siteArcadeRoute
+  '/archive': typeof siteArchiveRoute
   '/console': typeof siteConsoleRoute
   '/contact': typeof siteContactRoute
   '/results': typeof siteResultsRoute
@@ -341,6 +348,7 @@ export interface FileRoutesByTo {
   '/503': typeof errors503Route
   '/apply': typeof siteApplyRoute
   '/arcade': typeof siteArcadeRoute
+  '/archive': typeof siteArchiveRoute
   '/console': typeof siteConsoleRoute
   '/contact': typeof siteContactRoute
   '/results': typeof siteResultsRoute
@@ -389,6 +397,7 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503Route
   '/(site)/apply': typeof siteApplyRoute
   '/(site)/arcade': typeof siteArcadeRoute
+  '/(site)/archive': typeof siteArchiveRoute
   '/(site)/console': typeof siteConsoleRoute
   '/(site)/contact': typeof siteContactRoute
   '/(site)/results': typeof siteResultsRoute
@@ -435,6 +444,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/apply'
     | '/arcade'
+    | '/archive'
     | '/console'
     | '/contact'
     | '/results'
@@ -477,6 +487,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/apply'
     | '/arcade'
+    | '/archive'
     | '/console'
     | '/contact'
     | '/results'
@@ -524,6 +535,7 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/(site)/apply'
     | '/(site)/arcade'
+    | '/(site)/archive'
     | '/(site)/console'
     | '/(site)/contact'
     | '/(site)/results'
@@ -646,6 +658,13 @@ declare module '@tanstack/react-router' {
       path: '/console'
       fullPath: '/console'
       preLoaderRoute: typeof siteConsoleRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
+    '/(site)/archive': {
+      id: '/(site)/archive'
+      path: '/archive'
+      fullPath: '/archive'
+      preLoaderRoute: typeof siteArchiveRouteImport
       parentRoute: typeof siteRouteRoute
     }
     '/(site)/arcade': {
@@ -892,6 +911,7 @@ declare module '@tanstack/react-router' {
 interface siteRouteRouteChildren {
   siteApplyRoute: typeof siteApplyRoute
   siteArcadeRoute: typeof siteArcadeRoute
+  siteArchiveRoute: typeof siteArchiveRoute
   siteConsoleRoute: typeof siteConsoleRoute
   siteContactRoute: typeof siteContactRoute
   siteResultsRoute: typeof siteResultsRoute
@@ -909,6 +929,7 @@ interface siteRouteRouteChildren {
 const siteRouteRouteChildren: siteRouteRouteChildren = {
   siteApplyRoute: siteApplyRoute,
   siteArcadeRoute: siteArcadeRoute,
+  siteArchiveRoute: siteArchiveRoute,
   siteConsoleRoute: siteConsoleRoute,
   siteContactRoute: siteContactRoute,
   siteResultsRoute: siteResultsRoute,
