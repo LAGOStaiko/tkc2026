@@ -169,8 +169,8 @@ function Lightbox({
             className='size-full object-contain'
           />
         ) : (
-          <div className='text-center opacity-25'>
-            <div className='mb-2 text-5xl'>📷</div>
+          <div className='text-center opacity-30'>
+            <div className='mb-2 text-3xl text-white/40'>[ Photo ]</div>
             <div className='text-base break-keep text-white/65'>
               {p.caption}
             </div>
@@ -233,10 +233,10 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
   const handleClose = useCallback(() => setLbIdx(null), [])
 
   const meta = [
-    { icon: '📅', value: tm.date },
-    { icon: '📍', value: tm.venue },
-    { icon: '👥', value: `${tm.participants}명` },
-    ...(tm.finalSong ? [{ icon: '🎵', value: tm.finalSong }] : []),
+    { label: tm.date },
+    { label: tm.venue },
+    { label: `${tm.participants}명` },
+    ...(tm.finalSong ? [{ label: tm.finalSong }] : []),
   ]
 
   return (
@@ -244,36 +244,29 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
       <article className='motion-safe:animate-[tkc-slide-up_0.65s_cubic-bezier(0.16,1,0.3,1)_both]'>
         {/* ── Year & Title ── */}
         <div className='mb-8'>
-          <div className='flex items-baseline gap-4'>
-            <span
-              className='font-mono text-6xl leading-none font-extrabold tracking-[-3px] opacity-12 select-none md:text-7xl'
-              style={{ color: tm.accent }}
-            >
-              {tm.year}
-            </span>
-            <div>
-              <h2 className='text-lg font-bold tracking-tight break-keep text-white/90 md:text-xl'>
-                {tm.titleKr}
-              </h2>
-              <p className='mt-0.5 font-mono text-sm tracking-wider text-white/65 uppercase'>
-                {tm.title}
-              </p>
-              {tm.subtitle && (
-                <p className='mt-1 text-sm text-white/50 italic'>
-                  {tm.subtitle}
-                </p>
-              )}
-            </div>
-          </div>
+          <span
+            className='mb-2 block font-mono text-5xl leading-none font-extrabold tracking-[-2px] select-none md:text-6xl'
+            style={{ color: tm.accent, opacity: 0.3 }}
+          >
+            {tm.year}
+          </span>
+          <h2 className='text-xl font-bold tracking-tight break-keep text-white/90 md:text-2xl'>
+            {tm.titleKr}
+          </h2>
+          <p className='mt-1 font-mono text-sm tracking-wider text-white/50 uppercase'>
+            {tm.title}
+          </p>
+          {tm.subtitle && (
+            <p className='mt-1 text-sm text-white/45 italic'>{tm.subtitle}</p>
+          )}
 
-          <div className='mt-4 flex flex-wrap gap-x-6 gap-y-1.5 pl-0.5'>
+          <div className='mt-4 flex flex-wrap gap-x-1.5 gap-y-1.5'>
             {meta.map((m) => (
               <span
-                key={m.value}
-                className='flex items-center gap-1.5 text-sm text-white/65'
+                key={m.label}
+                className='rounded-md border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-sm text-white/65'
               >
-                <span className='text-sm'>{m.icon}</span>
-                {m.value}
+                {m.label}
               </span>
             ))}
           </div>
@@ -289,18 +282,11 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
             }}
           >
             <div
-              className='absolute -top-4 -right-1.5 text-[100px] leading-none opacity-[0.035]'
-              aria-hidden
-            >
-              🏆
-            </div>
-            <div
               className='mb-4 font-mono text-sm tracking-[3px] uppercase opacity-70'
               style={{ color: tm.accent }}
             >
               Champion
             </div>
-            <div className='mb-3 text-5xl'>🥇</div>
             <div className='text-2xl font-extrabold text-[#f0f0f0]'>
               {tm.champion.name}
             </div>
@@ -311,16 +297,9 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
 
           {/* Runner-up */}
           <div className='relative overflow-hidden bg-white/[0.03] px-7 py-8 md:px-8 md:py-10'>
-            <div
-              className='absolute -top-4 -right-1.5 text-[100px] leading-none opacity-[0.025]'
-              aria-hidden
-            >
-              🥈
-            </div>
             <div className='mb-4 font-mono text-sm tracking-[3px] text-white/65 uppercase'>
               Runner-up
             </div>
-            <div className='mb-3 text-5xl'>🥈</div>
             <div className='text-2xl font-extrabold text-[#B0B0B0]'>
               {tm.runnerUp.name}
             </div>
@@ -354,7 +333,7 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
               </span>
             </div>
 
-            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3'>
+            <div className='grid grid-cols-2 gap-2 md:grid-cols-3'>
               {tm.photos.map((photo, i) => (
                 <PhotoCell
                   key={photo.id}

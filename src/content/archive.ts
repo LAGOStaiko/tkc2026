@@ -38,7 +38,11 @@ export const PAST_TOURNAMENTS: PastTournament[] = [
     participants: 8,
     champion: { name: '세상', title: '우승 / Champion' },
     runnerUp: { name: '뉴트리노개미', title: '준우승 / Runner-up' },
-    photos: [],
+    photos: [
+      { id: 1, url: null, caption: '대회 현장' },
+      { id: 2, url: null, caption: '결승전' },
+      { id: 3, url: null, caption: '시상식' },
+    ],
     accent: '#F5A623',
   },
   {
@@ -56,7 +60,12 @@ export const PAST_TOURNAMENTS: PastTournament[] = [
       title: '개인전 준우승 / Individual Runner-up',
     },
     note: '팀전: TEAM A 승리',
-    photos: [],
+    photos: [
+      { id: 1, url: null, caption: '대회장 전경' },
+      { id: 2, url: null, caption: '개인전 결승' },
+      { id: 3, url: null, caption: '팀전 현장' },
+      { id: 4, url: null, caption: '시상식' },
+    ],
     accent: '#3B8BE6',
   },
 ]
