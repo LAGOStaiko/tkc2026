@@ -141,26 +141,21 @@ function RSection({
   title,
   titleEn,
   children,
-  index = 0,
 }: {
   num: string
   title: string
   titleEn: string
   children: ReactNode
-  index?: number
 }) {
   return (
-    <section
-      className='mb-9 animate-[tkc-slide-up_0.5s_ease_both]'
-      style={{ animationDelay: `${0.1 + index * 0.05}s` }}
-    >
+    <section className='mb-9 motion-safe:animate-[tkc-slide-up_0.5s_ease_both]'>
       <div className='mb-4 flex items-baseline gap-2.5'>
         <span className='font-mono text-2xl leading-none font-bold text-[#E63B2E] opacity-15'>
           {num}
         </span>
         <div>
           <h2 className='text-[17px] font-extrabold text-[#f0f0f0]'>{title}</h2>
-          <span className='font-mono text-[9px] tracking-wider text-white/15'>
+          <span className='font-mono text-[10px] tracking-wider text-white/40'>
             {titleEn}
           </span>
         </div>
@@ -172,7 +167,7 @@ function RSection({
 
 function SDesc({ children }: { children: ReactNode }) {
   return (
-    <p className='mb-3.5 text-[13px] leading-[1.8] break-keep text-white/45'>
+    <p className='mb-3.5 text-sm leading-[1.8] break-keep text-white/70'>
       {children}
     </p>
   )
@@ -183,6 +178,16 @@ function SNote({ children }: { children: ReactNode }) {
     <div className='mt-3.5 flex gap-2.5 rounded-lg border border-[#6AB0F3]/10 bg-[#6AB0F3]/5 p-3 align-top'>
       <span className='mt-0.5 shrink-0 text-xs'>💡</span>
       <p className='text-xs leading-[1.75] break-keep text-[#6AB0F3]/70'>
+        {children}
+      </p>
+    </div>
+  )
+}
+
+function TabSummary({ children }: { children: ReactNode }) {
+  return (
+    <div className='mb-6 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3.5'>
+      <p className='text-sm leading-[1.8] break-keep text-white/70'>
         {children}
       </p>
     </div>
@@ -202,7 +207,7 @@ function CompactRuleCard({
     <div className='rounded-[10px] border border-white/[0.04] bg-white/[0.012] p-4'>
       <div className='mb-2.5 flex items-center gap-2.5'>
         <span className='text-base'>{icon}</span>
-        <span className='text-[13px] font-bold text-white/60'>{title}</span>
+        <span className='text-sm font-bold text-white/70'>{title}</span>
       </div>
       {children}
     </div>
@@ -248,11 +253,7 @@ function TournamentFlow() {
   return (
     <div className='mb-8 px-1'>
       {FLOW_STEPS.map((s, i) => (
-        <div
-          key={s.num}
-          className='flex animate-[tkc-slide-up_0.5s_ease_both] items-stretch gap-3.5'
-          style={{ animationDelay: `${i * 0.08}s` }}
-        >
+        <div key={s.num} className='flex items-stretch gap-3.5'>
           {/* Timeline */}
           <div className='flex w-8 shrink-0 flex-col items-center'>
             <div
@@ -281,12 +282,12 @@ function TournamentFlow() {
               {s.label}
             </div>
             <div
-              className='mt-0.5 font-mono text-[11px] opacity-70'
+              className='mt-0.5 font-mono text-xs opacity-70'
               style={{ color: s.accent }}
             >
               {s.detail}
             </div>
-            <div className='mt-1.5 text-xs leading-[1.65] break-keep text-white/35'>
+            <div className='mt-1.5 text-xs leading-[1.65] break-keep text-white/60'>
               {s.desc}
             </div>
           </div>
@@ -309,25 +310,25 @@ const CHECKLIST_ITEMS = [
 
 function PlayerChecklist() {
   return (
-    <div className='mb-8 animate-[tkc-slide-up_0.5s_ease_0.2s_both] rounded-[14px] border border-[#E63B2E]/10 bg-[#E63B2E]/[0.04] px-4 py-5'>
-      <div className='mb-1.5 font-mono text-[9px] tracking-[3px] text-[#E63B2E] uppercase opacity-60'>
+    <div className='mb-8 rounded-[14px] border border-[#E63B2E]/10 bg-[#E63B2E]/[0.04] px-4 py-5 motion-safe:animate-[tkc-slide-up_0.5s_ease_0.2s_both]'>
+      <div className='mb-1.5 font-mono text-[10px] tracking-[3px] text-[#E63B2E] uppercase opacity-60'>
         Player Checklist
       </div>
-      <p className='mb-3.5 text-xs leading-[1.7] break-keep text-white/30'>
+      <p className='mb-3.5 text-xs leading-[1.7] break-keep text-white/55'>
         대회 참가 전 꼭 확인해야 할 사항들입니다.
       </p>
       <div className='flex flex-col gap-3'>
         {CHECKLIST_ITEMS.map((item) => (
           <div key={item.text} className='flex items-center gap-3'>
             <span className='shrink-0 text-lg'>{item.icon}</span>
-            <span className='flex-1 text-[13px] font-semibold break-keep text-white/65'>
+            <span className='flex-1 text-sm font-semibold break-keep text-white/70'>
               {item.text}
             </span>
             <span
-              className={`shrink-0 rounded px-2 py-0.5 font-mono text-[9px] tracking-wide ${
+              className={`shrink-0 rounded px-2 py-0.5 font-mono text-[10px] tracking-wide ${
                 item.tag === '주의'
                   ? 'border border-[#E63B2E]/20 bg-[#E63B2E]/10 text-[#E63B2E]'
-                  : 'border border-white/[0.06] bg-white/[0.04] text-white/25'
+                  : 'border border-white/[0.06] bg-white/[0.04] text-white/40'
               }`}
             >
               {item.tag}
@@ -352,19 +353,17 @@ const REGIONS = [
 
 function RegionTable() {
   return (
-    <div className='grid grid-cols-4 gap-1.5'>
+    <div className='grid grid-cols-2 gap-1.5 sm:grid-cols-4'>
       {REGIONS.map((r) => (
         <div
           key={r.num}
           className='rounded-[10px] border border-white/[0.04] bg-white/[0.012] px-2 py-3.5 text-center'
         >
           <div className='mb-1.5 text-xl'>{r.emoji}</div>
-          <div className='font-mono text-[10px] tracking-wider text-white/25'>
+          <div className='font-mono text-xs tracking-wider text-white/45'>
             {r.num}
           </div>
-          <div className='mt-0.5 text-[13px] font-bold text-white/55'>
-            {r.city}
-          </div>
+          <div className='mt-0.5 text-sm font-bold text-white/75'>{r.city}</div>
         </div>
       ))}
     </div>
@@ -380,26 +379,24 @@ function MatchVisual() {
     <div className='flex flex-col items-center gap-2'>
       <div className='flex w-full gap-2'>
         <div className='flex-1 rounded-[10px] border border-[#E63B2E]/[0.12] bg-[#E63B2E]/[0.06] px-3.5 py-4 text-center'>
-          <div className='mb-2 font-mono text-[9px] tracking-widest text-[#E63B2E]'>
+          <div className='mb-2 font-mono text-[10px] tracking-widest text-[#E63B2E]'>
             SONG 1
           </div>
           <div className='mb-1 text-[22px]'>🥁</div>
-          <div className='text-xs font-semibold text-white/45'>
+          <div className='text-xs font-semibold text-white/65'>
             내가 고른 곡
           </div>
-          <div className='mt-1 text-[10px] text-white/20'>내가 사이드 선택</div>
+          <div className='mt-1 text-xs text-white/50'>내가 사이드 선택</div>
         </div>
         <div className='flex-1 rounded-[10px] border border-[#3B8BE6]/[0.12] bg-[#3B8BE6]/[0.06] px-3.5 py-4 text-center'>
-          <div className='mb-2 font-mono text-[9px] tracking-widest text-[#3B8BE6]'>
+          <div className='mb-2 font-mono text-[10px] tracking-widest text-[#3B8BE6]'>
             SONG 2
           </div>
           <div className='mb-1 text-[22px]'>🥁</div>
-          <div className='text-xs font-semibold text-white/45'>
+          <div className='text-xs font-semibold text-white/65'>
             상대가 고른 곡
           </div>
-          <div className='mt-1 text-[10px] text-white/20'>
-            상대가 사이드 선택
-          </div>
+          <div className='mt-1 text-xs text-white/50'>상대가 사이드 선택</div>
         </div>
       </div>
 
@@ -419,7 +416,7 @@ function MatchVisual() {
       </svg>
 
       <div className='w-full rounded-[10px] border border-[#FFD700]/10 bg-[#FFD700]/5 p-3.5 text-center'>
-        <span className='text-[13px] font-bold break-keep text-[#FFD700]/70'>
+        <span className='text-sm font-bold break-keep text-[#FFD700]/70'>
           2곡 합산 점수 → 고득점자 승리 🏆
         </span>
       </div>
@@ -465,55 +462,84 @@ const SWISS_DATA = [
   },
 ] as const
 
+function SwissGroupRow({
+  g,
+}: {
+  g: { record: string; count: number; color: string; status: string }
+}) {
+  return (
+    <div
+      className='flex items-center justify-between rounded-md px-2 py-1.5'
+      style={{
+        background:
+          g.status === '탈락'
+            ? 'rgba(244,67,54,0.06)'
+            : g.status === '자동 진출'
+              ? 'rgba(76,175,80,0.08)'
+              : 'rgba(255,255,255,0.02)',
+        border: `1px solid ${g.color}20`,
+      }}
+    >
+      <span className='font-mono text-sm font-bold' style={{ color: g.color }}>
+        {g.record}
+      </span>
+      <span className='text-[10px] opacity-65' style={{ color: g.color }}>
+        {g.status}
+      </span>
+    </div>
+  )
+}
+
 function SwissVisual() {
   return (
-    <div className='overflow-x-auto'>
-      <div className='flex min-w-[520px] gap-1.5'>
-        {SWISS_DATA.map((r) => (
-          <div
-            key={r.round}
-            className='min-w-[120px] flex-1 rounded-[10px] border border-white/[0.04] bg-white/[0.012] px-2.5 py-3'
-          >
-            <div className='mb-2.5 text-center font-mono text-[11px] font-bold tracking-widest text-white/35'>
-              {r.round}
+    <>
+      {/* Mobile: vertical stack */}
+      <div className='md:hidden'>
+        <div className='flex flex-col gap-2'>
+          {SWISS_DATA.map((r) => (
+            <div
+              key={r.round}
+              className='rounded-[10px] border border-white/[0.04] bg-white/[0.012] px-3 py-3'
+            >
+              <div className='mb-2 font-mono text-xs font-bold tracking-widest text-white/50'>
+                {r.round}
+              </div>
+              <div className='flex flex-col gap-1.5'>
+                {r.groups.map((g) => (
+                  <SwissGroupRow key={g.record} g={g} />
+                ))}
+              </div>
             </div>
-            <div className='flex flex-col gap-1.5'>
-              {r.groups.map((g) => (
-                <div
-                  key={g.record}
-                  className='flex items-center justify-between rounded-md px-2 py-1.5'
-                  style={{
-                    background:
-                      g.status === '탈락'
-                        ? 'rgba(244,67,54,0.06)'
-                        : g.status === '자동 진출'
-                          ? 'rgba(76,175,80,0.08)'
-                          : 'rgba(255,255,255,0.02)',
-                    border: `1px solid ${g.color}20`,
-                  }}
-                >
-                  <span
-                    className='font-mono text-[13px] font-bold'
-                    style={{ color: g.color }}
-                  >
-                    {g.record}
-                  </span>
-                  <span
-                    className='text-[9px] opacity-65'
-                    style={{ color: g.color }}
-                  >
-                    {g.status}
-                  </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop: horizontal 4-col */}
+      <div className='hidden md:block'>
+        <div className='overflow-x-auto'>
+          <div className='flex min-w-[520px] gap-1.5'>
+            {SWISS_DATA.map((r) => (
+              <div
+                key={r.round}
+                className='min-w-[120px] flex-1 rounded-[10px] border border-white/[0.04] bg-white/[0.012] px-2.5 py-3'
+              >
+                <div className='mb-2.5 text-center font-mono text-xs font-bold tracking-widest text-white/50'>
+                  {r.round}
                 </div>
-              ))}
-            </div>
+                <div className='flex flex-col gap-1.5'>
+                  {r.groups.map((g) => (
+                    <SwissGroupRow key={g.record} g={g} />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+          <div className='mt-2 text-center text-xs text-white/50'>
+            ← 스크롤 →
+          </div>
+        </div>
       </div>
-      <div className='mt-2 text-center text-[10px] text-white/15'>
-        ← 스크롤 →
-      </div>
-    </div>
+    </>
   )
 }
 
@@ -521,52 +547,83 @@ function SwissVisual() {
 /*  (6) SeedingMatchTable — 1라운드 시드 매칭                           */
 /* ================================================================== */
 
-function SeedingMatchTable() {
-  const headers = ['매치 1', '매치 2', '매치 3', '매치 4']
-  const row1 = ['1 vs 16', '2 vs 15', '3 vs 14', '4 vs 13']
-  const row2 = ['5 vs 12', '6 vs 11', '7 vs 10', '8 vs 9']
+const SEEDING_MATCHES = [
+  { match: '매치 1', pairs: ['1 vs 16', '5 vs 12'] },
+  { match: '매치 2', pairs: ['2 vs 15', '6 vs 11'] },
+  { match: '매치 3', pairs: ['3 vs 14', '7 vs 10'] },
+  { match: '매치 4', pairs: ['4 vs 13', '8 vs 9'] },
+]
 
+function SeedingMatchTable() {
   return (
     <div className='mb-4'>
-      <div className='overflow-hidden rounded-[10px] border border-white/[0.04] bg-white/[0.012]'>
-        <div className='grid grid-cols-4 border-b border-white/[0.04] bg-[#E63B2E]/[0.06]'>
-          {headers.map((h, i) => (
+      {/* Mobile: 2-col cards */}
+      <div className='md:hidden'>
+        <div className='grid grid-cols-2 gap-2'>
+          {SEEDING_MATCHES.map((m) => (
             <div
-              key={h}
-              className={`px-1.5 py-2 text-center font-mono text-[9px] font-bold tracking-wider text-[#E63B2E] ${
-                i < 3 ? 'border-r border-white/[0.03]' : ''
-              }`}
+              key={m.match}
+              className='rounded-lg border border-white/[0.04] bg-white/[0.012] p-3'
             >
-              {h}
-            </div>
-          ))}
-        </div>
-        <div className='grid grid-cols-4 border-b border-white/[0.03]'>
-          {row1.map((c, i) => (
-            <div
-              key={c}
-              className={`px-1.5 py-2 text-center font-mono text-[11px] text-white/40 ${
-                i < 3 ? 'border-r border-white/[0.03]' : ''
-              }`}
-            >
-              {c}
-            </div>
-          ))}
-        </div>
-        <div className='grid grid-cols-4'>
-          {row2.map((c, i) => (
-            <div
-              key={c}
-              className={`px-1.5 py-2 text-center font-mono text-[11px] text-white/40 ${
-                i < 3 ? 'border-r border-white/[0.03]' : ''
-              }`}
-            >
-              {c}
+              <div className='mb-2 text-center text-[10px] font-bold tracking-wider text-[#E63B2E]'>
+                {m.match}
+              </div>
+              {m.pairs.map((p) => (
+                <div
+                  key={p}
+                  className='py-1 text-center font-mono text-xs text-white/55'
+                >
+                  {p}
+                </div>
+              ))}
             </div>
           ))}
         </div>
       </div>
-      <div className='mt-1.5 text-center text-[10px] text-white/15'>
+
+      {/* Desktop: 4-col grid table */}
+      <div className='hidden md:block'>
+        <div className='overflow-hidden rounded-[10px] border border-white/[0.04] bg-white/[0.012]'>
+          <div className='grid grid-cols-4 border-b border-white/[0.04] bg-[#E63B2E]/[0.06]'>
+            {SEEDING_MATCHES.map((m, i) => (
+              <div
+                key={m.match}
+                className={`px-1.5 py-2 text-center font-mono text-[10px] font-bold tracking-wider text-[#E63B2E] ${
+                  i < 3 ? 'border-r border-white/[0.03]' : ''
+                }`}
+              >
+                {m.match}
+              </div>
+            ))}
+          </div>
+          <div className='grid grid-cols-4 border-b border-white/[0.03]'>
+            {SEEDING_MATCHES.map((m, i) => (
+              <div
+                key={m.pairs[0]}
+                className={`px-1.5 py-2 text-center font-mono text-xs text-white/55 ${
+                  i < 3 ? 'border-r border-white/[0.03]' : ''
+                }`}
+              >
+                {m.pairs[0]}
+              </div>
+            ))}
+          </div>
+          <div className='grid grid-cols-4'>
+            {SEEDING_MATCHES.map((m, i) => (
+              <div
+                key={m.pairs[1]}
+                className={`px-1.5 py-2 text-center font-mono text-xs text-white/55 ${
+                  i < 3 ? 'border-r border-white/[0.03]' : ''
+                }`}
+              >
+                {m.pairs[1]}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className='mt-1.5 text-center text-xs text-white/50'>
         1라운드: 온라인 순위 기반 시드 매칭
       </div>
     </div>
@@ -589,7 +646,7 @@ function QualificationPath() {
           <div className='font-mono text-base font-bold text-[#4CAF50]'>
             4-0 → 자동 진출
           </div>
-          <div className='mt-0.5 text-[11px] break-keep text-white/30'>
+          <div className='mt-0.5 text-xs break-keep text-white/55'>
             전승 기록자 1명 바로 확정
           </div>
         </div>
@@ -605,27 +662,27 @@ function QualificationPath() {
             <div className='font-mono text-base font-bold text-[#F5A623]'>
               3-1 → 결정전
             </div>
-            <div className='mt-0.5 text-[11px] break-keep text-white/30'>
+            <div className='mt-0.5 text-xs break-keep text-white/55'>
               스코어 어택으로 1명 추가 선발
             </div>
           </div>
         </div>
         <div className='flex flex-col gap-1 rounded-lg bg-black/20 px-3.5 py-2.5'>
           <div className='flex justify-between'>
-            <span className='text-[11px] text-white/30'>방식</span>
-            <span className='text-[11px] font-semibold text-white/50'>
+            <span className='text-xs text-white/50'>방식</span>
+            <span className='text-xs font-semibold text-white/65'>
               스코어 어택 1회
             </span>
           </div>
           <div className='flex justify-between'>
-            <span className='text-[11px] text-white/30'>과제곡</span>
-            <span className='text-[11px] font-semibold text-white/50'>
+            <span className='text-xs text-white/50'>과제곡</span>
+            <span className='text-xs font-semibold text-white/65'>
               {ARCADE_SONGS.decider31.title} ★{ARCADE_SONGS.decider31.level}
             </span>
           </div>
           <div className='flex justify-between'>
-            <span className='text-[11px] text-white/30'>비고</span>
-            <span className='text-[11px] font-semibold text-[#E63B2E]'>
+            <span className='text-xs text-white/50'>비고</span>
+            <span className='text-xs font-semibold text-[#E63B2E]'>
               사전 비공개
             </span>
           </div>
@@ -679,11 +736,11 @@ function BracketVisual() {
       <div className='mb-2 flex justify-center gap-4'>
         <div className='flex items-center gap-1.5'>
           <div className='size-2.5 rounded-sm bg-[#4CAF50]' />
-          <span className='text-[10px] text-white/35'>A그룹 (4-0 진출)</span>
+          <span className='text-xs text-white/50'>A그룹 (4-0 진출)</span>
         </div>
         <div className='flex items-center gap-1.5'>
           <div className='size-2.5 rounded-sm bg-[#3B8BE6]' />
-          <span className='text-[10px] text-white/35'>B그룹 (3-1 진출)</span>
+          <span className='text-xs text-white/50'>B그룹 (3-1 진출)</span>
         </div>
       </div>
 
@@ -692,29 +749,29 @@ function BracketVisual() {
           key={m.qf}
           className='flex items-center gap-2.5 rounded-[10px] border border-white/[0.04] bg-white/[0.012] px-3.5 py-3'
         >
-          <div className='w-7 shrink-0 text-center font-mono text-[9px] tracking-wider text-white/20'>
+          <div className='w-7 shrink-0 text-center font-mono text-[10px] tracking-wider text-white/40'>
             {m.qf}
           </div>
 
           <div className='flex flex-1 items-center justify-end gap-2'>
-            <span className='text-[10px] text-white/20'>{m.a.desc}</span>
+            <span className='text-xs text-white/45'>{m.a.desc}</span>
             <span className='min-w-9 rounded-md bg-[#4CAF50]/10 px-2.5 py-1 text-center font-mono text-[15px] font-bold text-[#4CAF50]'>
               {m.a.seed}
             </span>
           </div>
 
-          <span className='font-mono text-[10px] text-white/15'>vs</span>
+          <span className='font-mono text-xs text-white/30'>vs</span>
 
           <div className='flex flex-1 items-center gap-2'>
             <span className='min-w-9 rounded-md bg-[#3B8BE6]/10 px-2.5 py-1 text-center font-mono text-[15px] font-bold text-[#3B8BE6]'>
               {m.b.seed}
             </span>
-            <span className='text-[10px] text-white/20'>{m.b.desc}</span>
+            <span className='text-xs text-white/45'>{m.b.desc}</span>
           </div>
         </div>
       ))}
 
-      <div className='mt-1 text-center text-[10px] break-keep text-white/15'>
+      <div className='mt-1 text-center text-xs break-keep text-white/50'>
         시드 과제곡: {ARCADE_SONGS.seeding.title} ★{ARCADE_SONGS.seeding.level}{' '}
         (사전 비공개)
       </div>
@@ -735,13 +792,13 @@ function SideAndTiebreakRules() {
             <div className='mb-1 font-mono text-[10px] tracking-wider text-[#E63B2E]'>
               내 곡
             </div>
-            <div className='text-xs font-semibold text-white/50'>내가 선택</div>
+            <div className='text-xs font-semibold text-white/65'>내가 선택</div>
           </div>
           <div className='flex-1 rounded-lg bg-[#3B8BE6]/5 px-3 py-2.5 text-center'>
             <div className='mb-1 font-mono text-[10px] tracking-wider text-[#3B8BE6]'>
               상대 곡
             </div>
-            <div className='text-xs font-semibold text-white/50'>
+            <div className='text-xs font-semibold text-white/65'>
               상대가 선택
             </div>
           </div>
@@ -749,7 +806,7 @@ function SideAndTiebreakRules() {
       </CompactRuleCard>
 
       <CompactRuleCard icon='⚖️' title='동점 시'>
-        <div className='rounded-lg bg-black/15 px-3.5 py-2.5 text-xs leading-[1.8] break-keep text-white/45'>
+        <div className='rounded-lg bg-black/15 px-3.5 py-2.5 text-xs leading-[1.8] break-keep text-white/65'>
           선곡풀에서{' '}
           <span className='font-semibold text-[#F5A623]'>랜덤 1곡</span> 선정 →
           단판 재경기
@@ -774,41 +831,62 @@ const FINALS_ROUNDS = [
 
 function FinalsStructure() {
   return (
-    <div className='-mx-4 overflow-x-auto px-4'>
-      <Table className='text-sm'>
-        <TableHeader className='bg-white/[0.07] text-white/75'>
-          <TableRow className='border-white/[0.07]'>
-            <TableHead className='border-white/[0.07] px-3 py-2 text-xs font-bold text-white/75'>
-              라운드
-            </TableHead>
-            <TableHead className='border-white/[0.07] px-3 py-2 text-xs font-bold text-white/75'>
-              방식
-            </TableHead>
-            <TableHead className='border-white/[0.07] px-3 py-2 text-xs font-bold text-white/75'>
-              곡 수
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className='text-white/90'>
-          {FINALS_ROUNDS.map((r) => (
-            <TableRow
-              key={r.round}
-              className='border-white/[0.07] hover:bg-white/[0.04]'
-            >
-              <TableCell className='border-white/[0.07] px-3 py-2.5 text-sm font-semibold text-white/80'>
-                {r.round}
-              </TableCell>
-              <TableCell className='border-white/[0.07] px-3 py-2.5 text-sm text-white/60'>
-                {r.method}
-              </TableCell>
-              <TableCell className='border-white/[0.07] px-3 py-2.5 text-sm text-white/60'>
-                {r.songs}
-              </TableCell>
+    <>
+      {/* Mobile: card list */}
+      <div className='flex flex-col gap-2 md:hidden'>
+        {FINALS_ROUNDS.map((r) => (
+          <div
+            key={r.round}
+            className='flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.012] px-4 py-3'
+          >
+            <span className='text-sm font-semibold text-white/80'>
+              {r.round}
+            </span>
+            <div className='text-right'>
+              <div className='text-sm text-white/65'>{r.method}</div>
+              <div className='text-xs text-white/50'>{r.songs}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: table */}
+      <div className='hidden md:block'>
+        <Table className='text-sm'>
+          <TableHeader className='bg-white/[0.07] text-white/75'>
+            <TableRow className='border-white/[0.07]'>
+              <TableHead className='border-white/[0.07] px-3 py-2 text-xs font-bold text-white/75'>
+                라운드
+              </TableHead>
+              <TableHead className='border-white/[0.07] px-3 py-2 text-xs font-bold text-white/75'>
+                방식
+              </TableHead>
+              <TableHead className='border-white/[0.07] px-3 py-2 text-xs font-bold text-white/75'>
+                곡 수
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody className='text-white/90'>
+            {FINALS_ROUNDS.map((r) => (
+              <TableRow
+                key={r.round}
+                className='border-white/[0.07] hover:bg-white/[0.04]'
+              >
+                <TableCell className='border-white/[0.07] px-3 py-2.5 text-sm font-semibold text-white/80'>
+                  {r.round}
+                </TableCell>
+                <TableCell className='border-white/[0.07] px-3 py-2.5 text-sm text-white/65'>
+                  {r.method}
+                </TableCell>
+                <TableCell className='border-white/[0.07] px-3 py-2.5 text-sm text-white/65'>
+                  {r.songs}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   )
 }
 
@@ -821,16 +899,16 @@ function BanPickProcedure() {
     <div className='flex flex-col gap-2.5'>
       {/* 공통 순서 */}
       <div className='rounded-[10px] border border-white/[0.04] bg-white/[0.012] p-4'>
-        <div className='mb-2.5 font-mono text-[9px] tracking-[3px] text-[#E63B2E] uppercase opacity-60'>
+        <div className='mb-2.5 font-mono text-[10px] tracking-[3px] text-[#E63B2E] uppercase opacity-60'>
           Common Order
         </div>
         <div className='flex items-center justify-center gap-1.5'>
           {['A 밴', 'B 밴', 'A 픽', 'B 픽'].map((step, i) => (
             <div key={step} className='flex items-center gap-1.5'>
-              <span className='rounded-md bg-white/[0.06] px-2.5 py-1.5 text-xs font-semibold text-white/50'>
+              <span className='rounded-md bg-white/[0.06] px-2.5 py-1.5 text-xs font-semibold text-white/65'>
                 {step}
               </span>
-              {i < 3 && <span className='text-[10px] text-white/15'>→</span>}
+              {i < 3 && <span className='text-xs text-white/30'>→</span>}
             </div>
           ))}
         </div>
@@ -839,18 +917,18 @@ function BanPickProcedure() {
       {/* 라운드별 */}
       <div className='grid grid-cols-2 gap-2'>
         <div className='rounded-[10px] border border-white/[0.04] bg-white/[0.012] p-3.5 text-center'>
-          <div className='mb-1.5 font-mono text-[9px] tracking-wider text-white/25'>
+          <div className='mb-1.5 font-mono text-xs tracking-wider text-white/40'>
             8강 / 4강 / 3·4위전
           </div>
-          <div className='text-sm font-semibold break-keep text-white/55'>
+          <div className='text-sm font-semibold break-keep text-white/70'>
             각자 1곡 픽
           </div>
         </div>
         <div className='rounded-[10px] border border-[#E63B2E]/[0.08] bg-[#E63B2E]/[0.03] p-3.5 text-center'>
-          <div className='mb-1.5 font-mono text-[9px] tracking-wider text-[#E63B2E]/50'>
+          <div className='mb-1.5 font-mono text-xs tracking-wider text-[#E63B2E]/60'>
             결승
           </div>
-          <div className='text-sm font-semibold break-keep text-white/55'>
+          <div className='text-sm font-semibold break-keep text-white/70'>
             각자 2곡 픽
           </div>
         </div>
@@ -872,7 +950,7 @@ function OperationsRules() {
   return (
     <div className='flex flex-col gap-2.5'>
       <CompactRuleCard icon='🎯' title='플레이/옵션'>
-        <div className='rounded-lg bg-black/15 px-3.5 py-2.5 text-xs leading-[1.8] break-keep text-white/45'>
+        <div className='rounded-lg bg-black/15 px-3.5 py-2.5 text-xs leading-[1.8] break-keep text-white/65'>
           선곡한 곡: 해당 선수가 1P/2P 선택
           <br />
           과제곡: 합산 점수 우위자가 선택 (첫 곡이면 시드 상위자)
@@ -883,7 +961,7 @@ function OperationsRules() {
       </CompactRuleCard>
 
       <CompactRuleCard icon='🔄' title='동점/재경기'>
-        <div className='rounded-lg bg-black/15 px-3.5 py-2.5 text-xs leading-[1.8] break-keep text-white/45'>
+        <div className='rounded-lg bg-black/15 px-3.5 py-2.5 text-xs leading-[1.8] break-keep text-white/65'>
           동점 시 마지막 곡 동일 조건 재대결
           <br />
           재대결도 동점이면 양(良) 개수 많은 선수 승리
@@ -893,7 +971,7 @@ function OperationsRules() {
       </CompactRuleCard>
 
       <div className='mt-2 rounded-lg border border-white/[0.04] bg-white/[0.015] p-3.5 text-center'>
-        <span className='text-[11px] leading-[1.7] break-keep text-white/20'>
+        <span className='text-xs leading-[1.7] break-keep text-white/50'>
           ※ 본 규정집의 세부 사항은 대회 운영진의 판단에 따라 변경될 수
           있습니다.
         </span>
@@ -907,7 +985,7 @@ function OperationsRules() {
 /* ================================================================== */
 
 const TAB_TRIGGER_CLASS =
-  'flex-1 py-2.5 text-[13px] font-medium transition-all data-[state=active]:bg-[#E63B2E]/10 data-[state=active]:text-[#f0f0f0] data-[state=active]:border data-[state=active]:border-[#E63B2E]/20 text-white/30 rounded-lg'
+  'flex-1 py-3 min-h-11 text-sm font-medium transition-all data-[state=active]:bg-[#E63B2E]/10 data-[state=active]:text-[#f0f0f0] data-[state=active]:border data-[state=active]:border-[#E63B2E]/20 text-white/30 rounded-lg'
 
 function ArcadePage() {
   const title = t('nav.arcade')
@@ -927,7 +1005,7 @@ function ArcadePage() {
         <TkcPageHeader title={title} subtitle='아케이드 예선 공식 규정집' />
 
         <Tabs defaultValue='overview'>
-          <TabsList className='mb-6 h-auto w-full rounded-[10px] bg-white/[0.03] p-1'>
+          <TabsList className='mb-6 h-auto w-full overflow-x-auto rounded-[10px] bg-white/[0.03] p-1 whitespace-nowrap'>
             <TabsTrigger value='overview' className={TAB_TRIGGER_CLASS}>
               📋 개요
             </TabsTrigger>
@@ -941,23 +1019,19 @@ function ArcadePage() {
 
           {/* ──────── Tab 1: 개요 ──────── */}
           <TabsContent value='overview'>
+            <TabSummary>
+              아케이드 부문은 온라인 예선 → 오프라인 예선(스위스) → Top 8
+              결선으로 진행됩니다. 4개 지역에서 각 2명씩, 총 8명이 결선에
+              진출합니다.
+            </TabSummary>
+
             <PlayerChecklist />
 
-            <RSection
-              num='01'
-              title='대회 흐름'
-              titleEn='Tournament Flow'
-              index={0}
-            >
+            <RSection num='01' title='대회 흐름' titleEn='Tournament Flow'>
               <TournamentFlow />
             </RSection>
 
-            <RSection
-              num='02'
-              title='예선 지역'
-              titleEn='Qualifier Regions'
-              index={1}
-            >
+            <RSection num='02' title='예선 지역' titleEn='Qualifier Regions'>
               <SDesc>
                 오프라인 예선은 전국 4개 지역에서 각 1회씩 진행됩니다. 참가자는
                 4개 차수 중 1개만 선택 가능하며, 탈락 후 다른 차수 재도전은
@@ -966,23 +1040,22 @@ function ArcadePage() {
               <RegionTable />
             </RSection>
 
-            <RSection
-              num='03'
-              title='온라인 예선'
-              titleEn='Online Qualifier'
-              index={2}
-            >
+            <RSection num='03' title='온라인 예선' titleEn='Online Qualifier'>
               <MarkdownBlock body={ONLINE_QUALIFIER_MD} />
             </RSection>
           </TabsContent>
 
           {/* ──────── Tab 2: 오프라인 예선 ──────── */}
           <TabsContent value='offline'>
+            <TabSummary>
+              스위스 시스템 4라운드로 진행됩니다. 각 매치는 양측이 1곡씩
+              제공하여 2곡 합산으로 승패를 결정하며, 2패 시 탈락합니다.
+            </TabSummary>
+
             <RSection
               num='01'
               title='1경기 = 2곡 합산'
               titleEn='Match = 2-Song Aggregate'
-              index={0}
             >
               <SDesc>
                 한 매치에서 나와 상대가 각각 1곡씩 제공합니다. 두 곡 모두 양쪽이
@@ -999,7 +1072,6 @@ function ArcadePage() {
               num='02'
               title='스위스 라운드'
               titleEn='Swiss Round Progression'
-              index={1}
             >
               <SDesc>
                 매 라운드마다 같은 전적의 선수끼리 매칭됩니다. 1라운드는 온라인
@@ -1013,12 +1085,7 @@ function ArcadePage() {
               </SNote>
             </RSection>
 
-            <RSection
-              num='03'
-              title='진출 조건'
-              titleEn='Qualification Path'
-              index={2}
-            >
+            <RSection num='03' title='진출 조건' titleEn='Qualification Path'>
               <SDesc>
                 각 예선에서 2명이 Top 8 결선에 진출합니다. 진출 방식은 아래 두
                 가지입니다.
@@ -1026,24 +1093,28 @@ function ArcadePage() {
               <QualificationPath />
             </RSection>
 
-            <RSection
-              num='04'
-              title='추가 규칙'
-              titleEn='Additional Rules'
-              index={3}
-            >
-              <SDesc>사이드(1P/2P) 선택권과 동점 시 처리 방식입니다.</SDesc>
-              <SideAndTiebreakRules />
-            </RSection>
+            <details className='mb-9'>
+              <summary className='cursor-pointer text-sm font-semibold text-white/50 transition-colors hover:text-white/70'>
+                추가 규칙 (사이드/동점)
+              </summary>
+              <div className='mt-4'>
+                <SDesc>사이드(1P/2P) 선택권과 동점 시 처리 방식입니다.</SDesc>
+                <SideAndTiebreakRules />
+              </div>
+            </details>
           </TabsContent>
 
           {/* ──────── Tab 3: 결선/운영 ──────── */}
           <TabsContent value='finals'>
+            <TabSummary>
+              Top 8 결선은 크로스 시딩 8강 토너먼트입니다. 밴픽 후 합산 점수로
+              승패를 결정합니다.
+            </TabSummary>
+
             <RSection
               num='01'
               title='Top 8 대진'
               titleEn='Finals Bracket — Cross Seeding'
-              index={0}
             >
               <SDesc>
                 4-0 진출자 4명(A그룹)과 3-1 진출자 4명(B그룹)을 교차 배치하여
@@ -1052,33 +1123,23 @@ function ArcadePage() {
               <BracketVisual />
             </RSection>
 
-            <RSection
-              num='02'
-              title='결선 구조'
-              titleEn='Finals Structure'
-              index={1}
-            >
+            <RSection num='02' title='결선 구조' titleEn='Finals Structure'>
               <FinalsStructure />
             </RSection>
 
-            <RSection
-              num='03'
-              title='밴픽 절차'
-              titleEn='Ban / Pick Procedure'
-              index={2}
-            >
+            <RSection num='03' title='밴픽 절차' titleEn='Ban / Pick Procedure'>
               <SDesc>공통 순서: A 밴 → B 밴 → A 픽 → B 픽</SDesc>
               <BanPickProcedure />
             </RSection>
 
-            <RSection
-              num='04'
-              title='점수/운영 규칙'
-              titleEn='Scoring & Operations'
-              index={3}
-            >
-              <OperationsRules />
-            </RSection>
+            <details className='mb-9'>
+              <summary className='cursor-pointer text-sm font-semibold text-white/50 transition-colors hover:text-white/70'>
+                점수/운영 규칙
+              </summary>
+              <div className='mt-4'>
+                <OperationsRules />
+              </div>
+            </details>
           </TabsContent>
         </Tabs>
       </TkcSection>
