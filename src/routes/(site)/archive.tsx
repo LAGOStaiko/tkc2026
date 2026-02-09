@@ -34,7 +34,7 @@ function PhotoCell({
     <button
       type='button'
       onClick={onClick}
-      className='group relative aspect-[4/3] overflow-hidden rounded-lg border border-white/5 transition-all hover:-translate-y-0.5 hover:border-white/15'
+      className='group relative aspect-[4/3] overflow-hidden rounded-lg border border-white/5 transition-all hover:-translate-y-0.5 hover:border-white/15 focus-visible:ring-2 focus-visible:ring-[#ff2a00]/50 focus-visible:outline-none'
       style={{
         background: photo.url
           ? '#111'
@@ -90,7 +90,7 @@ function PhotoCell({
 
       {/* caption gradient */}
       <span className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent px-2.5 pt-5 pb-2'>
-        <span className='text-xs break-keep text-white/65'>
+        <span className='text-xs break-keep text-white/70'>
           {photo.caption}
         </span>
       </span>
@@ -145,7 +145,7 @@ function Lightbox({
       <button
         type='button'
         onClick={onClose}
-        className='absolute top-4 right-4 z-10 flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-lg text-white transition hover:bg-white/10'
+        className='absolute top-4 right-4 z-10 flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-lg text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none'
         aria-label='닫기'
       >
         ✕
@@ -184,7 +184,7 @@ function Lightbox({
             e.stopPropagation()
             onNav(-1)
           }}
-          className='flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white transition hover:bg-white/10'
+          className='flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none'
           aria-label='이전'
         >
           ‹
@@ -198,14 +198,14 @@ function Lightbox({
             e.stopPropagation()
             onNav(1)
           }}
-          className='flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white transition hover:bg-white/10'
+          className='flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none'
           aria-label='다음'
         >
           ›
         </button>
       </div>
 
-      <p className='mt-2.5 text-sm break-keep text-white/55'>{p.caption}</p>
+      <p className='mt-2.5 text-sm break-keep text-white/60'>{p.caption}</p>
     </div>
   )
 }
@@ -241,7 +241,7 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
     <>
       <article className='motion-safe:animate-[tkc-slide-up_0.65s_cubic-bezier(0.16,1,0.3,1)_both]'>
         {/* ── Year & Title ── */}
-        <div className='mb-7'>
+        <div className='mb-6'>
           <div className='flex items-baseline gap-3.5'>
             <span
               className='font-mono text-5xl leading-none font-bold opacity-15 md:text-6xl'
@@ -250,10 +250,10 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
               {tm.year}
             </span>
             <div>
-              <h2 className='text-sm font-normal tracking-wider break-keep text-white/60'>
+              <h2 className='text-sm font-normal tracking-wider break-keep text-white/70'>
                 {tm.titleKr}
               </h2>
-              <h3 className='mt-0.5 font-mono text-xs font-normal tracking-wider text-white/40 uppercase'>
+              <h3 className='mt-0.5 font-mono text-xs font-normal tracking-wider text-white/55 uppercase'>
                 {tm.title}
               </h3>
             </div>
@@ -273,7 +273,7 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
         </div>
 
         {/* ── Champion / Runner-up ── */}
-        <div className='mb-4 grid grid-cols-1 gap-px overflow-hidden rounded-xl bg-white/[0.03] sm:grid-cols-2'>
+        <div className='mb-4 grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-white/[0.03] sm:grid-cols-2'>
           {/* Champion */}
           <div
             className='relative overflow-hidden px-6 py-7 md:px-7 md:py-8'
@@ -303,14 +303,14 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
           </div>
 
           {/* Runner-up */}
-          <div className='relative overflow-hidden bg-white/[0.015] px-6 py-7 md:px-7 md:py-8'>
+          <div className='relative overflow-hidden bg-white/[0.03] px-6 py-7 md:px-7 md:py-8'>
             <div
               className='absolute -top-4 -right-1.5 text-[90px] leading-none opacity-[0.025]'
               aria-hidden
             >
               🥈
             </div>
-            <div className='mb-3.5 font-mono text-xs tracking-[3px] text-white/40 uppercase'>
+            <div className='mb-3.5 font-mono text-xs tracking-[3px] text-white/55 uppercase'>
               Runner-up
             </div>
             <div className='mb-2.5 text-[42px]'>🥈</div>
@@ -324,11 +324,11 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
         </div>
 
         {/* ── 3rd / 4th ── */}
-        <div className='mb-8 grid grid-cols-1 gap-2 sm:grid-cols-2'>
+        <div className='mb-6 grid grid-cols-1 gap-2 sm:grid-cols-2'>
           {tm.top4.map((p) => (
             <div
               key={p.rank}
-              className='flex items-center gap-2.5 rounded-lg border border-white/[0.035] bg-white/[0.015] px-4 py-3'
+              className='flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3'
             >
               <span className='text-xl'>{p.rank === 3 ? '🥉' : '4️⃣'}</span>
               <div>
@@ -340,7 +340,7 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
                 >
                   {p.name}
                 </div>
-                <div className='font-mono text-xs tracking-wider text-white/40'>
+                <div className='font-mono text-xs tracking-wider text-white/55'>
                   {p.rank === 3 ? '3RD PLACE' : '4TH PLACE'}
                 </div>
               </div>
@@ -350,16 +350,16 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
 
         {/* ── Gallery ── */}
         <div>
-          <div className='mb-3.5 flex items-center gap-2.5'>
+          <div className='mb-4 flex items-center gap-2.5'>
             <div
               className='h-px w-[18px]'
               style={{ background: `${tm.accent}33` }}
             />
-            <span className='font-mono text-xs tracking-[3px] text-white/40 uppercase'>
+            <span className='font-mono text-xs tracking-[3px] text-white/55 uppercase'>
               Gallery
             </span>
             <div className='h-px flex-1 bg-white/[0.035]' />
-            <span className='font-mono text-xs tracking-wider text-white/40'>
+            <span className='font-mono text-xs tracking-wider text-white/55'>
               {tm.photos.length} photos
             </span>
           </div>
@@ -396,7 +396,7 @@ function TournamentCard({ tournament: tm }: { tournament: PastTournament }) {
 function ComingNext() {
   return (
     <GlassCard
-      className='border-[#E63B2E]/[0.07] p-10 text-center motion-safe:animate-[tkc-slide-up_0.6s_ease_0.3s_both]'
+      className='border-[#E63B2E]/[0.07] p-10 text-center motion-safe:animate-[tkc-slide-up_0.5s_ease_both]'
       style={{
         background:
           'linear-gradient(135deg, rgba(230,59,46,0.045), rgba(230,59,46,0.01))',
@@ -421,26 +421,19 @@ function ArchivePage() {
   }, [])
 
   return (
-    <>
-      <style>{`
-        @keyframes tkc-fade-in { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes tkc-slide-up { from { opacity: 0; transform: translateY(28px) } to { opacity: 1; transform: translateY(0) } }
-      `}</style>
+    <TkcSection>
+      <TkcPageHeader
+        title='대회 아카이브'
+        subtitle='꿈의 시작부터, 현실에서 기적으로 — 우리가 함께 만들어온 무대의 기록'
+      />
 
-      <TkcSection>
-        <TkcPageHeader
-          title='대회 아카이브'
-          subtitle='꿈의 시작부터, 현실에서 기적으로 — 우리가 함께 만들어온 무대의 기록'
-        />
+      <div className='space-y-10 md:space-y-16'>
+        {PAST_TOURNAMENTS.map((tournament) => (
+          <TournamentCard key={tournament.id} tournament={tournament} />
+        ))}
+      </div>
 
-        <div className='space-y-10 md:space-y-16'>
-          {PAST_TOURNAMENTS.map((tournament) => (
-            <TournamentCard key={tournament.id} tournament={tournament} />
-          ))}
-        </div>
-
-        <ComingNext />
-      </TkcSection>
-    </>
+      <ComingNext />
+    </TkcSection>
   )
 }

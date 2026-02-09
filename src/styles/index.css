@@ -144,6 +144,26 @@
   }
 }
 
+@keyframes tkc-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tkc-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @layer utilities {
   .site-scope .rounded-3xl {
     border-radius: 0.75rem;
