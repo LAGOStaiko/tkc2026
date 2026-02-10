@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSite } from '@/lib/api'
@@ -444,8 +444,8 @@ function FaqList({ items }: { items: string[] }) {
   return (
     <ul className='mt-2 space-y-1'>
       {items.map((item, i) => (
-        <li key={i} className='flex gap-2 text-sm text-white/70'>
-          <span className='mt-0.5 shrink-0 text-[#ff8c66]'>›</span>
+        <li key={i} className='flex gap-2 text-[12px] text-white/55 sm:text-[13px]'>
+          <span className='mt-0.5 shrink-0 font-bold text-[#f5a623]'>›</span>
           <span className='break-keep'>{item}</span>
         </li>
       ))}
@@ -455,14 +455,12 @@ function FaqList({ items }: { items: string[] }) {
 
 function FaqNote({ children }: { children: ReactNode }) {
   return (
-    <p className='mt-2 text-xs text-white/40'>※ {children}</p>
+    <div className='mt-2.5 flex gap-2 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-2.5 text-[11px] leading-relaxed text-white/50 sm:text-[12px]'>
+      <span className='shrink-0'>※</span>
+      <span className='break-keep'>{children}</span>
+    </div>
   )
 }
-
-const TAG_STYLES = {
-  console: 'border-amber-400/30 bg-amber-400/10 text-amber-400',
-  arcade: 'border-violet-400/30 bg-violet-400/10 text-violet-400',
-} as const
 
 /* ════════════════════════════════════════════════════════════════════ */
 /*  FAQ Item                                                           */
@@ -472,80 +470,56 @@ function FaqItem({
   num,
   question,
   answer,
-  tag,
   isOpen,
   onToggle,
 }: {
   num: number
   question: string
   answer: ReactNode
-  tag?: 'console' | 'arcade'
   isOpen: boolean
   onToggle: () => void
 }) {
-  const numColor = tag === 'console'
-    ? 'text-amber-400 bg-amber-400/10'
-    : tag === 'arcade'
-      ? 'text-violet-400 bg-violet-400/10'
-      : 'text-sky-400 bg-sky-400/10'
-
-  const hoverBorder = tag === 'console'
-    ? 'hover:border-amber-400/20'
-    : tag === 'arcade'
-      ? 'hover:border-violet-400/20'
-      : 'hover:border-sky-400/20'
+  const contentRef = useRef<HTMLDivElement>(null)
 
   return (
-    <GlassCard
+    <div
       className={cn(
-        'overflow-hidden transition-all',
-        hoverBorder,
-        isOpen && 'border-white/20 bg-white/[0.05]'
+        'tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111]',
+        isOpen ? 'border-[#2a2a2a]' : 'hover:border-[#2a2a2a]'
       )}
     >
       <button
         type='button'
-        className='flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-white/[0.02] md:gap-4 md:px-6 md:py-4'
+        className='flex w-full items-center gap-3 px-4 py-3.5 text-left sm:px-6 sm:py-4'
         onClick={onToggle}
       >
-        <span
-          className={cn(
-            'shrink-0 rounded px-2 py-0.5 font-mono text-[11px] font-bold',
-            numColor
-          )}
-        >
+        <span className='shrink-0 rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider text-[#f5a623] bg-[#f5a623]/[0.08]'>
           Q{num}
         </span>
-        <span className='flex-1 text-sm font-medium break-keep text-white/90 md:text-[15px]'>
+        <span className='flex-1 text-[13px] font-bold break-keep text-white/90 sm:text-sm'>
           {question}
         </span>
-        <svg
+        <span
           className={cn(
-            'size-5 flex-shrink-0 text-white/30 transition-transform duration-300',
+            'text-[10px] text-white/35 transition-transform duration-300',
             isOpen && 'rotate-180'
           )}
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
         >
-          <polyline points='6 9 12 15 18 9' />
-        </svg>
+          ▾
+        </span>
       </button>
       <div
-        className={cn(
-          'grid transition-all duration-300',
-          isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-        )}
+        ref={contentRef}
+        className='overflow-hidden transition-all duration-400'
+        style={{
+          maxHeight: isOpen ? (contentRef.current?.scrollHeight ?? 2000) : 0,
+        }}
       >
-        <div className='overflow-hidden'>
-          <div className='border-t border-white/[0.06] px-4 pt-3 pb-4 pl-[3.2rem] text-sm leading-relaxed text-white/65 break-keep md:px-6 md:pt-4 md:pb-5 md:pl-[4.2rem]'>
-            {answer}
-          </div>
+        <div className='border-t border-[#1e1e1e] px-4 py-4 pl-[3.2rem] text-[13px] leading-relaxed text-white/55 break-keep sm:px-6 sm:py-5 sm:pl-[4.2rem]'>
+          {answer}
         </div>
       </div>
-    </GlassCard>
+    </div>
   )
 }
 
@@ -703,13 +677,13 @@ function ContactPage() {
       {/* FAQ Section */}
       <div className='space-y-6'>
         <div className='space-y-2'>
-          <p className='text-xs font-semibold tracking-[3px] text-[#ff2a00] uppercase'>
+          <span className='font-mono text-xs font-semibold tracking-[2px] text-[#f5a623] uppercase'>
             FAQ
-          </p>
-          <h2 className='text-2xl font-bold tracking-tight md:text-3xl'>
+          </span>
+          <h2 className='text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
             {t('contact.faqTitle')}
           </h2>
-          <p className='text-sm text-white/50 break-keep md:text-base'>
+          <p className='text-sm font-light text-white/55'>
             룰북 기반 자주 묻는 질문 30선
           </p>
         </div>
@@ -717,20 +691,16 @@ function ContactPage() {
         <div className='space-y-8'>
           {FAQ_SECTIONS.map((section, sIdx) => {
             return (
-              <div key={sIdx} className='space-y-2.5'>
+              <div key={sIdx} className='space-y-3'>
                 {/* Section header */}
-                <div className='flex items-center gap-2.5 pb-1'>
-                  <h3 className='text-base font-bold tracking-tight text-white/80 md:text-lg'>
+                <div className='flex items-center gap-2.5 border-b border-[#1e1e1e] pb-3'>
+                  <span className='size-2 shrink-0 rounded-full bg-[#e86e3a]' />
+                  <span className='text-[15px] font-bold text-white/90'>
                     {section.title}
-                  </h3>
+                  </span>
                   {section.tag && (
-                    <span
-                      className={cn(
-                        'rounded px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase',
-                        TAG_STYLES[section.tag]
-                      )}
-                    >
-                      {section.tag}
+                    <span className='rounded px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider bg-[#f5a623]/[0.08] text-[#f5a623]'>
+                      {section.tag === 'console' ? 'CONSOLE' : 'ARCADE'}
                     </span>
                   )}
                 </div>
@@ -746,7 +716,6 @@ function ContactPage() {
                         num={globalNum}
                         question={item.question}
                         answer={item.answer}
-                        tag={section.tag}
                         isOpen={openFaq === key}
                         onToggle={() =>
                           setOpenFaq(openFaq === key ? null : key)
@@ -764,27 +733,27 @@ function ContactPage() {
       {/* Comparison Table */}
       <div className='space-y-4'>
         <div className='space-y-2'>
-          <p className='text-xs font-semibold tracking-[3px] text-[#ff2a00] uppercase'>
+          <span className='font-mono text-xs font-semibold tracking-[2px] text-[#f5a623] uppercase'>
             COMPARE
-          </p>
-          <h2 className='text-2xl font-bold tracking-tight md:text-3xl'>
+          </span>
+          <h2 className='text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
             부문별 비교 요약
           </h2>
         </div>
 
         {/* Desktop table */}
-        <div className='hidden overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] md:block'>
-          <table className='w-full text-sm'>
+        <div className='hidden overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] md:block'>
+          <table className='w-full text-[13px]'>
             <caption className='sr-only'>콘솔 · 아케이드 부문 비교</caption>
             <thead>
-              <tr className='border-b border-white/[0.08] bg-white/[0.015]'>
-                <th className='px-5 py-3.5 text-left text-xs font-semibold tracking-wider text-white/40 uppercase'>
+              <tr className='border-b border-[#1e1e1e] bg-[#1a1a1a]'>
+                <th className='px-5 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wider text-white/35 uppercase'>
                   항목
                 </th>
-                <th className='px-5 py-3.5 text-left text-xs font-semibold tracking-wider text-amber-400 uppercase'>
+                <th className='px-5 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wider text-[#f5a623] uppercase'>
                   콘솔
                 </th>
-                <th className='px-5 py-3.5 text-left text-xs font-semibold tracking-wider text-violet-400 uppercase'>
+                <th className='px-5 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wider text-[#f5a623] uppercase'>
                   아케이드
                 </th>
               </tr>
@@ -793,15 +762,18 @@ function ContactPage() {
               {COMPARE_ROWS.map((row, i) => (
                 <tr
                   key={i}
-                  className='border-b border-white/[0.04] last:border-b-0'
+                  className={cn(
+                    'border-b border-[#1e1e1e] last:border-b-0',
+                    i % 2 === 1 && 'bg-white/[0.015]'
+                  )}
                 >
-                  <td className='px-5 py-3 font-medium text-white/50 break-keep'>
+                  <td className='px-5 py-3 font-medium text-white/55 break-keep'>
                     {row.label}
                   </td>
-                  <td className='px-5 py-3 text-white/70 break-keep'>
+                  <td className='px-5 py-3 font-semibold text-white/90 break-keep'>
                     {row.console}
                   </td>
-                  <td className='px-5 py-3 text-white/70 break-keep'>
+                  <td className='px-5 py-3 font-semibold text-white/90 break-keep'>
                     {row.arcade}
                   </td>
                 </tr>
@@ -811,56 +783,43 @@ function ContactPage() {
         </div>
 
         {/* Mobile cards */}
-        <div className='space-y-2.5 md:hidden'>
+        <div className='space-y-2 md:hidden'>
           {COMPARE_ROWS.map((row, i) => (
-            <GlassCard key={i} className='px-4 py-3'>
-              <p className='mb-2 text-xs font-semibold text-white/40'>
+            <div
+              key={i}
+              className='tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3 hover:border-[#2a2a2a]'
+            >
+              <p className='mb-2 font-mono text-[10px] font-semibold tracking-wider text-white/35 uppercase'>
                 {row.label}
               </p>
               <div className='grid grid-cols-2 gap-3'>
                 <div>
-                  <p className='mb-0.5 text-[10px] font-semibold text-amber-400 uppercase'>
+                  <p className='mb-0.5 font-mono text-[10px] font-bold tracking-wider text-[#f5a623]'>
                     콘솔
                   </p>
-                  <p className='text-sm text-white/70 break-keep'>
+                  <p className='text-[12px] font-semibold text-white/90 break-keep'>
                     {row.console}
                   </p>
                 </div>
                 <div>
-                  <p className='mb-0.5 text-[10px] font-semibold text-violet-400 uppercase'>
+                  <p className='mb-0.5 font-mono text-[10px] font-bold tracking-wider text-[#f5a623]'>
                     아케이드
                   </p>
-                  <p className='text-sm text-white/70 break-keep'>
+                  <p className='text-[12px] font-semibold text-white/90 break-keep'>
                     {row.arcade}
                   </p>
                 </div>
               </div>
-            </GlassCard>
+            </div>
           ))}
         </div>
       </div>
 
       {/* Notice */}
-      <GlassCard className='flex items-start gap-3.5 p-5 md:p-6'>
-        <div className='mt-0.5 flex size-7 flex-shrink-0 items-center justify-center rounded-lg border border-[#ff2a00]/12 bg-[#ff2a00]/6'>
-          <svg
-            className='size-3.5 text-[#ff2a00]'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <circle cx='12' cy='12' r='10' />
-            <line x1='12' y1='16' x2='12' y2='12' />
-            <line x1='12' y1='8' x2='12.01' y2='8' />
-          </svg>
-        </div>
-        <p className='text-sm leading-relaxed text-white/50 break-keep md:text-base'>
-          {t('contact.notice')}
-        </p>
-      </GlassCard>
+      <div className='flex gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px]'>
+        <span className='mt-0.5 shrink-0'>⚠</span>
+        <span className='break-keep'>{t('contact.notice')}</span>
+      </div>
     </TkcSection>
   )
 }

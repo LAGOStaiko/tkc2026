@@ -244,7 +244,7 @@ function ArcadeOnlinePage() {
             {GLANCE_ITEMS.map((item, i) => (
               <div
                 key={item.label}
-                className={`border-[#1e1e1e] px-6 py-5 ${i < 4 ? 'border-b' : ''} ${i % 2 === 0 ? 'border-r' : ''}`}
+                className={`flex min-h-[96px] flex-col justify-center border-[#1e1e1e] px-6 py-5 ${i < 4 ? 'border-b' : ''} ${i % 2 === 0 ? 'border-r' : ''}`}
               >
                 <div className='mb-1 text-[11px] font-medium tracking-wider text-white/35'>
                   {item.label}

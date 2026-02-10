@@ -196,7 +196,7 @@ function OverviewSection() {
         {OVERVIEW_STATS.map((s) => (
           <div
             key={s.label}
-            className='relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-6 text-center'
+            className='relative flex min-h-[132px] flex-col justify-center overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-6 text-center'
           >
             <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#e86e3a] opacity-50' />
             <div
