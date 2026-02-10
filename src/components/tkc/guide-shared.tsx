@@ -170,18 +170,18 @@ export function StepCard({
     <FadeIn>
       <div className='tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'>
         {/* Main */}
-        <div className='flex items-start gap-3 p-4 sm:gap-4 sm:p-6'>
+        <div className='flex items-start gap-3.5 p-5 sm:gap-4 sm:p-6'>
           <div
-            className='shrink-0 pt-0.5 text-[26px] leading-none font-extrabold opacity-25 sm:text-[32px]'
+            className='shrink-0 pt-0.5 text-[22px] leading-none font-extrabold opacity-25 sm:text-[32px]'
             style={{ color: accentColor }}
           >
             {num}
           </div>
           <div className='min-w-0 flex-1'>
-            <div className='mb-1 text-base font-bold tracking-tight text-white/90 sm:mb-1.5 sm:text-lg'>
+            <div className='mb-1.5 text-[15px] font-bold tracking-tight text-white/90 sm:mb-1.5 sm:text-lg'>
               {heading}
             </div>
-            <div className='text-[13px] leading-relaxed break-keep text-white/55 sm:text-sm'>
+            <div className='text-[13px] leading-[1.75] break-keep text-white/55 sm:text-sm sm:leading-relaxed'>
               {summary}
             </div>
           </div>

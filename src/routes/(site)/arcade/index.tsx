@@ -287,19 +287,9 @@ function ArcadeOnlinePage() {
           heading='신청 & 차수 선택'
           summary={
             <>
-              홈페이지에서 신청하며,{' '}
-              <span className='rounded bg-[#f5a623]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f5a623]'>
-                참가할 차수
-              </span>
-              를 선택합니다. 차수는 오프라인 대회가 열리는 장소를 뜻하며,{' '}
-              <strong className='text-white/90'>
-                거주지와 무관하게 자유롭게 선택
-              </strong>{' '}
-              가능합니다. 신청 시{' '}
-              <span className='rounded bg-[#f7d154]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f7d154]'>
-                오프라인 예선곡 4곡
-              </span>
-              도 함께 선택해야 합니다.
+              홈페이지에서 <strong className='text-white/90'>참가 차수</strong>를
+              선택하여 신청합니다. 거주지와 무관하게 자유롭게 선택 가능하며,
+              오프라인 예선곡 4곡도 함께 선택합니다.
             </>
           }
           toggleLabel='차수 안내 · 사용곡 선택 상세 보기'
@@ -370,14 +360,9 @@ function ArcadeOnlinePage() {
           heading='동더 광장 연동 & 점수 제출'
           summary={
             <>
-              <strong className='text-white/90'>남코 아이디</strong>와{' '}
-              <strong className='text-white/90'>동더 광장</strong>을 연동하면
-              과제곡 점수가 자동으로 반영됩니다. 별도 영상 촬영이 필요 없으며,
-              플레이하면{' '}
-              <strong className='text-white/90'>
-                홈페이지에 실시간으로 점수가 표시
-              </strong>
-              됩니다.
+              남코 아이디와 동더 광장을 연동하면 과제곡 점수가{' '}
+              <strong className='text-white/90'>자동으로 반영</strong>됩니다.
+              별도 영상 촬영 없이, 플레이만 하면 됩니다.
             </>
           }
           toggleLabel='연동 절차 · 과제곡 상세 보기'
@@ -466,12 +451,9 @@ function ArcadeOnlinePage() {
           heading='스위스 스테이지 진출'
           summary={
             <>
-              2곡 합산 통산 점수{' '}
-              <span className='rounded bg-[#f7d154]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f7d154]'>
-                차수별 상위 16명
-              </span>
-              이 해당 차수의 스위스 스테이지에 진출합니다. 스위스
-              스테이지를 거쳐 최종 결선 진출자가 결정됩니다.
+              2곡 합산 점수 <strong className='text-white/90'>차수별 상위 16명</strong>이
+              스위스 스테이지에 진출합니다.
+              스위스 스테이지를 거쳐 최종 결선 진출자가 결정됩니다.
             </>
           }
           toggleLabel='점수 산정 · 진출 구조 상세 보기'

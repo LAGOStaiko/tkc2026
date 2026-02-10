@@ -234,20 +234,9 @@ function ConsoleQualifierPage() {
           accentColor='#e86e3a'
           summary={
             <>
-              <strong className='text-white/90'>希望へのメロディー</strong>{' '}
-              <span className='rounded bg-[#f7d154]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f7d154]'>
-                뒷보면 ★9
-              </span>{' '}
-              와 <strong className='text-white/90'>TAIKO-TONGUE-TWISTER</strong>{' '}
-              <span className='rounded bg-[#b275f0]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#b275f0]'>
-                귀신 ★8
-              </span>{' '}
-              두 곡을 플레이하세요.
-              <br />
-              <span className='rounded bg-[#e86e3a]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#e86e3a]'>
-                옵션 전면 금지
-              </span>{' '}
-              진타·배속 등 일체 사용 불가합니다.
+              과제곡 <strong className='text-white/90'>2곡</strong>을
+              플레이하세요. 진타·배속 등{' '}
+              <strong className='text-white/90'>옵션은 전면 금지</strong>입니다.
             </>
           }
           toggleLabel='과제곡 · 컨트롤러 상세 보기'
@@ -327,14 +316,10 @@ function ConsoleQualifierPage() {
           accentColor='#e86e3a'
           summary={
             <>
-              직접 앵글로 촬영 →{' '}
+              직접 앵글로 촬영하여{' '}
               <strong className='text-white/90'>유튜브 일부공개</strong>로
-              업로드 → 신청 폼에 링크 제출.
-              <br />
-              <strong className='text-white/90'>플레이 화면</strong>
-              (곡명·점수·결과)과{' '}
-              <strong className='text-white/90'>손/컨트롤러 조작</strong>이
-              반드시 보여야 합니다.
+              업로드 후 링크를 제출합니다.
+              플레이 화면과 조작이 모두 보여야 합니다.
             </>
           }
           toggleLabel='제출 절차 · 필수 요소 상세 보기'
@@ -396,12 +381,9 @@ function ConsoleQualifierPage() {
           accentColor='#e86e3a'
           summary={
             <>
-              2곡 합산 통산 점수{' '}
-              <span className='rounded bg-[#f7d154]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f7d154]'>
-                상위 4명
-              </span>
-              이 PlayX4 결선 토너먼트에 진출합니다. 예비 번호가 부여되며, 기권
-              시 순차 대체됩니다.
+              2곡 합산 점수 <strong className='text-white/90'>상위 4명</strong>이
+              PlayX4 결선에 진출합니다.
+              기권 시 예비 순번으로 대체됩니다.
             </>
           }
           toggleLabel='점수 산정 · 순위 상세 보기'
