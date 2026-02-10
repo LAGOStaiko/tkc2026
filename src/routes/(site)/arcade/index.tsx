@@ -36,10 +36,10 @@ const GLANCE_ITEMS: GlanceItem[] = [
 ]
 
 const REGIONS = [
-  { num: 1, label: '1차수', venue: '서울' },
-  { num: 2, label: '2차수', venue: '대전' },
-  { num: 3, label: '3차수', venue: '광주' },
-  { num: 4, label: '4차수', venue: '부산' },
+  { num: 1, label: '1차수', venue: '서울', arcade: 'TAIKO LABS' },
+  { num: 2, label: '2차수', venue: '대전', arcade: 'CYGameworld' },
+  { num: 3, label: '3차수', venue: '광주', arcade: 'GAMEPLAZA' },
+  { num: 4, label: '4차수', venue: '부산', arcade: 'GAME D' },
 ] as const
 
 const LINK_FLOW = [
@@ -314,30 +314,31 @@ function ArcadeOnlinePage() {
             차수는 <strong>오프라인 스위스 스테이지가 열리는 장소</strong>를
             의미합니다.
             <br />
-            예를 들어, 1차수(서울)에 신청하면 <strong>
+            예를 들어, 1차수(서울 · TAIKO LABS)에 신청하면 <strong>
               거주지에 상관없이
             </strong>{' '}
             1차수에 신청한 참가자들끼리 온라인 점수를 겨루고, 상위 16명이{' '}
-            <strong>서울에서 열리는 오프라인 대회</strong>에 진출하는
+            <strong>서울 TAIKO LABS에서 열리는 오프라인 대회</strong>에 진출하는
             구조입니다.
           </HighlightCard>
 
           <div>
             <DetailSubtitle>차수 안내</DetailSubtitle>
-            <div className='grid grid-cols-2 gap-1.5 sm:grid-cols-4'>
+            <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
               {REGIONS.map((r) => (
                 <div
                   key={r.num}
-                  className='rounded-xl border border-[#1e1e1e] bg-white/[0.02] px-2.5 py-4 text-center'
+                  className='relative overflow-hidden rounded-xl border border-[#f5a623]/15 bg-[#111] px-3 py-5 text-center'
                 >
-                  <div className='text-2xl font-extrabold text-[#f5a623]'>
-                    {r.num}
-                  </div>
-                  <div className='text-[13px] font-bold text-white/90'>
+                  <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#f5a623]' />
+                  <div className='mb-0.5 font-mono text-[10px] font-semibold tracking-widest text-white/35 uppercase'>
                     {r.label}
                   </div>
-                  <div className='mt-1 inline-block rounded bg-white/[0.03] px-2 py-0.5 font-mono text-[10px] font-semibold text-white/35'>
-                    오프라인: {r.venue}
+                  <div className='text-lg font-extrabold text-[#f5a623]'>
+                    {r.venue}
+                  </div>
+                  <div className='mt-2 inline-block rounded-md border border-[#f5a623]/20 bg-[#f5a623]/[0.06] px-2.5 py-1 text-[12px] font-bold tracking-wide text-[#f5a623]'>
+                    {r.arcade}
                   </div>
                 </div>
               ))}
