@@ -45,8 +45,15 @@ function SubNav() {
     return pathname.startsWith(item.to)
   }
 
+  const activeIndex = NAV_ITEMS.findIndex((item) => isActive(item))
+  const prevItem = activeIndex > 0 ? NAV_ITEMS[activeIndex - 1] : undefined
+  const nextItem =
+    activeIndex >= 0 && activeIndex < NAV_ITEMS.length - 1
+      ? NAV_ITEMS[activeIndex + 1]
+      : undefined
+
   return (
-    <nav className='mb-10 overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111]'>
+    <nav className='mb-8 overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] sm:mb-10'>
       {/* Desktop */}
       <div className='hidden sm:flex'>
         {NAV_ITEMS.map((item, i) => {
@@ -96,47 +103,100 @@ function SubNav() {
         })}
       </div>
       {/* Mobile */}
-      <div className='flex flex-col sm:hidden'>
-        {NAV_ITEMS.map((item, i) => {
-          const active = isActive(item)
-          return (
+      <div className='space-y-2 p-2 sm:hidden'>
+        <div
+          className='grid gap-2'
+          style={{
+            gridTemplateColumns: `repeat(${NAV_ITEMS.length}, minmax(112px, 1fr))`,
+          }}
+        >
+          {NAV_ITEMS.map((item) => {
+            const active = isActive(item)
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                preload='render'
+                className={`relative rounded-lg border px-3 py-3 text-left transition-colors ${
+                  active
+                    ? 'border-white/20 bg-white/[0.05]'
+                    : 'border-[#1e1e1e] bg-[#0f0f0f] hover:border-[#2a2a2a]'
+                }`}
+              >
+                <div
+                  className='absolute top-0 right-0 left-0 h-0.5 transition-opacity'
+                  style={{
+                    background: item.color,
+                    opacity: active ? 1 : 0.3,
+                  }}
+                />
+                <div
+                  className='mb-0.5 font-mono text-[11px] font-extrabold transition-opacity'
+                  style={{
+                    color: item.color,
+                    opacity: active ? 1 : 0.5,
+                  }}
+                >
+                  {item.phase}
+                </div>
+                <div
+                  className={`text-[12px] font-bold transition-colors ${active ? 'text-white/90' : 'text-white/55'}`}
+                >
+                  {item.label}
+                </div>
+                <div
+                  className={`mt-0.5 text-[10px] transition-colors ${active ? 'text-white/35' : 'text-white/30'}`}
+                >
+                  {item.desc}
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+        <div className='grid grid-cols-2 gap-2'>
+          {prevItem ? (
             <Link
-              key={item.to}
-              to={item.to}
+              to={prevItem.to}
               preload='render'
-              className={`relative border-[#1e1e1e] px-4 py-3.5 text-center transition-colors ${
-                i < NAV_ITEMS.length - 1 ? 'border-b' : ''
-              } ${active ? 'bg-white/[0.02]' : ''}`}
+              className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 text-left transition-colors hover:border-[#2a2a2a]'
             >
-              <div
-                className='absolute top-0 right-0 left-0 h-0.5 transition-opacity'
-                style={{
-                  background: item.color,
-                  opacity: active ? 1 : 0.3,
-                }}
-              />
-              <div
-                className='mb-0.5 font-mono text-[11px] font-extrabold transition-opacity'
-                style={{
-                  color: item.color,
-                  opacity: active ? 1 : 0.5,
-                }}
-              >
-                {item.phase}
+              <div className='text-[10px] font-mono font-semibold tracking-wide text-white/35'>
+                PREV PHASE
               </div>
-              <div
-                className={`text-[13px] font-bold transition-colors ${active ? 'text-white/90' : 'text-white/45'}`}
-              >
-                {item.label}
-              </div>
-              <div
-                className={`text-[11px] transition-colors ${active ? 'text-white/35' : 'text-white/20'}`}
-              >
-                {item.desc}
+              <div className='truncate text-[12px] font-bold text-white/85'>
+                {prevItem.phase}
               </div>
             </Link>
-          )
-        })}
+          ) : (
+            <div className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 opacity-40'>
+              <div className='text-[10px] font-mono font-semibold tracking-wide text-white/35'>
+                PREV PHASE
+              </div>
+              <div className='text-[12px] font-bold text-white/55'>-</div>
+            </div>
+          )}
+          {nextItem ? (
+            <Link
+              to={nextItem.to}
+              preload='render'
+              className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 text-right transition-colors hover:border-[#2a2a2a]'
+            >
+              <div className='text-[10px] font-mono font-semibold tracking-wide text-white/35'>
+                NEXT PHASE
+              </div>
+              <div className='truncate text-[12px] font-bold text-white/85'>
+                {nextItem.phase}
+              </div>
+            </Link>
+          ) : (
+            <div className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 text-right opacity-40'>
+              <div className='text-[10px] font-mono font-semibold tracking-wide text-white/35'>
+                NEXT PHASE
+              </div>
+              <div className='text-[12px] font-bold text-white/55'>-</div>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   )
@@ -156,7 +216,7 @@ function ConsoleLayout() {
   return (
     <div className='mx-auto max-w-[960px] px-4 md:px-6'>
       {/* ── Hero ── */}
-      <section className='relative overflow-hidden pt-16 pb-10 md:pt-24 md:pb-14'>
+      <section className='relative overflow-hidden pt-12 pb-8 sm:pt-16 sm:pb-10 md:pt-24 md:pb-14'>
         <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(232,110,58,0.15)_0%,transparent_70%)]' />
         <div className='relative'>
           <FadeIn>
@@ -166,7 +226,7 @@ function ConsoleLayout() {
             </div>
           </FadeIn>
           <FadeIn delay={120}>
-            <h1 className='text-[clamp(36px,6vw,56px)] leading-[1.1] font-extrabold tracking-tight'>
+            <h1 className='text-[clamp(30px,8.5vw,56px)] leading-[1.1] font-extrabold tracking-tight'>
               <span className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'>
                 콘솔 예선
               </span>
