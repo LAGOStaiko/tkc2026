@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+﻿import { useEffect, useRef, useState, type ReactNode } from 'react'
 
-/* ════════════════════════════════════════════════════════════════════ */
+/* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧 */
 /*  Shared utility components for guide pages (arcade / console)       */
-/* ════════════════════════════════════════════════════════════════════ */
+/* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧 */
 
 export function Callout({
   type,
@@ -20,7 +20,7 @@ export function Callout({
   }
   return (
     <div
-      className={`flex gap-3 rounded-xl border p-4 text-[13px] leading-relaxed text-white/55 ${cls[type]}`}
+      className={`flex gap-3 rounded-xl border p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px] ${cls[type]}`}
     >
       <span className='mt-0.5 shrink-0'>{icon}</span>
       <span className='break-keep'>{children}</span>
@@ -95,7 +95,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-[#1e1e1e] bg-[#111] p-7 transition-colors hover:border-[#2a2a2a] ${className}`}
+      className={`rounded-2xl border border-[#1e1e1e] bg-[#111] p-4 transition-colors hover:border-[#2a2a2a] sm:p-7 ${className}`}
     >
       {children}
     </div>
@@ -117,14 +117,13 @@ export function Accordion({
       <button
         type='button'
         onClick={() => setOpen((v) => !v)}
-        className='flex w-full items-center justify-between px-6 py-4 text-left'
+        className='flex w-full items-center justify-between px-4 py-3.5 text-left sm:px-6 sm:py-4'
       >
-        <span className='text-sm font-bold text-white/90'>{title}</span>
+        <span className='text-[13px] font-bold text-white/90 sm:text-sm'>{title}</span>
         <span
           className={`text-[10px] text-white/35 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
         >
-          ▼
-        </span>
+          ??        </span>
       </button>
       <div
         ref={contentRef}
@@ -133,7 +132,7 @@ export function Accordion({
           maxHeight: open ? (contentRef.current?.scrollHeight ?? 2000) : 0,
         }}
       >
-        <div className='border-t border-[#1e1e1e] px-6 py-5'>{children}</div>
+        <div className='border-t border-[#1e1e1e] px-4 py-4 sm:px-6 sm:py-5'>{children}</div>
       </div>
     </div>
   )
@@ -161,18 +160,18 @@ export function StepCard({
     <FadeIn>
       <div className='rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
         {/* Main */}
-        <div className='flex items-start gap-4 p-6'>
+        <div className='flex items-start gap-3 p-4 sm:gap-4 sm:p-6'>
           <div
-            className='shrink-0 pt-0.5 text-[32px] leading-none font-extrabold opacity-25'
+            className='shrink-0 pt-0.5 text-[26px] leading-none font-extrabold opacity-25 sm:text-[32px]'
             style={{ color: accentColor }}
           >
             {num}
           </div>
           <div className='min-w-0 flex-1'>
-            <div className='mb-1.5 text-lg font-bold tracking-tight text-white/90'>
+            <div className='mb-1 text-base font-bold tracking-tight text-white/90 sm:mb-1.5 sm:text-lg'>
               {heading}
             </div>
-            <div className='text-sm leading-relaxed break-keep text-white/55'>
+            <div className='text-[13px] leading-relaxed break-keep text-white/55 sm:text-sm'>
               {summary}
             </div>
           </div>
@@ -182,14 +181,13 @@ export function StepCard({
         <button
           type='button'
           onClick={() => setOpen((v) => !v)}
-          className='flex w-full items-center justify-center gap-1.5 border-t border-[#1e1e1e] py-2.5 text-xs text-white/35 transition-colors hover:text-white/55'
+          className='flex w-full items-center justify-center gap-1.5 border-t border-[#1e1e1e] py-3 text-[11px] text-white/35 transition-colors hover:text-white/55 sm:py-2.5 sm:text-xs'
         >
           {toggleLabel}
           <span
             className={`text-[10px] transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
           >
-            ▼
-          </span>
+            ??          </span>
         </button>
 
         {/* Detail */}
@@ -200,7 +198,7 @@ export function StepCard({
             maxHeight: open ? (contentRef.current?.scrollHeight ?? 2000) : 0,
           }}
         >
-          <div className='border-t border-[#1e1e1e] px-6 py-5 [&>*+*]:mt-5'>
+          <div className='border-t border-[#1e1e1e] px-4 py-4 [&>*+*]:mt-4 sm:px-6 sm:py-5 sm:[&>*+*]:mt-5'>
             {children}
           </div>
         </div>
@@ -227,11 +225,11 @@ export function DetailRow({
   accentColor?: string
 }) {
   return (
-    <div className='flex items-center justify-between border-b border-[#1e1e1e] py-2.5 text-[13px] last:border-b-0'>
-      <span className='text-white/55'>{label}</span>
+    <div className='flex items-center justify-between gap-3 border-b border-[#1e1e1e] py-2.5 text-[12px] last:border-b-0 sm:text-[13px]'>
+      <span className='min-w-0 text-white/55'>{label}</span>
       {isBadge ? (
         <span
-          className='rounded px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider'
+          className='shrink-0 rounded px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider'
           style={{
             backgroundColor: `color-mix(in srgb, ${accentColor} 8%, transparent)`,
             color: accentColor,
@@ -240,8 +238,9 @@ export function DetailRow({
           {value}
         </span>
       ) : (
-        <span className='font-semibold text-white/90'>{value}</span>
+        <span className='shrink-0 font-semibold text-white/90'>{value}</span>
       )}
     </div>
   )
 }
+

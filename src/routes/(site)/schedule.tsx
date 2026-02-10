@@ -1,16 +1,16 @@
-﻿import { useEffect } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSchedule } from '@/lib/api'
-import {
-  ScheduleLane,
-  type ScheduleItem as LaneItem,
-} from '@/components/schedule/schedule-lane'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { FadeIn } from '@/components/tkc/guide-shared'
 
 export const Route = createFileRoute('/(site)/schedule')({
   component: SchedulePage,
 })
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Types                                                              */
+/* ════════════════════════════════════════════════════════════════════ */
 
 type ApiScheduleItem = {
   id?: string | number
@@ -36,10 +36,19 @@ type ScheduleData = {
   values?: unknown[]
 }
 
-const ASSETS = {
-  consoleIcon: '/branding/console-icon.png',
-  arcadeIcon: '/branding/arcade-icon.png',
-}
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Constants                                                          */
+/* ════════════════════════════════════════════════════════════════════ */
+
+const NAV_ITEMS = [
+  { id: 'division', label: '부문별 일정' },
+  { id: 'timeline', label: '전체 타임라인' },
+  { id: 'finals', label: '결선 토너먼트' },
+]
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Data Utilities                                                     */
+/* ════════════════════════════════════════════════════════════════════ */
 
 const looksLikeDateValue = (value?: string) => {
   if (!value) return false
@@ -259,6 +268,77 @@ const getOrderValue = (item: ApiScheduleItem) => {
   return Number.POSITIVE_INFINITY
 }
 
+const parseDateValue = (value?: string) => {
+  if (!value) return null
+  const isoMatch = value.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  if (isoMatch) {
+    const [, yyyy, mm, dd] = isoMatch
+    return new Date(Number(yyyy), Number(mm) - 1, Number(dd))
+  }
+  const monthDayMatch = value.match(/(\d{1,2})[.\-/](\d{1,2})/)
+  if (monthDayMatch) {
+    const [, mm, dd] = monthDayMatch
+    const year = new Date().getFullYear()
+    return new Date(year, Number(mm) - 1, Number(dd))
+  }
+  const koreanMatch = value.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/)
+  if (koreanMatch) {
+    const [, mm, dd] = koreanMatch
+    const year = new Date().getFullYear()
+    return new Date(year, Number(mm) - 1, Number(dd))
+  }
+  const parsed = new Date(value)
+  if (!Number.isNaN(parsed.getTime())) {
+    return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate())
+  }
+  return null
+}
+
+const formatMmDd = (value?: string) => {
+  if (!value) return null
+  const isoMatch = value.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
+  if (isoMatch) {
+    const [, , mm, dd] = isoMatch
+    return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
+  }
+  const shortMatch = value.match(/(\d{1,2})[.\-/](\d{1,2})/)
+  if (shortMatch) {
+    const [, mm, dd] = shortMatch
+    return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
+  }
+  const parsed = parseDateValue(value)
+  if (parsed) {
+    return `${String(parsed.getMonth() + 1).padStart(2, '0')}.${String(
+      parsed.getDate()
+    ).padStart(2, '0')}`
+  }
+  return null
+}
+
+const formatDateObj = (d: Date) =>
+  `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
+
+const parseDateRangeFromText = (value?: string) => {
+  if (!value) return { start: null, end: null }
+  const matches =
+    value.match(/(\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2}|\d{1,2}[.\-/]\d{1,2})/g) ?? []
+  const [first, second] = matches
+  const start = parseDateValue(first)
+  const end = parseDateValue(second)
+  return { start, end }
+}
+
+const getDateRange = (item: ApiScheduleItem) => {
+  const startSource = item.startDate ?? item.start
+  const endSource = item.endDate ?? item.end
+  const textRange = parseDateRangeFromText(item.dateText)
+
+  const start = parseDateValue(startSource) ?? textRange.start
+  const end = parseDateValue(endSource) ?? textRange.end
+
+  return { start, end }
+}
+
 const getFallbackDate = (item: ApiScheduleItem) => {
   const divisionDateCandidate =
     typeof item.division === 'string' && looksLikeDateValue(item.division)
@@ -309,79 +389,12 @@ const expandArcadeItems = (items: ApiScheduleItem[]) =>
     return splitTitles.map((title) => ({ ...item, title }))
   })
 
-const formatMmDd = (value?: string) => {
-  if (!value) return null
-  const isoMatch = value.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
-  if (isoMatch) {
-    const [, , mm, dd] = isoMatch
-    return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
-  }
-  const shortMatch = value.match(/(\d{1,2})[.\-/](\d{1,2})/)
-  if (shortMatch) {
-    const [, mm, dd] = shortMatch
-    return `${mm.padStart(2, '0')}.${dd.padStart(2, '0')}`
-  }
-  const parsed = parseDateValue(value)
-  if (parsed) {
-    return `${String(parsed.getMonth() + 1).padStart(2, '0')}.${String(
-      parsed.getDate()
-    ).padStart(2, '0')}`
-  }
-  return null
-}
-
-const parseDateValue = (value?: string) => {
-  if (!value) return null
-  const isoMatch = value.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/)
-  if (isoMatch) {
-    const [, yyyy, mm, dd] = isoMatch
-    return new Date(Number(yyyy), Number(mm) - 1, Number(dd))
-  }
-  const monthDayMatch = value.match(/(\d{1,2})[.\-/](\d{1,2})/)
-  if (monthDayMatch) {
-    const [, mm, dd] = monthDayMatch
-    const year = new Date().getFullYear()
-    return new Date(year, Number(mm) - 1, Number(dd))
-  }
-  const koreanMatch = value.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/)
-  if (koreanMatch) {
-    const [, mm, dd] = koreanMatch
-    const year = new Date().getFullYear()
-    return new Date(year, Number(mm) - 1, Number(dd))
-  }
-  const parsed = new Date(value)
-  if (!Number.isNaN(parsed.getTime())) {
-    return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate())
-  }
-  return null
-}
-
-const parseDateRangeFromText = (value?: string) => {
-  if (!value) return { start: null, end: null }
-  const matches =
-    value.match(/(\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2}|\d{1,2}[.\-/]\d{1,2})/g) ?? []
-  const [first, second] = matches
-  const start = parseDateValue(first)
-  const end = parseDateValue(second)
-  return { start, end }
-}
-
-const startOfDay = (date: Date) =>
-  new Date(date.getFullYear(), date.getMonth(), date.getDate())
-
-const getDateRange = (item: ApiScheduleItem) => {
-  const startSource = item.startDate ?? item.start
-  const endSource = item.endDate ?? item.end
-  const textRange = parseDateRangeFromText(item.dateText)
-
-  const start = parseDateValue(startSource) ?? textRange.start
-  const end = parseDateValue(endSource) ?? textRange.end
-
-  return { start, end }
-}
-
 const resolveDateParts = (item: ApiScheduleItem) => {
   if (item.dateText) {
+    const range = parseDateRangeFromText(item.dateText)
+    if (range.start && range.end && range.start.getTime() !== range.end.getTime()) {
+      return { main: formatDateObj(range.start), sub: `~ ${formatDateObj(range.end)}` }
+    }
     const main = formatMmDd(item.dateText)
     if (main) return { main, sub: undefined }
     return { main: item.dateText, sub: undefined }
@@ -393,7 +406,7 @@ const resolveDateParts = (item: ApiScheduleItem) => {
   const end = formatMmDd(endSource)
 
   if (start && end) {
-    if (start !== end) return { main: start, sub: `~${end}` }
+    if (start !== end) return { main: start, sub: `~ ${end}` }
     return { main: start, sub: undefined }
   }
   if (start) return { main: start, sub: undefined }
@@ -401,114 +414,6 @@ const resolveDateParts = (item: ApiScheduleItem) => {
 
   return { main: '추후', sub: '공지' }
 }
-
-const normalizeStatus = (status?: string) => status?.toLowerCase().trim() ?? ''
-
-const isLive = (item: ApiScheduleItem) => {
-  const status = normalizeStatus(item.status)
-  return status.includes('live') || status.includes('진행')
-}
-
-const isOpen = (item: ApiScheduleItem) => {
-  const status = normalizeStatus(item.status)
-  return status.includes('open') || status.includes('접수')
-}
-
-const getStatusLabel = (status?: string) => {
-  const normalized = normalizeStatus(status)
-  if (!normalized) return undefined
-  if (normalized.includes('live') || normalized.includes('진행'))
-    return '진행중'
-  if (normalized.includes('open') || normalized.includes('접수'))
-    return '접수중'
-  if (
-    normalized.includes('ready') ||
-    normalized.includes('upcoming') ||
-    normalized.includes('예정')
-  ) {
-    return '예정'
-  }
-  if (
-    normalized.includes('done') ||
-    normalized.includes('finished') ||
-    normalized.includes('종료') ||
-    normalized.includes('완료')
-  ) {
-    return '종료'
-  }
-  return status
-}
-
-const getFeaturedSet = (items: ApiScheduleItem[]) => {
-  if (items.length === 0) return new Set<ApiScheduleItem>()
-
-  const today = startOfDay(new Date())
-  const decorated = items.map((item, index) => {
-    const { start: rangeStart, end: rangeEnd } = getDateRange(item)
-    const start = rangeStart ?? rangeEnd
-    const end = rangeEnd ?? rangeStart
-    return {
-      item,
-      index,
-      start,
-      end,
-      hasDate: Boolean(start || end),
-    }
-  })
-
-  const liveItems = decorated
-    .filter(({ item, start, end }) => {
-      const liveByStatus = isLive(item)
-      if (start && end) {
-        return liveByStatus || (start <= today && today <= end)
-      }
-      return liveByStatus
-    })
-    .map(({ item }) => item)
-
-  if (liveItems.length > 0) return new Set(liveItems)
-
-  const isUpcoming = (
-    entry: (typeof decorated)[number]
-  ): entry is (typeof decorated)[number] & { start: Date } =>
-    Boolean(entry.start && entry.start >= today)
-
-  const upcoming = decorated.filter(isUpcoming).sort((a, b) => {
-    const dateDiff = a.start.getTime() - b.start.getTime()
-    if (dateDiff !== 0) return dateDiff
-    return getOrderValue(a.item) - getOrderValue(b.item)
-  })
-
-  if (upcoming.length > 0) return new Set([upcoming[0].item])
-
-  const hasAnyDate = decorated.some(({ hasDate }) => hasDate)
-  if (hasAnyDate) return new Set<ApiScheduleItem>()
-
-  const liveFallback = items.find((item) => isLive(item))
-  if (liveFallback) return new Set([liveFallback])
-  const openFallback = items.find((item) => isOpen(item))
-  if (openFallback) return new Set([openFallback])
-  return new Set([items[0]])
-}
-
-const toLaneItems = (
-  items: ApiScheduleItem[],
-  featuredSet: Set<ApiScheduleItem>
-): LaneItem[] =>
-  items.map((item, index) => {
-    const dateParts = resolveDateParts(item)
-    const title = item.title ?? `${t('schedule.itemFallback')} ${index + 1}`
-    return {
-      id: item.id ?? item.order ?? `${title}-${index}`,
-      dateMain: dateParts.main,
-      dateSub: dateParts.sub,
-      title,
-      meta1: item.location,
-      meta2: item.note,
-      statusLabel: getStatusLabel(item.status),
-      featured: featuredSet.has(item),
-    }
-  })
 
 const renderFinalMeta = (item: ApiScheduleItem | undefined) => {
   if (!item) return '추후 공개 예정입니다.'
@@ -528,7 +433,364 @@ const renderFinalMeta = (item: ApiScheduleItem | undefined) => {
   return pieces.length > 0 ? pieces.join(' · ') : '추후 공개 예정입니다.'
 }
 
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Timeline Utilities                                                 */
+/* ════════════════════════════════════════════════════════════════════ */
+
+type TimelineEntry = {
+  date: Date
+  dateLabel: string
+  division: 'console' | 'arcade' | 'all'
+  title: string
+  meta?: string
+  mode?: 'online' | 'offline'
+  isFinals?: boolean
+}
+
+type TimelineGroupData = { dateLabel: string; entries: TimelineEntry[] }
+
+const inferMode = (item: ApiScheduleItem): 'online' | 'offline' | undefined => {
+  const title = (item.title ?? '').toLowerCase()
+  const location = (item.location ?? '').toLowerCase()
+  if (title.includes('온라인') || location === 'online' || location === '온라인')
+    return 'online'
+  if (title.includes('오프라인') || title.includes('결선')) return 'offline'
+  if (item.location && item.location.trim().length > 0 && !looksLikeUrl(item.location))
+    return 'offline'
+  return undefined
+}
+
+const buildTimelineEntries = (
+  groups: { items: ApiScheduleItem[]; division: 'console' | 'arcade' | 'all' }[]
+): TimelineEntry[] => {
+  const entries: TimelineEntry[] = []
+
+  for (const { items, division } of groups) {
+    for (const item of items) {
+      const { start, end } = getDateRange(item)
+      const mode = inferMode(item)
+      const title = item.title ?? '일정'
+      const isFinals = division === 'all'
+
+      if (start && end && start.getTime() !== end.getTime()) {
+        entries.push({
+          date: start,
+          dateLabel: formatDateObj(start),
+          division,
+          title: `${title} 시작`,
+          meta: `~ ${formatDateObj(end)}까지`,
+          mode,
+          isFinals,
+        })
+        entries.push({
+          date: end,
+          dateLabel: formatDateObj(end),
+          division,
+          title: `${title} 마감`,
+          isFinals,
+        })
+      } else {
+        const d = start ?? end
+        if (!d) continue
+        entries.push({
+          date: d,
+          dateLabel: formatDateObj(d),
+          division,
+          title,
+          meta:
+            item.location && !looksLikeUrl(item.location)
+              ? item.location
+              : undefined,
+          mode,
+          isFinals,
+        })
+      }
+    }
+  }
+
+  entries.sort((a, b) => a.date.getTime() - b.date.getTime())
+  return entries
+}
+
+const groupTimelineByDate = (entries: TimelineEntry[]): TimelineGroupData[] => {
+  const groups: TimelineGroupData[] = []
+  for (const entry of entries) {
+    const last = groups[groups.length - 1]
+    if (last && last.dateLabel === entry.dateLabel) {
+      last.entries.push(entry)
+    } else {
+      groups.push({ dateLabel: entry.dateLabel, entries: [entry] })
+    }
+  }
+  return groups
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  UI Components                                                      */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function SectionBlock({
+  id,
+  num,
+  title,
+  desc,
+  children,
+}: {
+  id: string
+  num: string
+  title: string
+  desc: string
+  children: ReactNode
+}) {
+  return (
+    <section id={id} data-section={id} className='mb-20'>
+      <FadeIn>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+          Section {num}
+        </div>
+        <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
+          {title}
+        </h2>
+        <p className='mb-8 max-w-[640px] text-[15px] leading-relaxed font-light break-keep text-white/55'>
+          {desc}
+        </p>
+      </FadeIn>
+      <div className='space-y-5'>{children}</div>
+    </section>
+  )
+}
+
+function SectionNav({ activeId }: { activeId: string }) {
+  return (
+    <nav className='sticky top-0 z-50 -mx-4 mb-10 border-b border-[#1e1e1e] bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-2xl md:-mx-6 md:px-6'>
+      <div
+        className='flex gap-1.5 overflow-x-auto'
+        style={{ scrollbarWidth: 'none' }}
+      >
+        {NAV_ITEMS.map((item) => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            className={`shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-all ${
+              activeId === item.id
+                ? 'border-[#2a2a2a] bg-[#111] text-white/90'
+                : 'border-transparent text-white/35 hover:bg-[#111] hover:text-white/55'
+            }`}
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </nav>
+  )
+}
+
+function ModeTag({ mode }: { mode: 'online' | 'offline' }) {
+  return (
+    <span
+      className={`shrink-0 rounded-[5px] px-2.5 py-1 font-mono text-[11px] font-semibold tracking-wider ${
+        mode === 'online'
+          ? 'bg-[#4a9eff]/[0.08] text-[#4a9eff]'
+          : 'bg-[#e86e3a]/[0.08] text-[#e86e3a]'
+      }`}
+    >
+      {mode.toUpperCase()}
+    </span>
+  )
+}
+
+/* ── Division Panel ── */
+
+type DisplayEvent = {
+  dateMain: string
+  dateSub?: string
+  title: string
+  meta?: string
+  mode?: 'online' | 'offline'
+}
+
+function SchedulePanel({
+  icon: iconSrc,
+  title,
+  subtitle,
+  variant,
+  events,
+}: {
+  icon: string
+  title: string
+  subtitle: string
+  variant: 'console' | 'arcade'
+  events: DisplayEvent[]
+}) {
+  const iconCls =
+    variant === 'console'
+      ? 'bg-[#e86e3a]/10 border-[#e86e3a]/15'
+      : 'bg-[#f5a623]/10 border-[#f5a623]/15'
+
+  return (
+    <div className='overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
+      <div className='flex items-center gap-3.5 border-b border-[#1e1e1e] px-6 py-5'>
+        <div
+          className={`grid h-[42px] w-[42px] shrink-0 place-items-center rounded-[10px] border ${iconCls}`}
+        >
+          <img
+            src={iconSrc}
+            alt=''
+            className='h-5 w-5'
+            loading='lazy'
+            draggable={false}
+          />
+        </div>
+        <div>
+          <div className='text-lg font-bold text-white/90'>{title}</div>
+          <div className='text-[13px] text-white/35'>{subtitle}</div>
+        </div>
+      </div>
+
+      <div className='py-1.5'>
+        {events.length === 0 ? (
+          <div className='px-6 py-8 text-center text-sm text-white/35'>
+            등록된 일정이 없습니다.
+          </div>
+        ) : (
+          events.map((e, i) => (
+            <div
+              key={i}
+              className='group relative flex items-center gap-4 px-6 py-4 transition-colors hover:bg-white/[0.015]'
+            >
+              {i < events.length - 1 && (
+                <div className='absolute bottom-0 left-6 right-6 h-px bg-[#1e1e1e]' />
+              )}
+              <div className='w-16 shrink-0 font-mono text-[15px] font-semibold leading-tight text-white/55'>
+                {e.dateMain}
+                {e.dateSub && (
+                  <span className='block text-xs font-medium text-white/30'>
+                    {e.dateSub}
+                  </span>
+                )}
+              </div>
+              <div
+                className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+                  variant === 'console' ? 'bg-[#e86e3a]' : 'bg-[#f5a623]'
+                }`}
+              />
+              <div className='min-w-0 flex-1'>
+                <div className='text-[15px] font-semibold break-keep text-white/90'>
+                  {e.title}
+                </div>
+                {e.meta && (
+                  <div className='mt-0.5 text-[13px] text-white/35'>{e.meta}</div>
+                )}
+              </div>
+              {e.mode && <ModeTag mode={e.mode} />}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ── Timeline ── */
+
+function Timeline({ groups }: { groups: TimelineGroupData[] }) {
+  if (groups.length === 0) {
+    return (
+      <div className='py-8 text-center text-sm text-white/35'>
+        타임라인 데이터가 없습니다.
+      </div>
+    )
+  }
+
+  return (
+    <div className='relative pl-9'>
+      <div className='absolute top-2 bottom-2 left-[11px] w-0.5 bg-[#1e1e1e]' />
+
+      {groups.map((group) => (
+        <div key={group.dateLabel} className='mb-10 last:mb-0'>
+          {/* Date marker */}
+          <div className='relative mb-3.5 flex items-center gap-3'>
+            <div
+              className={`absolute -left-9 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-[#0a0a0a] ${
+                group.entries.some((e) => e.isFinals)
+                  ? 'bg-[#e86e3a] shadow-[0_0_0_3px_rgba(232,110,58,0.15),0_0_8px_rgba(232,110,58,0.3)]'
+                  : 'bg-[#e86e3a] shadow-[0_0_0_2px_rgba(232,110,58,0.2)]'
+              }`}
+            />
+            <span className='font-mono text-base font-semibold tracking-wide text-[#e86e3a]'>
+              {group.dateLabel}
+            </span>
+          </div>
+
+          {/* Events */}
+          <div className='space-y-2.5'>
+            {group.entries.map((entry, i) => (
+              <div
+                key={i}
+                className={`flex items-center gap-3.5 rounded-xl border px-5 py-4 transition-colors hover:border-[#2a2a2a] ${
+                  entry.isFinals
+                    ? 'border-[#e86e3a]/25 bg-[#111]'
+                    : 'border-[#1e1e1e] bg-[#111]'
+                }`}
+              >
+                <div
+                  className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+                    entry.division === 'arcade' ? 'bg-[#f5a623]' : 'bg-[#e86e3a]'
+                  } ${entry.isFinals ? 'shadow-[0_0_6px_rgba(232,110,58,0.4)]' : ''}`}
+                />
+                <div className='min-w-0 flex-1'>
+                  <div className='text-[15px] font-semibold break-keep text-white/90'>
+                    {entry.title}
+                  </div>
+                  {entry.meta && (
+                    <div className='mt-0.5 text-[13px] text-white/35'>
+                      {entry.meta}
+                    </div>
+                  )}
+                </div>
+                {entry.mode && <ModeTag mode={entry.mode} />}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* ── Finals Teaser ── */
+
+function FinalsTeaser({ title, meta }: { title: string; meta: string }) {
+  return (
+    <div className='relative overflow-hidden rounded-2xl border border-[#e86e3a]/20 bg-[#111] px-8 py-10 text-center'>
+      <div className='absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#e86e3a] to-transparent' />
+      <div className='pointer-events-none absolute -top-16 left-1/2 h-[200px] w-[400px] -translate-x-1/2 bg-[radial-gradient(ellipse,rgba(232,110,58,0.06)_0%,transparent_70%)]' />
+
+      <div className='relative'>
+        <div className='mb-3 font-mono text-xs font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+          PlayX4 2026 · Finals
+        </div>
+        <div className='mb-2 text-2xl font-extrabold tracking-tight text-white/90 md:text-[30px]'>
+          {title}
+        </div>
+        <p className='text-[15px] break-keep text-white/55'>
+          콘솔 · 아케이드 결선이 동시 진행됩니다.
+        </p>
+        <div className='mt-6 inline-flex items-center gap-2 rounded-[10px] border border-dashed border-[#e86e3a]/20 bg-[#e86e3a]/[0.06] px-6 py-3 font-mono text-[15px] font-semibold tracking-wider text-white/55'>
+          {meta}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Page                                                               */
+/* ════════════════════════════════════════════════════════════════════ */
+
 function SchedulePage() {
+  const [activeSection, setActiveSection] = useState('division')
+
   const { data, isLoading, isError } = useSchedule<
     ScheduleData | ApiScheduleItem[]
   >()
@@ -550,54 +812,137 @@ function SchedulePage() {
     })
   )
 
-  const featuredConsole = getFeaturedSet(consoleItems)
-  const featuredArcade = getFeaturedSet(arcadeItems)
+  /* Division panel events */
+  const toDisplayEvents = (items: ApiScheduleItem[]): DisplayEvent[] =>
+    items.map((item) => {
+      const parts = resolveDateParts(item)
+      const metaParts = [
+        item.location && !looksLikeUrl(item.location) ? item.location : undefined,
+        item.note && !looksLikeUrl(item.note) ? item.note : undefined,
+      ].filter(Boolean)
+      return {
+        dateMain: parts.main,
+        dateSub: parts.sub,
+        title: item.title ?? '일정',
+        meta: metaParts.length > 0 ? metaParts.join(' · ') : undefined,
+        mode: inferMode(item),
+      }
+    })
 
-  const consoleLaneItems = toLaneItems(consoleItems, featuredConsole)
-  const arcadeLaneItems = toLaneItems(arcadeItems, featuredArcade)
+  const consoleEvents = toDisplayEvents(consoleItems)
+  const arcadeEvents = toDisplayEvents(arcadeItems)
 
+  /* Timeline */
+  const timelineEntries = buildTimelineEntries([
+    { items: consoleItems, division: 'console' },
+    { items: arcadeItems, division: 'arcade' },
+    { items: allItems, division: 'all' },
+  ])
+  const timelineGroups = groupTimelineByDate(timelineEntries)
+
+  /* Finals */
   const finalItem = allItems[0]
   const finalTitle = finalItem?.title ?? '플레이엑스포 결선 토너먼트'
   const finalMeta = renderFinalMeta(finalItem)
+
+  /* Intersection observer for section nav */
+  useEffect(() => {
+    const sections = document.querySelectorAll<HTMLElement>('[data-section]')
+    if (!sections.length) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const id = (entry.target as HTMLElement).dataset.section
+            if (id) setActiveSection(id)
+          }
+        }
+      },
+      { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' }
+    )
+
+    sections.forEach((s) => observer.observe(s))
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('schedule.title')}`
   }, [])
 
   return (
-    <TkcSection>
-      <TkcPageHeader
-        title={t('schedule.title')}
-        subtitle={t('schedule.subtitle')}
-      />
+    <>
+      <SectionNav activeId={activeSection} />
 
       {isError && (
-        <p className='text-sm text-destructive'>{t('schedule.failed')}</p>
+        <p className='mb-6 text-sm text-destructive'>{t('schedule.failed')}</p>
       )}
 
       {isLoading && expandedItems.length === 0 ? (
-        <p className='text-sm text-white/60'>{t('schedule.loading')}</p>
+        <p className='mb-6 text-sm text-white/60'>{t('schedule.loading')}</p>
       ) : null}
 
-      <div className='grid gap-6 lg:grid-cols-2'>
-        <ScheduleLane
-          iconSrc={ASSETS.consoleIcon}
-          title='콘솔'
-          desc='콘솔 일정 및 경기 정보를 확인하세요.'
-          items={consoleLaneItems}
-        />
-        <ScheduleLane
-          iconSrc={ASSETS.arcadeIcon}
-          title='아케이드'
-          desc='아케이드 일정 및 경기 정보를 확인하세요.'
-          items={arcadeLaneItems}
-        />
-      </div>
+      {/* Section 01: Division Schedule */}
+      <SectionBlock
+        id='division'
+        num='01'
+        title='부문별 일정'
+        desc='콘솔과 아케이드 부문의 예선 및 결선 일정입니다.'
+      >
+        <div className='grid gap-5 lg:grid-cols-2'>
+          <SchedulePanel
+            icon='/branding/console-icon.png'
+            title='콘솔'
+            subtitle='콘솔 일정 및 경기 정보'
+            variant='console'
+            events={consoleEvents}
+          />
+          <SchedulePanel
+            icon='/branding/arcade-icon.png'
+            title='아케이드'
+            subtitle='아케이드 일정 및 경기 정보'
+            variant='arcade'
+            events={arcadeEvents}
+          />
+        </div>
+      </SectionBlock>
 
-      <section className='rounded-3xl bg-white/5 p-6 text-center ring-1 ring-white/10'>
-        <div className='text-lg font-semibold text-white'>{finalTitle}</div>
-        <p className='mt-2 text-sm text-white/70'>{finalMeta}</p>
-      </section>
-    </TkcSection>
+      {/* Section 02: Timeline */}
+      <SectionBlock
+        id='timeline'
+        num='02'
+        title='전체 타임라인'
+        desc='모든 일정을 시간순으로 확인합니다.'
+      >
+        <div className='mb-7 flex gap-6'>
+          <div className='flex items-center gap-2.5 text-[15px] text-white/55'>
+            <div className='h-2.5 w-2.5 rounded-full bg-[#e86e3a]' />
+            콘솔
+          </div>
+          <div className='flex items-center gap-2.5 text-[15px] text-white/55'>
+            <div className='h-2.5 w-2.5 rounded-full bg-[#f5a623]' />
+            아케이드
+          </div>
+        </div>
+        <Timeline groups={timelineGroups} />
+      </SectionBlock>
+
+      {/* Section 03: Finals */}
+      <SectionBlock
+        id='finals'
+        num='03'
+        title='결선 토너먼트'
+        desc='예선을 통과한 선수들이 겨루는 최종 무대입니다.'
+      >
+        <FinalsTeaser title={finalTitle} meta={finalMeta} />
+        <div className='flex gap-3 rounded-xl border border-[#4a9eff]/[0.12] bg-[#4a9eff]/[0.04] p-4 text-[13px] leading-relaxed text-white/55'>
+          <span className='mt-0.5 shrink-0 inline-block h-4 w-4 rounded border border-dashed border-white/30' />
+          <span className='break-keep'>
+            결선 세부 일정 및 진행 방식은 예선 종료 후{' '}
+            <strong className='text-white/70'>공식 채널을 통해 공지</strong>됩니다.
+          </span>
+        </div>
+      </SectionBlock>
+    </>
   )
 }

@@ -7,10 +7,31 @@ const FADE_OUT_MS = 350
 
 type OverlayState = 'hidden' | 'visible' | 'exiting'
 
+/**
+ * Returns true when both from/to are within the same guide section
+ * (arcade or console), meaning the overlay should be suppressed.
+ */
+function isSameSectionNav(from: string, to: string): boolean {
+  const a = from.replace(/\/$/, '')
+  const b = to.replace(/\/$/, '')
+  const isArcade = (p: string) => p === '/arcade' || p.startsWith('/arcade/')
+  const isConsole = (p: string) => p === '/console' || p.startsWith('/console/')
+  if (isArcade(a) && isArcade(b)) return true
+  if (isConsole(a) && isConsole(b)) return true
+  return false
+}
+
 export function GlobalLoadingOverlay() {
-  const routerStatus = useRouterState({ select: (state) => state.status })
+  const { routerStatus, from, to } = useRouterState({
+    select: (state) => ({
+      routerStatus: state.status,
+      from: state.resolvedLocation?.pathname ?? state.location.pathname,
+      to: state.location.pathname,
+    }),
+  })
   const isMutating = useIsMutating()
-  const isNavigating = routerStatus === 'pending'
+  const isNavigating =
+    routerStatus === 'pending' && !isSameSectionNav(from, to)
   const shouldShow = isNavigating || isMutating > 0
 
   const [overlayState, setOverlayState] = useState<OverlayState>('hidden')
