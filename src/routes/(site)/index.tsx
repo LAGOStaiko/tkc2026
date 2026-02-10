@@ -313,22 +313,13 @@ function DivisionCard({
 
         <div className='relative flex h-full flex-col p-6 sm:p-7'>
           <div className='mb-3.5 flex items-center gap-3.5'>
-            <div
-              className='flex size-11 shrink-0 items-center justify-center rounded-lg'
-              style={{
-                background: `${accent}18`,
-                border: `1px solid ${accent}30`,
-                boxShadow: `0 0 16px ${accent}14`,
-              }}
-            >
-              <img
-                src={iconSrc}
-                alt=''
-                className='size-6 object-contain'
-                loading='lazy'
-                draggable={false}
-              />
-            </div>
+            <img
+              src={iconSrc}
+              alt=''
+              className='size-11 shrink-0 rounded-xl object-contain'
+              loading='lazy'
+              draggable={false}
+            />
             <h3 className='text-xl font-bold text-white/95 sm:text-2xl'>
               {title}
             </h3>

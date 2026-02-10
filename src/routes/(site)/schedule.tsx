@@ -47,6 +47,56 @@ const NAV_ITEMS = [
   { id: 'finals', label: '결선 토너먼트' },
 ]
 
+const FALLBACK_SCHEDULE: ApiScheduleItem[] = [
+  {
+    order: 1,
+    division: '콘솔',
+    title: '콘솔 예선',
+    dateText: '2026-03-02 ~ 2026-04-30',
+  },
+  {
+    order: 2,
+    division: '아케이드',
+    title: '아케이드 온라인 예선',
+    dateText: '2026-03-02 ~ 2026-03-16',
+  },
+  {
+    order: 3,
+    division: '아케이드',
+    title: '아케이드 오프라인 예선 (서울)',
+    dateText: '2026-03-21',
+    location: '서울',
+  },
+  {
+    order: 4,
+    division: '아케이드',
+    title: '아케이드 오프라인 예선 (대전)',
+    dateText: '2026-03-28',
+    location: '대전',
+  },
+  {
+    order: 5,
+    division: '아케이드',
+    title: '아케이드 오프라인 예선 (광주)',
+    dateText: '2026-04-04',
+    location: '광주',
+  },
+  {
+    order: 6,
+    division: '아케이드',
+    title: '아케이드 오프라인 예선 (부산)',
+    dateText: '2026-04-11',
+    location: '부산',
+  },
+  {
+    order: 7,
+    division: '결선',
+    title: '결선',
+    dateText: '2026-05-23',
+    location: '킨텍스 · 플레이엑스포 2026',
+  },
+]
+
 /* ════════════════════════════════════════════════════════════════════ */
 /*  Data Utilities                                                     */
 /* ════════════════════════════════════════════════════════════════════ */
@@ -801,7 +851,8 @@ function SchedulePage() {
   const { data, isLoading, isError } = useSchedule<
     ScheduleData | ApiScheduleItem[]
   >()
-  const rawItems = getScheduleItems(data)
+  const apiItems = getScheduleItems(data)
+  const rawItems = apiItems.length > 0 ? apiItems : FALLBACK_SCHEDULE
   const normalizedItems = rawItems.map(normalizeItem)
   const expandedItems = expandArcadeItems(normalizedItems)
 
