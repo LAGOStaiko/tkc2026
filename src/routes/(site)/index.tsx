@@ -12,15 +12,6 @@ const ASSETS = {
   logo: '/branding/v2/logo.png',
   consoleIcon: '/branding/v2/icon-console.png',
   arcadeIcon: '/branding/v2/icon-arcade.png',
-  emoji: {
-    details: '/branding/v2/emojis/webp/details.webp',
-    summary: '/branding/v2/emojis/webp/summary.webp',
-    photo: '/branding/v2/emojis/webp/photo.webp',
-    songPick: '/branding/v2/emojis/webp/song-pick.webp',
-    stadium: '/branding/v2/emojis/webp/stadium.webp',
-    rank1: '/branding/v2/emojis/webp/rank-1.webp',
-    advance: '/branding/v2/emojis/webp/advance.webp',
-  },
 }
 const HOME_YOUTUBE_ID = 'DQKIfLMIgXY'
 const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
@@ -50,7 +41,6 @@ const SCHEDULE_ITEMS = [
     fullDate: '2026-03-02',
     endDate: '2026-04-30',
     name: '콘솔 예선',
-    iconSrc: ASSETS.emoji.songPick,
     tag: 'ONLINE',
     tagCls: 'bg-[#f5a623]/[0.08] text-[#f5a623]',
     dotCls: 'bg-[#e86e3a] shadow-[0_0_10px_rgba(232,110,58,0.4)]',
@@ -59,7 +49,6 @@ const SCHEDULE_ITEMS = [
     date: '03.21',
     fullDate: '2026-03-21',
     name: '오프라인 예선 → 서울',
-    iconSrc: ASSETS.emoji.stadium,
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
@@ -68,7 +57,6 @@ const SCHEDULE_ITEMS = [
     date: '04.11',
     fullDate: '2026-04-11',
     name: '오프라인 예선 → 부산',
-    iconSrc: ASSETS.emoji.advance,
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
@@ -78,7 +66,6 @@ const SCHEDULE_ITEMS = [
     fullDate: '2026-05-23',
     name: '결선 → PlayX4',
     sub: '콘솔 · 아케이드 동시 진행',
-    iconSrc: ASSETS.emoji.rank1,
     tag: 'FINALS',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#e86e3a] shadow-[0_0_10px_rgba(232,110,58,0.4)]',
@@ -147,10 +134,10 @@ function HomePage() {
           {/* Text + CTA */}
           <div className='absolute inset-x-0 bottom-0 flex flex-col items-end gap-4 px-6 pb-7 text-right sm:px-8 sm:pb-9 md:px-10 md:pb-10'>
             <div>
-              <div className='mb-1 font-mono text-[11px] font-semibold tracking-[2.5px] text-[#e86e3a] uppercase sm:text-xs'>
+              <div className='mb-1 font-mono text-[11px] font-semibold tracking-[2.5px] text-white/70 uppercase sm:text-xs'>
                 Taiko Korea Championship
               </div>
-              <h1 className='text-[clamp(28px,5vw,44px)] leading-tight font-extrabold tracking-tight text-white'>
+              <h1 className='bg-gradient-to-r from-[#e86e3a] to-[#f5a623] bg-clip-text text-[clamp(28px,5vw,44px)] leading-tight font-extrabold tracking-tight text-transparent'>
                 2026
               </h1>
               <p className='mt-1.5 text-sm text-white/75 sm:text-[15px]'>
@@ -160,32 +147,18 @@ function HomePage() {
             <div className='flex flex-col gap-2.5 sm:flex-row sm:items-center'>
               <Link
                 to='/apply'
-                className='inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-110 sm:w-auto'
+                className='inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-110 sm:w-auto'
                 style={{
                   background: '#e86e3a',
                   boxShadow: '0 4px 24px rgba(232,110,58,0.35)',
                 }}
               >
-                <img
-                  src={ASSETS.emoji.details}
-                  alt=''
-                  className='size-4 rounded-sm object-cover'
-                  loading='lazy'
-                  draggable={false}
-                />
                 대회 신청하기
               </Link>
               <Link
                 to='/schedule'
-                className='inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10 hover:text-white sm:w-auto'
+                className='inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10 hover:text-white sm:w-auto'
               >
-                <img
-                  src={ASSETS.emoji.summary}
-                  alt=''
-                  className='size-4 rounded-sm object-cover'
-                  loading='lazy'
-                  draggable={false}
-                />
                 일정 보기 →
               </Link>
             </div>
@@ -203,11 +176,7 @@ function HomePage() {
       {/* ── SCHEDULE ── */}
       <section className='mt-16 md:mt-20'>
         <FadeIn>
-          <SectionHead
-            label='Schedule'
-            title='다가오는 일정'
-            iconSrc={ASSETS.emoji.summary}
-          >
+          <SectionHead label='Schedule' title='다가오는 일정'>
             <Link
               to='/schedule'
               className='text-sm text-white/55 transition-colors hover:text-[#e86e3a]'
@@ -224,7 +193,7 @@ function HomePage() {
       {/* ── VIDEO ── */}
       <section className='mt-16 md:mt-20'>
         <FadeIn>
-          <SectionHead label='Video' title='영상' iconSrc={ASSETS.emoji.photo} />
+          <SectionHead label='Video' title='영상' />
         </FadeIn>
         <FadeIn delay={100}>
           <YouTubeEmbed />
@@ -295,28 +264,17 @@ function HomePage() {
 function SectionHead({
   label,
   title,
-  iconSrc,
   children,
 }: {
   label: string
   title: string
-  iconSrc?: string
   children?: React.ReactNode
 }) {
   return (
     <div className='mb-6 flex items-end justify-between gap-4'>
       <div>
-        <div className='mb-1.5 flex items-center gap-2 font-mono text-sm font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
-          {iconSrc && (
-            <img
-              src={iconSrc}
-              alt=''
-              className='size-4 rounded-sm object-cover'
-              loading='lazy'
-              draggable={false}
-            />
-          )}
-          <span>{label}</span>
+        <div className='mb-1.5 font-mono text-sm font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+          {label}
         </div>
         <h2 className='text-[clamp(24px,4vw,32px)] font-extrabold tracking-tight text-white/95'>
           {title}
@@ -438,15 +396,6 @@ function ScheduleStrip() {
                   : ''
               }`}
             >
-              <div className='mx-auto mb-2.5 flex size-9 items-center justify-center rounded-lg border border-[#2a2a2a] bg-white/[0.03]'>
-                <img
-                  src={item.iconSrc}
-                  alt=''
-                  className='size-6 rounded-md object-cover'
-                  loading='lazy'
-                  draggable={false}
-                />
-              </div>
               <div
                 className={`mx-auto mb-3 size-2 rounded-full ${item.dotCls}`}
               />
@@ -500,15 +449,6 @@ function ScheduleStrip() {
                   : ''
               }`}
             >
-              <div className='flex size-8 shrink-0 items-center justify-center rounded-md border border-[#2a2a2a] bg-white/[0.03]'>
-                <img
-                  src={item.iconSrc}
-                  alt=''
-                  className='size-5 rounded-sm object-cover'
-                  loading='lazy'
-                  draggable={false}
-                />
-              </div>
               <div
                 className={`size-2 shrink-0 rounded-full ${item.dotCls}`}
               />
