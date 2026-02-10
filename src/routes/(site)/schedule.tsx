@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSchedule } from '@/lib/api'
 import { FadeIn } from '@/components/tkc/guide-shared'
+import { PageHero } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/schedule')({
   component: SchedulePage,
@@ -878,6 +879,11 @@ function SchedulePage() {
 
   return (
     <>
+      <PageHero
+        badge='SCHEDULE'
+        title='대회 일정'
+        subtitle='콘솔과 아케이드 부문의 전체 일정을 확인하세요.'
+      />
       <SectionNav activeId={activeSection} />
 
       {isError && (

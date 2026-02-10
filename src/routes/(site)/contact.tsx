@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSite } from '@/lib/api'
 import { GlassCard } from '@/components/tkc/glass-card'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/(site)/contact')({
@@ -111,9 +111,12 @@ function ContactPage() {
 
   return (
     <TkcSection>
-      <TkcPageHeader
-        title={t('contact.title')}
+      <PageHero
+        badge='CONTACT'
+        title='문의하기'
         subtitle={t('contact.subtitle')}
+        accentColor='#f5a623'
+        gradientTo='#f7d154'
       />
 
       {isSiteError && (
@@ -123,7 +126,7 @@ function ContactPage() {
       {/* Contact Cards */}
       <div className='grid gap-4 md:grid-cols-2'>
         {/* Email Card */}
-        <GlassCard className='group relative overflow-hidden p-5 md:p-7'>
+        <GlassCard className='group relative overflow-hidden p-5 transition-transform duration-300 hover:-translate-y-1 md:p-7'>
           <div className='pointer-events-none absolute -top-8 -right-8 size-32 rounded-full bg-sky-500/5' />
           <div className='relative flex h-full flex-col'>
             <div className='mb-5 flex items-center gap-3.5'>
@@ -185,7 +188,7 @@ function ContactPage() {
         </GlassCard>
 
         {/* Kakao Card */}
-        <GlassCard className='group relative overflow-hidden p-5 md:p-7'>
+        <GlassCard className='group relative overflow-hidden p-5 transition-transform duration-300 hover:-translate-y-1 md:p-7'>
           <div className='pointer-events-none absolute -top-8 -right-8 size-32 rounded-full bg-yellow-400/5' />
           <div className='relative flex h-full flex-col'>
             <div className='mb-5 flex items-center gap-3.5'>

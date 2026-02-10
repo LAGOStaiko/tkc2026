@@ -4,7 +4,7 @@ import { t } from '@/text'
 import { useSongPools } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { LevelBadge } from '@/components/tkc/level-badge'
 
 export const Route = createFileRoute('/(site)/song-pool')({
@@ -109,9 +109,12 @@ function SongPoolPage() {
 
   return (
     <TkcSection className='space-y-8'>
-      <TkcPageHeader
+      <PageHero
+        badge='SONG POOL'
         title={title}
         subtitle='대회에서 사용되는 선곡풀 목록입니다.'
+        accentColor='#f5a623'
+        gradientTo='#f7d154'
       />
 
       {isError && (

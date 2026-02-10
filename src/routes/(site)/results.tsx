@@ -4,7 +4,7 @@ import { t } from '@/text'
 import { useResults } from '@/lib/api'
 import { resolveArcadeSeasonArchive } from '@/lib/arcade-results-archive'
 import { cn } from '@/lib/utils'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { PageHero, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/results')({
   component: ResultsHubPage,
@@ -70,8 +70,9 @@ function ResultsHubPage() {
 
   return (
     <TkcSection className='space-y-8 md:space-y-10'>
-      <TkcPageHeader
-        title='순위 및 결과 아카이브'
+      <PageHero
+        badge='RESULTS'
+        title='순위 및 결과'
         subtitle='아케이드 예선/결선 기록을 시즌 단위로 보관합니다.'
       />
 

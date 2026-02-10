@@ -4,7 +4,7 @@ import { t } from '@/text'
 import { useSongs } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { LevelBadge } from '@/components/tkc/level-badge'
 
 export const Route = createFileRoute('/(site)/songs')({
@@ -51,7 +51,7 @@ function SongsPage() {
 
   return (
     <TkcSection className='space-y-8'>
-      <TkcPageHeader title={title} subtitle='결승전까지 가는 여정 —' />
+      <PageHero badge='SONGS' title={title} subtitle='결승전까지 가는 여정 —' />
 
       {isError && (
         <p className='text-sm text-destructive'>

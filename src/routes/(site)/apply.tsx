@@ -35,7 +35,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { GlassCard } from '@/components/tkc/glass-card'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import { PageHero, TkcSection } from '@/components/tkc/layout'
 
 declare global {
   interface Window {
@@ -409,7 +409,7 @@ function ApplyPage() {
 
   return (
     <TkcSection>
-      <TkcPageHeader title={t('apply.title')} subtitle={t('apply.subtitle')} />
+      <PageHero badge='REGISTRATION' title={t('apply.title')} subtitle={t('apply.subtitle')} />
 
       {isError && (
         <p className='text-sm text-destructive'>{t('apply.failedStatus')}</p>

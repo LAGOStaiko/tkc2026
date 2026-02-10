@@ -11,6 +11,15 @@ const ASSETS = {
   logo: '/branding/v2/logo.png',
   consoleIcon: '/branding/v2/icon-console.png',
   arcadeIcon: '/branding/v2/icon-arcade.png',
+  emoji: {
+    details: '/branding/v2/emojis/webp/details.webp',
+    summary: '/branding/v2/emojis/webp/summary.webp',
+    photo: '/branding/v2/emojis/webp/photo.webp',
+    songPick: '/branding/v2/emojis/webp/song-pick.webp',
+    stadium: '/branding/v2/emojis/webp/stadium.webp',
+    rank1: '/branding/v2/emojis/webp/rank-1.webp',
+    advance: '/branding/v2/emojis/webp/advance.webp',
+  },
 }
 const HOME_YOUTUBE_ID = 'DQKIfLMIgXY'
 const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
@@ -37,28 +46,38 @@ const DIVISIONS = [
 const SCHEDULE_ITEMS = [
   {
     date: '03.02',
-    name: '콘솔 예선 시작',
+    fullDate: '2026-03-02',
+    endDate: '2026-04-30',
+    name: '콘솔 예선',
+    iconSrc: ASSETS.emoji.songPick,
     tag: 'ONLINE',
     tagCls: 'bg-[#f5a623]/[0.08] text-[#f5a623]',
     dotCls: 'bg-[#e86e3a] shadow-[0_0_10px_rgba(232,110,58,0.4)]',
   },
   {
     date: '03.21',
+    fullDate: '2026-03-21',
     name: '오프라인 예선 → 서울',
+    iconSrc: ASSETS.emoji.stadium,
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
   },
   {
     date: '04.11',
+    fullDate: '2026-04-11',
     name: '오프라인 예선 → 부산',
+    iconSrc: ASSETS.emoji.advance,
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
   },
   {
     date: '05.23',
+    fullDate: '2026-05-23',
     name: '결선 → PlayX4',
+    sub: '콘솔 · 아케이드 동시 진행',
+    iconSrc: ASSETS.emoji.rank1,
     tag: 'FINALS',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#e86e3a] shadow-[0_0_10px_rgba(232,110,58,0.4)]',
@@ -66,11 +85,26 @@ const SCHEDULE_ITEMS = [
   },
 ]
 
-const FINALS_INFO = [
-  { value: '05.23', label: '날짜' },
-  { value: 'PlayX4', label: '장소' },
-  { value: '콘솔 + 아케이드', label: '부문' },
-] as const
+type ScheduleStatus = '예정' | '진행중' | '종료'
+
+function getScheduleStatus(item: (typeof SCHEDULE_ITEMS)[number]): ScheduleStatus {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const start = new Date(item.fullDate + 'T00:00:00')
+  const end = 'endDate' in item && item.endDate
+    ? new Date(item.endDate + 'T23:59:59')
+    : new Date(item.fullDate + 'T23:59:59')
+
+  if (today < start) return '예정'
+  if (today <= end) return '진행중'
+  return '종료'
+}
+
+const STATUS_STYLES: Record<ScheduleStatus, string> = {
+  예정: 'bg-white/[0.06] text-white/60',
+  진행중: 'bg-emerald-500/15 text-emerald-400',
+  종료: 'bg-white/[0.05] text-white/50',
+}
 
 type Partner = {
   order?: number
@@ -110,7 +144,7 @@ function HomePage() {
           <div className='absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent' />
 
           {/* Text + CTA */}
-          <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-6 pb-7 sm:px-8 sm:pb-9 md:px-10 md:pb-10'>
+          <div className='absolute inset-x-0 bottom-0 flex flex-col items-end gap-4 px-6 pb-7 text-right sm:px-8 sm:pb-9 md:px-10 md:pb-10'>
             <div>
               <div className='mb-1 font-mono text-[11px] font-semibold tracking-[2.5px] text-[#e86e3a] uppercase sm:text-xs'>
                 Taiko Korea Championship
@@ -118,25 +152,39 @@ function HomePage() {
               <h1 className='text-[clamp(28px,5vw,44px)] leading-tight font-extrabold tracking-tight text-white'>
                 2026
               </h1>
-              <p className='mt-1.5 text-sm text-white/65 sm:text-[15px]'>
+              <p className='mt-1.5 text-sm text-white/75 sm:text-[15px]'>
                 지금 참가 신청을 받고 있습니다
               </p>
             </div>
             <div className='flex flex-col gap-2.5 sm:flex-row sm:items-center'>
               <Link
                 to='/apply'
-                className='inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-110 sm:w-auto'
+                className='inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-110 sm:w-auto'
                 style={{
                   background: '#e86e3a',
                   boxShadow: '0 4px 24px rgba(232,110,58,0.35)',
                 }}
               >
+                <img
+                  src={ASSETS.emoji.details}
+                  alt=''
+                  className='size-4 rounded-sm object-cover'
+                  loading='lazy'
+                  draggable={false}
+                />
                 대회 신청하기
               </Link>
               <Link
                 to='/schedule'
-                className='inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10 hover:text-white sm:w-auto'
+                className='inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10 hover:text-white sm:w-auto'
               >
+                <img
+                  src={ASSETS.emoji.summary}
+                  alt=''
+                  className='size-4 rounded-sm object-cover'
+                  loading='lazy'
+                  draggable={false}
+                />
                 일정 보기 →
               </Link>
             </div>
@@ -154,10 +202,14 @@ function HomePage() {
       {/* ── SCHEDULE ── */}
       <section className='mt-16 md:mt-20'>
         <FadeIn>
-          <SectionHead label='Schedule' title='다가오는 일정'>
+          <SectionHead
+            label='Schedule'
+            title='다가오는 일정'
+            iconSrc={ASSETS.emoji.summary}
+          >
             <Link
               to='/schedule'
-              className='text-sm text-white/40 transition-colors hover:text-[#e86e3a]'
+              className='text-sm text-white/55 transition-colors hover:text-[#e86e3a]'
             >
               전체 일정 보기 →
             </Link>
@@ -168,20 +220,10 @@ function HomePage() {
         </FadeIn>
       </section>
 
-      {/* ── FINALS ── */}
-      <section className='mt-16 md:mt-20'>
-        <FadeIn>
-          <SectionHead label='Finals' title='결선 토너먼트' />
-        </FadeIn>
-        <FadeIn delay={100}>
-          <FinalsCard />
-        </FadeIn>
-      </section>
-
       {/* ── VIDEO ── */}
       <section className='mt-16 md:mt-20'>
         <FadeIn>
-          <SectionHead label='Video' title='영상' />
+          <SectionHead label='Video' title='영상' iconSrc={ASSETS.emoji.photo} />
         </FadeIn>
         <FadeIn delay={100}>
           <div className='overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
@@ -200,7 +242,7 @@ function HomePage() {
               <div className='text-[15px] font-semibold text-white/90'>
                 TAIKO LABS
               </div>
-              <div className='mt-0.5 text-sm text-white/40'>
+              <div className='mt-0.5 text-sm text-white/55'>
                 이제 우리는 그 너머로 향합니다.
               </div>
             </div>
@@ -256,7 +298,7 @@ function HomePage() {
               })}
           </div>
 
-          <div className='text-sm text-white/50'>
+          <div className='text-sm text-white/60'>
             © {new Date().getFullYear()} 태고의 달인 플레이엑스포 토너먼트
           </div>
         </div>
@@ -272,17 +314,28 @@ function HomePage() {
 function SectionHead({
   label,
   title,
+  iconSrc,
   children,
 }: {
   label: string
   title: string
+  iconSrc?: string
   children?: React.ReactNode
 }) {
   return (
     <div className='mb-6 flex items-end justify-between gap-4'>
       <div>
-        <div className='mb-1.5 font-mono text-sm font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
-          {label}
+        <div className='mb-1.5 flex items-center gap-2 font-mono text-sm font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+          {iconSrc && (
+            <img
+              src={iconSrc}
+              alt=''
+              className='size-4 rounded-sm object-cover'
+              loading='lazy'
+              draggable={false}
+            />
+          )}
+          <span>{label}</span>
         </div>
         <h2 className='text-[clamp(24px,4vw,32px)] font-extrabold tracking-tight text-white/95'>
           {title}
@@ -342,7 +395,7 @@ function DivisionCard({
             </h3>
           </div>
 
-          <p className='mb-5 text-[15px] leading-relaxed break-keep text-white/60'>
+          <p className='mb-5 text-[15px] leading-relaxed break-keep text-white/70'>
             {description}
           </p>
 
@@ -350,7 +403,7 @@ function DivisionCard({
             {chips.map((chip) => (
               <span
                 key={chip}
-                className='rounded-md border border-[#1e1e1e] bg-white/[0.03] px-3 py-1 font-mono text-[12px] font-semibold tracking-wide text-white/50'
+                className='rounded-md border border-[#1e1e1e] bg-white/[0.03] px-3 py-1 font-mono text-[12px] font-semibold tracking-wide text-white/65'
               >
                 {chip}
               </span>
@@ -360,7 +413,7 @@ function DivisionCard({
           <div className='mt-auto flex gap-2.5'>
             <Link
               to={detailTo}
-              className='flex-1 rounded-lg border border-[#2a2a2a] bg-transparent py-2.5 text-center text-sm font-semibold text-white/60 transition-all hover:border-white/30 hover:bg-white/[0.04] hover:text-white/90'
+              className='flex-1 rounded-lg border border-[#2a2a2a] bg-transparent py-2.5 text-center text-sm font-semibold text-white/70 transition-all hover:border-white/30 hover:bg-white/[0.04] hover:text-white/90'
             >
               자세히 보기
             </Link>
@@ -387,120 +440,124 @@ function DivisionCard({
 
 function ScheduleStrip() {
   return (
-    <div className='overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111]'>
+    <Link
+      to='/schedule'
+      className='block overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
+    >
       {/* Desktop */}
       <div className='hidden sm:grid sm:grid-cols-4'>
-        {SCHEDULE_ITEMS.map((item, i) => (
-          <div
-            key={item.date}
-            className={`relative px-4 py-7 text-center transition-colors hover:bg-white/[0.02] ${
-              'highlight' in item && item.highlight
-                ? 'bg-[#e86e3a]/[0.03]'
-                : ''
-            }`}
-          >
+        {SCHEDULE_ITEMS.map((item, i) => {
+          const status = getScheduleStatus(item)
+          return (
             <div
-              className={`mx-auto mb-3 size-2 rounded-full ${item.dotCls}`}
-            />
-            <div
-              className={`mb-1.5 font-mono text-[28px] font-extrabold tracking-tight ${
+              key={item.date}
+              className={`relative px-4 py-7 text-center transition-colors hover:bg-white/[0.02] ${
                 'highlight' in item && item.highlight
-                  ? 'bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'
-                  : 'text-white/95'
+                  ? 'bg-[#e86e3a]/[0.03]'
+                  : ''
               }`}
             >
-              {item.date}
+              <div className='mx-auto mb-2.5 flex size-9 items-center justify-center rounded-lg border border-[#2a2a2a] bg-white/[0.03]'>
+                <img
+                  src={item.iconSrc}
+                  alt=''
+                  className='size-6 rounded-md object-cover'
+                  loading='lazy'
+                  draggable={false}
+                />
+              </div>
+              <div
+                className={`mx-auto mb-3 size-2 rounded-full ${item.dotCls}`}
+              />
+              <div
+                className={`mb-1.5 font-mono text-[28px] font-extrabold tracking-tight ${
+                  'highlight' in item && item.highlight
+                    ? 'bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'
+                    : 'text-white/95'
+                }`}
+              >
+                {item.date}
+              </div>
+              <div className='mb-1.5 text-sm font-medium text-white/75'>
+                {item.name}
+              </div>
+              {'sub' in item && item.sub && (
+                <div className='mb-2 text-[12px] text-white/50'>
+                  {item.sub}
+                </div>
+              )}
+              <div className='flex items-center justify-center gap-1.5'>
+                <span
+                  className={`inline-block rounded px-2.5 py-0.5 font-mono text-[11px] font-semibold tracking-wider ${item.tagCls}`}
+                >
+                  {item.tag}
+                </span>
+                <span
+                  className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${STATUS_STYLES[status]}`}
+                >
+                  {status}
+                </span>
+              </div>
+              {i < SCHEDULE_ITEMS.length - 1 && (
+                <div className='absolute top-[20%] right-0 bottom-[20%] w-px bg-[#1e1e1e]' />
+              )}
             </div>
-            <div className='mb-2 text-sm font-medium text-white/60'>
-              {item.name}
-            </div>
-            <span
-              className={`inline-block rounded px-2.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider ${item.tagCls}`}
-            >
-              {item.tag}
-            </span>
-            {i < SCHEDULE_ITEMS.length - 1 && (
-              <div className='absolute top-[20%] right-0 bottom-[20%] w-px bg-[#1e1e1e]' />
-            )}
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Mobile */}
       <div className='divide-y divide-[#1e1e1e] sm:hidden'>
-        {SCHEDULE_ITEMS.map((item) => (
-          <div
-            key={item.date}
-            className={`flex items-center gap-4 px-5 py-4 ${
-              'highlight' in item && item.highlight
-                ? 'bg-[#e86e3a]/[0.03]'
-                : ''
-            }`}
-          >
+        {SCHEDULE_ITEMS.map((item) => {
+          const status = getScheduleStatus(item)
+          return (
             <div
-              className={`size-2 shrink-0 rounded-full ${item.dotCls}`}
-            />
-            <div className='w-14 shrink-0 font-mono text-lg font-extrabold tracking-tight text-white/95'>
-              {item.date}
-            </div>
-            <div className='min-w-0 flex-1 text-sm font-medium text-white/60'>
-              {item.name}
-            </div>
-            <span
-              className={`shrink-0 rounded px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider ${item.tagCls}`}
+              key={item.date}
+              className={`flex items-center gap-4 px-5 py-4 ${
+                'highlight' in item && item.highlight
+                  ? 'bg-[#e86e3a]/[0.03]'
+                  : ''
+              }`}
             >
-              {item.tag}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-/* ════════════════════════════════════════════════════════════════════ */
-/*  Finals Card                                                       */
-/* ════════════════════════════════════════════════════════════════════ */
-
-function FinalsCard() {
-  return (
-    <div className='relative overflow-hidden rounded-2xl'>
-      <div className='absolute inset-0 rounded-2xl bg-gradient-to-br from-[#e86e3a]/30 via-transparent to-[#f5a623]/30' />
-
-      <div className='relative m-px overflow-hidden rounded-2xl bg-[#111]'>
-        <div className='pointer-events-none absolute -top-16 left-[30%] h-[200px] w-[300px] rounded-full bg-[radial-gradient(ellipse,rgba(232,110,58,0.06),transparent_70%)] blur-xl' />
-        <div className='pointer-events-none absolute -bottom-10 right-[20%] h-[150px] w-[250px] rounded-full bg-[radial-gradient(ellipse,rgba(245,166,35,0.04),transparent_70%)] blur-xl' />
-
-        <div className='relative px-6 py-14 text-center sm:px-10 sm:py-16'>
-          <div className='mb-4 font-mono text-[13px] font-semibold tracking-[3px] text-[#e86e3a] uppercase'>
-            PlayX4 2026
-          </div>
-          <h3 className='mb-2.5 text-[clamp(24px,5vw,36px)] font-extrabold tracking-tight text-white/95'>
-            플레이엑스포 결선 토너먼트
-          </h3>
-          <p className='mb-8 text-[16px] text-white/55'>
-            콘솔·아케이드 결선이 동시 진행됩니다.
-          </p>
-
-          <div className='mx-auto inline-flex flex-col items-stretch overflow-hidden rounded-xl border border-[#e86e3a]/15 bg-[#e86e3a]/[0.04] sm:flex-row'>
-            {FINALS_INFO.map((info, i) => (
-              <div
-                key={info.label}
-                className={`flex items-center gap-3 px-7 py-4 sm:flex-col sm:gap-1 sm:py-5 ${
-                  i > 0
-                    ? 'border-t border-[#e86e3a]/10 sm:border-t-0 sm:border-l'
-                    : ''
-                }`}
-              >
-                <span className='text-lg font-bold text-white/95 sm:text-xl'>
-                  {info.value}
-                </span>
-                <span className='text-xs text-white/40'>{info.label}</span>
+              <div className='flex size-8 shrink-0 items-center justify-center rounded-md border border-[#2a2a2a] bg-white/[0.03]'>
+                <img
+                  src={item.iconSrc}
+                  alt=''
+                  className='size-5 rounded-sm object-cover'
+                  loading='lazy'
+                  draggable={false}
+                />
               </div>
-            ))}
-          </div>
-        </div>
+              <div
+                className={`size-2 shrink-0 rounded-full ${item.dotCls}`}
+              />
+              <div className='w-14 shrink-0 font-mono text-lg font-extrabold tracking-tight text-white/95'>
+                {item.date}
+              </div>
+              <div className='min-w-0 flex-1'>
+                <div className='text-sm font-medium text-white/75'>
+                  {item.name}
+                </div>
+                {'sub' in item && item.sub && (
+                  <div className='text-[11px] text-white/50'>{item.sub}</div>
+                )}
+              </div>
+              <div className='flex shrink-0 flex-col items-end gap-1'>
+                <span
+                  className={`rounded px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider ${item.tagCls}`}
+                >
+                  {item.tag}
+                </span>
+                <span
+                  className={`rounded px-2 py-0.5 text-[11px] font-semibold ${STATUS_STYLES[status]}`}
+                >
+                  {status}
+                </span>
+              </div>
+            </div>
+          )
+        })}
       </div>
-    </div>
+    </Link>
   )
 }
