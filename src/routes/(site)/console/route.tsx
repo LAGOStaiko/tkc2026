@@ -145,7 +145,7 @@ function SubNav() {
                   {item.label}
                 </div>
                 <div
-                  className={`mt-0.5 text-[10px] transition-colors ${active ? 'text-white/35' : 'text-white/30'}`}
+                  className={`mt-0.5 text-[11px] transition-colors ${active ? 'text-white/35' : 'text-white/30'}`}
                 >
                   {item.desc}
                 </div>
@@ -160,7 +160,7 @@ function SubNav() {
               preload='render'
               className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 text-left transition-colors hover:border-[#2a2a2a]'
             >
-              <div className='text-[10px] font-mono font-semibold tracking-wide text-white/35'>
+              <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
                 PREV PHASE
               </div>
               <div className='truncate text-[12px] font-bold text-white/85'>
@@ -169,7 +169,7 @@ function SubNav() {
             </Link>
           ) : (
             <div className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 opacity-40'>
-              <div className='text-[10px] font-mono font-semibold tracking-wide text-white/35'>
+              <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
                 PREV PHASE
               </div>
               <div className='text-[12px] font-bold text-white/55'>-</div>
@@ -181,7 +181,7 @@ function SubNav() {
               preload='render'
               className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 text-right transition-colors hover:border-[#2a2a2a]'
             >
-              <div className='text-[10px] font-mono font-semibold tracking-wide text-white/35'>
+              <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
                 NEXT PHASE
               </div>
               <div className='truncate text-[12px] font-bold text-white/85'>
@@ -190,7 +190,7 @@ function SubNav() {
             </Link>
           ) : (
             <div className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 text-right opacity-40'>
-              <div className='text-[10px] font-mono font-semibold tracking-wide text-white/35'>
+              <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
                 NEXT PHASE
               </div>
               <div className='text-[12px] font-bold text-white/55'>-</div>

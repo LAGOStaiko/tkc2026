@@ -222,7 +222,7 @@ function TaskCard({
               {song.stageLabel}
             </span>
             {!isRevealed && (
-              <span className='rounded bg-[#e86e3a]/[0.08] px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-[#e86e3a]'>
+              <span className='rounded bg-[#e86e3a]/[0.08] px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider text-[#e86e3a]'>
                 추후 공지
               </span>
             )}

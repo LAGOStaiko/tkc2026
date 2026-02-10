@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 /* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧 */
 /*  Shared utility components for guide pages (arcade / console)       */
@@ -131,7 +131,7 @@ export function Accordion({
       >
         <span className='text-[13px] font-bold text-white/90 sm:text-sm'>{title}</span>
         <span
-          className={`text-[10px] text-white/35 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
+          className={`text-[11px] text-white/35 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
         >
           ??        </span>
       </button>
@@ -195,7 +195,7 @@ export function StepCard({
         >
           {toggleLabel}
           <span
-            className={`text-[10px] transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
+            className={`text-[11px] transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
           >
             ??          </span>
         </button>
@@ -239,7 +239,7 @@ export function DetailRow({
       <span className='min-w-0 text-white/55'>{label}</span>
       {isBadge ? (
         <span
-          className='shrink-0 rounded px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider'
+          className='shrink-0 rounded px-2.5 py-0.5 font-mono text-[11px] font-bold tracking-wider'
           style={{
             backgroundColor: `color-mix(in srgb, ${accentColor} 8%, transparent)`,
             color: accentColor,

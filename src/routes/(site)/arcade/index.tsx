@@ -335,7 +335,7 @@ function ArcadeOnlinePage() {
                     className='mx-auto mb-3 size-12 rounded-lg object-cover'
                     loading='lazy'
                   />
-                  <div className='mb-0.5 font-mono text-[10px] font-semibold tracking-wide text-white/35 uppercase'>
+                  <div className='mb-0.5 font-mono text-[11px] font-semibold tracking-wide text-white/35 uppercase'>
                     {r.label}
                   </div>
                   <div className='text-lg font-extrabold text-[#f5a623]'>
@@ -398,7 +398,7 @@ function ArcadeOnlinePage() {
                   <div className='text-xs font-semibold text-white/90'>
                     {step.label}
                   </div>
-                  <div className='mt-0.5 text-[10px] text-white/35'>
+                  <div className='mt-0.5 text-[11px] text-white/35'>
                     {step.desc}
                   </div>
                 </div>
@@ -414,7 +414,7 @@ function ArcadeOnlinePage() {
                 className='flex items-center justify-between border-b border-[#1e1e1e] py-2.5 text-[13px] last:border-b-0'
               >
                 <span className='text-white/55'>{info.label}</span>
-                <span className='rounded bg-[#f5a623]/[0.08] px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wide text-[#f5a623]'>
+                <span className='rounded bg-[#f5a623]/[0.08] px-2.5 py-0.5 font-mono text-[11px] font-bold tracking-wide text-[#f5a623]'>
                   필수
                 </span>
               </div>
@@ -435,7 +435,7 @@ function ArcadeOnlinePage() {
                       background: i === 0 ? '#f5a623' : '#f7d154',
                     }}
                   />
-                  <div className='mb-1.5 font-mono text-[10px] font-semibold tracking-wide text-white/35 uppercase'>
+                  <div className='mb-1.5 font-mono text-[11px] font-semibold tracking-wide text-white/35 uppercase'>
                     {song.label}
                   </div>
                   <div className='mb-1 text-[15px] font-extrabold tracking-tight text-white/90'>
@@ -444,7 +444,7 @@ function ArcadeOnlinePage() {
                   <div className='flex items-center gap-2 text-xs text-white/55'>
                     <span>{song.genre}</span>
                     <span
-                      className='rounded px-1.5 py-0.5 font-mono text-[10px] font-bold text-white'
+                      className='rounded px-1.5 py-0.5 font-mono text-[11px] font-bold text-white'
                       style={{ background: song.levelColor }}
                     >
                       ★{song.level}

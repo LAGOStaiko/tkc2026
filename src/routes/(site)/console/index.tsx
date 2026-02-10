@@ -156,7 +156,7 @@ function RankingVisual() {
               />
             </div>
             <span
-              className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide ${
+              className={`rounded px-1.5 py-0.5 font-mono text-[11px] font-bold tracking-wide ${
                 qualify
                   ? 'bg-[#f7d154]/[0.08] text-[#f7d154]'
                   : 'bg-white/[0.02] text-white/35'
@@ -266,7 +266,7 @@ function ConsoleQualifierPage() {
                       background: i === 0 ? '#e86e3a' : '#f5a623',
                     }}
                   />
-                  <div className='mb-1.5 font-mono text-[10px] font-semibold tracking-wide text-white/35 uppercase'>
+                  <div className='mb-1.5 font-mono text-[11px] font-semibold tracking-wide text-white/35 uppercase'>
                     {song.label}
                   </div>
                   <div className='mb-1 text-[15px] font-extrabold tracking-tight text-white/90'>
@@ -275,7 +275,7 @@ function ConsoleQualifierPage() {
                   <div className='flex items-center gap-2 text-xs text-white/55'>
                     <span>{song.genre}</span>
                     <span
-                      className='rounded px-1.5 py-0.5 font-mono text-[10px] font-bold text-white'
+                      className='rounded px-1.5 py-0.5 font-mono text-[11px] font-bold text-white'
                       style={{ background: song.levelColor }}
                     >
                       ★{song.level}
@@ -295,7 +295,7 @@ function ConsoleQualifierPage() {
               >
                 <span className='text-white/55'>{rule.label}</span>
                 <span
-                  className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide ${
+                  className={`rounded px-2 py-0.5 font-mono text-[11px] font-bold tracking-wide ${
                     rule.allowed
                       ? 'bg-[#f7d154]/[0.08] text-[#f7d154]'
                       : 'bg-[#e86e3a]/[0.08] text-[#e86e3a]'
@@ -355,7 +355,7 @@ function ConsoleQualifierPage() {
                   <div className='text-xs font-semibold text-white/90'>
                     {step.label}
                   </div>
-                  <div className='mt-0.5 text-[10px] text-white/35'>
+                  <div className='mt-0.5 text-[11px] text-white/35'>
                     {step.desc}
                   </div>
                 </div>

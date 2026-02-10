@@ -493,7 +493,7 @@ function FaqItem({
         className='flex w-full items-center gap-3 px-4 py-3.5 text-left sm:px-6 sm:py-4'
         onClick={onToggle}
       >
-        <span className='shrink-0 rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide text-[#f5a623] bg-[#f5a623]/[0.08]'>
+        <span className='shrink-0 rounded px-2 py-0.5 font-mono text-[11px] font-bold tracking-wide text-[#f5a623] bg-[#f5a623]/[0.08]'>
           Q{num}
         </span>
         <span className='flex-1 text-[13px] font-bold break-keep text-white/90 sm:text-sm'>
@@ -501,7 +501,7 @@ function FaqItem({
         </span>
         <span
           className={cn(
-            'text-[10px] text-white/35 transition-transform duration-300',
+            'text-[11px] text-white/35 transition-transform duration-300',
             isOpen && 'rotate-180'
           )}
         >
@@ -699,7 +699,7 @@ function ContactPage() {
                     {section.title}
                   </span>
                   {section.tag && (
-                    <span className='rounded px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wide bg-[#f5a623]/[0.08] text-[#f5a623]'>
+                    <span className='rounded px-2.5 py-0.5 font-mono text-[11px] font-bold tracking-wide bg-[#f5a623]/[0.08] text-[#f5a623]'>
                       {section.tag === 'console' ? 'CONSOLE' : 'ARCADE'}
                     </span>
                   )}
@@ -789,12 +789,12 @@ function ContactPage() {
               key={i}
               className='tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3 hover:border-[#2a2a2a]'
             >
-              <p className='mb-2 font-mono text-[10px] font-semibold tracking-wide text-white/35 uppercase'>
+              <p className='mb-2 font-mono text-[11px] font-semibold tracking-wide text-white/35 uppercase'>
                 {row.label}
               </p>
               <div className='grid grid-cols-2 gap-3'>
                 <div>
-                  <p className='mb-0.5 font-mono text-[10px] font-bold tracking-wide text-[#f5a623]'>
+                  <p className='mb-0.5 font-mono text-[11px] font-bold tracking-wide text-[#f5a623]'>
                     콘솔
                   </p>
                   <p className='text-[12px] font-semibold text-white/90 break-keep'>
@@ -802,7 +802,7 @@ function ContactPage() {
                   </p>
                 </div>
                 <div>
-                  <p className='mb-0.5 font-mono text-[10px] font-bold tracking-wide text-[#f5a623]'>
+                  <p className='mb-0.5 font-mono text-[11px] font-bold tracking-wide text-[#f5a623]'>
                     아케이드
                   </p>
                   <p className='text-[12px] font-semibold text-white/90 break-keep'>

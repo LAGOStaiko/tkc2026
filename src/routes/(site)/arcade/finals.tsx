@@ -157,7 +157,7 @@ function MatchCard({
 }) {
   return (
     <div className='overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
-      <div className='border-b border-[#1e1e1e] bg-white/[0.02] px-3 py-1.5 text-center font-mono text-[10px] font-semibold tracking-[1px] text-white/35 uppercase'>
+      <div className='border-b border-[#1e1e1e] bg-white/[0.02] px-3 py-1.5 text-center font-mono text-[11px] font-semibold tracking-[1px] text-white/35 uppercase'>
         {label}
       </div>
       {rows.map((r, i) => (
@@ -502,7 +502,7 @@ function BanPickSection() {
                   background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
                 }}
               />
-              <div className='mb-2.5 font-mono text-[10px] font-semibold tracking-[1px] text-white/35'>
+              <div className='mb-2.5 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
                 {s.step}
               </div>
               <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
@@ -536,7 +536,7 @@ function BanPickSection() {
                   background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
                 }}
               />
-              <div className='mb-2 font-mono text-[10px] font-semibold tracking-[1px] text-white/35'>
+              <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
                 {s.step}
               </div>
               <div className='mb-2 text-[28px] font-extrabold text-white/90'>
@@ -578,7 +578,7 @@ function BanPickSection() {
                   background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
                 }}
               />
-              <div className='mb-2.5 font-mono text-[10px] font-semibold tracking-[1px] text-white/35'>
+              <div className='mb-2.5 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
                 {s.step}
               </div>
               <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
@@ -612,7 +612,7 @@ function BanPickSection() {
                   background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
                 }}
               />
-              <div className='mb-2 font-mono text-[10px] font-semibold tracking-[1px] text-white/35'>
+              <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
                 {s.step}
               </div>
               <div className='mb-2 text-[28px] font-extrabold text-white/90'>
@@ -691,7 +691,7 @@ function RoundsSection() {
                     <div className='font-mono text-xl font-bold tracking-[3px] text-white/35'>
                       ???
                     </div>
-                    <div className='font-mono text-[10px] font-semibold text-[#e86e3a] opacity-50'>
+                    <div className='font-mono text-[11px] font-semibold text-[#e86e3a] opacity-50'>
                       추후 공개
                     </div>
                   </div>
@@ -732,7 +732,7 @@ function RoundsSection() {
                     <div className='font-mono text-xl font-bold tracking-[3px] text-white/35'>
                       ???
                     </div>
-                    <div className='font-mono text-[10px] font-semibold text-[#e86e3a] opacity-50'>
+                    <div className='font-mono text-[11px] font-semibold text-[#e86e3a] opacity-50'>
                       추후 공개
                     </div>
                   </div>

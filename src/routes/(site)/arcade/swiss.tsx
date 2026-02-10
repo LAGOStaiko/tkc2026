@@ -464,7 +464,7 @@ function SwissSection() {
               key={m.label}
               className='rounded-xl border border-[#f5a623]/10 bg-[#f5a623]/[0.04] p-3.5 text-center'
             >
-              <div className='mb-2 font-mono text-[10px] tracking-[1px] text-white/35'>
+              <div className='mb-2 font-mono text-[11px] tracking-[1px] text-white/35'>
                 {m.label}
               </div>
               <div className='text-sm font-semibold'>

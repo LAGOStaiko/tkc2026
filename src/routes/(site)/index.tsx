@@ -10,27 +10,29 @@ export const Route = createFileRoute('/(site)/')({
 const ASSETS = {
   hero: '/branding/v2/home-hero.jpg',
   logo: '/branding/v2/logo.png',
-  consoleIcon: '/branding/v2/icon-console.png',
-  arcadeIcon: '/branding/v2/icon-arcade.png',
 }
 const HOME_YOUTUBE_ID = 'DQKIfLMIgXY'
 const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
 
 const DIVISIONS = [
   {
-    iconSrc: ASSETS.consoleIcon,
+    num: '01',
     title: '콘솔',
     description: '동더! 원더풀 페스티벌로 진행하는 대회입니다.',
     accent: '#e86e3a',
-    chips: ['03.02 ~ 04.30', 'ONLINE'],
+    periodLabel: '온라인 예선 접수 기간',
+    periodStart: '03.02',
+    periodEnd: '04.30',
     detailTo: '/console' as const,
   },
   {
-    iconSrc: ASSETS.arcadeIcon,
+    num: '02',
     title: '아케이드',
     description: '태고의 달인 니지이로 ver.로 진행하는 대회입니다.',
     accent: '#f5a623',
-    chips: ['03.02 ~ 04.11', 'ONLINE + OFFLINE'],
+    periodLabel: '온라인 예선 접수 기간',
+    periodStart: '03.02',
+    periodEnd: '04.11',
     detailTo: '/arcade' as const,
   },
 ]
@@ -264,10 +266,12 @@ function HomePage() {
       </section>
 
       {/* ── DIVISIONS ── */}
-      <section className='mt-10 grid grid-cols-1 gap-4 md:mt-14 md:grid-cols-2 md:gap-5'>
-        {DIVISIONS.map((d) => (
-          <DivisionCard key={d.title} {...d} />
-        ))}
+      <section className='border-t border-[#1e1e1e]'>
+        <div className='grid grid-cols-1 md:grid-cols-2'>
+          {DIVISIONS.map((d, i) => (
+            <DivisionPanel key={d.title} {...d} index={i} />
+          ))}
+        </div>
       </section>
 
       {/* ── SCHEDULE ── */}
@@ -383,72 +387,95 @@ function SectionHead({
 }
 
 /* ════════════════════════════════════════════════════════════════════ */
-/*  Division Card                                                     */
+/*  Division Panel                                                    */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function DivisionCard({
-  iconSrc,
+function DivisionPanel({
+  num,
   title,
   description,
   accent,
-  chips,
+  periodLabel,
+  periodStart,
+  periodEnd,
   detailTo,
-}: (typeof DIVISIONS)[number]) {
+  index,
+}: (typeof DIVISIONS)[number] & { index: number }) {
   return (
-    <FadeIn>
-      <div className='tkc-motion-lift group relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'>
+    <FadeIn delay={index * 100}>
+      <div
+        className={`group relative h-full overflow-hidden p-8 transition-colors hover:bg-white/[0.015] sm:p-10 md:p-12 ${
+          index === 0
+            ? 'border-b border-[#1e1e1e] md:border-b-0 md:border-r'
+            : ''
+        }`}
+      >
+        {/* Top accent line */}
         <div
-          className='absolute top-0 right-0 left-0 h-0.5'
-          style={{ background: accent }}
-        />
-        <div
-          className='pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full opacity-50 transition-opacity group-hover:opacity-100'
+          className='absolute top-0 right-0 left-0 h-0.5 opacity-40 transition-opacity group-hover:opacity-100'
           style={{
-            background: `radial-gradient(circle, ${accent}10, transparent 70%)`,
+            background: `linear-gradient(90deg, ${accent}, transparent 80%)`,
+          }}
+        />
+        {/* Corner glow */}
+        <div
+          className='pointer-events-none absolute -top-[60px] -right-[60px] size-[200px] rounded-full opacity-0 transition-opacity group-hover:opacity-100'
+          style={{
+            background: `radial-gradient(circle, ${accent}0a, transparent 70%)`,
           }}
         />
 
-        <div className='relative flex h-full flex-col p-6 sm:p-7'>
-          <div className='mb-3.5 flex items-center gap-3.5'>
-            <img
-              src={iconSrc}
-              alt=''
-              className='size-11 shrink-0 rounded-xl object-cover'
-              loading='lazy'
-              draggable={false}
-            />
-            <h3 className='text-xl font-bold text-white/95 sm:text-2xl'>
-              {title}
-            </h3>
+        <div className='relative'>
+          {/* Top row: ID + Status */}
+          <div className='mb-4 flex items-center justify-between'>
+            <div className='flex items-center gap-3.5'>
+              <span className='text-5xl font-black leading-none tracking-[-2px] text-white/[0.08]'>
+                {num}
+              </span>
+              <h3 className='text-[28px] font-extrabold tracking-[-0.5px]'>
+                {title}
+              </h3>
+            </div>
+            <div className='inline-flex items-center gap-2 rounded-full border border-[#4a9eff]/20 bg-[#4a9eff]/[0.08] px-3.5 py-1.5 font-mono text-[13px] font-bold tracking-[0.5px] text-[#4a9eff]'>
+              <span className='tkc-motion-dot size-2 rounded-full bg-[#4a9eff] shadow-[0_0_8px_#4a9eff]' />
+              신청 중
+            </div>
           </div>
 
-          <p className='mb-5 text-[15px] leading-[1.55] break-keep text-white/70'>
+          {/* Description */}
+          <p className='mb-7 text-[15px] leading-[1.6] break-keep text-white/60'>
             {description}
           </p>
 
-          <div className='mb-5 flex flex-wrap gap-2'>
-            {chips.map((chip) => (
-              <span
-                key={chip}
-                className='rounded-md border border-[#1e1e1e] bg-white/[0.03] px-3 py-1 font-mono text-[12px] font-semibold tracking-wide text-white/65'
-              >
-                {chip}
-              </span>
-            ))}
+          {/* Period block */}
+          <div className='mb-7 rounded-xl border border-white/[0.04] bg-white/[0.02] px-5 py-4'>
+            <div className='mb-1 text-[12px] font-medium text-white/50'>
+              {periodLabel}
+            </div>
+            <div
+              className='text-[28px] font-extrabold tracking-[-0.5px]'
+              style={{ color: accent }}
+            >
+              {periodStart}{' '}
+              <span className='mx-1 text-xl opacity-40'>→</span>{' '}
+              {periodEnd}
+            </div>
           </div>
 
-          <div className='mt-auto flex gap-2.5'>
+          {/* Actions */}
+          <div className='flex gap-2'>
             <Link
               to={detailTo}
-              className='tkc-motion-surface flex-1 rounded-lg border border-[#2a2a2a] bg-transparent py-2.5 text-center text-sm font-semibold text-white/70 hover:border-white/30 hover:bg-white/[0.04] hover:text-white/90'
+              className='tkc-motion-surface rounded-lg border border-[#1e1e1e] px-6 py-2.5 text-sm font-semibold text-white/60 hover:border-white/30 hover:text-white'
             >
               자세히 보기
             </Link>
             <Link
               to='/apply'
-              className='tkc-motion-surface flex-1 rounded-lg py-2.5 text-center text-sm font-semibold text-white hover:brightness-110'
+              className='tkc-motion-surface rounded-lg px-6 py-2.5 text-sm font-semibold hover:brightness-110'
               style={{
                 background: accent,
+                color: accent === '#f5a623' ? '#0a0a0a' : '#fff',
                 boxShadow: `0 4px 20px ${accent}33`,
               }}
             >
@@ -556,7 +583,7 @@ function ScheduleStrip() {
                         <div className='text-[17px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
                           {fmtDate(ev.startDate)}
                         </div>
-                        <div className='my-1 text-[10px] leading-none text-white/20'>→</div>
+                        <div className='my-1 text-[11px] leading-none text-white/20'>→</div>
                         <div className='text-[17px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
                           {fmtDate(ev.endDate)}
                         </div>
@@ -619,7 +646,17 @@ function ScheduleStrip() {
                         {ev.name}
                       </div>
                       <div className='mt-0.5 flex items-center gap-1.5 text-[13px] text-white/40'>
-                        <span className='size-1 rounded-full bg-white/20' />
+                        {ev.venueImage ? (
+                          <img
+                            src={ev.venueImage}
+                            alt=''
+                            className='size-5 rounded object-cover'
+                            loading='lazy'
+                            draggable={false}
+                          />
+                        ) : (
+                          <span className='size-1 rounded-full bg-white/20' />
+                        )}
                         {ev.venueName}
                       </div>
                     </div>
