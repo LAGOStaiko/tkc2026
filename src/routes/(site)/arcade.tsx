@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ARCADE_SONGS } from '@/content/arcade-songs'
 import { t } from '@/text'
@@ -200,6 +200,47 @@ function Callout({
   )
 }
 
+function FadeIn({
+  children,
+  className = '',
+  delay = 0,
+}: {
+  children: ReactNode
+  className?: string
+  delay?: number
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.08 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ease-out ${
+        visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'
+      } ${className}`}
+      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+    >
+      {children}
+    </div>
+  )
+}
+
 function TkcIcon({
   name,
   className = 'size-4',
@@ -253,16 +294,20 @@ function SectionBlock({
       {showDivider && (
         <div className='mb-12 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent' />
       )}
-      <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e84545] uppercase'>
-        Section {num}
-      </div>
-      <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
-        {title}
-      </h2>
-      <p className='mb-8 max-w-[640px] text-[15px] leading-relaxed font-light break-keep text-white/55'>
-        {desc}
-      </p>
-      <div className='space-y-5'>{children}</div>
+      <FadeIn>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e84545] uppercase'>
+          Section {num}
+        </div>
+        <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
+          {title}
+        </h2>
+        <p className='mb-8 max-w-[640px] text-[15px] leading-relaxed font-light break-keep text-white/55'>
+          {desc}
+        </p>
+      </FadeIn>
+      <FadeIn delay={150}>
+        <div className='space-y-5'>{children}</div>
+      </FadeIn>
     </section>
   )
 }
@@ -273,16 +318,7 @@ function SectionBlock({
 
 function SwissAnimator() {
   const [activeRound, setActiveRound] = useState<1 | 2 | 3 | 4>(1)
-  const [autoPlay, setAutoPlay] = useState(true)
   const groups = SWISS_ROUNDS[activeRound]
-
-  useEffect(() => {
-    if (!autoPlay) return
-    const id = setInterval(() => {
-      setActiveRound((prev) => (prev >= 4 ? 1 : ((prev + 1) as 1 | 2 | 3 | 4)))
-    }, 3000)
-    return () => clearInterval(id)
-  }, [autoPlay])
 
   return (
     <Card>
@@ -299,10 +335,7 @@ function SwissAnimator() {
           <button
             key={r}
             type='button'
-            onClick={() => {
-              setAutoPlay(false)
-              setActiveRound(r)
-            }}
+            onClick={() => setActiveRound(r)}
             className={`relative flex-1 overflow-hidden rounded-xl border py-2.5 text-[13px] font-semibold transition-all ${
               activeRound === r
                 ? 'border-[#e84545] bg-[#e84545]/[0.05] text-white/90'
@@ -974,20 +1007,26 @@ function ArcadePage() {
       <section className='relative overflow-hidden pt-16 pb-12 md:pt-24 md:pb-16'>
         <div className='pointer-events-none absolute -top-24 -right-48 h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(232,69,69,0.15)_0%,transparent_70%)]' />
         <div className='relative'>
-          <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e84545]/20 bg-[#e84545]/[0.08] px-3.5 py-1.5 text-[13px] font-medium tracking-wide text-[#e84545]'>
-            <span className='size-1.5 animate-pulse rounded-full bg-[#e84545]' />
-            ARCADE OFFLINE QUALIFIER
-          </div>
-          <h1 className='text-[clamp(42px,6vw,64px)] leading-[1.1] font-extrabold tracking-tight'>
-            <span className='bg-gradient-to-br from-[#e84545] to-[#f5a623] bg-clip-text text-transparent'>
-              스위스 스테이지
-            </span>
-            <br />
-            진행 안내
-          </h1>
-          <p className='mt-4 text-base font-light text-white/55'>
-            결선까지 가는 여정 — 2패 탈락 스위스 시스템의 모든 것
-          </p>
+          <FadeIn>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e84545]/20 bg-[#e84545]/[0.08] px-3.5 py-1.5 text-[13px] font-medium tracking-wide text-[#e84545]'>
+              <span className='size-1.5 animate-pulse rounded-full bg-[#e84545]' />
+              ARCADE OFFLINE QUALIFIER
+            </div>
+          </FadeIn>
+          <FadeIn delay={120}>
+            <h1 className='text-[clamp(42px,6vw,64px)] leading-[1.1] font-extrabold tracking-tight'>
+              <span className='bg-gradient-to-br from-[#e84545] to-[#f5a623] bg-clip-text text-transparent'>
+                스위스 스테이지
+              </span>
+              <br />
+              진행 안내
+            </h1>
+          </FadeIn>
+          <FadeIn delay={240}>
+            <p className='mt-4 text-base font-light text-white/55'>
+              결선까지 가는 여정 — 2패 탈락 스위스 시스템의 모든 것
+            </p>
+          </FadeIn>
         </div>
       </section>
 
