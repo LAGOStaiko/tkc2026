@@ -37,10 +37,10 @@ const GLANCE_ITEMS: GlanceItem[] = [
 ]
 
 const REGIONS = [
-  { num: 1, label: '1차수', venue: '서울', arcade: 'TAIKO LABS' },
-  { num: 2, label: '2차수', venue: '대전', arcade: 'CYGameworld' },
-  { num: 3, label: '3차수', venue: '광주', arcade: 'GAMEPLAZA' },
-  { num: 4, label: '4차수', venue: '부산', arcade: 'GAME D' },
+  { num: 1, label: '1차수', venue: '서울', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.png' },
+  { num: 2, label: '2차수', venue: '대전', arcade: 'CYGameworld', image: '/branding/venue-daejeon.png' },
+  { num: 3, label: '3차수', venue: '광주', arcade: 'GAMEPLAZA', image: '/branding/venue-gwangju.png' },
+  { num: 4, label: '4차수', venue: '부산', arcade: 'GAME D', image: '/branding/venue-busan.png' },
 ] as const
 
 const LINK_FLOW = [
@@ -329,9 +329,15 @@ function ArcadeOnlinePage() {
               {REGIONS.map((r) => (
                 <div
                   key={r.num}
-                  className='relative overflow-hidden rounded-xl border border-[#f5a623]/15 bg-[#111] px-3 py-5 text-center'
+                  className='relative overflow-hidden rounded-xl border border-[#f5a623]/15 bg-[#111] px-3 pt-4 pb-5 text-center'
                 >
                   <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#f5a623]' />
+                  <img
+                    src={r.image}
+                    alt={r.arcade}
+                    className='mx-auto mb-3 size-12 rounded-lg object-cover'
+                    loading='lazy'
+                  />
                   <div className='mb-0.5 font-mono text-[10px] font-semibold tracking-widest text-white/35 uppercase'>
                     {r.label}
                   </div>

@@ -29,10 +29,10 @@ const STAT_ITEMS = [
 ] as const
 
 const REGIONS = [
-  { num: 1, name: '서울', detail: '1차 예선', arcade: 'TAIKO LABS' },
-  { num: 2, name: '대전', detail: '2차 예선', arcade: 'CYGameworld' },
-  { num: 3, name: '광주', detail: '3차 예선', arcade: 'GAMEPLAZA' },
-  { num: 4, name: '부산', detail: '4차 예선', arcade: 'GAME D' },
+  { num: 1, name: '서울', detail: '1차 예선', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.png' },
+  { num: 2, name: '대전', detail: '2차 예선', arcade: 'CYGameworld', image: '/branding/venue-daejeon.png' },
+  { num: 3, name: '광주', detail: '3차 예선', arcade: 'GAMEPLAZA', image: '/branding/venue-gwangju.png' },
+  { num: 4, name: '부산', detail: '4차 예선', arcade: 'GAME D', image: '/branding/venue-busan.png' },
 ] as const
 
 const SEED_MATCHES = [
@@ -378,9 +378,12 @@ function OverviewSection() {
             >
               <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#f5a623]/40' />
               <div className='flex items-center gap-3.5'>
-                <div className='flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-[#f5a623] font-mono text-sm font-bold text-[#f5a623]'>
-                  {r.num}
-                </div>
+                <img
+                  src={r.image}
+                  alt={r.arcade}
+                  className='size-9 shrink-0 rounded-lg object-cover'
+                  loading='lazy'
+                />
                 <div className='min-w-0 flex-1'>
                   <div className='flex items-center gap-2'>
                     <span className='text-sm font-semibold text-white/90'>
@@ -402,9 +405,12 @@ function OverviewSection() {
         <div className='hidden items-center py-5 sm:flex'>
           {REGIONS.map((r, i) => (
             <div key={r.num} className='relative flex-1 text-center'>
-              <div className='relative z-10 mx-auto mb-2.5 flex size-9 items-center justify-center rounded-full border-2 border-[#f5a623] bg-[#111] font-mono text-sm font-bold text-[#f5a623]'>
-                {r.num}
-              </div>
+              <img
+                src={r.image}
+                alt={r.arcade}
+                className='relative z-10 mx-auto mb-2.5 size-10 rounded-lg object-cover'
+                loading='lazy'
+              />
               <div className='text-sm font-semibold text-white/90'>
                 {r.name}
               </div>
@@ -415,7 +421,7 @@ function OverviewSection() {
                 {r.detail}
               </div>
               {i < REGIONS.length - 1 && (
-                <div className='absolute top-[18px] left-1/2 h-px w-full bg-[#2a2a2a]' />
+                <div className='absolute top-[20px] left-1/2 h-px w-full bg-[#2a2a2a]' />
               )}
             </div>
           ))}

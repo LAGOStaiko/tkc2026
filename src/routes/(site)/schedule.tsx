@@ -1,7 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
-import { useSchedule } from '@/lib/api'
 import { FadeIn } from '@/components/tkc/guide-shared'
 import { PageHero } from '@/components/tkc/layout'
 
@@ -848,11 +847,7 @@ function FinalsTeaser({ title, meta }: { title: string; meta: string }) {
 function SchedulePage() {
   const [activeSection, setActiveSection] = useState('division')
 
-  const { data, isLoading, isError } = useSchedule<
-    ScheduleData | ApiScheduleItem[]
-  >()
-  const apiItems = getScheduleItems(data)
-  const rawItems = apiItems.length > 0 ? apiItems : FALLBACK_SCHEDULE
+  const rawItems = getScheduleItems(FALLBACK_SCHEDULE)
   const normalizedItems = rawItems.map(normalizeItem)
   const expandedItems = expandArcadeItems(normalizedItems)
 
@@ -936,14 +931,6 @@ function SchedulePage() {
         subtitle='콘솔과 아케이드 부문의 전체 일정을 확인하세요.'
       />
       <SectionNav activeId={activeSection} />
-
-      {isError && (
-        <p className='mb-6 text-sm text-destructive'>{t('schedule.failed')}</p>
-      )}
-
-      {isLoading && expandedItems.length === 0 ? (
-        <p className='mb-6 text-sm text-white/60'>{t('schedule.loading')}</p>
-      ) : null}
 
       {/* Section 01: Division Schedule */}
       <SectionBlock
