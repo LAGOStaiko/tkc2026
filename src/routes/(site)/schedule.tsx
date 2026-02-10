@@ -100,6 +100,50 @@ const FALLBACK_SCHEDULE: ApiScheduleItem[] = [
 /*  Data Utilities                                                     */
 /* ════════════════════════════════════════════════════════════════════ */
 
+const DEFAULT_VENUE_IMAGE = '/branding/v2/icon-arcade.png'
+
+type VenueAsset = {
+  image: string
+  dates: string[]
+  keywords: string[]
+}
+
+const VENUE_ASSETS: VenueAsset[] = [
+  {
+    image: '/branding/venue-seoul.png',
+    dates: ['2026-03-21'],
+    keywords: ['taiko labs'],
+  },
+  {
+    image: '/branding/venue-daejeon.png',
+    dates: ['2026-03-28'],
+    keywords: ['cygameworld'],
+  },
+  {
+    image: '/branding/venue-gwangju.png',
+    dates: ['2026-04-04'],
+    keywords: ['gameplaza'],
+  },
+  {
+    image: '/branding/venue-busan.png',
+    dates: ['2026-04-11'],
+    keywords: ['game d', 'gamed'],
+  },
+]
+
+const normalizeMatchText = (value?: string) =>
+  (value ?? '').toLowerCase().replace(/\s+/g, '')
+
+const findVenueAsset = (item: ApiScheduleItem) => {
+  const haystack = normalizeMatchText(`${item.title ?? ''} ${item.location ?? ''}`)
+  const dateText = normalizeMatchText(item.dateText)
+  return VENUE_ASSETS.find(
+    (venue) =>
+      venue.dates.some((date) => dateText.includes(normalizeMatchText(date))) ||
+      venue.keywords.some((keyword) => haystack.includes(normalizeMatchText(keyword)))
+  )
+}
+
 const looksLikeDateValue = (value?: string) => {
   if (!value) return false
   const text = value.trim()
@@ -663,6 +707,8 @@ type DisplayEvent = {
   title: string
   meta?: string
   mode?: 'online' | 'offline'
+  venueLabel?: string
+  venueImage?: string
 }
 
 function SchedulePanel({
@@ -734,8 +780,27 @@ function SchedulePanel({
                 <div className='text-[15px] font-semibold break-keep text-white/90'>
                   {e.title}
                 </div>
-                {e.meta && (
+                {e.venueLabel ? (
+                  <div className='mt-1 flex items-center gap-2'>
+                    <img
+                      src={e.venueImage ?? DEFAULT_VENUE_IMAGE}
+                      alt={e.venueLabel}
+                      className='size-6 rounded-md object-cover'
+                      loading='lazy'
+                      onError={(event) => {
+                        const image = event.currentTarget
+                        if (image.dataset.fallbackApplied === 'true') return
+                        image.dataset.fallbackApplied = 'true'
+                        image.src = DEFAULT_VENUE_IMAGE
+                      }}
+                    />
+                    <span className='text-[13px] text-white/40'>{e.venueLabel}</span>
+                  </div>
+                ) : e.meta ? (
                   <div className='mt-0.5 text-[13px] text-white/35'>{e.meta}</div>
+                ) : null}
+                {e.venueLabel && e.meta && (
+                  <div className='mt-1 text-[12px] text-white/30'>{e.meta}</div>
                 )}
               </div>
               {e.mode && <ModeTag mode={e.mode} />}
@@ -869,8 +934,10 @@ function SchedulePage() {
   const toDisplayEvents = (items: ApiScheduleItem[]): DisplayEvent[] =>
     items.map((item) => {
       const parts = resolveDateParts(item)
+      const mode = inferMode(item)
+      const venue = mode === 'offline' ? findVenueAsset(item) : undefined
       const metaParts = [
-        item.location && !looksLikeUrl(item.location) ? item.location : undefined,
+        !venue && item.location && !looksLikeUrl(item.location) ? item.location : undefined,
         item.note && !looksLikeUrl(item.note) ? item.note : undefined,
       ].filter(Boolean)
       return {
@@ -878,7 +945,9 @@ function SchedulePage() {
         dateSub: parts.sub,
         title: item.title ?? '일정',
         meta: metaParts.length > 0 ? metaParts.join(' · ') : undefined,
-        mode: inferMode(item),
+        mode,
+        venueLabel: venue ? item.location ?? item.title : undefined,
+        venueImage: venue?.image,
       }
     })
 

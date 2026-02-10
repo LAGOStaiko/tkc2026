@@ -273,6 +273,45 @@
   }
 }
 
+/* ── Animated border for archive cards ── */
+
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes tkc-border-spin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.tkc-arc-glow {
+  position: relative;
+}
+
+.tkc-arc-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 40%,
+    var(--tkc-arc-glow-color, rgba(232, 110, 58, 0.35)),
+    transparent 60%
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  animation: tkc-border-spin 4s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tkc-motion-reveal,
   .tkc-motion-surface,
@@ -290,5 +329,9 @@
 
   .tkc-motion-lift:hover {
     transform: none;
+  }
+
+  .tkc-arc-glow::before {
+    animation: none !important;
   }
 }
