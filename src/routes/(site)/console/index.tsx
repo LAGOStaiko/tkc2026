@@ -544,9 +544,7 @@ function ConsoleQualifierPage() {
                     key={i}
                     className='flex items-start gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
                   >
-                    <span className='mt-0.5 flex size-4 shrink-0 items-center justify-center rounded border-2 border-white/25'>
-                      <span className='hidden' />
-                    </span>
+                    <TkcIcon name='info' className='mt-0.5 size-4 shrink-0 opacity-80' />
                     <span
                       className='break-keep text-white/55 [&>strong]:text-white/90'
                       dangerouslySetInnerHTML={{ __html: html }}

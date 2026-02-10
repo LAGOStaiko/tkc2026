@@ -549,49 +549,51 @@ function ScheduleStrip() {
                 return (
                   <div
                     key={ev.name}
-                    className='rounded-xl border border-[#1e1e1e] bg-[#111] p-4 transition-colors hover:border-[#2a2a2a] sm:p-5'
+                    className='rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
                   >
-                    <div className='flex flex-wrap items-center gap-x-4 gap-y-2'>
-                      <div className='flex items-center gap-2'>
-                        <span className='text-xl leading-none font-extrabold tracking-tight tabular-nums text-white/95 sm:text-[22px]'>
+                    <div className='flex items-start gap-3 p-4 sm:gap-4 sm:p-5'>
+                      <div className='w-[64px] shrink-0 pt-0.5 text-center sm:w-[76px]'>
+                        <div className='text-[17px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
                           {fmtDate(ev.startDate)}
-                        </span>
-                        <span className='text-sm leading-none text-white/25'>
-                          →
-                        </span>
-                        <span className='text-xl leading-none font-extrabold tracking-tight tabular-nums text-white/95 sm:text-[22px]'>
+                        </div>
+                        <div className='my-1 text-[10px] leading-none text-white/20'>→</div>
+                        <div className='text-[17px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
                           {fmtDate(ev.endDate)}
-                        </span>
+                        </div>
                       </div>
                       <div className='min-w-0 flex-1'>
-                        <div className='text-[16px] leading-[1.25] font-semibold text-white/90'>
-                          {ev.name}
+                        <div className='flex items-start justify-between gap-3'>
+                          <div>
+                            <div className='text-[15px] leading-[1.3] font-semibold text-white/90'>
+                              {ev.name}
+                            </div>
+                            <div className='mt-0.5 text-[13px] leading-[1.4] text-white/40'>
+                              {ev.detail}
+                            </div>
+                          </div>
+                          <div className='flex shrink-0 gap-1.5'>
+                            <span className='rounded-[5px] bg-[#4a9eff]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#4a9eff]'>
+                              ONLINE
+                            </span>
+                            <StatusTag status={status} />
+                          </div>
                         </div>
-                        <div className='text-[13px] leading-[1.4] text-white/40'>
-                          {ev.detail}
+                        <div className='mt-3 flex items-center gap-2'>
+                          <div className='h-[3px] flex-1 overflow-hidden rounded-full bg-[#1e1e1e]'>
+                            <div
+                              className={`h-full rounded-full transition-all duration-1000 ${
+                                ev.division === 'console'
+                                  ? 'bg-[#e86e3a]'
+                                  : 'bg-[#f5a623]'
+                              }`}
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                          <span className='text-[11px] leading-none tabular-nums text-white/40'>
+                            {progress}%
+                          </span>
                         </div>
                       </div>
-                      <div className='flex gap-1.5'>
-                        <span className='rounded-[5px] bg-[#4a9eff]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#4a9eff]'>
-                          ONLINE
-                        </span>
-                        <StatusTag status={status} />
-                      </div>
-                    </div>
-                    <div className='mt-3 flex items-center gap-2'>
-                      <div className='h-[3px] flex-1 overflow-hidden rounded-full bg-[#1e1e1e]'>
-                        <div
-                          className={`h-full rounded-full transition-all duration-1000 ${
-                            ev.division === 'console'
-                              ? 'bg-[#e86e3a]'
-                              : 'bg-[#f5a623]'
-                          }`}
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                      <span className='text-[11px] leading-none tabular-nums text-white/40'>
-                        {progress}%
-                      </span>
                     </div>
                   </div>
                 )
@@ -602,22 +604,22 @@ function ScheduleStrip() {
                 return (
                   <div
                     key={ev.fullDate}
-                    className='flex items-center gap-4 rounded-xl border border-[#1e1e1e] bg-[#111] px-4 py-3.5 transition-colors hover:border-[#2a2a2a] sm:px-5'
+                    className='flex items-center gap-3 rounded-xl border border-[#1e1e1e] bg-[#111] px-4 py-3.5 transition-colors hover:border-[#2a2a2a] sm:gap-4 sm:px-5'
                   >
-                    <div className='w-[72px] shrink-0 text-center sm:w-[84px]'>
-                      <div className='text-lg leading-none font-extrabold tracking-tight tabular-nums whitespace-nowrap text-white/95 sm:text-2xl'>
+                    <div className='w-[64px] shrink-0 text-center sm:w-[76px]'>
+                      <div className='text-[17px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-xl'>
                         {fmtDate(ev.fullDate)}
                       </div>
-                      <div className='mt-1 text-[11px] leading-none text-white/40'>
+                      <div className='mt-1 text-[11px] leading-none text-white/35'>
                         {fmtDay(ev.fullDate)}
                       </div>
                     </div>
                     <div className='min-w-0 flex-1'>
-                      <div className='text-[16px] leading-[1.25] font-semibold text-white/90'>
+                      <div className='text-[15px] leading-[1.3] font-semibold text-white/90'>
                         {ev.name}
                       </div>
-                      <div className='mt-1 flex items-center gap-1.5 text-[13px] leading-[1.35] text-white/40'>
-                        <span className='size-1 rounded-full bg-white/25' />
+                      <div className='mt-0.5 flex items-center gap-1.5 text-[13px] text-white/40'>
+                        <span className='size-1 rounded-full bg-white/20' />
                         {ev.venueName}
                       </div>
                     </div>
@@ -635,22 +637,22 @@ function ScheduleStrip() {
                 return (
                   <div
                     key={ev.fullDate}
-                    className='flex items-center gap-4 rounded-xl border border-dashed border-[#e86e3a]/15 bg-[#111] px-4 py-3.5 sm:px-5'
+                    className='flex items-center gap-3 rounded-xl border border-dashed border-[#1e1e1e] bg-[#111]/60 px-4 py-3.5 sm:gap-4 sm:px-5'
                   >
-                    <div className='w-[72px] shrink-0 text-center sm:w-[84px]'>
-                      <div className='text-lg leading-none font-semibold tracking-tight tabular-nums whitespace-nowrap text-white/40 sm:text-xl'>
+                    <div className='w-[64px] shrink-0 text-center sm:w-[76px]'>
+                      <div className='text-base leading-none font-semibold tracking-tight tabular-nums text-white/35 sm:text-[17px]'>
                         {fmtDate(ev.fullDate)}
                       </div>
                     </div>
                     <div className='min-w-0 flex-1'>
-                      <div className='text-[16px] leading-[1.25] font-semibold text-white/55'>
+                      <div className='text-[15px] leading-[1.3] font-medium text-white/50'>
                         {ev.name}
                       </div>
-                      <div className='text-[13px] leading-[1.4] text-white/35'>
+                      <div className='mt-0.5 text-[13px] leading-[1.4] text-white/30'>
                         {ev.detail}
                       </div>
                     </div>
-                    <span className='rounded-[5px] border border-[#1e1e1e] bg-white/[0.03] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-white/40'>
+                    <span className='rounded-[5px] border border-[#1e1e1e] bg-white/[0.02] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-white/35'>
                       마감
                     </span>
                   </div>
@@ -662,33 +664,36 @@ function ScheduleStrip() {
                 return (
                   <div
                     key={ev.fullDate}
-                    className='flex items-center gap-4 rounded-xl border border-[#e86e3a]/20 bg-gradient-to-br from-[#e86e3a]/[0.03] to-[#111] px-5 py-5 transition-colors hover:border-[#e86e3a]/35 sm:px-6'
+                    className='relative overflow-hidden rounded-xl border border-[#e86e3a]/20 bg-[#111] transition-colors hover:border-[#e86e3a]/30'
                   >
-                    <div className='w-[72px] shrink-0 text-center sm:w-[88px]'>
-                      <div className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-2xl leading-none font-extrabold tracking-tight tabular-nums whitespace-nowrap text-transparent sm:text-[32px]'>
-                        {fmtDate(ev.fullDate)}
+                    <div className='absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-[#e86e3a] to-[#f5a623]' />
+                    <div className='flex items-center gap-3 px-4 py-5 sm:gap-4 sm:px-5'>
+                      <div className='w-[64px] shrink-0 text-center sm:w-[76px]'>
+                        <div className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-xl leading-none font-extrabold tracking-tight tabular-nums text-transparent sm:text-2xl'>
+                          {fmtDate(ev.fullDate)}
+                        </div>
+                        <div className='mt-1 text-[11px] leading-none text-[#e86e3a]/60'>
+                          {fmtDay(ev.fullDate)}
+                        </div>
                       </div>
-                      <div className='mt-1 text-[11px] leading-none text-[#e86e3a]/70'>
-                        {fmtDay(ev.fullDate)}
+                      <div className='min-w-0 flex-1'>
+                        <div className='text-[16px] leading-[1.3] font-bold text-white/90'>
+                          {ev.name}
+                        </div>
+                        <div className='mt-0.5 text-[13px] leading-[1.4] text-white/40'>
+                          {ev.detail}
+                        </div>
+                        <div className='mt-1 flex items-center gap-1.5 text-[13px] text-white/40'>
+                          <span className='size-1 rounded-full bg-[#e86e3a]/50' />
+                          {ev.venueName}
+                        </div>
                       </div>
-                    </div>
-                    <div className='min-w-0 flex-1'>
-                      <div className='text-[18px] leading-[1.2] font-semibold text-white/90'>
-                        {ev.name}
+                      <div className='flex shrink-0 gap-1.5'>
+                        <span className='rounded-[5px] border border-[#e86e3a]/20 bg-[#e86e3a]/[0.12] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e86e3a]'>
+                          FINALS
+                        </span>
+                        <StatusTag status={status} />
                       </div>
-                      <div className='text-[13px] leading-[1.4] text-white/40'>
-                        {ev.detail}
-                      </div>
-                      <div className='mt-1 flex items-center gap-1.5 text-[13px] leading-[1.35] text-white/40'>
-                        <span className='size-1 rounded-full bg-white/25' />
-                        {ev.venueName}
-                      </div>
-                    </div>
-                    <div className='flex shrink-0 gap-1.5'>
-                      <span className='rounded-[5px] border border-[#e86e3a]/20 bg-[#e86e3a]/[0.12] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e86e3a]'>
-                        FINALS
-                      </span>
-                      <StatusTag status={status} />
                     </div>
                   </div>
                 )

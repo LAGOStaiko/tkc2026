@@ -107,7 +107,7 @@ function SubNav() {
         <div
           className='grid gap-2'
           style={{
-            gridTemplateColumns: `repeat(${NAV_ITEMS.length}, minmax(112px, 1fr))`,
+            gridTemplateColumns: `repeat(${NAV_ITEMS.length}, minmax(0, 1fr))`,
           }}
         >
           {NAV_ITEMS.map((item) => {

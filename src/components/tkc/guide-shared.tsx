@@ -76,12 +76,22 @@ export function TkcIcon({
   name: string
   className?: string
 }) {
+  const resolveSrc = (iconName: string) => `/branding/v2/emojis/png/${iconName}.png`
+  const fallbackSrc = resolveSrc('info')
+
   return (
     <img
-      src={`/branding/v2/emojis/png/${name}.png`}
+      src={resolveSrc(name)}
       alt=''
-      className={className}
+      className={`${className} object-contain`}
       draggable={false}
+      loading='lazy'
+      onError={(event) => {
+        const image = event.currentTarget
+        if (image.dataset.fallbackApplied === 'true') return
+        image.dataset.fallbackApplied = 'true'
+        image.src = fallbackSrc
+      }}
     />
   )
 }

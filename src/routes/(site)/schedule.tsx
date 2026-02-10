@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
-import { FadeIn } from '@/components/tkc/guide-shared'
+import { FadeIn, TkcIcon } from '@/components/tkc/guide-shared'
 import { PageHero } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/schedule')({
@@ -1069,7 +1069,7 @@ function SchedulePage() {
       >
         <FinalsTeaser title={finalTitle} meta={finalMeta} />
         <div className='flex gap-3 rounded-xl border border-[#4a9eff]/[0.12] bg-[#4a9eff]/[0.04] p-4 text-[13px] leading-[1.55] text-white/55'>
-          <span className='mt-0.5 shrink-0 inline-block h-4 w-4 rounded border border-dashed border-white/30' />
+          <TkcIcon name='info' className='mt-0.5 size-4 shrink-0 opacity-80' />
           <span className='break-keep'>
             결선 세부 일정 및 진행 방식은 예선 종료 후{' '}
             <strong className='text-white/70'>공식 채널을 통해 공지</strong>됩니다.
