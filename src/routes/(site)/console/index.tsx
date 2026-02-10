@@ -28,7 +28,7 @@ type GlanceItem = {
 
 const GLANCE_ITEMS: GlanceItem[] = [
   { label: '방식', value: '스코어 어택', sub: '2곡 합산' },
-  { label: '결선 진출', value: '상위 4명', color: '#4ecb71' },
+  { label: '결선 진출', value: '상위 4명', color: '#f7d154' },
   { label: '신청 기간', value: '3.2 ~ 4.30' },
   { label: '제출 방법', value: '유튜브 영상', color: '#f5a623' },
 ]
@@ -137,18 +137,18 @@ function RankingVisual() {
             key={i}
             className={`flex items-center gap-2.5 rounded-xl border p-2.5 px-3.5 ${
               qualify
-                ? 'border-[#4ecb71]/20 bg-[#4ecb71]/[0.02]'
+                ? 'border-[#f7d154]/20 bg-[#f7d154]/[0.02]'
                 : 'border-[#1e1e1e] opacity-45'
             }`}
           >
             <div
-              className={`w-[26px] text-center text-base font-extrabold ${qualify ? 'text-[#4ecb71]' : 'text-white/35'}`}
+              className={`w-[26px] text-center text-base font-extrabold ${qualify ? 'text-[#f7d154]' : 'text-white/35'}`}
             >
               {i + 1}
             </div>
             <div className='h-1.5 flex-1 overflow-hidden rounded-full bg-[#1e1e1e]'>
               <div
-                className={`h-full rounded-full transition-all duration-800 ease-out ${qualify ? 'bg-gradient-to-r from-[#4ecb71] to-[#4a9eff]' : 'bg-white/25'}`}
+                className={`h-full rounded-full transition-all duration-800 ease-out ${qualify ? 'bg-gradient-to-r from-[#f7d154] to-[#f5a623]' : 'bg-white/25'}`}
                 style={{
                   width: animated ? `${score}%` : '0%',
                   transitionDelay: `${i * 80}ms`,
@@ -158,7 +158,7 @@ function RankingVisual() {
             <span
               className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider ${
                 qualify
-                  ? 'bg-[#4ecb71]/[0.08] text-[#4ecb71]'
+                  ? 'bg-[#f7d154]/[0.08] text-[#f7d154]'
                   : 'bg-white/[0.02] text-white/35'
               }`}
             >
@@ -182,7 +182,7 @@ function ConsoleQualifierPage() {
       <FadeIn delay={300}>
         <Card className='mb-12 overflow-hidden p-0'>
           <div className='flex items-center gap-2.5 border-b border-[#1e1e1e] bg-[#111] px-6 py-4'>
-            <span className='size-2 rounded-full bg-[#e84545]' />
+            <span className='size-2 rounded-full bg-[#e86e3a]' />
             <span className='text-[15px] font-bold text-white/90'>
               한눈에 보기
             </span>
@@ -215,7 +215,7 @@ function ConsoleQualifierPage() {
 
       {/* ── Steps Header ── */}
       <FadeIn>
-        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e84545] uppercase'>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
           How to participate
         </div>
         <h2 className='mb-2 text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
@@ -231,7 +231,7 @@ function ConsoleQualifierPage() {
         <StepCard
           num='01'
           heading='과제곡 플레이'
-          accentColor='#e84545'
+          accentColor='#e86e3a'
           summary={
             <>
               <strong className='text-white/90'>希望へのメロディー</strong>{' '}
@@ -244,7 +244,7 @@ function ConsoleQualifierPage() {
               </span>{' '}
               두 곡을 플레이하세요.
               <br />
-              <span className='rounded bg-[#e84545]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#e84545]'>
+              <span className='rounded bg-[#e86e3a]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#e86e3a]'>
                 옵션 전면 금지
               </span>{' '}
               진타·배속 등 일체 사용 불가합니다.
@@ -263,7 +263,7 @@ function ConsoleQualifierPage() {
                   <div
                     className='absolute top-0 right-0 left-0 h-0.5'
                     style={{
-                      background: i === 0 ? '#e84545' : '#f5a623',
+                      background: i === 0 ? '#e86e3a' : '#f5a623',
                     }}
                   />
                   <div className='mb-1.5 font-mono text-[10px] font-semibold tracking-widest text-white/35 uppercase'>
@@ -297,8 +297,8 @@ function ConsoleQualifierPage() {
                 <span
                   className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider ${
                     rule.allowed
-                      ? 'bg-[#4ecb71]/[0.08] text-[#4ecb71]'
-                      : 'bg-[#e84545]/[0.08] text-[#e84545]'
+                      ? 'bg-[#f7d154]/[0.08] text-[#f7d154]'
+                      : 'bg-[#e86e3a]/[0.08] text-[#e86e3a]'
                   }`}
                 >
                   {rule.allowed ? '허용' : '불가'}
@@ -324,7 +324,7 @@ function ConsoleQualifierPage() {
         <StepCard
           num='02'
           heading='영상 촬영 & 제출'
-          accentColor='#e84545'
+          accentColor='#e86e3a'
           summary={
             <>
               직접 앵글로 촬영 →{' '}
@@ -349,7 +349,7 @@ function ConsoleQualifierPage() {
                     i === 0 ? 'rounded-l-xl' : i === 2 ? 'rounded-r-xl' : ''
                   } ${i > 0 ? '-ml-px' : ''}`}
                 >
-                  <div className='mb-1 text-base font-extrabold text-[#e84545]'>
+                  <div className='mb-1 text-base font-extrabold text-[#e86e3a]'>
                     {step.num}
                   </div>
                   <div className='text-xs font-semibold text-white/90'>
@@ -371,8 +371,8 @@ function ConsoleQualifierPage() {
                   key={item.bold}
                   className='flex items-center gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
                 >
-                  <span className='flex size-4 shrink-0 items-center justify-center rounded border-2 border-[#4ecb71]'>
-                    <span className='size-1.5 rounded-sm bg-[#4ecb71]' />
+                  <span className='flex size-4 shrink-0 items-center justify-center rounded border-2 border-[#f7d154]'>
+                    <span className='size-1.5 rounded-sm bg-[#f7d154]' />
                   </span>
                   <span className='text-white/55'>
                     <strong className='text-white/90'>{item.bold}</strong> —{' '}
@@ -383,7 +383,7 @@ function ConsoleQualifierPage() {
             </div>
             <Callout type='danger' icon={<TkcIcon name='warning' />}>
               규정 미준수 영상은{' '}
-              <strong className='text-[#e84545]'>심사 대상에서 제외</strong>될
+              <strong className='text-[#e86e3a]'>심사 대상에서 제외</strong>될
               수 있습니다.
             </Callout>
           </div>
@@ -393,11 +393,11 @@ function ConsoleQualifierPage() {
         <StepCard
           num='03'
           heading='결선 진출 확인'
-          accentColor='#e84545'
+          accentColor='#e86e3a'
           summary={
             <>
               2곡 합산 통산 점수{' '}
-              <span className='rounded bg-[#4ecb71]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#4ecb71]'>
+              <span className='rounded bg-[#f7d154]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f7d154]'>
                 상위 4명
               </span>
               이 PlayX4 결선 토너먼트에 진출합니다. 예비 번호가 부여되며, 기권
@@ -413,15 +413,15 @@ function ConsoleQualifierPage() {
                 <div className='text-[11px] text-white/35'>과제곡 1</div>
                 <div className='text-sm font-bold text-white/90'>점수 A</div>
               </div>
-              <div className='text-xl font-extrabold text-[#e84545]'>+</div>
+              <div className='text-xl font-extrabold text-[#e86e3a]'>+</div>
               <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.02] px-5 py-2.5 text-center'>
                 <div className='text-[11px] text-white/35'>과제곡 2</div>
                 <div className='text-sm font-bold text-white/90'>점수 B</div>
               </div>
-              <div className='text-xl font-extrabold text-[#e84545]'>=</div>
-              <div className='rounded-xl border border-[#4ecb71]/25 bg-[#4ecb71]/[0.03] px-5 py-2.5 text-center'>
+              <div className='text-xl font-extrabold text-[#e86e3a]'>=</div>
+              <div className='rounded-xl border border-[#f7d154]/25 bg-[#f7d154]/[0.03] px-5 py-2.5 text-center'>
                 <div className='text-[11px] text-white/35'>통산 점수</div>
-                <div className='text-sm font-bold text-[#4ecb71]'>A + B</div>
+                <div className='text-sm font-bold text-[#f7d154]'>A + B</div>
               </div>
             </div>
           </div>
@@ -442,7 +442,7 @@ function ConsoleQualifierPage() {
       <div className='mt-16'>
         <div className='mb-12 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent' />
         <FadeIn>
-          <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e84545] uppercase'>
+          <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
             Detailed Rules
           </div>
           <h2 className='mb-2 text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
@@ -464,7 +464,7 @@ function ConsoleQualifierPage() {
                   label={f.label}
                   value={f.value}
                   isBadge={'isBadge' in f ? f.isBadge : undefined}
-                  accentColor='#e84545'
+                  accentColor='#e86e3a'
                 />
               ))}
             </Accordion>
@@ -482,13 +482,13 @@ function ConsoleQualifierPage() {
                   label='아케이드 · 콘솔 예선 참가'
                   value='가능'
                   isBadge={false}
-                  accentColor='#e84545'
+                  accentColor='#e86e3a'
                 />
                 <DetailRow
                   label='아케이드 · 콘솔 동시 결선 진출'
                   value='불가'
                   isBadge={false}
-                  accentColor='#e84545'
+                  accentColor='#e86e3a'
                 />
                 <Callout type='warning' icon={<TkcIcon name='warning' />}>
                   예선 중복 참가 가능하지만,{' '}
@@ -501,7 +501,7 @@ function ConsoleQualifierPage() {
                 <DetailSubtitle>대리 참가 · 부정행위</DetailSubtitle>
                 <Callout type='danger' icon={<TkcIcon name='warning' />}>
                   중복 참가 및 대리 참가는{' '}
-                  <strong className='text-[#e84545]'>엄격히 금지</strong>
+                  <strong className='text-[#e86e3a]'>엄격히 금지</strong>
                   됩니다. 위반 시 실격 처리되며, 향후 대회 참가에 불이익이 있을
                   수 있습니다.
                 </Callout>
@@ -516,7 +516,7 @@ function ConsoleQualifierPage() {
                   label={r.label}
                   value={r.value}
                   isBadge={'isBadge' in r ? r.isBadge : undefined}
-                  accentColor='#e84545'
+                  accentColor='#e86e3a'
                 />
               ))}
               <Callout type='info' icon={<TkcIcon name='info' />}>

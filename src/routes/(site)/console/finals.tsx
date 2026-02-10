@@ -736,7 +736,7 @@ function PlayRulesSection() {
 
       <Callout type='danger' icon={<TkcIcon name='warning' />}>
         선수 과실에 의한 미스는{' '}
-        <strong className='text-[#e84545]'>재경기 사유에 해당하지 않습니다.</strong>
+        <strong className='text-[#e86e3a]'>재경기 사유에 해당하지 않습니다.</strong>
       </Callout>
     </SectionBlock>
   )
@@ -815,7 +815,7 @@ function ConsoleFinalsPage() {
         <div className='mt-4 mb-8 text-center'>
           <Link
             to='/console'
-            className='inline-flex items-center gap-1.5 text-[13px] font-medium text-[#e84545] transition-colors hover:text-[#f5a623]'
+            className='inline-flex items-center gap-1.5 text-[13px] font-medium text-[#e86e3a] transition-colors hover:text-[#f5a623]'
           >
             ← 온라인 예선 안내로 돌아가기
           </Link>

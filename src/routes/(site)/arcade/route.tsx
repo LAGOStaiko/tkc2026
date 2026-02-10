@@ -30,7 +30,7 @@ const NAV_ITEMS = [
     exact: false,
     phase: 'PHASE 2',
     label: '오프라인 스위스',
-    desc: '차시별 Top 16',
+    desc: '차수별 Top 16',
     color: '#f7d154',
   },
   {
@@ -39,7 +39,7 @@ const NAV_ITEMS = [
     phase: 'FINALS',
     label: 'PlayX4 결선',
     desc: 'Top 8 최종 결선',
-    color: '#4ecb71',
+    color: '#e86e3a',
   },
 ] as const
 
@@ -184,7 +184,7 @@ function ArcadeLayout() {
           </FadeIn>
           <FadeIn delay={240}>
             <p className='mt-4 max-w-[520px] text-[15px] font-light break-keep text-white/55'>
-              돈더풀로드 연동으로 점수를 제출하고, 차시별 상위 16명이 오프라인
+              동더 광장 연동으로 점수를 제출하고, 차수별 상위 16명이 오프라인
               스위스 스테이지에 진출합니다.
             </p>
           </FadeIn>

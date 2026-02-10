@@ -23,7 +23,7 @@ const NAV_ITEMS = [
     phase: 'PHASE 1',
     label: '온라인 예선',
     desc: '스코어 어택',
-    color: '#e84545',
+    color: '#e86e3a',
   },
   {
     to: '/console/finals',
@@ -157,17 +157,17 @@ function ConsoleLayout() {
     <div className='mx-auto max-w-[960px] px-4 md:px-6'>
       {/* ── Hero ── */}
       <section className='relative overflow-hidden pt-16 pb-10 md:pt-24 md:pb-14'>
-        <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(232,69,69,0.15)_0%,transparent_70%)]' />
+        <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(232,110,58,0.15)_0%,transparent_70%)]' />
         <div className='relative'>
           <FadeIn>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e84545]/20 bg-[#e84545]/[0.08] px-3.5 py-1.5 text-[13px] font-medium tracking-wide text-[#e84545]'>
-              <span className='size-1.5 animate-pulse rounded-full bg-[#e84545]' />
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e86e3a]/20 bg-[#e86e3a]/[0.08] px-3.5 py-1.5 text-[13px] font-medium tracking-wide text-[#e86e3a]'>
+              <span className='size-1.5 animate-pulse rounded-full bg-[#e86e3a]' />
               CONSOLE DIVISION
             </div>
           </FadeIn>
           <FadeIn delay={120}>
             <h1 className='text-[clamp(36px,6vw,56px)] leading-[1.1] font-extrabold tracking-tight'>
-              <span className='bg-gradient-to-br from-[#e84545] to-[#f5a623] bg-clip-text text-transparent'>
+              <span className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'>
                 콘솔 예선
               </span>
               <br />

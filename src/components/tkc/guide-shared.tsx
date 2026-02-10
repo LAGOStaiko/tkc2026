@@ -14,9 +14,9 @@ export function Callout({
   children: ReactNode
 }) {
   const cls = {
-    info: 'bg-[#4a9eff]/[0.04] border-[#4a9eff]/[0.12]',
+    info: 'bg-[#f5a623]/[0.04] border-[#f5a623]/[0.12]',
     warning: 'bg-[#f5a623]/[0.04] border-[#f5a623]/[0.12]',
-    danger: 'bg-[#e84545]/[0.04] border-[#e84545]/[0.12]',
+    danger: 'bg-[#e86e3a]/[0.04] border-[#e86e3a]/[0.12]',
   }
   return (
     <div

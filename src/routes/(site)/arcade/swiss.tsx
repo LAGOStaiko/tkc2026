@@ -22,10 +22,10 @@ const NAV_ITEMS = [
 ]
 
 const STAT_ITEMS = [
-  { value: '4회', label: '오프라인 예선', color: '#e84545' },
+  { value: '4회', label: '오프라인 예선', color: '#e86e3a' },
   { value: '16명', label: '지역별 참가자', color: '#f5a623' },
   { value: '2명', label: '회차별 진출', color: '#f7d154' },
-  { value: 'Top 8', label: '결선 진출 인원', color: '#4ecb71' },
+  { value: 'Top 8', label: '결선 진출 인원', color: '#f7d154' },
 ] as const
 
 const REGIONS = [
@@ -96,7 +96,7 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
   1: [
     {
       record: '1-0',
-      recordCls: 'text-[#4ecb71] bg-[#4ecb71]/[0.08]',
+      recordCls: 'text-[#f7d154] bg-[#f7d154]/[0.08]',
       count: 8,
       tag: '승리 그룹',
       players: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8'],
@@ -112,7 +112,7 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
   2: [
     {
       record: '2-0',
-      recordCls: 'text-[#4ecb71] bg-[#4ecb71]/[0.08]',
+      recordCls: 'text-[#f7d154] bg-[#f7d154]/[0.08]',
       count: 4,
       tag: '전승 유지',
       players: ['P1', 'P2', 'P3', 'P4'],
@@ -126,7 +126,7 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
     },
     {
       record: '0-2',
-      recordCls: 'text-[#e84545] bg-[#e84545]/[0.08]',
+      recordCls: 'text-[#e86e3a] bg-[#e86e3a]/[0.08]',
       count: 4,
       tag: '탈락',
       tagType: 'eliminated',
@@ -137,21 +137,21 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
   3: [
     {
       record: '3-0',
-      recordCls: 'text-[#4ecb71] bg-[#4ecb71]/[0.08]',
+      recordCls: 'text-[#f7d154] bg-[#f7d154]/[0.08]',
       count: 2,
       tag: '전승 유지',
       players: ['P1', 'P2'],
     },
     {
       record: '2-1',
-      recordCls: 'text-[#4a9eff] bg-[#4a9eff]/[0.08]',
+      recordCls: 'text-[#f5a623] bg-[#f5a623]/[0.08]',
       count: 6,
       tag: '생존',
       players: ['P3', 'P4', 'P5', 'P6', 'P7', 'P8'],
     },
     {
       record: '1-2',
-      recordCls: 'text-[#e84545] bg-[#e84545]/[0.08]',
+      recordCls: 'text-[#e86e3a] bg-[#e86e3a]/[0.08]',
       count: 4,
       tag: '탈락',
       tagType: 'eliminated',
@@ -162,7 +162,7 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
   4: [
     {
       record: '4-0',
-      recordCls: 'text-[#4ecb71] bg-[#4ecb71]/[0.08]',
+      recordCls: 'text-[#f7d154] bg-[#f7d154]/[0.08]',
       count: 1,
       tag: '자동 진출',
       tagType: 'qualified',
@@ -170,7 +170,7 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
     },
     {
       record: '3-1',
-      recordCls: 'text-[#4a9eff] bg-[#4a9eff]/[0.08]',
+      recordCls: 'text-[#f5a623] bg-[#f5a623]/[0.08]',
       count: 4,
       tag: '선발전 진출',
       tagType: 'advance',
@@ -178,7 +178,7 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
     },
     {
       record: '2-2',
-      recordCls: 'text-[#e84545] bg-[#e84545]/[0.08]',
+      recordCls: 'text-[#e86e3a] bg-[#e86e3a]/[0.08]',
       count: 3,
       tag: '탈락',
       tagType: 'eliminated',
@@ -290,9 +290,9 @@ function SwissAnimator() {
                 <span
                   className={`rounded px-2 py-0.5 text-[11px] font-semibold ${
                     g.tagType === 'eliminated'
-                      ? 'bg-[#e84545]/[0.08] text-[#e84545]'
+                      ? 'bg-[#e86e3a]/[0.08] text-[#e86e3a]'
                       : g.tagType === 'qualified'
-                        ? 'bg-[#4ecb71]/[0.08] text-[#4ecb71]'
+                        ? 'bg-[#f7d154]/[0.08] text-[#f7d154]'
                         : 'bg-[#f5a623]/[0.08] text-[#f5a623]'
                   }`}
                 >
@@ -424,7 +424,7 @@ function SwissSection() {
       desc='같은 전적의 참가자끼리 매칭하는 스위스 시스템. 패배가 2회 누적되면 즉시 탈락합니다.'
     >
       <Callout type='danger' icon={<TkcIcon name='warning' />}>
-        <strong className='text-[#e84545]'>2패 누적 시 즉시 탈락</strong> — 0-2,
+        <strong className='text-[#e86e3a]'>2패 누적 시 즉시 탈락</strong> — 0-2,
         1-2, 2-2 등 패배가 2회 누적되는 순간 스테이지가 종료되며, 이후 라운드에
         배정되지 않습니다.
       </Callout>
@@ -583,34 +583,34 @@ function SideSection() {
       <Card>
         {/* Mobile */}
         <div className='flex flex-col items-center gap-4 sm:hidden'>
-          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e84545] bg-[#e84545]/[0.06]'>
+          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e86e3a] bg-[#e86e3a]/[0.06]'>
             <TkcIcon name='match' className='mb-1.5 size-8' />
-            <div className='text-sm font-bold text-[#e84545]'>1P</div>
+            <div className='text-sm font-bold text-[#e86e3a]'>1P</div>
           </div>
           <div className='text-center text-xs leading-relaxed text-white/35'>
             자기 곡 차례에
             <br />
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
-          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#4a9eff] bg-[#4a9eff]/[0.06]'>
+          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#f7d154] bg-[#f7d154]/[0.06]'>
             <TkcIcon name='match' className='mb-1.5 size-8' />
-            <div className='text-sm font-bold text-[#4a9eff]'>2P</div>
+            <div className='text-sm font-bold text-[#f7d154]'>2P</div>
           </div>
         </div>
         {/* Desktop */}
         <div className='hidden items-center justify-center gap-8 py-7 sm:flex'>
-          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e84545] bg-[#e84545]/[0.06]'>
+          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e86e3a] bg-[#e86e3a]/[0.06]'>
             <TkcIcon name='match' className='mb-1.5 size-8' />
-            <div className='text-sm font-bold text-[#e84545]'>1P</div>
+            <div className='text-sm font-bold text-[#e86e3a]'>1P</div>
           </div>
           <div className='text-center text-[13px] leading-relaxed text-white/35'>
             자기 곡 차례에
             <br />
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
-          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#4a9eff] bg-[#4a9eff]/[0.06]'>
+          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#f7d154] bg-[#f7d154]/[0.06]'>
             <TkcIcon name='match' className='mb-1.5 size-8' />
-            <div className='text-sm font-bold text-[#4a9eff]'>2P</div>
+            <div className='text-sm font-bold text-[#f7d154]'>2P</div>
           </div>
         </div>
       </Card>
@@ -621,16 +621,16 @@ function SideSection() {
           곡별 사이드 선택
         </div>
         <div className='grid grid-cols-2 gap-2'>
-          <div className='rounded-xl border border-[#e84545]/[0.12] bg-[#e84545]/[0.04] p-4 text-center'>
-            <div className='mb-1 text-[13px] font-semibold text-[#e84545]'>
+          <div className='rounded-xl border border-[#e86e3a]/[0.12] bg-[#e86e3a]/[0.04] p-4 text-center'>
+            <div className='mb-1 text-[13px] font-semibold text-[#e86e3a]'>
               A의 곡 진행 시
             </div>
             <div className='text-[15px] font-bold text-white/90'>
               A가 사이드 선택
             </div>
           </div>
-          <div className='rounded-xl border border-[#4a9eff]/[0.12] bg-[#4a9eff]/[0.04] p-4 text-center'>
-            <div className='mb-1 text-[13px] font-semibold text-[#4a9eff]'>
+          <div className='rounded-xl border border-[#f7d154]/[0.12] bg-[#f7d154]/[0.04] p-4 text-center'>
+            <div className='mb-1 text-[13px] font-semibold text-[#f7d154]'>
               B의 곡 진행 시
             </div>
             <div className='text-[15px] font-bold text-white/90'>
@@ -724,10 +724,10 @@ function AdvanceSection() {
     >
       <div className='grid gap-4 sm:grid-cols-2'>
         {/* 4-0 Auto */}
-        <div className='relative overflow-hidden rounded-2xl border border-[#4ecb71]/20 bg-[#4ecb71]/[0.04] p-6 text-center'>
+        <div className='relative overflow-hidden rounded-2xl border border-[#f7d154]/20 bg-[#f7d154]/[0.04] p-6 text-center'>
           <TkcIcon name='champion' className='mx-auto mb-2.5 size-10' />
-          <div className='text-xl font-bold text-[#4ecb71]'>자동 진출</div>
-          <div className='my-2 font-mono text-[28px] font-extrabold text-[#4ecb71]'>
+          <div className='text-xl font-bold text-[#f7d154]'>자동 진출</div>
+          <div className='my-2 font-mono text-[28px] font-extrabold text-[#f7d154]'>
             4-0
           </div>
           <div className='text-[13px] leading-relaxed break-keep text-white/55'>
@@ -760,7 +760,7 @@ function AdvanceSection() {
           3-1 기록자 전원 대상 스코어 어택
         </div>
         <div className='relative overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] p-7 text-center'>
-          <div className='absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-[#f5a623] to-[#4a9eff]' />
+          <div className='absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-[#f5a623] to-[#f5a623]' />
           <div className='text-[11px] tracking-[1px] text-white/35 uppercase'>
             과제곡
           </div>
@@ -791,7 +791,7 @@ function SeedSection() {
       desc='각 지역 진출자 2명이 시드 산정용 과제곡을 플레이합니다.'
     >
       <div className='relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] p-7 text-center'>
-        <div className='absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-[#b275f0] to-[#4a9eff]' />
+        <div className='absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-[#b275f0] to-[#f5a623]' />
         <div className='text-[11px] tracking-[1px] text-white/35 uppercase'>
           시드 산정 과제곡
         </div>

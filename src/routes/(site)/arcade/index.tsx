@@ -29,22 +29,22 @@ type GlanceItem = {
 const GLANCE_ITEMS: GlanceItem[] = [
   { label: '온라인 예선', value: '스코어 어택', sub: '2곡 합산' },
   { label: '오프라인 예선', value: '스위스 스테이지', color: '#f5a623' },
-  { label: '예선 차시', value: '4개 차시' },
-  { label: '온라인 → 오프라인', value: '차시별 Top 16', color: '#4ecb71' },
+  { label: '예선 차수', value: '4개 차수' },
+  { label: '온라인 → 오프라인', value: '차수별 Top 16', color: '#f7d154' },
   { label: '신청 기간', value: '3.2 ~ 4.30' },
-  { label: '점수 제출', value: '돈더풀로드 연동', color: '#f7d154' },
+  { label: '점수 제출', value: '동더 광장 연동', color: '#f7d154' },
 ]
 
 const REGIONS = [
-  { num: 1, label: '1차시', venue: '서울' },
-  { num: 2, label: '2차시', venue: '대전' },
-  { num: 3, label: '3차시', venue: '광주' },
-  { num: 4, label: '4차시', venue: '부산' },
+  { num: 1, label: '1차수', venue: '서울' },
+  { num: 2, label: '2차수', venue: '대전' },
+  { num: 3, label: '3차수', venue: '광주' },
+  { num: 4, label: '4차수', venue: '부산' },
 ] as const
 
 const LINK_FLOW = [
-  { num: '①', label: '단코 아이디 제출', desc: '신청 폼에서 입력' },
-  { num: '②', label: '돈더풀로드 연동', desc: '점수 자동 수집' },
+  { num: '①', label: '남코 아이디 제출', desc: '신청 폼에서 입력' },
+  { num: '②', label: '동더 광장 연동', desc: '점수 자동 수집' },
   { num: '③', label: '홈페이지 표시', desc: '실시간 점수 반영' },
 ] as const
 
@@ -66,9 +66,9 @@ const SONGS = [
 ] as const
 
 const REQUIRED_INFO = [
-  { label: '단코 아이디' },
-  { label: '반다패스 번호' },
-  { label: '돈더풀로드 부 번호' },
+  { label: '남코 아이디' },
+  { label: '바나패스 번호' },
+  { label: '동더 광장 북번호' },
 ] as const
 
 const APPLY_FIELDS = [
@@ -76,11 +76,11 @@ const APPLY_FIELDS = [
   { label: '닉네임', value: '게임 내 닉네임' },
   { label: '전화번호', value: '본인 연락처' },
   { label: '이메일', value: '본인 이메일 주소' },
-  { label: '단코 아이디', value: '필수', isBadge: true },
-  { label: '반다패스 번호', value: '필수', isBadge: true },
-  { label: '돈더풀로드 부 번호', value: '필수', isBadge: true },
+  { label: '남코 아이디', value: '필수', isBadge: true },
+  { label: '바나패스 번호', value: '필수', isBadge: true },
+  { label: '동더 광장 북번호', value: '필수', isBadge: true },
   { label: '개인정보활용 동의', value: '필수', isBadge: true },
-  { label: '참가 차시', value: '필수', isBadge: true },
+  { label: '참가 차수', value: '필수', isBadge: true },
   { label: '오프라인 사용곡 4곡', value: '필수', isBadge: true },
   { label: '부모님 동의서', value: '미성년자 한정 · PDF' },
 ] as const
@@ -194,10 +194,10 @@ function AdvanceVisual() {
         오프라인 스위스 진출
       </div>
       <div className='mt-1 text-[26px] font-extrabold tracking-tight text-white/90'>
-        차시별 Top 16
+        차수별 Top 16
       </div>
       <div className='mx-auto mt-2 mb-6 max-w-[300px] text-[13px] leading-relaxed text-white/55'>
-        해당 차시 통산 점수 상위 16명이
+        해당 차수 통산 점수 상위 16명이
         <br />
         오프라인 스위스 스테이지에 진출
       </div>
@@ -283,17 +283,17 @@ function ArcadeOnlinePage() {
 
       {/* ── Steps ── */}
       <div className='space-y-4'>
-        {/* ── Step 01: 신청 & 차시 선택 ── */}
+        {/* ── Step 01: 신청 & 차수 선택 ── */}
         <StepCard
           num='01'
-          heading='신청 & 차시 선택'
+          heading='신청 & 차수 선택'
           summary={
             <>
               홈페이지에서 신청하며,{' '}
               <span className='rounded bg-[#f5a623]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f5a623]'>
-                참가할 차시
+                참가할 차수
               </span>
-              를 선택합니다. 차시는 오프라인 대회가 열리는 장소를 뜻하며,{' '}
+              를 선택합니다. 차수는 오프라인 대회가 열리는 장소를 뜻하며,{' '}
               <strong className='text-white/90'>
                 거주지와 무관하게 자유롭게 선택
               </strong>{' '}
@@ -304,26 +304,26 @@ function ArcadeOnlinePage() {
               도 함께 선택해야 합니다.
             </>
           }
-          toggleLabel='차시 안내 · 사용곡 선택 상세 보기'
+          toggleLabel='차수 안내 · 사용곡 선택 상세 보기'
         >
           <HighlightCard
-            title='차시란?'
+            title='차수란?'
             tag='중요'
-            tagCls='bg-[#4a9eff]/[0.08] text-[#4a9eff]'
+            tagCls='bg-[#f5a623]/[0.08] text-[#f5a623]'
           >
-            차시는 <strong>오프라인 스위스 스테이지가 열리는 장소</strong>를
+            차수는 <strong>오프라인 스위스 스테이지가 열리는 장소</strong>를
             의미합니다.
             <br />
-            예를 들어, 1차시(서울)에 신청하면 <strong>
+            예를 들어, 1차수(서울)에 신청하면 <strong>
               거주지에 상관없이
             </strong>{' '}
-            1차시에 신청한 참가자들끼리 온라인 점수를 겨루고, 상위 16명이{' '}
+            1차수에 신청한 참가자들끼리 온라인 점수를 겨루고, 상위 16명이{' '}
             <strong>서울에서 열리는 오프라인 대회</strong>에 진출하는
             구조입니다.
           </HighlightCard>
 
           <div>
-            <DetailSubtitle>차시 안내</DetailSubtitle>
+            <DetailSubtitle>차수 안내</DetailSubtitle>
             <div className='grid grid-cols-2 gap-1.5 sm:grid-cols-4'>
               {REGIONS.map((r) => (
                 <div
@@ -343,8 +343,8 @@ function ArcadeOnlinePage() {
               ))}
             </div>
             <Callout type='info' icon={<TkcIcon name='info' />}>
-              차시별로 <strong className='text-white/80'>별도 집계</strong>
-              됩니다. 같은 차시에 신청한 참가자끼리만 경쟁합니다.
+              차수별로 <strong className='text-white/80'>별도 집계</strong>
+              됩니다. 같은 차수에 신청한 참가자끼리만 경쟁합니다.
             </Callout>
           </div>
 
@@ -359,14 +359,14 @@ function ArcadeOnlinePage() {
           </HighlightCard>
         </StepCard>
 
-        {/* ── Step 02: 돈더풀로드 연동 & 점수 제출 ── */}
+        {/* ── Step 02: 동더 광장 연동 & 점수 제출 ── */}
         <StepCard
           num='02'
-          heading='돈더풀로드 연동 & 점수 제출'
+          heading='동더 광장 연동 & 점수 제출'
           summary={
             <>
-              <strong className='text-white/90'>단코 아이디</strong>와{' '}
-              <strong className='text-white/90'>돈더풀로드</strong>를 연동하면
+              <strong className='text-white/90'>남코 아이디</strong>와{' '}
+              <strong className='text-white/90'>동더 광장</strong>을 연동하면
               과제곡 점수가 자동으로 반영됩니다. 별도 영상 촬영이 필요 없으며,
               플레이하면{' '}
               <strong className='text-white/90'>
@@ -449,7 +449,7 @@ function ArcadeOnlinePage() {
               ))}
             </div>
             <Callout type='danger' icon={<TkcIcon name='warning' />}>
-              <strong className='text-[#e84545]'>옵션 전면 금지</strong> — 진타,
+              <strong className='text-[#e86e3a]'>옵션 전면 금지</strong> — 진타,
               배속 등 일체의 옵션 사용이 불가합니다.
             </Callout>
           </div>
@@ -462,10 +462,10 @@ function ArcadeOnlinePage() {
           summary={
             <>
               2곡 합산 통산 점수{' '}
-              <span className='rounded bg-[#4ecb71]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#4ecb71]'>
-                차시별 상위 16명
+              <span className='rounded bg-[#f7d154]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f7d154]'>
+                차수별 상위 16명
               </span>
-              이 해당 차시의 오프라인 스위스 스테이지에 진출합니다. 스위스
+              이 해당 차수의 오프라인 스위스 스테이지에 진출합니다. 스위스
               스테이지를 거쳐 최종 결선 진출자가 결정됩니다.
             </>
           }
@@ -475,18 +475,18 @@ function ArcadeOnlinePage() {
             <DetailSubtitle>점수 산정 방식</DetailSubtitle>
             <div className='flex flex-wrap items-center justify-center gap-3 py-2'>
               <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.02] px-5 py-2.5 text-center'>
-                <div className='text-[11px] text-white/35'>과제곡 1</div>
+                <div className='text-[11px] text-white/35'>{SONGS[0].name}</div>
                 <div className='text-sm font-bold text-white/90'>점수 A</div>
               </div>
               <div className='text-xl font-extrabold text-[#f5a623]'>+</div>
               <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.02] px-5 py-2.5 text-center'>
-                <div className='text-[11px] text-white/35'>과제곡 2</div>
+                <div className='text-[11px] text-white/35'>{SONGS[1].name}</div>
                 <div className='text-sm font-bold text-white/90'>점수 B</div>
               </div>
               <div className='text-xl font-extrabold text-[#f5a623]'>=</div>
-              <div className='rounded-xl border border-[#4ecb71]/25 bg-[#4ecb71]/[0.03] px-5 py-2.5 text-center'>
+              <div className='rounded-xl border border-[#f7d154]/25 bg-[#f7d154]/[0.03] px-5 py-2.5 text-center'>
                 <div className='text-[11px] text-white/35'>통산 점수</div>
-                <div className='text-sm font-bold text-[#4ecb71]'>A + B</div>
+                <div className='text-sm font-bold text-[#f7d154]'>A + B</div>
               </div>
             </div>
           </div>
@@ -562,7 +562,7 @@ function ArcadeOnlinePage() {
                 <DetailSubtitle>대리 참가 · 부정행위</DetailSubtitle>
                 <Callout type='danger' icon={<TkcIcon name='warning' />}>
                   중복 참가 및 대리 참가는{' '}
-                  <strong className='text-[#e84545]'>엄격히 금지</strong>
+                  <strong className='text-[#e86e3a]'>엄격히 금지</strong>
                   됩니다. 위반 시 실격 처리되며, 향후 대회 참가에 불이익이 있을
                   수 있습니다.
                 </Callout>
