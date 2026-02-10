@@ -155,9 +155,9 @@ function HomePage() {
   return (
     <div>
       {/* ── HERO ── */}
-      <section className='relative -mt-20 grid grid-cols-1 overflow-hidden md:-mt-24 md:grid-cols-2'>
+      <section className='relative -mt-20 grid grid-cols-1 overflow-hidden md:-mt-24 md:grid-cols-[3fr_2fr]'>
         {/* ── Image side ── */}
-        <div className='relative min-h-[280px] overflow-hidden sm:min-h-[320px] md:min-h-[420px] lg:min-h-[480px]'>
+        <div className='relative h-[240px] overflow-hidden sm:h-[280px] md:h-auto md:min-h-[460px] lg:min-h-[520px]'>
           <img
             src={ASSETS.hero}
             alt='TKC2026 Hero'
@@ -172,29 +172,10 @@ function HomePage() {
           <div className='absolute inset-0 hidden bg-gradient-to-r from-transparent via-transparent to-black md:block' />
           {/* Desktop: bottom edge */}
           <div className='absolute inset-x-0 bottom-0 hidden h-20 bg-gradient-to-t from-black to-transparent md:block' />
-
-          {/* Slogan */}
-          <div className='absolute bottom-8 left-6 z-10 sm:bottom-12 sm:left-8 md:bottom-12 md:left-10'>
-            <FadeIn>
-              <h2
-                className='text-[clamp(26px,4.5vw,48px)] leading-[1.15] font-black tracking-[-0.5px] text-white'
-                style={{ textShadow: '0 2px 40px rgba(0,0,0,0.5)' }}
-              >
-                꿈을 현실로,
-                <br />
-                현실을 기적으로.
-              </h2>
-            </FadeIn>
-            <FadeIn delay={150}>
-              <p className='mt-2.5 text-[15px] tracking-[2px] text-white/70'>
-                타이코 코리아 챔피언십 2026
-              </p>
-            </FadeIn>
-          </div>
         </div>
 
         {/* ── Content side ── */}
-        <div className='relative flex flex-col justify-center px-6 py-10 sm:px-8 md:px-12 md:py-16'>
+        <div className='relative flex flex-col justify-center px-6 py-8 sm:px-8 md:px-10 md:py-0 lg:px-14'>
           {/* Ambient glow */}
           <div
             className='pointer-events-none absolute top-[20%] -left-20 h-[300px] w-[300px] rounded-full blur-[40px]'
@@ -215,9 +196,9 @@ function HomePage() {
 
             {/* Year */}
             <FadeIn delay={300}>
-              <div className='tkc-hero-year mb-2 bg-gradient-to-br from-[#e86e3a] via-[#f5a623] to-[#ffcc5f] bg-clip-text text-[clamp(64px,10vw,100px)] leading-none font-black tracking-[-2px] text-transparent md:tracking-[-4px]'>
+              <h1 className='tkc-hero-year mb-2 bg-gradient-to-br from-[#e86e3a] via-[#f5a623] to-[#ffcc5f] bg-clip-text text-[clamp(64px,12vw,110px)] leading-none font-black tracking-[-2px] text-transparent md:tracking-[-4px]'>
                 2026
-              </div>
+              </h1>
             </FadeIn>
 
             {/* CTA text */}

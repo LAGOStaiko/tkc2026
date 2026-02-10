@@ -222,7 +222,7 @@ function ArcadeLayout() {
   }, [title])
 
   return (
-    <div className='mx-auto max-w-[960px] px-4 md:px-6'>
+    <div className='w-full'>
       {/* ── Hero ── */}
       <section className='relative overflow-hidden pt-12 pb-8 sm:pt-16 sm:pb-10 md:pt-24 md:pb-14'>
         <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(245,166,35,0.15)_0%,transparent_70%)]' />
