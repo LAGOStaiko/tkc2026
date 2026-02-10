@@ -4,6 +4,7 @@ import { t } from '@/text'
 import { useSongs } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { PageHero, TkcSection } from '@/components/tkc/layout'
+import { LevelBadge } from '@/components/tkc/level-badge'
 
 export const Route = createFileRoute('/(site)/songs')({
   component: SongsPage,
@@ -28,14 +29,6 @@ type SongsData = {
 const DIFF_LABEL: Record<string, string> = {
   ura: '뒷보면',
   oni: '귀신',
-}
-
-function diffBadgeClass(level: number | null): string {
-  if (level == null) return 'bg-[#e86e3a]/10 text-[#e86e3a]'
-  if (level >= 10)
-    return 'bg-[#e8403a]/15 text-[#e8403a] shadow-[0_0_6px_rgba(232,64,58,0.08)]'
-  if (level >= 9) return 'bg-[#e8403a]/10 text-[#e8403a]'
-  return 'bg-[#e86e3a]/10 text-[#e86e3a]'
 }
 
 function SongsPage() {
@@ -239,14 +232,10 @@ function TaskCard({
                   <span className='inline-flex items-center gap-1.5 text-sm font-medium text-[#808080]'>
                     {DIFF_LABEL[song.difficulty] ?? song.difficulty}
                     {song.level != null && (
-                      <span
-                        className={cn(
-                          'rounded px-2 py-0.5 font-mono text-xs font-bold',
-                          diffBadgeClass(song.level)
-                        )}
-                      >
-                        ★{song.level}
-                      </span>
+                      <LevelBadge
+                        level={song.level}
+                        isUra={song.difficulty === 'ura'}
+                      />
                     )}
                   </span>
                 )}

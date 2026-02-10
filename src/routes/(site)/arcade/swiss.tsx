@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ARCADE_SONGS } from '@/content/arcade-songs'
 import { Callout, Card, FadeIn, TkcIcon } from '@/components/tkc/guide-shared'
+import { LevelBadge } from '@/components/tkc/level-badge'
 
 export const Route = createFileRoute('/(site)/arcade/swiss')({
   component: ArcadeSwissPage,
@@ -790,9 +791,7 @@ function AdvanceSection() {
           </div>
           <div className='inline-flex items-center gap-2 text-[13px] text-white/35'>
             <span>귀신(오니)</span>
-            <span className='rounded bg-[#f5a623] px-2 py-0.5 text-xs font-bold text-white'>
-              ★{ARCADE_SONGS.decider31.level}
-            </span>
+            <LevelBadge level={ARCADE_SONGS.decider31.level} />
           </div>
           <div className='mt-3.5 rounded-lg border border-[#f5a623]/15 bg-[#f5a623]/[0.04] px-4 py-3 text-[13px] break-keep text-white/55'>
             과제곡은 사전에 비공개 · 각 1회 플레이 · 최고점 1명이 추가 진출
@@ -821,9 +820,7 @@ function SeedSection() {
         </div>
         <div className='inline-flex items-center gap-2 text-[13px] text-white/35'>
           <span>귀신(오니)</span>
-          <span className='rounded bg-[#b275f0] px-2 py-0.5 text-xs font-bold text-white'>
-            ★{ARCADE_SONGS.seeding.level}
-          </span>
+          <LevelBadge level={ARCADE_SONGS.seeding.level} />
         </div>
         <div className='mt-3.5 rounded-lg border border-[#b275f0]/15 bg-[#b275f0]/[0.05] px-4 py-3 text-[13px] break-keep text-white/55'>
           이 단계에서는 승패로 탈락/우승을 결정하지 않으며, 순수하게 시드 산정용

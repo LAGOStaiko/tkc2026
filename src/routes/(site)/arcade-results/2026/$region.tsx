@@ -164,11 +164,7 @@ function ResultCallout({
 /* ════════════════════════════════════════════════════════════════════ */
 
 function DiffBadge({ level }: { level: number }) {
-  return (
-    <span className='rounded-md bg-[#e86e3a]/10 px-2 py-0.5 font-mono text-xs font-bold text-[#e86e3a]'>
-      ★{level}
-    </span>
-  )
+  return <LevelBadge level={level} />
 }
 
 /* ════════════════════════════════════════════════════════════════════ */

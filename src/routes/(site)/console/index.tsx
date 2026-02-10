@@ -10,6 +10,7 @@ import {
   DetailSubtitle,
   DetailRow,
 } from '@/components/tkc/guide-shared'
+import { LevelBadge } from '@/components/tkc/level-badge'
 
 export const Route = createFileRoute('/(site)/console/')({
   component: ConsoleQualifierPage,
@@ -263,12 +264,7 @@ function ConsoleQualifierPage() {
                   </div>
                   <div className='flex items-center gap-2 text-xs text-white/55'>
                     <span>{song.genre}</span>
-                    <span
-                      className='rounded px-1.5 py-0.5 font-mono text-[11px] font-bold text-white'
-                      style={{ background: song.levelColor }}
-                    >
-                      ★{song.level}
-                    </span>
+                    <LevelBadge level={song.level} />
                   </div>
                 </div>
               ))}
