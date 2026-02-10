@@ -548,8 +548,8 @@ function ScheduleStrip() {
                     key={ev.name}
                     className='rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
                   >
-                    <div className='flex items-start gap-3 p-5 sm:gap-4 sm:p-5'>
-                      <div className='w-[52px] shrink-0 pt-0.5 text-center sm:w-[72px]'>
+                    <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5'>
+                      <div className='w-[52px] shrink-0 text-center sm:w-[72px]'>
                         <div className='text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
                           {fmtDate(ev.startDate)}
                         </div>
@@ -609,8 +609,8 @@ function ScheduleStrip() {
                     key={ev.fullDate}
                     className='rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
                   >
-                    <div className='flex items-start gap-3 p-5 sm:gap-4 sm:p-5'>
-                      <div className='w-[52px] shrink-0 pt-0.5 text-center sm:w-[72px]'>
+                    <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5'>
+                      <div className='w-[52px] shrink-0 text-center sm:w-[72px]'>
                         <div className='text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-xl'>
                           {fmtDate(ev.fullDate)}
                         </div>
@@ -692,8 +692,8 @@ function ScheduleStrip() {
                     className='relative overflow-hidden rounded-xl border border-[#e86e3a]/20 bg-[#111] transition-colors hover:border-[#e86e3a]/30'
                   >
                     <div className='absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-[#e86e3a] to-[#f5a623]' />
-                    <div className='flex items-start gap-3 p-5 sm:gap-4 sm:p-5 sm:py-5'>
-                      <div className='w-[52px] shrink-0 pt-0.5 text-center sm:w-[72px]'>
+                    <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5 sm:py-5'>
+                      <div className='w-[52px] shrink-0 text-center sm:w-[72px]'>
                         <div className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-lg leading-none font-extrabold tracking-tight tabular-nums text-transparent sm:text-2xl'>
                           {fmtDate(ev.fullDate)}
                         </div>
