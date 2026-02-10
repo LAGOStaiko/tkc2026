@@ -913,9 +913,14 @@ function SectionNav({ activeId }: { activeId: string }) {
         style={{ scrollbarWidth: 'none' }}
       >
         {NAV_ITEMS.map((item) => (
-          <a
+          <button
             key={item.id}
-            href={`#${item.id}`}
+            type='button'
+            onClick={() => {
+              document
+                .getElementById(item.id)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }}
             className={`shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-all ${
               activeId === item.id
                 ? 'border-[#2a2a2a] bg-[#111] text-white/90'
@@ -923,7 +928,7 @@ function SectionNav({ activeId }: { activeId: string }) {
             }`}
           >
             {item.label}
-          </a>
+          </button>
         ))}
       </div>
     </nav>
