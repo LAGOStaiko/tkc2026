@@ -59,7 +59,7 @@ const ROUND_DETAILS: { name: string; songs: string; picks: string; challenge: bo
 
 const PLAY_RULES: { icon: string; title: string; body: ReactNode; wide?: boolean }[] = [
   {
-    icon: '🎮',
+    icon: 'match',
     title: '컨트롤러 규정',
     body: (
       <>
@@ -71,7 +71,7 @@ const PLAY_RULES: { icon: string; title: string; body: ReactNode; wide?: boolean
     wide: true,
   },
   {
-    icon: '▶',
+    icon: 'summary',
     title: '점수 기준',
     body: (
       <>
@@ -80,7 +80,7 @@ const PLAY_RULES: { icon: string; title: string; body: ReactNode; wide?: boolean
     ),
   },
   {
-    icon: '＝',
+    icon: 'tie',
     title: '동점 처리',
     body: (
       <>
@@ -91,7 +91,7 @@ const PLAY_RULES: { icon: string; title: string; body: ReactNode; wide?: boolean
     ),
   },
   {
-    icon: '⚡',
+    icon: 'warning',
     title: '기기 트러블',
     body: (
       <>
@@ -722,8 +722,8 @@ function PlayRulesSection() {
           >
             <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#e86e3a] opacity-40' />
             <div className='mb-3 flex items-center gap-2.5'>
-              <div className='flex size-[30px] shrink-0 items-center justify-center rounded-lg border-[1.5px] border-dashed border-white/25 text-[13px] text-white/35'>
-                {rule.icon}
+              <div className='flex size-[30px] shrink-0 items-center justify-center'>
+                <TkcIcon name={rule.icon} className='size-6' />
               </div>
               <div className='text-[17px] font-bold text-white/90'>{rule.title}</div>
             </div>

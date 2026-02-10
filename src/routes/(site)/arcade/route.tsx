@@ -63,6 +63,7 @@ function SubNav() {
             <Link
               key={item.to}
               to={item.to}
+              preload='render'
               className={`relative flex-1 border-[#1e1e1e] px-3 py-[18px] text-center transition-colors ${
                 i < NAV_ITEMS.length - 1 ? 'border-r' : ''
               } ${active ? 'bg-white/[0.02]' : 'hover:bg-white/[0.01]'}`}
@@ -110,6 +111,7 @@ function SubNav() {
             <Link
               key={item.to}
               to={item.to}
+              preload='render'
               className={`relative border-[#1e1e1e] px-4 py-3.5 text-center transition-colors ${
                 i < NAV_ITEMS.length - 1 ? 'border-b' : ''
               } ${active ? 'bg-white/[0.02]' : ''}`}
