@@ -71,14 +71,14 @@ const FALLBACK_SCHEDULE: ApiScheduleItem[] = [
     division: '아케이드',
     title: '아케이드 오프라인 예선 (대전)',
     dateText: '2026-03-28',
-    location: '싸이뮤직 · 대전',
+    location: '대전 싸이뮤직 게임월드 · 대전',
   },
   {
     order: 5,
     division: '아케이드',
     title: '아케이드 오프라인 예선 (광주)',
     dateText: '2026-04-04',
-    location: '게임플라자 · 광주',
+    location: '광주 게임플라자 · 광주',
   },
   {
     order: 6,

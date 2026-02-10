@@ -38,8 +38,8 @@ const GLANCE_ITEMS: GlanceItem[] = [
 
 const REGIONS = [
   { num: 1, label: '1차수', venue: '서울', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.png' },
-  { num: 2, label: '2차수', venue: '대전', arcade: '싸이뮤직', image: '/branding/venue-daejeon.png' },
-  { num: 3, label: '3차수', venue: '광주', arcade: '게임플라자', image: '/branding/venue-gwangju.png' },
+  { num: 2, label: '2차수', venue: '대전', arcade: '대전 싸이뮤직 게임월드', image: '/branding/venue-daejeon.png' },
+  { num: 3, label: '3차수', venue: '광주', arcade: '광주 게임플라자', image: '/branding/venue-gwangju.png' },
   { num: 4, label: '4차수', venue: '부산', arcade: '게임D', image: '/branding/venue-busan.png' },
 ] as const
 
