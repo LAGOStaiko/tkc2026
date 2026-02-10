@@ -413,7 +413,7 @@ function StatusTag({ status }: { status: string }) {
         : 'border border-[#1e1e1e] bg-white/[0.03] text-white/45'
   return (
     <span
-      className={`rounded-[5px] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider ${cls}`}
+      className={`rounded-[5px] px-2.5 py-1 text-[11px] font-semibold tracking-wide ${cls}`}
     >
       {status}
     </span>
@@ -449,7 +449,7 @@ function ScheduleStrip() {
                   }`}
                 />
                 <span
-                  className={`mt-2.5 font-mono text-[11px] font-semibold ${
+                  className={`mt-2.5 text-[11px] font-semibold ${
                     active ? 'text-[#e86e3a]' : 'text-white/35'
                   }`}
                 >
@@ -467,7 +467,7 @@ function ScheduleStrip() {
           {/* Month label */}
           <div className='mb-3.5 flex items-center gap-2.5'>
             <span
-              className={`rounded-md border px-3 py-1 font-mono text-[12px] font-semibold tracking-wider ${
+              className={`rounded-md border px-3 py-1 text-[12px] font-semibold tracking-wide ${
                 group.isFinals
                   ? 'border-[#e86e3a]/20 bg-[#e86e3a]/[0.04] text-[#e86e3a]'
                   : 'border-[#1e1e1e] bg-white/[0.02] text-white/40'
@@ -547,7 +547,7 @@ function ScheduleStrip() {
                       <div className='font-mono text-lg font-extrabold tracking-tight text-white/95 sm:text-2xl'>
                         {fmtDate(ev.fullDate)}
                       </div>
-                      <div className='font-mono text-[11px] text-white/40'>
+                      <div className='text-[11px] text-white/40'>
                         {fmtDay(ev.fullDate)}
                       </div>
                     </div>
@@ -607,7 +607,7 @@ function ScheduleStrip() {
                       <div className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text font-mono text-2xl font-extrabold tracking-tight text-transparent sm:text-[32px]'>
                         {fmtDate(ev.fullDate)}
                       </div>
-                      <div className='font-mono text-[11px] text-[#e86e3a]/70'>
+                      <div className='text-[11px] text-[#e86e3a]/70'>
                         {fmtDay(ev.fullDate)}
                       </div>
                     </div>
