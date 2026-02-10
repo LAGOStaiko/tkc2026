@@ -419,7 +419,7 @@ function ConsolePage() {
   }, [title])
 
   return (
-    <div className='mx-auto max-w-[720px] px-5 md:px-6'>
+    <div className='mx-auto max-w-[960px] px-4 md:px-6'>
       {/* ── Hero ── */}
       <section className='relative overflow-hidden pt-16 pb-12 md:pt-24 md:pb-16'>
         <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(232,69,69,0.15)_0%,transparent_70%)]' />
@@ -431,7 +431,7 @@ function ConsolePage() {
             </div>
           </FadeIn>
           <FadeIn delay={120}>
-            <h1 className='text-[clamp(36px,6vw,56px)] leading-[1.1] font-extrabold tracking-tight'>
+            <h1 className='text-[clamp(42px,6vw,64px)] leading-[1.1] font-extrabold tracking-tight'>
               <span className='bg-gradient-to-br from-[#e84545] to-[#f5a623] bg-clip-text text-transparent'>
                 콘솔 예선
               </span>
@@ -440,7 +440,7 @@ function ConsolePage() {
             </h1>
           </FadeIn>
           <FadeIn delay={240}>
-            <p className='mt-4 max-w-[480px] text-[15px] font-light break-keep text-white/55'>
+            <p className='mt-4 max-w-[640px] text-base font-light break-keep text-white/55'>
               과제곡 2곡을 플레이하고 영상을 제출하세요. 합산 점수 상위 4명이
               결선에 진출합니다.
             </p>
@@ -823,7 +823,7 @@ function ConsolePage() {
       </div>
 
       {/* ── Footer ── */}
-      <footer className='mt-14 border-t border-[#1e1e1e] py-10 text-center'>
+      <footer className='mt-10 border-t border-[#1e1e1e] py-10 text-center'>
         <p className='text-xs leading-relaxed text-white/35'>
           ※ 세부 사항은 운영진 판단에 따라 변경될 수 있습니다.
           <br />
