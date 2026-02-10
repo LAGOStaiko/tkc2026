@@ -21,6 +21,7 @@ import { Route as siteResultsRouteImport } from './routes/(site)/results'
 import { Route as siteContactRouteImport } from './routes/(site)/contact'
 import { Route as siteConsoleRouteImport } from './routes/(site)/console'
 import { Route as siteArchiveRouteImport } from './routes/(site)/archive'
+import { Route as siteArcadeRouteImport } from './routes/(site)/arcade'
 import { Route as siteApplyRouteImport } from './routes/(site)/apply'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
@@ -53,8 +54,6 @@ import { Route as AdminSettingsAccountRouteImport } from './routes/admin/setting
 import { Route as AdminErrorsErrorRouteImport } from './routes/admin/errors/$error'
 import { Route as siteOpsArcadeControlRouteImport } from './routes/(site)/ops/arcade-control'
 import { Route as siteOpsArcadeBroadcastRouteImport } from './routes/(site)/ops/arcade-broadcast'
-import { Route as siteArcadeSwissRouteImport } from './routes/(site)/arcade/swiss'
-import { Route as siteArcadeFinalsRouteImport } from './routes/(site)/arcade/finals'
 import { Route as siteArcadeResults2026IndexRouteImport } from './routes/(site)/arcade-results/2026/index'
 import { Route as siteArcadeResults2026FinalsRouteImport } from './routes/(site)/arcade-results/2026/finals'
 import { Route as siteArcadeResults2026RegionRouteImport } from './routes/(site)/arcade-results/2026/$region'
@@ -116,6 +115,11 @@ const siteConsoleRoute = siteConsoleRouteImport.update({
 const siteArchiveRoute = siteArchiveRouteImport.update({
   id: '/archive',
   path: '/archive',
+  getParentRoute: () => siteRouteRoute,
+} as any)
+const siteArcadeRoute = siteArcadeRouteImport.update({
+  id: '/arcade',
+  path: '/arcade',
   getParentRoute: () => siteRouteRoute,
 } as any)
 const siteApplyRoute = siteApplyRouteImport.update({
@@ -224,7 +228,7 @@ const AdminAppsIndexRoute = AdminAppsIndexRouteImport.update({
 const siteArcadeIndexRoute = siteArcadeIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => siteArcadeRouteRoute,
+  getParentRoute: () => siteArcadeRoute,
 } as any)
 const ClerkAuthenticatedUserManagementRoute =
   ClerkAuthenticatedUserManagementRouteImport.update({
@@ -278,16 +282,6 @@ const siteOpsArcadeBroadcastRoute = siteOpsArcadeBroadcastRouteImport.update({
   path: '/ops/arcade-broadcast',
   getParentRoute: () => siteRouteRoute,
 } as any)
-const siteArcadeSwissRoute = siteArcadeSwissRouteImport.update({
-  id: '/swiss',
-  path: '/swiss',
-  getParentRoute: () => siteArcadeRouteRoute,
-} as any)
-const siteArcadeFinalsRoute = siteArcadeFinalsRouteImport.update({
-  id: '/finals',
-  path: '/finals',
-  getParentRoute: () => siteArcadeRouteRoute,
-} as any)
 const siteArcadeResults2026IndexRoute =
   siteArcadeResults2026IndexRouteImport.update({
     id: '/arcade-results/2026/',
@@ -310,7 +304,7 @@ const siteArcadeResults2026RegionRoute =
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
-  '/arcade': typeof siteArcadeRouteRouteWithChildren
+  '/arcade': typeof siteArcadeRouteWithChildren
   '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
@@ -332,8 +326,6 @@ export interface FileRoutesByFullPath {
   '/songs': typeof siteSongsRoute
   '/': typeof siteIndexRoute
   '/admin/': typeof AdminIndexRoute
-  '/arcade/finals': typeof siteArcadeFinalsRoute
-  '/arcade/swiss': typeof siteArcadeSwissRoute
   '/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
   '/ops/arcade-control': typeof siteOpsArcadeControlRoute
   '/admin/errors/$error': typeof AdminErrorsErrorRoute
@@ -357,6 +349,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/arcade': typeof siteArcadeIndexRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -377,8 +370,6 @@ export interface FileRoutesByTo {
   '/songs': typeof siteSongsRoute
   '/': typeof siteIndexRoute
   '/admin': typeof AdminIndexRoute
-  '/arcade/finals': typeof siteArcadeFinalsRoute
-  '/arcade/swiss': typeof siteArcadeSwissRoute
   '/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
   '/ops/arcade-control': typeof siteOpsArcadeControlRoute
   '/admin/errors/$error': typeof AdminErrorsErrorRoute
@@ -389,7 +380,6 @@ export interface FileRoutesByTo {
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
-  '/arcade': typeof siteArcadeIndexRoute
   '/admin/apps': typeof AdminAppsIndexRoute
   '/admin/chats': typeof AdminChatsIndexRoute
   '/admin/help-center': typeof AdminHelpCenterIndexRoute
@@ -405,7 +395,7 @@ export interface FileRoutesById {
   '/(site)': typeof siteRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
   '/clerk': typeof ClerkRouteRouteWithChildren
-  '/(site)/arcade': typeof siteArcadeRouteRouteWithChildren
+  '/(site)/arcade': typeof siteArcadeRouteWithChildren
   '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
   '/clerk/(auth)': typeof ClerkauthRouteRouteWithChildren
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -429,8 +419,6 @@ export interface FileRoutesById {
   '/(site)/songs': typeof siteSongsRoute
   '/(site)/': typeof siteIndexRoute
   '/admin/': typeof AdminIndexRoute
-  '/(site)/arcade/finals': typeof siteArcadeFinalsRoute
-  '/(site)/arcade/swiss': typeof siteArcadeSwissRoute
   '/(site)/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
   '/(site)/ops/arcade-control': typeof siteOpsArcadeControlRoute
   '/admin/errors/$error': typeof AdminErrorsErrorRoute
@@ -479,8 +467,6 @@ export interface FileRouteTypes {
     | '/songs'
     | '/'
     | '/admin/'
-    | '/arcade/finals'
-    | '/arcade/swiss'
     | '/ops/arcade-broadcast'
     | '/ops/arcade-control'
     | '/admin/errors/$error'
@@ -504,6 +490,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
+    | '/arcade'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -524,8 +511,6 @@ export interface FileRouteTypes {
     | '/songs'
     | '/'
     | '/admin'
-    | '/arcade/finals'
-    | '/arcade/swiss'
     | '/ops/arcade-broadcast'
     | '/ops/arcade-control'
     | '/admin/errors/$error'
@@ -536,7 +521,6 @@ export interface FileRouteTypes {
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
-    | '/arcade'
     | '/admin/apps'
     | '/admin/chats'
     | '/admin/help-center'
@@ -575,8 +559,6 @@ export interface FileRouteTypes {
     | '/(site)/songs'
     | '/(site)/'
     | '/admin/'
-    | '/(site)/arcade/finals'
-    | '/(site)/arcade/swiss'
     | '/(site)/ops/arcade-broadcast'
     | '/(site)/ops/arcade-control'
     | '/admin/errors/$error'
@@ -699,6 +681,13 @@ declare module '@tanstack/react-router' {
       path: '/archive'
       fullPath: '/archive'
       preLoaderRoute: typeof siteArchiveRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
+    '/(site)/arcade': {
+      id: '/(site)/arcade'
+      path: '/arcade'
+      fullPath: '/arcade'
+      preLoaderRoute: typeof siteArcadeRouteImport
       parentRoute: typeof siteRouteRoute
     }
     '/(site)/apply': {
@@ -853,7 +842,7 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/arcade/'
       preLoaderRoute: typeof siteArcadeIndexRouteImport
-      parentRoute: typeof siteArcadeRouteRoute
+      parentRoute: typeof siteArcadeRoute
     }
     '/clerk/_authenticated/user-management': {
       id: '/clerk/_authenticated/user-management'
@@ -925,20 +914,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof siteOpsArcadeBroadcastRouteImport
       parentRoute: typeof siteRouteRoute
     }
-    '/(site)/arcade/swiss': {
-      id: '/(site)/arcade/swiss'
-      path: '/swiss'
-      fullPath: '/arcade/swiss'
-      preLoaderRoute: typeof siteArcadeSwissRouteImport
-      parentRoute: typeof siteArcadeRouteRoute
-    }
-    '/(site)/arcade/finals': {
-      id: '/(site)/arcade/finals'
-      path: '/finals'
-      fullPath: '/arcade/finals'
-      preLoaderRoute: typeof siteArcadeFinalsRouteImport
-      parentRoute: typeof siteArcadeRouteRoute
-    }
     '/(site)/arcade-results/2026/': {
       id: '/(site)/arcade-results/2026/'
       path: '/arcade-results/2026'
@@ -963,25 +938,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface siteArcadeRouteRouteChildren {
-  siteArcadeFinalsRoute: typeof siteArcadeFinalsRoute
-  siteArcadeSwissRoute: typeof siteArcadeSwissRoute
+interface siteArcadeRouteChildren {
   siteArcadeIndexRoute: typeof siteArcadeIndexRoute
 }
 
-const siteArcadeRouteRouteChildren: siteArcadeRouteRouteChildren = {
-  siteArcadeFinalsRoute: siteArcadeFinalsRoute,
-  siteArcadeSwissRoute: siteArcadeSwissRoute,
+const siteArcadeRouteChildren: siteArcadeRouteChildren = {
   siteArcadeIndexRoute: siteArcadeIndexRoute,
 }
 
-const siteArcadeRouteRouteWithChildren = siteArcadeRouteRoute._addFileChildren(
-  siteArcadeRouteRouteChildren,
+const siteArcadeRouteWithChildren = siteArcadeRoute._addFileChildren(
+  siteArcadeRouteChildren,
 )
 
 interface siteRouteRouteChildren {
-  siteArcadeRouteRoute: typeof siteArcadeRouteRouteWithChildren
+  siteArcadeRouteRoute: typeof siteArcadeRouteRoute
   siteApplyRoute: typeof siteApplyRoute
+  siteArcadeRoute: typeof siteArcadeRouteWithChildren
   siteArchiveRoute: typeof siteArchiveRoute
   siteConsoleRoute: typeof siteConsoleRoute
   siteContactRoute: typeof siteContactRoute
@@ -998,8 +970,9 @@ interface siteRouteRouteChildren {
 }
 
 const siteRouteRouteChildren: siteRouteRouteChildren = {
-  siteArcadeRouteRoute: siteArcadeRouteRouteWithChildren,
+  siteArcadeRouteRoute: siteArcadeRouteRoute,
   siteApplyRoute: siteApplyRoute,
+  siteArcadeRoute: siteArcadeRouteWithChildren,
   siteArchiveRoute: siteArchiveRoute,
   siteConsoleRoute: siteConsoleRoute,
   siteContactRoute: siteContactRoute,

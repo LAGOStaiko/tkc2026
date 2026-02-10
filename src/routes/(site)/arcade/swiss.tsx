@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ARCADE_SONGS } from '@/content/arcade-songs'
-import { t } from '@/text'
+import { Callout, Card, FadeIn, TkcIcon } from '@/components/tkc/guide-shared'
 
-export const Route = createFileRoute('/(site)/arcade')({
-  component: ArcadePage,
+export const Route = createFileRoute('/(site)/arcade/swiss')({
+  component: ArcadeSwissPage,
 })
 
 /* ════════════════════════════════════════════════════════════════════ */
@@ -64,7 +64,23 @@ const MATCH_RULES = [
   },
 ] as const
 
-/* ── Swiss Round Data ── */
+const FLOW_STEPS = [
+  {
+    title: 'A 선수의 곡',
+    desc: 'A가 사전 제출한\n해당 라운드 곡',
+    icon: 'music',
+  },
+  {
+    title: 'B 선수의 곡',
+    desc: 'B가 사전 제출한\n해당 라운드 곡',
+    icon: 'music',
+  },
+  {
+    title: '2곡 합산',
+    desc: '두 곡 점수를 합산\n고득점자 승리',
+    icon: 'chart',
+  },
+] as const
 
 type SwissGroup = {
   record: string
@@ -176,126 +192,23 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
 /*  Utility Components                                                 */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function Callout({
-  type,
-  icon,
-  children,
-}: {
-  type: 'info' | 'warning' | 'danger'
-  icon: ReactNode
-  children: ReactNode
-}) {
-  const cls = {
-    info: 'bg-[#4a9eff]/[0.04] border-[#4a9eff]/[0.12]',
-    warning: 'bg-[#f5a623]/[0.04] border-[#f5a623]/[0.12]',
-    danger: 'bg-[#e84545]/[0.04] border-[#e84545]/[0.12]',
-  }
-  return (
-    <div
-      className={`flex gap-3 rounded-xl border p-4 text-[13px] leading-relaxed text-white/55 ${cls[type]}`}
-    >
-      <span className='mt-0.5 shrink-0'>{icon}</span>
-      <span className='break-keep'>{children}</span>
-    </div>
-  )
-}
-
-function FadeIn({
-  children,
-  className = '',
-  delay = 0,
-}: {
-  children: ReactNode
-  className?: string
-  delay?: number
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.08 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${
-        visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'
-      } ${className}`}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
-    >
-      {children}
-    </div>
-  )
-}
-
-function TkcIcon({
-  name,
-  className = 'size-4',
-}: {
-  name: string
-  className?: string
-}) {
-  return (
-    <img
-      src={`/branding/v2/emojis/png/${name}.png`}
-      alt=''
-      className={className}
-      draggable={false}
-    />
-  )
-}
-
-function Card({
-  children,
-  className = '',
-}: {
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <div
-      className={`rounded-2xl border border-[#1e1e1e] bg-[#111] p-7 transition-colors hover:border-[#2a2a2a] ${className}`}
-    >
-      {children}
-    </div>
-  )
-}
-
 function SectionBlock({
   id,
   num,
   title,
   desc,
   children,
-  showDivider = true,
 }: {
   id: string
   num: string
   title: string
   desc: string
   children: ReactNode
-  showDivider?: boolean
 }) {
   return (
     <section id={id} data-section={id} className='mb-20'>
-      {showDivider && (
-        <div className='mb-12 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent' />
-      )}
       <FadeIn>
-        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e84545] uppercase'>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#f5a623] uppercase'>
           Section {num}
         </div>
         <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
@@ -305,9 +218,7 @@ function SectionBlock({
           {desc}
         </p>
       </FadeIn>
-      <FadeIn delay={150}>
-        <div className='space-y-5'>{children}</div>
-      </FadeIn>
+      <div className='space-y-5'>{children}</div>
     </section>
   )
 }
@@ -318,7 +229,16 @@ function SectionBlock({
 
 function SwissAnimator() {
   const [activeRound, setActiveRound] = useState<1 | 2 | 3 | 4>(1)
+  const [autoPlay, setAutoPlay] = useState(true)
   const groups = SWISS_ROUNDS[activeRound]
+
+  useEffect(() => {
+    if (!autoPlay) return
+    const id = setInterval(() => {
+      setActiveRound((prev) => (prev >= 4 ? 1 : ((prev + 1) as 1 | 2 | 3 | 4)))
+    }, 3000)
+    return () => clearInterval(id)
+  }, [autoPlay])
 
   return (
     <Card>
@@ -335,16 +255,19 @@ function SwissAnimator() {
           <button
             key={r}
             type='button'
-            onClick={() => setActiveRound(r)}
+            onClick={() => {
+              setAutoPlay(false)
+              setActiveRound(r)
+            }}
             className={`relative flex-1 overflow-hidden rounded-xl border py-2.5 text-[13px] font-semibold transition-all ${
               activeRound === r
-                ? 'border-[#e84545] bg-[#e84545]/[0.05] text-white/90'
+                ? 'border-[#f5a623] bg-[#f5a623]/[0.05] text-white/90'
                 : 'border-[#1e1e1e] text-white/35 hover:border-[#2a2a2a] hover:text-white/55'
             }`}
           >
             R{r} 후
             {activeRound === r && (
-              <span className='absolute right-0 bottom-0 left-0 h-0.5 bg-[#e84545]' />
+              <span className='absolute right-0 bottom-0 left-0 h-0.5 bg-[#f5a623]' />
             )}
           </button>
         ))}
@@ -406,7 +329,7 @@ function SwissAnimator() {
 }
 
 /* ════════════════════════════════════════════════════════════════════ */
-/*  Section 00 — 개요                                                   */
+/*  Sections                                                           */
 /* ════════════════════════════════════════════════════════════════════ */
 
 function OverviewSection() {
@@ -414,7 +337,6 @@ function OverviewSection() {
     <SectionBlock
       id='overview'
       num='00'
-      showDivider={false}
       title='개요 및 전반 구조'
       desc='전국 4개 지역 오프라인 예선을 거쳐, 총 8명이 최종 결선에 진출합니다.'
     >
@@ -454,7 +376,7 @@ function OverviewSection() {
               key={r.num}
               className='flex items-center gap-3.5 rounded-lg border border-[#1e1e1e] bg-white/[0.02] px-4 py-3'
             >
-              <div className='flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-[#e84545] font-mono text-sm font-bold text-[#e84545]'>
+              <div className='flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-[#f5a623] font-mono text-sm font-bold text-[#f5a623]'>
                 {r.num}
               </div>
               <div>
@@ -470,7 +392,7 @@ function OverviewSection() {
         <div className='hidden items-center py-5 sm:flex'>
           {REGIONS.map((r, i) => (
             <div key={r.num} className='relative flex-1 text-center'>
-              <div className='relative z-10 mx-auto mb-2.5 flex size-9 items-center justify-center rounded-full border-2 border-[#e84545] bg-[#111] font-mono text-sm font-bold text-[#e84545]'>
+              <div className='relative z-10 mx-auto mb-2.5 flex size-9 items-center justify-center rounded-full border-2 border-[#f5a623] bg-[#111] font-mono text-sm font-bold text-[#f5a623]'>
                 {r.num}
               </div>
               <div className='text-sm font-semibold text-white/90'>
@@ -492,10 +414,6 @@ function OverviewSection() {
     </SectionBlock>
   )
 }
-
-/* ════════════════════════════════════════════════════════════════════ */
-/*  Section 01 — 스위스 스테이지                                        */
-/* ════════════════════════════════════════════════════════════════════ */
 
 function SwissSection() {
   return (
@@ -523,7 +441,7 @@ function SwissSection() {
           {SEED_MATCHES.map((m) => (
             <div
               key={m.label}
-              className='rounded-xl border border-[#e84545]/10 bg-[#e84545]/[0.04] p-3.5 text-center'
+              className='rounded-xl border border-[#f5a623]/10 bg-[#f5a623]/[0.04] p-3.5 text-center'
             >
               <div className='mb-2 font-mono text-[10px] tracking-[1px] text-white/35'>
                 {m.label}
@@ -548,7 +466,7 @@ function SwissSection() {
             key={rule.num}
             className='flex gap-3.5 border-b border-[#1e1e1e] py-3.5 last:border-b-0'
           >
-            <div className='flex size-7 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-[#e84545] font-mono text-base font-extrabold text-[#e84545]'>
+            <div className='flex size-7 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-[#f5a623] font-mono text-base font-extrabold text-[#f5a623]'>
               {rule.num}
             </div>
             <div>
@@ -568,28 +486,6 @@ function SwissSection() {
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════ */
-/*  Section 02 — 경기 규칙                                              */
-/* ════════════════════════════════════════════════════════════════════ */
-
-const FLOW_STEPS = [
-  {
-    title: 'A 선수의 곡',
-    desc: 'A가 사전 제출한\n해당 라운드 곡',
-    icon: 'song-pick',
-  },
-  {
-    title: 'B 선수의 곡',
-    desc: 'B가 사전 제출한\n해당 라운드 곡',
-    icon: 'song-pick',
-  },
-  {
-    title: '2곡 합산',
-    desc: '두 곡 점수를 합산\n고득점자 승리',
-    icon: 'summary',
-  },
-] as const
-
 function MatchSection() {
   return (
     <SectionBlock
@@ -605,7 +501,9 @@ function MatchSection() {
             <div
               className={`border border-[#1e1e1e] bg-[#111] px-4 py-5 text-center ${i === 0 ? 'rounded-t-2xl' : i === 2 ? 'rounded-b-2xl' : ''}`}
             >
-              <TkcIcon name={step.icon} className='mx-auto mb-2 size-7' />
+              <div className='mb-2'>
+                <TkcIcon name={step.icon} className='mx-auto size-7' />
+              </div>
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
               </div>
@@ -614,7 +512,7 @@ function MatchSection() {
               </div>
             </div>
             {i < 2 && (
-              <div className='flex justify-center py-0.5 text-[#e84545]'>▼</div>
+              <div className='flex justify-center py-0.5 text-[#f5a623]'>▼</div>
             )}
           </div>
         ))}
@@ -627,7 +525,9 @@ function MatchSection() {
             <div
               className={`flex-1 border border-[#1e1e1e] bg-[#111] px-4 py-5 text-center ${i === 0 ? 'rounded-l-2xl' : i === 2 ? 'rounded-r-2xl' : ''}`}
             >
-              <TkcIcon name={step.icon} className='mx-auto mb-2 size-7' />
+              <div className='mb-2'>
+                <TkcIcon name={step.icon} className='mx-auto size-7' />
+              </div>
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
               </div>
@@ -636,7 +536,7 @@ function MatchSection() {
               </div>
             </div>
             {i < 2 && (
-              <span className='shrink-0 px-1 text-base text-[#e84545]'>→</span>
+              <span className='shrink-0 px-1 text-base text-[#f5a623]'>→</span>
             )}
           </div>
         ))}
@@ -672,10 +572,6 @@ function MatchSection() {
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════ */
-/*  Section 03 — 사이드 규칙                                            */
-/* ════════════════════════════════════════════════════════════════════ */
-
 function SideSection() {
   return (
     <SectionBlock
@@ -688,7 +584,7 @@ function SideSection() {
         {/* Mobile */}
         <div className='flex flex-col items-center gap-4 sm:hidden'>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e84545] bg-[#e84545]/[0.06]'>
-            <TkcIcon name='match' className='mx-auto mb-1.5 size-8' />
+            <TkcIcon name='drum' className='mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#e84545]'>1P</div>
           </div>
           <div className='text-center text-xs leading-relaxed text-white/35'>
@@ -697,14 +593,14 @@ function SideSection() {
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#4a9eff] bg-[#4a9eff]/[0.06]'>
-            <TkcIcon name='match' className='mx-auto mb-1.5 size-8' />
+            <TkcIcon name='drum' className='mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#4a9eff]'>2P</div>
           </div>
         </div>
         {/* Desktop */}
         <div className='hidden items-center justify-center gap-8 py-7 sm:flex'>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e84545] bg-[#e84545]/[0.06]'>
-            <TkcIcon name='match' className='mx-auto mb-1.5 size-8' />
+            <TkcIcon name='drum' className='mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#e84545]'>1P</div>
           </div>
           <div className='text-center text-[13px] leading-relaxed text-white/35'>
@@ -713,7 +609,7 @@ function SideSection() {
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#4a9eff] bg-[#4a9eff]/[0.06]'>
-            <TkcIcon name='match' className='mx-auto mb-1.5 size-8' />
+            <TkcIcon name='drum' className='mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#4a9eff]'>2P</div>
           </div>
         </div>
@@ -755,10 +651,6 @@ function SideSection() {
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════ */
-/*  Section 04 — 동점 처리                                              */
-/* ════════════════════════════════════════════════════════════════════ */
-
 function TiebreakSection() {
   return (
     <SectionBlock
@@ -778,15 +670,15 @@ function TiebreakSection() {
           </div>
         </div>
         <div className='relative h-7 w-0.5 bg-[#2a2a2a]'>
-          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-[#e84545]'>
+          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-[#f5a623]'>
             ▼
           </span>
         </div>
-        <div className='rounded-lg border border-dashed border-[#e84545]/30 bg-[#e84545]/[0.06] px-5 py-2 text-xs font-semibold text-[#f5a623]'>
+        <div className='rounded-lg border border-dashed border-[#f5a623]/30 bg-[#f5a623]/[0.06] px-5 py-2 text-xs font-semibold text-[#f5a623]'>
           동점 발생
         </div>
         <div className='relative h-7 w-0.5 bg-[#2a2a2a]'>
-          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-[#e84545]'>
+          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-[#f5a623]'>
             ▼
           </span>
         </div>
@@ -800,7 +692,7 @@ function TiebreakSection() {
           </div>
         </div>
         <div className='relative h-7 w-0.5 bg-[#2a2a2a]'>
-          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-[#e84545]'>
+          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-[#f5a623]'>
             ▼
           </span>
         </div>
@@ -822,10 +714,6 @@ function TiebreakSection() {
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════ */
-/*  Section 05 — 진출자 선발                                            */
-/* ════════════════════════════════════════════════════════════════════ */
-
 function AdvanceSection() {
   return (
     <SectionBlock
@@ -837,7 +725,7 @@ function AdvanceSection() {
       <div className='grid gap-4 sm:grid-cols-2'>
         {/* 4-0 Auto */}
         <div className='relative overflow-hidden rounded-2xl border border-[#4ecb71]/20 bg-[#4ecb71]/[0.04] p-6 text-center'>
-          <TkcIcon name='champion' className='mx-auto mb-2.5 size-9' />
+          <TkcIcon name='trophy' className='mx-auto mb-2.5 size-10' />
           <div className='text-xl font-bold text-[#4ecb71]'>자동 진출</div>
           <div className='my-2 font-mono text-[28px] font-extrabold text-[#4ecb71]'>
             4-0
@@ -850,7 +738,7 @@ function AdvanceSection() {
         </div>
         {/* 3-1 Playoff */}
         <div className='relative overflow-hidden rounded-2xl border border-[#f5a623]/20 bg-[#f5a623]/[0.04] p-6 text-center'>
-          <TkcIcon name='playoff' className='mx-auto mb-2.5 size-9' />
+          <TkcIcon name='fire' className='mx-auto mb-2.5 size-10' />
           <div className='text-xl font-bold text-[#f5a623]'>진출자 선발전</div>
           <div className='my-2 font-mono text-[28px] font-extrabold text-[#f5a623]'>
             3-1
@@ -894,10 +782,6 @@ function AdvanceSection() {
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════ */
-/*  Section 06 — 시드 산정                                              */
-/* ════════════════════════════════════════════════════════════════════ */
-
 function SeedSection() {
   return (
     <SectionBlock
@@ -940,20 +824,15 @@ function SeedSection() {
 
 function SectionNav({ activeId }: { activeId: string }) {
   return (
-    <nav className='sticky top-0 z-50 -mx-4 border-b border-[#1e1e1e] bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-2xl md:-mx-6 md:px-6'>
+    <nav className='sticky top-0 z-50 -mx-4 mb-10 border-b border-[#1e1e1e] bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-2xl md:-mx-6 md:px-6'>
       <div
         className='flex gap-1.5 overflow-x-auto'
         style={{ scrollbarWidth: 'none' }}
       >
         {NAV_ITEMS.map((item) => (
-          <button
+          <a
             key={item.id}
-            type='button'
-            onClick={() => {
-              document
-                .getElementById(item.id)
-                ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            }}
+            href={`#${item.id}`}
             className={`shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-all ${
               activeId === item.id
                 ? 'border-[#2a2a2a] bg-[#111] text-white/90'
@@ -961,7 +840,7 @@ function SectionNav({ activeId }: { activeId: string }) {
             }`}
           >
             {item.label}
-          </button>
+          </a>
         ))}
       </div>
     </nav>
@@ -972,15 +851,9 @@ function SectionNav({ activeId }: { activeId: string }) {
 /*  Page                                                               */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function ArcadePage() {
-  const title = t('nav.arcade')
+function ArcadeSwissPage() {
   const [activeSection, setActiveSection] = useState('overview')
 
-  useEffect(() => {
-    document.title = `${t('meta.siteName')} | ${title}`
-  }, [title])
-
-  // IntersectionObserver for active nav state
   useEffect(() => {
     const sections = document.querySelectorAll<HTMLElement>('[data-section]')
     if (!sections.length) return
@@ -1002,37 +875,9 @@ function ArcadePage() {
   }, [])
 
   return (
-    <div className='mx-auto max-w-[960px] px-4 md:px-6'>
-      {/* Hero */}
-      <section className='relative overflow-hidden pt-16 pb-12 md:pt-24 md:pb-16'>
-        <div className='pointer-events-none absolute -top-24 -right-48 h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(232,69,69,0.15)_0%,transparent_70%)]' />
-        <div className='relative'>
-          <FadeIn>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e84545]/20 bg-[#e84545]/[0.08] px-3.5 py-1.5 text-[13px] font-medium tracking-wide text-[#e84545]'>
-              <span className='size-1.5 animate-pulse rounded-full bg-[#e84545]' />
-              ARCADE OFFLINE QUALIFIER
-            </div>
-          </FadeIn>
-          <FadeIn delay={120}>
-            <h1 className='text-[clamp(42px,6vw,64px)] leading-[1.1] font-extrabold tracking-tight'>
-              <span className='bg-gradient-to-br from-[#e84545] to-[#f5a623] bg-clip-text text-transparent'>
-                스위스 스테이지
-              </span>
-              <br />
-              진행 안내
-            </h1>
-          </FadeIn>
-          <FadeIn delay={240}>
-            <p className='mt-4 text-base font-light text-white/55'>
-              결선까지 가는 여정 — 2패 탈락 스위스 시스템의 모든 것
-            </p>
-          </FadeIn>
-        </div>
-      </section>
-
+    <>
       <SectionNav activeId={activeSection} />
-
-      <div className='pt-10'>
+      <div>
         <OverviewSection />
         <SwissSection />
         <MatchSection />
@@ -1041,16 +886,6 @@ function ArcadePage() {
         <AdvanceSection />
         <SeedSection />
       </div>
-
-      {/* Footer */}
-      <footer className='mt-10 border-t border-[#1e1e1e] py-10 text-center'>
-        <p className='text-xs leading-relaxed text-white/35'>
-          ※ 본 규정집의 세부 사항은 대회 운영진의 판단에 따라 변경될 수
-          있습니다.
-          <br />
-          ARCADE TOURNAMENT — 오프라인 예선 공식 규정
-        </p>
-      </footer>
-    </div>
+    </>
   )
 }
