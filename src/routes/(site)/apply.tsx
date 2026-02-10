@@ -557,7 +557,7 @@ function ApplyPage() {
                                 {
                                   value: 'console' as const,
                                   label: '콘솔',
-                                  sub: '태고 마스터 페스티벌',
+                                  sub: '쿵딱! 원더풀 페스티벌',
                                 },
                                 {
                                   value: 'arcade' as const,

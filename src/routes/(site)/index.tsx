@@ -18,7 +18,7 @@ const DIVISIONS = [
   {
     num: '01',
     title: '콘솔',
-    description: '동더! 원더풀 페스티벌로 진행하는 대회입니다.',
+    description: '쿵딱! 원더풀 페스티벌로 진행하는 대회입니다.',
     accent: '#e86e3a',
     periodLabel: '온라인 예선 접수 기간',
     periodStart: '03.02',
