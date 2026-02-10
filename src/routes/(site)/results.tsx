@@ -206,7 +206,7 @@ function ResultsHubPage() {
                   {region.shortLabel}
                 </div>
                 <div className='mt-2 text-[14px] text-white/50'>
-                  온라인 {region.onlineRows.length}명 · Swiss{' '}
+                  온라인 {region.onlineRows.length}명 · 스위스{' '}
                   {region.swissMatches.length}매치
                 </div>
 

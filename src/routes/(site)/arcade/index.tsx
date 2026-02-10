@@ -99,7 +99,7 @@ const MINOR_ROWS = [
 ] as const
 
 const PLAYX4_ROWS = [
-  { label: '현장 참여 시', value: '확정 명찰 현장 수령' },
+  { label: '직관 참여 시', value: '확정 명찰 현장 수령' },
   { label: '불참 시', value: '명찰 미지급 (별도 발송 불가)' },
 ] as const
 
@@ -597,7 +597,7 @@ function ArcadeOnlinePage() {
                 <DetailRow key={r.label} label={r.label} value={r.value} />
               ))}
               <Callout type='info' icon={<TkcIcon name='info' />}>
-                신청 시 PlayX4 현장 참여 여부를 함께 선택합니다.
+                신청 시 PlayX4 직관 참여 여부를 함께 선택합니다.
               </Callout>
             </Accordion>
 

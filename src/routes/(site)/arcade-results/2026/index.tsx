@@ -200,7 +200,7 @@ function ArcadeResults2026Page() {
                       명
                     </div>
                     <div>
-                      Swiss{' '}
+                      스위스{' '}
                       <span className='font-medium text-white/80'>
                         {region.swissMatches.length}
                       </span>

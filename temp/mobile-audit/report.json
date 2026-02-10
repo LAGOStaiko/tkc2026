@@ -1,12 +1,13 @@
 {
-  "checkedAt": "2026-02-10T14:28:44.421Z",
+  "checkedAt": "2026-02-10T14:36:19.416Z",
   "baseUrl": "http://127.0.0.1:4173",
   "routeCount": 15,
   "viewportCount": 2,
-  "issueCount": 2,
+  "issueCount": 3,
   "issues": [
     "mobile-375 /arcade/swiss: tiny text 3",
-    "mobile-390 /arcade/swiss: tiny text 3"
+    "mobile-390 /arcade/swiss: tiny text 3",
+    "mobile-390 /arcade-results/2026/finals: status 404"
   ],
   "results": [
     {
@@ -267,9 +268,9 @@
         },
         {
           "selector": "div.overflow-hidden.transition-all:nth-of-type(2) > div.border-t.border-[#1e1e1e] > div.relative.overflow-hidden:nth-of-type(2) > div.tkc-motion-glow.pointer-events-none:nth-of-type(1)",
-          "left": -78.75,
-          "right": 193.75,
-          "width": 272.5,
+          "left": -78.73,
+          "right": 193.73,
+          "width": 272.45,
           "text": ""
         }
       ],
@@ -648,9 +649,9 @@
         },
         {
           "selector": "div.overflow-hidden.transition-all:nth-of-type(2) > div.border-t.border-[#1e1e1e] > div.relative.overflow-hidden:nth-of-type(2) > div.tkc-motion-glow.pointer-events-none:nth-of-type(1)",
-          "left": -71.23,
-          "right": 201.23,
-          "width": 272.45,
+          "left": -71.2,
+          "right": 201.2,
+          "width": 272.41,
           "text": ""
         }
       ],
@@ -758,22 +759,15 @@
     {
       "viewport": "mobile-390",
       "route": "/arcade-results/2026/finals",
-      "status": 200,
+      "status": 404,
       "horizontalOverflowPx": 0,
-      "overflowOffenders": [
-        {
-          "selector": "section.space-y-8.md:space-y-10 > div.space-y-3:nth-of-type(1) > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
-          "left": 166,
-          "right": 566,
-          "width": 400,
-          "text": ""
-        }
-      ],
+      "overflowOffenders": [],
       "tinyText": []
     }
   ],
   "previewLogs": [
     "\n> shadcn-admin@2.2.1 preview C:\\Users\\LAGOS\\OneDrive\\문서\\GitHub\\tkc2026\n> vite preview \"--host\" \"127.0.0.1\" \"--port\" \"4173\" \"--strictPort\"\n\n",
-    "  \u001b[32m➜\u001b[39m  \u001b[1mLocal\u001b[22m:   \u001b[36mhttp://127.0.0.1:\u001b[1m4173\u001b[22m/\u001b[39m\n"
+    "\u001b[31merror when starting preview server:\nError: Port 4173 is already in use\n    at Server.onError$1 (file:///C:/Users/LAGOS/OneDrive/%EB%AC%B8%EC%84%9C/GitHub/tkc2026/node_modules/.pnpm/vite@7.3.0_@types+node@25.0_405f8f12e22c21099c3b6cdaf2657b15/node_modules/vite/dist/node/chunks/config.js:14932:28)\n    at Server.emit (node:events:519:28)\n    at emitErrorNT (node:net:1976:8)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)\u001b[39m\n",
+    " ELIFECYCLE  Command failed with exit code 1.\n"
   ]
 }

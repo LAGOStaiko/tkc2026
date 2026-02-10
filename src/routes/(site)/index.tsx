@@ -177,7 +177,7 @@ function HomePage() {
         </div>
 
         {/* ── Content side ── */}
-        <div className='relative flex flex-col justify-center px-6 py-8 sm:px-8 md:px-10 md:py-0 lg:px-14'>
+        <div className='relative flex flex-col justify-center px-5 py-6 sm:px-8 sm:py-8 md:px-10 md:py-0 lg:px-14'>
           {/* Ambient glow */}
           <div
             className='pointer-events-none absolute top-[20%] -left-20 h-[300px] w-[300px] rounded-full blur-[40px]'
@@ -205,7 +205,7 @@ function HomePage() {
 
             {/* CTA text */}
             <FadeIn delay={400}>
-              <p className='mb-7 text-[17px] text-white/65'>
+              <p className='mb-6 text-[15px] text-white/65 sm:mb-7 sm:text-[17px]'>
                 지금 참가 신청을 받고 있습니다
               </p>
             </FadeIn>
@@ -231,36 +231,6 @@ function HomePage() {
                 </Link>
               </div>
             </FadeIn>
-
-            {/* Stats */}
-            <FadeIn delay={600}>
-              <div className='mt-8 flex gap-5 border-t border-[#1e1e1e] pt-6 md:gap-6'>
-                <div>
-                  <div className='text-xl font-extrabold tracking-[-0.5px] md:text-2xl'>
-                    2
-                  </div>
-                  <div className='mt-0.5 text-[13px] text-white/50'>
-                    부문
-                  </div>
-                </div>
-                <div>
-                  <div className='text-xl font-extrabold tracking-[-0.5px] md:text-2xl'>
-                    4
-                  </div>
-                  <div className='mt-0.5 text-[13px] text-white/50'>
-                    지역
-                  </div>
-                </div>
-                <div>
-                  <div className='text-xl font-extrabold tracking-[-0.5px] md:text-2xl'>
-                    05.23
-                  </div>
-                  <div className='mt-0.5 text-[13px] text-white/50'>
-                    결선
-                  </div>
-                </div>
-              </div>
-            </FadeIn>
           </div>
         </div>
       </section>
@@ -275,7 +245,7 @@ function HomePage() {
       </section>
 
       {/* ── SCHEDULE ── */}
-      <section className='mt-16 md:mt-20'>
+      <section className='mt-12 sm:mt-16 md:mt-20'>
         <FadeIn>
           <SectionHead label='Schedule' title='일정'>
             <Link
@@ -292,7 +262,7 @@ function HomePage() {
       </section>
 
       {/* ── VIDEO ── */}
-      <section className='mt-16 md:mt-20'>
+      <section className='mt-12 sm:mt-16 md:mt-20'>
         <FadeIn>
           <SectionHead label='Video' title='영상' />
         </FadeIn>
@@ -302,7 +272,7 @@ function HomePage() {
       </section>
 
       {/* ── FOOTER STRIP ── */}
-      <section className='mt-16 border-t border-[#1e1e1e] pt-8 pb-7 md:mt-20'>
+      <section className='mt-12 border-t border-[#1e1e1e] pt-8 pb-7 sm:mt-16 md:mt-20'>
         <div className='flex flex-col items-center justify-between gap-5 md:flex-row'>
           <div className='flex items-center gap-3'>
             <img
@@ -350,7 +320,7 @@ function HomePage() {
           </div>
 
           <div className='text-sm text-white/60'>
-            © {new Date().getFullYear()} 태고의 달인 플레이엑스포 토너먼트
+            © {new Date().getFullYear()} 태고의 달인 PlayX4 토너먼트
           </div>
         </div>
       </section>
@@ -372,9 +342,9 @@ function SectionHead({
   children?: React.ReactNode
 }) {
   return (
-    <div className='mb-6 flex items-end justify-between gap-4'>
+    <div className='mb-5 flex items-end justify-between gap-4 sm:mb-6'>
       <div>
-        <div className='mb-1.5 font-mono text-sm font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
+        <div className='mb-1.5 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase sm:text-sm'>
           {label}
         </div>
         <h2 className='text-[clamp(24px,4vw,32px)] font-extrabold tracking-tight text-white/95'>
@@ -404,7 +374,7 @@ function DivisionPanel({
   return (
     <FadeIn delay={index * 100}>
       <div
-        className={`group relative h-full overflow-hidden p-8 transition-colors hover:bg-white/[0.015] sm:p-10 md:p-12 ${
+        className={`group relative h-full overflow-hidden p-6 transition-colors hover:bg-white/[0.015] sm:p-10 md:p-12 ${
           index === 0
             ? 'border-b border-[#1e1e1e] md:border-b-0 md:border-r'
             : ''
@@ -429,35 +399,35 @@ function DivisionPanel({
           {/* Top row: ID + Status */}
           <div className='mb-4 flex items-center justify-between'>
             <div className='flex items-center gap-3.5'>
-              <span className='text-5xl font-black leading-none tracking-[-2px] text-white/[0.08]'>
+              <span className='text-4xl font-black leading-none tracking-[-2px] text-white/[0.08] sm:text-5xl'>
                 {num}
               </span>
-              <h3 className='text-[28px] font-extrabold tracking-[-0.5px]'>
+              <h3 className='text-[24px] font-extrabold tracking-[-0.5px] sm:text-[28px]'>
                 {title}
               </h3>
             </div>
-            <div className='inline-flex items-center gap-2 rounded-full border border-[#4a9eff]/20 bg-[#4a9eff]/[0.08] px-3.5 py-1.5 font-mono text-[13px] font-bold tracking-[0.5px] text-[#4a9eff]'>
+            <div className='inline-flex items-center gap-1.5 rounded-full border border-[#4a9eff]/20 bg-[#4a9eff]/[0.08] px-3 py-1.5 font-mono text-[11px] font-bold tracking-[0.5px] text-[#4a9eff] sm:gap-2 sm:px-3.5 sm:text-[13px]'>
               <span className='tkc-motion-dot size-2 rounded-full bg-[#4a9eff] shadow-[0_0_8px_#4a9eff]' />
               신청 중
             </div>
           </div>
 
           {/* Description */}
-          <p className='mb-7 text-[15px] leading-[1.6] break-keep text-white/60'>
+          <p className='mb-5 text-[14px] leading-[1.6] break-keep text-white/60 sm:mb-7 sm:text-[15px]'>
             {description}
           </p>
 
           {/* Period block */}
-          <div className='mb-7 rounded-xl border border-white/[0.04] bg-white/[0.02] px-5 py-4'>
+          <div className='mb-6 rounded-xl border border-white/[0.04] bg-white/[0.02] px-4 py-3.5 sm:mb-7 sm:px-5 sm:py-4'>
             <div className='mb-1 text-[12px] font-medium text-white/50'>
               {periodLabel}
             </div>
             <div
-              className='text-[28px] font-extrabold tracking-[-0.5px]'
+              className='text-[22px] font-extrabold tracking-[-0.5px] sm:text-[28px]'
               style={{ color: accent }}
             >
               {periodStart}{' '}
-              <span className='mx-1 text-xl opacity-40'>→</span>{' '}
+              <span className='mx-1 text-lg opacity-40 sm:text-xl'>→</span>{' '}
               {periodEnd}
             </div>
           </div>
@@ -568,7 +538,7 @@ function ScheduleStrip() {
           </div>
 
           {/* Events */}
-          <div className='space-y-2'>
+          <div className='space-y-2.5 sm:space-y-2'>
             {group.events.map((ev) => {
               if (ev.type === 'range') {
                 const progress = getDateProgress(ev.startDate, ev.endDate)
@@ -579,19 +549,19 @@ function ScheduleStrip() {
                     className='rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
                   >
                     <div className='flex items-start gap-3 p-4 sm:gap-4 sm:p-5'>
-                      <div className='w-[64px] shrink-0 pt-0.5 text-center sm:w-[76px]'>
-                        <div className='text-[17px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
+                      <div className='w-[52px] shrink-0 pt-0.5 text-center sm:w-[72px]'>
+                        <div className='text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
                           {fmtDate(ev.startDate)}
                         </div>
                         <div className='my-1 text-[11px] leading-none text-white/20'>→</div>
-                        <div className='text-[17px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
+                        <div className='text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
                           {fmtDate(ev.endDate)}
                         </div>
                       </div>
                       <div className='min-w-0 flex-1'>
                         <div className='flex items-start justify-between gap-2'>
                           <div className='min-w-0'>
-                            <div className='text-[15px] leading-[1.3] font-semibold break-keep text-white/90'>
+                            <div className='text-[14px] leading-[1.35] font-semibold break-keep text-white/90 sm:text-[15px] sm:leading-[1.3]'>
                               {ev.name}
                             </div>
                             <div className='mt-0.5 text-[13px] leading-[1.4] break-keep text-white/40'>
@@ -640,8 +610,8 @@ function ScheduleStrip() {
                     className='rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
                   >
                     <div className='flex items-start gap-3 p-4 sm:gap-4 sm:p-5'>
-                      <div className='w-[64px] shrink-0 pt-0.5 text-center sm:w-[76px]'>
-                        <div className='text-[17px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-xl'>
+                      <div className='w-[52px] shrink-0 pt-0.5 text-center sm:w-[72px]'>
+                        <div className='text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-xl'>
                           {fmtDate(ev.fullDate)}
                         </div>
                         <div className='mt-1 text-[11px] leading-none text-white/35'>
@@ -651,7 +621,7 @@ function ScheduleStrip() {
                       <div className='min-w-0 flex-1'>
                         <div className='flex items-start justify-between gap-2'>
                           <div className='min-w-0'>
-                            <div className='text-[15px] leading-[1.3] font-semibold break-keep text-white/90'>
+                            <div className='text-[14px] leading-[1.35] font-semibold break-keep text-white/90 sm:text-[15px] sm:leading-[1.3]'>
                               {ev.name}
                             </div>
                             <div className='mt-1 flex items-center gap-1.5 text-[13px] text-white/40'>
@@ -694,8 +664,8 @@ function ScheduleStrip() {
                     key={ev.fullDate}
                     className='flex items-center gap-3 rounded-xl border border-dashed border-[#1e1e1e] bg-[#111]/60 px-4 py-3.5 sm:gap-4 sm:px-5'
                   >
-                    <div className='w-[64px] shrink-0 text-center sm:w-[76px]'>
-                      <div className='text-base leading-none font-semibold tracking-tight tabular-nums text-white/35 sm:text-[17px]'>
+                    <div className='w-[52px] shrink-0 text-center sm:w-[72px]'>
+                      <div className='text-[14px] leading-none font-semibold tracking-tight tabular-nums text-white/35 sm:text-[17px]'>
                         {fmtDate(ev.fullDate)}
                       </div>
                     </div>
@@ -723,8 +693,8 @@ function ScheduleStrip() {
                   >
                     <div className='absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-[#e86e3a] to-[#f5a623]' />
                     <div className='flex items-start gap-3 p-4 sm:gap-4 sm:p-5 sm:py-5'>
-                      <div className='w-[64px] shrink-0 pt-0.5 text-center sm:w-[76px]'>
-                        <div className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-xl leading-none font-extrabold tracking-tight tabular-nums text-transparent sm:text-2xl'>
+                      <div className='w-[52px] shrink-0 pt-0.5 text-center sm:w-[72px]'>
+                        <div className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-lg leading-none font-extrabold tracking-tight tabular-nums text-transparent sm:text-2xl'>
                           {fmtDate(ev.fullDate)}
                         </div>
                         <div className='mt-1 text-[11px] leading-none text-[#e86e3a]/60'>

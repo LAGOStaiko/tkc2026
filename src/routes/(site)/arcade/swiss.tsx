@@ -691,7 +691,7 @@ function TiebreakSection() {
           </div>
         </div>
         <div className='relative h-7 w-0.5 bg-[#2a2a2a]'>
-          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-[#f5a623]'>
+          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[11px] text-[#f5a623]'>
             ▼
           </span>
         </div>
@@ -699,7 +699,7 @@ function TiebreakSection() {
           동점 발생
         </div>
         <div className='relative h-7 w-0.5 bg-[#2a2a2a]'>
-          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-[#f5a623]'>
+          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[11px] text-[#f5a623]'>
             ▼
           </span>
         </div>
@@ -713,7 +713,7 @@ function TiebreakSection() {
           </div>
         </div>
         <div className='relative h-7 w-0.5 bg-[#2a2a2a]'>
-          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-[#f5a623]'>
+          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[11px] text-[#f5a623]'>
             ▼
           </span>
         </div>

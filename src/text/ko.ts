@@ -6,7 +6,7 @@ export const ko = {
     '미성년자는 보호자 동의서를 다운로드하여 작성 후, 스캔본 또는 사진을 클라우드(Google Drive, Naver MYBOX 등)에 업로드하고 공유 링크를 입력해 주세요.',
   'apply.field.consentDownload': '보호자 동의서 양식 다운로드',
   'apply.field.division': '부문',
-  'apply.field.dohirobaNo': '북번호 (동더 광장)',
+  'apply.field.dohirobaNo': '동더 광장 북번호',
   'apply.field.email': '이메일',
   'apply.field.isMinor': '미성년자 여부',
   'apply.field.isMinorHelp':
@@ -23,11 +23,11 @@ export const ko = {
   'apply.field.offlineSongs': '오프라인 예선곡 선택',
   'apply.field.offlineSongsHelp':
     '곡 풀에서 4곡을 선택해 주세요. 중복 선택은 불가합니다.',
-  'apply.field.offlineSongLabel': '예선곡',
+  'apply.field.offlineSongLabel': '오프라인 예선곡',
   'apply.field.offlineSongPlaceholder': '곡을 선택해 주세요',
   'apply.field.spectator': '직관 참여 여부',
   'apply.field.spectatorHelp':
-    '대회에 참가하고 PlayX4 결선까지 참관하시면 대회 기념 굿즈를 지급합니다.',
+    '대회에 참가하고 PlayX4 결선까지 직관 참여하시면 대회 기념 굿즈를 지급합니다.',
   'apply.field.videoLink': '동영상 링크',
   'apply.field.videoLinkHelp':
     '본인의 플레이 영상을 유튜브에 일부공개로 업로드하고 링크를 입력해 주세요.',
@@ -58,7 +58,7 @@ export const ko = {
   'apply.submitFailed': '신청에 실패했습니다. 다시 시도해 주세요.',
   'apply.validation.consentRequired': '미성년자는 동의서 링크가 필요합니다.',
   'apply.validation.divisionRequired': '부문을 선택해 주세요.',
-  'apply.validation.dohirobaNoRequired': '북번호를 입력해 주세요.',
+  'apply.validation.dohirobaNoRequired': '동더 광장 북번호를 입력해 주세요.',
   'apply.validation.emailRequired': '이메일을 입력해 주세요.',
   'apply.validation.emailInvalid': '올바른 이메일 형식이 아닙니다.',
   'apply.validation.namcoIdRequired': '남코 아이디를 입력해 주세요.',

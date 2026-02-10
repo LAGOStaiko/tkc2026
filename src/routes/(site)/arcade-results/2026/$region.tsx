@@ -34,7 +34,6 @@ const REGION_ROUND_LABELS: Record<string, string> = {
 /* ════════════════════════════════════════════════════════════════════ */
 
 const NAV_ITEMS = [
-  { id: 'swiss', label: '스위스 스테이지' },
   { id: 'finals', label: '최종 순위' },
   { id: 'selection', label: '추가 진출자 선발전' },
   { id: 'seed', label: '시드 배정전' },
@@ -444,7 +443,7 @@ function ArcadeRegionDetailPage() {
   const { region } = Route.useParams()
   const { data } = useResults<unknown>()
   const archive = useMemo(() => resolveArcadeSeasonArchive(data), [data])
-  const [activeSection, setActiveSection] = useState('swiss')
+  const [activeSection, setActiveSection] = useState('finals')
 
   const regionData = useMemo(() => {
     if (!isArcadeRegionKey(region)) return undefined
@@ -568,151 +567,7 @@ function ArcadeRegionDetailPage() {
       {/* ── Nav ── */}
       <SectionNav activeId={activeSection} />
 
-      {/* ═══════════ 01. Swiss Stage ═══════════ */}
-      <SectionBlock
-        id='swiss'
-        stageLabel='Stage 01'
-        title='스위스 스테이지'
-        desc={`온라인 ${regionData.onlineRows.length}명 · Swiss ${regionData.swissMatches.length}매치`}
-      >
-        {sortedStandings.length === 0 ? (
-          <div className='rounded-2xl border border-[#1e1e1e] bg-[#111] px-5 py-4 text-sm text-white/50'>
-            스위스 스테이지 결과가 아직 입력되지 않았습니다.
-          </div>
-        ) : (
-          <>
-            {/* Desktop table */}
-            <div className='hidden overflow-x-auto rounded-2xl border border-[#1e1e1e] bg-[#111] md:block'>
-              <table className='w-full text-left text-[15px]'>
-                <thead>
-                  <tr className='border-b border-[#1e1e1e] bg-white/[0.015]'>
-                    <th className='px-4 py-3.5 text-center font-mono text-xs font-semibold tracking-wider text-white/50 uppercase'>
-                      순위
-                    </th>
-                    <th className='px-4 py-3.5 font-mono text-xs font-semibold tracking-wider text-white/50 uppercase'>
-                      동더 네임
-                    </th>
-                    <th className='px-4 py-3.5 text-center font-mono text-xs font-semibold tracking-wider text-white/50 uppercase'>
-                      시드
-                    </th>
-                    <th className='px-4 py-3.5 text-center font-mono text-xs font-semibold tracking-wider text-white/50 uppercase'>
-                      전적
-                    </th>
-                    <th className='px-4 py-3.5 text-center font-mono text-xs font-semibold tracking-wider text-white/50 uppercase'>
-                      상태
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedStandings.map((row, idx) => {
-                    const isTop = idx < 2
-                    const label = standingStatusLabel(
-                      row.status,
-                      regionData,
-                      row.entryId
-                    )
-                    return (
-                      <tr
-                        key={`sw-${row.entryId}`}
-                        className='border-b border-white/[0.03] transition-colors last:border-b-0 hover:bg-white/[0.02]'
-                      >
-                        <td
-                          className={cn(
-                            'w-14 px-4 py-3.5 text-center font-mono text-sm font-bold',
-                            isTop ? 'text-[#e86e3a]' : 'text-white/50'
-                          )}
-                        >
-                          {idx + 1}
-                        </td>
-                        <td className='px-4 py-3.5'>
-                          <span className='font-semibold text-white'>
-                            {row.nickname}
-                          </span>
-                          <span className='ml-2 font-mono text-xs text-white/50'>
-                            {row.entryId}
-                          </span>
-                        </td>
-                        <td className='px-4 py-3.5 text-center text-white/65'>
-                          {row.seed}
-                        </td>
-                        <td className='px-4 py-3.5 text-center'>
-                          <RecordBadge wins={row.wins} losses={row.losses} />
-                        </td>
-                        <td className='px-4 py-3.5 text-center'>
-                          <StatusTag label={label} />
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile cards */}
-            <div className='space-y-2 md:hidden'>
-              {sortedStandings.map((row, idx) => {
-                const isTop = idx < 2
-                const label = standingStatusLabel(
-                  row.status,
-                  regionData,
-                  row.entryId
-                )
-                return (
-                  <div
-                    key={`sw-m-${row.entryId}`}
-                    className='flex items-center gap-3 rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3'
-                  >
-                    <span
-                      className={cn(
-                        'w-7 text-center font-mono text-sm font-bold',
-                        isTop ? 'text-[#e86e3a]' : 'text-white/40'
-                      )}
-                    >
-                      {idx + 1}
-                    </span>
-                    <div className='min-w-0 flex-1'>
-                      <div className='flex items-baseline gap-1.5'>
-                        <span className='font-semibold text-white'>
-                          {row.nickname}
-                        </span>
-                        <span className='font-mono text-xs text-white/40'>
-                          {row.entryId}
-                        </span>
-                      </div>
-                      <div className='mt-1 flex items-center gap-3 text-xs text-white/45'>
-                        <span>시드 {row.seed}</span>
-                        <RecordBadge wins={row.wins} losses={row.losses} />
-                      </div>
-                    </div>
-                    <StatusTag label={label} />
-                  </div>
-                )
-              })}
-            </div>
-          </>
-        )}
-
-        {/* Round detail */}
-        {swissByRound.length > 0 && (
-          <details className='group mt-6'>
-            <summary className='cursor-pointer text-sm font-medium text-white/40 transition-colors hover:text-white/60'>
-              <span className='group-open:hidden'>▸ 라운드별 상세 매치 기록 보기</span>
-              <span className='hidden group-open:inline'>▾ 라운드별 상세 매치 기록 접기</span>
-            </summary>
-            <div className='mt-5 space-y-6'>
-              {swissByRound.map((block) => (
-                <SwissRoundCard
-                  key={block.round}
-                  round={block.round}
-                  matches={block.matches}
-                />
-              ))}
-            </div>
-          </details>
-        )}
-      </SectionBlock>
-
-      {/* ═══════════ 02. Final Rankings ═══════════ */}
+      {/* ═══════════ 01. Final Rankings ═══════════ */}
       <SectionBlock
         id='finals'
         stageLabel='Final'
@@ -862,9 +717,28 @@ function ArcadeRegionDetailPage() {
             최종 순위 데이터가 아직 입력되지 않았습니다.
           </div>
         )}
+
+        {/* Swiss round detail */}
+        {swissByRound.length > 0 && (
+          <details className='group mt-6'>
+            <summary className='cursor-pointer text-sm font-medium text-white/40 transition-colors hover:text-white/60'>
+              <span className='group-open:hidden'>▸ 스위스 라운드별 상세 매치 기록 보기</span>
+              <span className='hidden group-open:inline'>▾ 스위스 라운드별 상세 매치 기록 접기</span>
+            </summary>
+            <div className='mt-5 space-y-6'>
+              {swissByRound.map((block) => (
+                <SwissRoundCard
+                  key={block.round}
+                  round={block.round}
+                  matches={block.matches}
+                />
+              ))}
+            </div>
+          </details>
+        )}
       </SectionBlock>
 
-      {/* ═══════════ 03. Selection Match ═══════════ */}
+      {/* ═══════════ 02. Selection Match ═══════════ */}
       <SectionBlock
         id='selection'
         stageLabel='Stage 02'

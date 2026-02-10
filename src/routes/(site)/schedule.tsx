@@ -92,7 +92,7 @@ const FALLBACK_SCHEDULE: ApiScheduleItem[] = [
     division: '결선',
     title: '결선',
     dateText: '2026-05-23',
-    location: '킨텍스 · 플레이엑스포 2026',
+    location: '킨텍스 · PlayX4 2026',
   },
 ]
 
@@ -978,7 +978,7 @@ function SchedulePage() {
 
   /* Finals */
   const finalItem = allItems[0]
-  const finalTitle = finalItem?.title ?? '플레이엑스포 결선 토너먼트'
+  const finalTitle = finalItem?.title ?? 'PlayX4 결선 토너먼트'
   const finalMeta = renderFinalMeta(finalItem)
 
   /* Intersection observer for section nav */

@@ -778,7 +778,7 @@ function ApplyPage() {
                     <>
                       <SectionLabel
                         title='아케이드 예선 정보'
-                        desc='북번호, 예선 지역, 오프라인 예선곡을 입력해 주세요.'
+                        desc='동더 광장 북번호, 예선 차수, 오프라인 예선곡을 입력해 주세요.'
                       />
 
                       <div className='space-y-4'>
