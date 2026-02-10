@@ -320,7 +320,7 @@ function DivisionCard({
             <img
               src={iconSrc}
               alt=''
-              className='size-11 shrink-0 rounded-xl object-contain'
+              className='size-11 shrink-0 rounded-xl object-cover'
               loading='lazy'
               draggable={false}
             />
