@@ -420,21 +420,6 @@ function renderParticipant(
   return entryId
 }
 
-function standingStatusLabel(
-  status: string,
-  region: ArcadeRegionArchive,
-  entryId: string
-) {
-  if (status === 'qualified') {
-    if (region.qualifiers.groupA?.entryId === entryId) return '결선 A그룹'
-    if (region.qualifiers.groupB?.entryId === entryId) return '결선 B그룹'
-    return '결선 진출'
-  }
-  if (status === 'decider') return '결선 진출자 선발전'
-  if (status === 'eliminated') return '탈락'
-  return '진행중'
-}
-
 /* ════════════════════════════════════════════════════════════════════ */
 /*  Page                                                               */
 /* ════════════════════════════════════════════════════════════════════ */
@@ -471,15 +456,6 @@ function ArcadeRegionDetailPage() {
         round,
         matches: [...matches].sort((a, b) => (a.table ?? 0) - (b.table ?? 0)),
       }))
-  }, [regionData])
-
-  const sortedStandings = useMemo(() => {
-    if (!regionData) return []
-    return [...regionData.swissStandings].sort((a, b) => {
-      if (b.wins !== a.wins) return b.wins - a.wins
-      if (a.losses !== b.losses) return a.losses - b.losses
-      return a.seed - b.seed
-    })
   }, [regionData])
 
   const sortedDeciderRows = useMemo(() => {
@@ -741,7 +717,7 @@ function ArcadeRegionDetailPage() {
       {/* ═══════════ 02. Selection Match ═══════════ */}
       <SectionBlock
         id='selection'
-        stageLabel='Stage 02'
+        stageLabel='Stage 01'
         title='추가 진출자 선발전'
         desc='3-1 추가 진출자 선발전'
       >
@@ -848,10 +824,10 @@ function ArcadeRegionDetailPage() {
         )}
       </SectionBlock>
 
-      {/* ═══════════ 04. Seed Match ═══════════ */}
+      {/* ═══════════ 03. Seed Match ═══════════ */}
       <SectionBlock
         id='seed'
-        stageLabel='Stage 03'
+        stageLabel='Stage 02'
         title='결선 시드 배정전'
         desc='A/B 그룹 시드를 결정합니다.'
       >
