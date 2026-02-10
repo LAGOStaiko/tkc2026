@@ -182,7 +182,7 @@ function Callout({
   children,
 }: {
   type: 'info' | 'warning' | 'danger'
-  icon: string
+  icon: ReactNode
   children: ReactNode
 }) {
   const cls = {
@@ -194,9 +194,26 @@ function Callout({
     <div
       className={`flex gap-3 rounded-xl border p-4 text-[13px] leading-relaxed text-white/55 ${cls[type]}`}
     >
-      <span className='mt-0.5 shrink-0 text-sm'>{icon}</span>
+      <span className='mt-0.5 shrink-0'>{icon}</span>
       <span className='break-keep'>{children}</span>
     </div>
+  )
+}
+
+function TkcIcon({
+  name,
+  className = 'size-4',
+}: {
+  name: string
+  className?: string
+}) {
+  return (
+    <img
+      src={`/branding/v2/emojis/png/${name}.png`}
+      alt=''
+      className={className}
+      draggable={false}
+    />
   )
 }
 
@@ -222,15 +239,20 @@ function SectionBlock({
   title,
   desc,
   children,
+  showDivider = true,
 }: {
   id: string
   num: string
   title: string
   desc: string
   children: ReactNode
+  showDivider?: boolean
 }) {
   return (
     <section id={id} data-section={id} className='mb-20'>
+      {showDivider && (
+        <div className='mb-12 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent' />
+      )}
       <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e84545] uppercase'>
         Section {num}
       </div>
@@ -359,6 +381,7 @@ function OverviewSection() {
     <SectionBlock
       id='overview'
       num='00'
+      showDivider={false}
       title='개요 및 전반 구조'
       desc='전국 4개 지역 오프라인 예선을 거쳐, 총 8명이 최종 결선에 진출합니다.'
     >
@@ -429,7 +452,7 @@ function OverviewSection() {
         </div>
       </Card>
 
-      <Callout type='info' icon='💡'>
+      <Callout type='info' icon={<TkcIcon name='info' />}>
         각 지역 온라인 예선 상위 16명이 오프라인 예선에 참가하며, 각 예선에서
         2명이 진출하여 총 8명으로 결선을 구성합니다.
       </Callout>
@@ -449,7 +472,7 @@ function SwissSection() {
       title='스위스 스테이지 (2패 탈락)'
       desc='같은 전적의 참가자끼리 매칭하는 스위스 시스템. 패배가 2회 누적되면 즉시 탈락합니다.'
     >
-      <Callout type='danger' icon='⚠️'>
+      <Callout type='danger' icon={<TkcIcon name='warning' />}>
         <strong className='text-[#e84545]'>2패 누적 시 즉시 탈락</strong> — 0-2,
         1-2, 2-2 등 패배가 2회 누적되는 순간 스테이지가 종료되며, 이후 라운드에
         배정되지 않습니다.
@@ -517,9 +540,21 @@ function SwissSection() {
 /* ════════════════════════════════════════════════════════════════════ */
 
 const FLOW_STEPS = [
-  { title: 'A 선수의 곡', desc: 'A가 사전 제출한\n해당 라운드 곡', icon: '🎵' },
-  { title: 'B 선수의 곡', desc: 'B가 사전 제출한\n해당 라운드 곡', icon: '🎵' },
-  { title: '2곡 합산', desc: '두 곡 점수를 합산\n고득점자 승리', icon: '📊' },
+  {
+    title: 'A 선수의 곡',
+    desc: 'A가 사전 제출한\n해당 라운드 곡',
+    icon: 'song-pick',
+  },
+  {
+    title: 'B 선수의 곡',
+    desc: 'B가 사전 제출한\n해당 라운드 곡',
+    icon: 'song-pick',
+  },
+  {
+    title: '2곡 합산',
+    desc: '두 곡 점수를 합산\n고득점자 승리',
+    icon: 'summary',
+  },
 ] as const
 
 function MatchSection() {
@@ -537,7 +572,7 @@ function MatchSection() {
             <div
               className={`border border-[#1e1e1e] bg-[#111] px-4 py-5 text-center ${i === 0 ? 'rounded-t-2xl' : i === 2 ? 'rounded-b-2xl' : ''}`}
             >
-              <div className='mb-2 text-[28px]'>{step.icon}</div>
+              <TkcIcon name={step.icon} className='mx-auto mb-2 size-7' />
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
               </div>
@@ -559,7 +594,7 @@ function MatchSection() {
             <div
               className={`flex-1 border border-[#1e1e1e] bg-[#111] px-4 py-5 text-center ${i === 0 ? 'rounded-l-2xl' : i === 2 ? 'rounded-r-2xl' : ''}`}
             >
-              <div className='mb-2 text-[28px]'>{step.icon}</div>
+              <TkcIcon name={step.icon} className='mx-auto mb-2 size-7' />
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
               </div>
@@ -596,7 +631,7 @@ function MatchSection() {
         </div>
       </Card>
 
-      <Callout type='info' icon='💡'>
+      <Callout type='info' icon={<TkcIcon name='info' />}>
         해당 라운드 매치에서 사용되는 "자기 곡"은 사전 제출된 해당 라운드 곡으로
         고정됩니다. (예: R3 배정 시 → 자신이 제출한 R3 곡 사용)
       </Callout>
@@ -620,7 +655,7 @@ function SideSection() {
         {/* Mobile */}
         <div className='flex flex-col items-center gap-4 sm:hidden'>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e84545] bg-[#e84545]/[0.06]'>
-            <div className='mb-1.5 text-[32px]'>🥁</div>
+            <TkcIcon name='match' className='mx-auto mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#e84545]'>1P</div>
           </div>
           <div className='text-center text-xs leading-relaxed text-white/35'>
@@ -629,14 +664,14 @@ function SideSection() {
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#4a9eff] bg-[#4a9eff]/[0.06]'>
-            <div className='mb-1.5 text-[32px]'>🥁</div>
+            <TkcIcon name='match' className='mx-auto mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#4a9eff]'>2P</div>
           </div>
         </div>
         {/* Desktop */}
         <div className='hidden items-center justify-center gap-8 py-7 sm:flex'>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e84545] bg-[#e84545]/[0.06]'>
-            <div className='mb-1.5 text-[32px]'>🥁</div>
+            <TkcIcon name='match' className='mx-auto mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#e84545]'>1P</div>
           </div>
           <div className='text-center text-[13px] leading-relaxed text-white/35'>
@@ -645,7 +680,7 @@ function SideSection() {
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#4a9eff] bg-[#4a9eff]/[0.06]'>
-            <div className='mb-1.5 text-[32px]'>🥁</div>
+            <TkcIcon name='match' className='mx-auto mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#4a9eff]'>2P</div>
           </div>
         </div>
@@ -676,7 +711,7 @@ function SideSection() {
         </div>
       </Card>
 
-      <Callout type='warning' icon='⚡'>
+      <Callout type='warning' icon={<TkcIcon name='warning' />}>
         재경기 등 운영상 우선권이 필요한 경우,{' '}
         <strong className='text-white/80'>
           온라인 예선 순위가 더 높은 선수
@@ -745,7 +780,7 @@ function TiebreakSection() {
         </div>
       </div>
 
-      <Callout type='info' icon='💡'>
+      <Callout type='info' icon={<TkcIcon name='info' />}>
         재경기 시 사이드 선택 우선권은{' '}
         <strong className='text-white/80'>온라인 예선 상위 순위</strong>{' '}
         선수에게 부여됩니다.
@@ -769,7 +804,7 @@ function AdvanceSection() {
       <div className='grid gap-4 sm:grid-cols-2'>
         {/* 4-0 Auto */}
         <div className='relative overflow-hidden rounded-2xl border border-[#4ecb71]/20 bg-[#4ecb71]/[0.04] p-6 text-center'>
-          <div className='mb-2.5 text-4xl'>👑</div>
+          <TkcIcon name='champion' className='mx-auto mb-2.5 size-9' />
           <div className='text-xl font-bold text-[#4ecb71]'>자동 진출</div>
           <div className='my-2 font-mono text-[28px] font-extrabold text-[#4ecb71]'>
             4-0
@@ -782,7 +817,7 @@ function AdvanceSection() {
         </div>
         {/* 3-1 Playoff */}
         <div className='relative overflow-hidden rounded-2xl border border-[#f5a623]/20 bg-[#f5a623]/[0.04] p-6 text-center'>
-          <div className='mb-2.5 text-4xl'>⚔️</div>
+          <TkcIcon name='playoff' className='mx-auto mb-2.5 size-9' />
           <div className='text-xl font-bold text-[#f5a623]'>진출자 선발전</div>
           <div className='my-2 font-mono text-[28px] font-extrabold text-[#f5a623]'>
             3-1
@@ -858,7 +893,7 @@ function SeedSection() {
         </div>
       </div>
 
-      <Callout type='info' icon='💡'>
+      <Callout type='info' icon={<TkcIcon name='info' />}>
         시드 과제곡은 사전에 비공개이며, 진출 확정 후 현장에서 각 1회
         플레이합니다.
       </Callout>
