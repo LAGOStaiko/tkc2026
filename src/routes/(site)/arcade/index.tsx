@@ -137,7 +137,7 @@ function HighlightCard({
           {tag}
         </span>
       </div>
-      <div className='text-[13px] leading-relaxed break-keep text-white/55 [&>strong]:text-white/90'>
+      <div className='text-[13px] leading-[1.55] break-keep text-white/55 [&>strong]:text-white/90'>
         {children}
       </div>
     </div>
@@ -188,13 +188,13 @@ function AdvanceVisual() {
         </div>
       </div>
 
-      <div className='text-[13px] font-semibold tracking-wider text-[#f5a623]'>
+      <div className='text-[13px] font-semibold tracking-wide text-[#f5a623]'>
         스위스 스테이지 진출
       </div>
       <div className='mt-1 text-[26px] font-extrabold tracking-tight text-white/90'>
         차수별 Top 16
       </div>
-      <div className='mx-auto mt-2 mb-6 max-w-[300px] text-[13px] leading-relaxed text-white/55'>
+      <div className='mx-auto mt-2 mb-6 max-w-[300px] text-[13px] leading-[1.55] text-white/55'>
         해당 차수 통산 점수 상위 16명이
         <br />
         스위스 스테이지에 진출
@@ -246,7 +246,7 @@ function ArcadeOnlinePage() {
                 key={item.label}
                 className={`flex min-h-[96px] flex-col justify-center border-[#1e1e1e] px-6 py-5 ${i < 4 ? 'border-b' : ''} ${i % 2 === 0 ? 'border-r' : ''}`}
               >
-                <div className='mb-1 text-[11px] font-medium tracking-wider text-white/35'>
+                <div className='mb-1 text-[11px] font-medium tracking-wide text-white/35'>
                   {item.label}
                 </div>
                 <div
@@ -268,7 +268,7 @@ function ArcadeOnlinePage() {
 
       {/* ── Steps Header ── */}
       <FadeIn>
-        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#f5a623] uppercase'>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#f5a623] uppercase'>
           How to participate
         </div>
         <h2 className='mb-2 text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
@@ -335,7 +335,7 @@ function ArcadeOnlinePage() {
                     className='mx-auto mb-3 size-12 rounded-lg object-cover'
                     loading='lazy'
                   />
-                  <div className='mb-0.5 font-mono text-[10px] font-semibold tracking-widest text-white/35 uppercase'>
+                  <div className='mb-0.5 font-mono text-[10px] font-semibold tracking-wide text-white/35 uppercase'>
                     {r.label}
                   </div>
                   <div className='text-lg font-extrabold text-[#f5a623]'>
@@ -414,7 +414,7 @@ function ArcadeOnlinePage() {
                 className='flex items-center justify-between border-b border-[#1e1e1e] py-2.5 text-[13px] last:border-b-0'
               >
                 <span className='text-white/55'>{info.label}</span>
-                <span className='rounded bg-[#f5a623]/[0.08] px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider text-[#f5a623]'>
+                <span className='rounded bg-[#f5a623]/[0.08] px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wide text-[#f5a623]'>
                   필수
                 </span>
               </div>
@@ -435,7 +435,7 @@ function ArcadeOnlinePage() {
                       background: i === 0 ? '#f5a623' : '#f7d154',
                     }}
                   />
-                  <div className='mb-1.5 font-mono text-[10px] font-semibold tracking-widest text-white/35 uppercase'>
+                  <div className='mb-1.5 font-mono text-[10px] font-semibold tracking-wide text-white/35 uppercase'>
                     {song.label}
                   </div>
                   <div className='mb-1 text-[15px] font-extrabold tracking-tight text-white/90'>
@@ -531,7 +531,7 @@ function ArcadeOnlinePage() {
       <div className='mt-16'>
         <div className='mb-12 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent' />
         <FadeIn>
-          <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#f5a623] uppercase'>
+          <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#f5a623] uppercase'>
             Detailed Rules
           </div>
           <h2 className='mb-2 text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>

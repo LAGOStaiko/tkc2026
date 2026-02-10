@@ -639,13 +639,13 @@ function SectionBlock({
   return (
     <section id={id} data-section={id} className='mb-20'>
       <FadeIn>
-        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
           Section {num}
         </div>
         <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
           {title}
         </h2>
-        <p className='mb-8 max-w-[640px] text-[15px] leading-relaxed font-light break-keep text-white/55'>
+        <p className='mb-8 max-w-[640px] text-[15px] leading-[1.55] font-light break-keep text-white/55'>
           {desc}
         </p>
       </FadeIn>
@@ -688,7 +688,7 @@ function SectionNav({ activeId }: { activeId: string }) {
 function ModeTag({ mode }: { mode: 'online' | 'offline' }) {
   return (
     <span
-      className={`shrink-0 rounded-[5px] px-2.5 py-1 font-mono text-[11px] font-semibold tracking-wider ${
+      className={`shrink-0 rounded-[5px] px-2.5 py-1 font-mono text-[11px] font-semibold tracking-wide ${
         mode === 'online'
           ? 'bg-[#4a9eff]/[0.08] text-[#4a9eff]'
           : 'bg-[#e86e3a]/[0.08] text-[#e86e3a]'
@@ -888,7 +888,7 @@ function FinalsTeaser({ title, meta }: { title: string; meta: string }) {
       <div className='pointer-events-none absolute -top-16 left-1/2 h-[200px] w-[400px] -translate-x-1/2 bg-[radial-gradient(ellipse,rgba(232,110,58,0.06)_0%,transparent_70%)]' />
 
       <div className='relative'>
-        <div className='mb-3 font-mono text-xs font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+        <div className='mb-3 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
           PlayX4 2026 · Finals
         </div>
         <div className='mb-2 text-2xl font-extrabold tracking-tight text-white/90 md:text-[30px]'>
@@ -897,7 +897,7 @@ function FinalsTeaser({ title, meta }: { title: string; meta: string }) {
         <p className='text-[15px] break-keep text-white/55'>
           콘솔 · 아케이드 결선이 동시 진행됩니다.
         </p>
-        <div className='mt-6 inline-flex items-center gap-2 rounded-[10px] border border-dashed border-[#e86e3a]/20 bg-[#e86e3a]/[0.06] px-6 py-3 font-mono text-[15px] font-semibold tracking-wider text-white/55'>
+        <div className='mt-6 inline-flex items-center gap-2 rounded-[10px] border border-dashed border-[#e86e3a]/20 bg-[#e86e3a]/[0.06] px-6 py-3 font-mono text-[15px] font-semibold tracking-wide text-white/55'>
           {meta}
         </div>
       </div>
@@ -1054,7 +1054,7 @@ function SchedulePage() {
         desc='예선을 통과한 선수들이 겨루는 최종 무대입니다.'
       >
         <FinalsTeaser title={finalTitle} meta={finalMeta} />
-        <div className='flex gap-3 rounded-xl border border-[#4a9eff]/[0.12] bg-[#4a9eff]/[0.04] p-4 text-[13px] leading-relaxed text-white/55'>
+        <div className='flex gap-3 rounded-xl border border-[#4a9eff]/[0.12] bg-[#4a9eff]/[0.04] p-4 text-[13px] leading-[1.55] text-white/55'>
           <span className='mt-0.5 shrink-0 inline-block h-4 w-4 rounded border border-dashed border-white/30' />
           <span className='break-keep'>
             결선 세부 일정 및 진행 방식은 예선 종료 후{' '}

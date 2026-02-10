@@ -208,13 +208,13 @@ function SectionBlock({
   return (
     <section id={id} data-section={id} className='mb-20'>
       <FadeIn>
-        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#f5a623] uppercase'>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#f5a623] uppercase'>
           Section {num}
         </div>
         <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
           {title}
         </h2>
-        <p className='mb-8 max-w-[640px] text-[15px] leading-relaxed font-light break-keep text-white/55'>
+        <p className='mb-8 max-w-[640px] text-[15px] leading-[1.55] font-light break-keep text-white/55'>
           {desc}
         </p>
       </FadeIn>
@@ -282,7 +282,7 @@ function SwissAnimator() {
           >
             <div className='mb-2.5 flex items-center gap-2.5'>
               <span
-                className={`rounded-md px-2.5 py-0.5 font-mono text-sm font-semibold tracking-wider ${g.recordCls}`}
+                className={`rounded-md px-2.5 py-0.5 font-mono text-sm font-semibold tracking-wide ${g.recordCls}`}
               >
                 {g.record}
               </span>
@@ -528,7 +528,7 @@ function MatchSection() {
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
               </div>
-              <div className='mt-1 text-[11px] leading-relaxed whitespace-pre-line text-white/35'>
+              <div className='mt-1 text-[11px] leading-[1.55] whitespace-pre-line text-white/35'>
                 {step.desc}
               </div>
             </div>
@@ -552,7 +552,7 @@ function MatchSection() {
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
               </div>
-              <div className='mt-1 text-[11px] leading-relaxed whitespace-pre-line text-white/35'>
+              <div className='mt-1 text-[11px] leading-[1.55] whitespace-pre-line text-white/35'>
                 {step.desc}
               </div>
             </div>
@@ -608,7 +608,7 @@ function SideSection() {
             <TkcIcon name='match' className='mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#e86e3a]'>1P</div>
           </div>
-          <div className='text-center text-xs leading-relaxed text-white/35'>
+          <div className='text-center text-xs leading-[1.55] text-white/35'>
             자기 곡 차례에
             <br />
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
@@ -624,7 +624,7 @@ function SideSection() {
             <TkcIcon name='match' className='mb-1.5 size-8' />
             <div className='text-sm font-bold text-[#e86e3a]'>1P</div>
           </div>
-          <div className='text-center text-[13px] leading-relaxed text-white/35'>
+          <div className='text-center text-[13px] leading-[1.55] text-white/35'>
             자기 곡 차례에
             <br />
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
@@ -751,7 +751,7 @@ function AdvanceSection() {
           <div className='my-2 font-mono text-[28px] font-extrabold text-[#f7d154]'>
             4-0
           </div>
-          <div className='text-[13px] leading-relaxed break-keep text-white/55'>
+          <div className='text-[13px] leading-[1.55] break-keep text-white/55'>
             4승 0패 달성자는
             <br />
             자동으로 결선 진출이 확정됩니다
@@ -764,7 +764,7 @@ function AdvanceSection() {
           <div className='my-2 font-mono text-[28px] font-extrabold text-[#f5a623]'>
             3-1
           </div>
-          <div className='text-[13px] leading-relaxed break-keep text-white/55'>
+          <div className='text-[13px] leading-[1.55] break-keep text-white/55'>
             3승 1패 참가자 전원 대상
             <br />
             스코어 어택으로 1명 추가 진출

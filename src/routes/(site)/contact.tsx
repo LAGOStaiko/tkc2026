@@ -455,7 +455,7 @@ function FaqList({ items }: { items: string[] }) {
 
 function FaqNote({ children }: { children: ReactNode }) {
   return (
-    <div className='mt-2.5 flex gap-2 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-2.5 text-[11px] leading-relaxed text-white/50 sm:text-[12px]'>
+    <div className='mt-2.5 flex gap-2 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-2.5 text-[11px] leading-[1.55] text-white/50 sm:text-[12px]'>
       <span className='shrink-0'>※</span>
       <span className='break-keep'>{children}</span>
     </div>
@@ -493,7 +493,7 @@ function FaqItem({
         className='flex w-full items-center gap-3 px-4 py-3.5 text-left sm:px-6 sm:py-4'
         onClick={onToggle}
       >
-        <span className='shrink-0 rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider text-[#f5a623] bg-[#f5a623]/[0.08]'>
+        <span className='shrink-0 rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide text-[#f5a623] bg-[#f5a623]/[0.08]'>
           Q{num}
         </span>
         <span className='flex-1 text-[13px] font-bold break-keep text-white/90 sm:text-sm'>
@@ -515,7 +515,7 @@ function FaqItem({
           maxHeight: isOpen ? (contentRef.current?.scrollHeight ?? 2000) : 0,
         }}
       >
-        <div className='border-t border-[#1e1e1e] px-4 py-4 pl-[3.2rem] text-[13px] leading-relaxed text-white/55 break-keep sm:px-6 sm:py-5 sm:pl-[4.2rem]'>
+        <div className='border-t border-[#1e1e1e] px-4 py-4 pl-[3.2rem] text-[13px] leading-[1.55] text-white/55 break-keep sm:px-6 sm:py-5 sm:pl-[4.2rem]'>
           {answer}
         </div>
       </div>
@@ -577,7 +577,7 @@ function ContactPage() {
                 </svg>
               </div>
               <div>
-                <p className='text-[11px] font-semibold tracking-widest text-white/40 uppercase'>
+                <p className='text-[11px] font-semibold tracking-wide text-white/40 uppercase'>
                   Email
                 </p>
                 <p className='text-lg font-bold text-sky-400'>
@@ -634,7 +634,7 @@ function ContactPage() {
                 </svg>
               </div>
               <div>
-                <p className='text-[11px] font-semibold tracking-widest text-white/40 uppercase'>
+                <p className='text-[11px] font-semibold tracking-wide text-white/40 uppercase'>
                   Kakao Channel
                 </p>
                 <p className='text-lg font-bold text-yellow-400'>
@@ -677,7 +677,7 @@ function ContactPage() {
       {/* FAQ Section */}
       <div className='space-y-6'>
         <div className='space-y-2'>
-          <span className='font-mono text-xs font-semibold tracking-[2px] text-[#f5a623] uppercase'>
+          <span className='font-mono text-xs font-semibold tracking-[1px] text-[#f5a623] uppercase'>
             FAQ
           </span>
           <h2 className='text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
@@ -699,7 +699,7 @@ function ContactPage() {
                     {section.title}
                   </span>
                   {section.tag && (
-                    <span className='rounded px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wider bg-[#f5a623]/[0.08] text-[#f5a623]'>
+                    <span className='rounded px-2.5 py-0.5 font-mono text-[10px] font-bold tracking-wide bg-[#f5a623]/[0.08] text-[#f5a623]'>
                       {section.tag === 'console' ? 'CONSOLE' : 'ARCADE'}
                     </span>
                   )}
@@ -733,7 +733,7 @@ function ContactPage() {
       {/* Comparison Table */}
       <div className='space-y-4'>
         <div className='space-y-2'>
-          <span className='font-mono text-xs font-semibold tracking-[2px] text-[#f5a623] uppercase'>
+          <span className='font-mono text-xs font-semibold tracking-[1px] text-[#f5a623] uppercase'>
             COMPARE
           </span>
           <h2 className='text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
@@ -747,13 +747,13 @@ function ContactPage() {
             <caption className='sr-only'>콘솔 · 아케이드 부문 비교</caption>
             <thead>
               <tr className='border-b border-[#1e1e1e] bg-[#1a1a1a]'>
-                <th className='px-5 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wider text-white/35 uppercase'>
+                <th className='px-5 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wide text-white/35 uppercase'>
                   항목
                 </th>
-                <th className='px-5 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wider text-[#f5a623] uppercase'>
+                <th className='px-5 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wide text-[#f5a623] uppercase'>
                   콘솔
                 </th>
-                <th className='px-5 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wider text-[#f5a623] uppercase'>
+                <th className='px-5 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wide text-[#f5a623] uppercase'>
                   아케이드
                 </th>
               </tr>
@@ -789,12 +789,12 @@ function ContactPage() {
               key={i}
               className='tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3 hover:border-[#2a2a2a]'
             >
-              <p className='mb-2 font-mono text-[10px] font-semibold tracking-wider text-white/35 uppercase'>
+              <p className='mb-2 font-mono text-[10px] font-semibold tracking-wide text-white/35 uppercase'>
                 {row.label}
               </p>
               <div className='grid grid-cols-2 gap-3'>
                 <div>
-                  <p className='mb-0.5 font-mono text-[10px] font-bold tracking-wider text-[#f5a623]'>
+                  <p className='mb-0.5 font-mono text-[10px] font-bold tracking-wide text-[#f5a623]'>
                     콘솔
                   </p>
                   <p className='text-[12px] font-semibold text-white/90 break-keep'>
@@ -802,7 +802,7 @@ function ContactPage() {
                   </p>
                 </div>
                 <div>
-                  <p className='mb-0.5 font-mono text-[10px] font-bold tracking-wider text-[#f5a623]'>
+                  <p className='mb-0.5 font-mono text-[10px] font-bold tracking-wide text-[#f5a623]'>
                     아케이드
                   </p>
                   <p className='text-[12px] font-semibold text-white/90 break-keep'>
@@ -816,7 +816,7 @@ function ContactPage() {
       </div>
 
       {/* Notice */}
-      <div className='flex gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px]'>
+      <div className='flex gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-[1.55] text-white/55 sm:p-4 sm:text-[13px]'>
         <span className='mt-0.5 shrink-0'>⚠</span>
         <span className='break-keep'>{t('contact.notice')}</span>
       </div>

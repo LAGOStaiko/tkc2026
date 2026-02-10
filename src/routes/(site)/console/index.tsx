@@ -156,7 +156,7 @@ function RankingVisual() {
               />
             </div>
             <span
-              className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wider ${
+              className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide ${
                 qualify
                   ? 'bg-[#f7d154]/[0.08] text-[#f7d154]'
                   : 'bg-white/[0.02] text-white/35'
@@ -193,7 +193,7 @@ function ConsoleQualifierPage() {
                 key={item.label}
                 className={`flex min-h-[96px] flex-col justify-center border-[#1e1e1e] px-6 py-5 ${i < 2 ? 'border-b' : ''} ${i % 2 === 0 ? 'border-r' : ''}`}
               >
-                <div className='mb-1 text-[11px] font-medium tracking-wider text-white/35'>
+                <div className='mb-1 text-[11px] font-medium tracking-wide text-white/35'>
                   {item.label}
                 </div>
                 <div
@@ -215,7 +215,7 @@ function ConsoleQualifierPage() {
 
       {/* ── Steps Header ── */}
       <FadeIn>
-        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
           How to participate
         </div>
         <h2 className='mb-2 text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
@@ -266,7 +266,7 @@ function ConsoleQualifierPage() {
                       background: i === 0 ? '#e86e3a' : '#f5a623',
                     }}
                   />
-                  <div className='mb-1.5 font-mono text-[10px] font-semibold tracking-widest text-white/35 uppercase'>
+                  <div className='mb-1.5 font-mono text-[10px] font-semibold tracking-wide text-white/35 uppercase'>
                     {song.label}
                   </div>
                   <div className='mb-1 text-[15px] font-extrabold tracking-tight text-white/90'>
@@ -295,7 +295,7 @@ function ConsoleQualifierPage() {
               >
                 <span className='text-white/55'>{rule.label}</span>
                 <span
-                  className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider ${
+                  className={`rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide ${
                     rule.allowed
                       ? 'bg-[#f7d154]/[0.08] text-[#f7d154]'
                       : 'bg-[#e86e3a]/[0.08] text-[#e86e3a]'
@@ -442,7 +442,7 @@ function ConsoleQualifierPage() {
       <div className='mt-16'>
         <div className='mb-12 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent' />
         <FadeIn>
-          <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+          <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
             Detailed Rules
           </div>
           <h2 className='mb-2 text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>

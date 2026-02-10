@@ -41,16 +41,50 @@ const SCHEDULE_ITEMS = [
     fullDate: '2026-03-02',
     endDate: '2026-04-30',
     name: '콘솔 예선',
+    division: 'console' as const,
     tag: 'ONLINE',
     tagCls: 'bg-[#f5a623]/[0.08] text-[#f5a623]',
     dotCls: 'bg-[#e86e3a] shadow-[0_0_10px_rgba(232,110,58,0.4)]',
   },
   {
+    date: '03.02',
+    fullDate: '2026-03-02',
+    endDate: '2026-03-16',
+    name: '아케이드 온라인 예선',
+    division: 'arcade' as const,
+    tag: 'ONLINE',
+    tagCls: 'bg-[#f5a623]/[0.08] text-[#f5a623]',
+    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
+  },
+  {
     date: '03.21',
     fullDate: '2026-03-21',
     name: '오프라인 예선',
-    venueName: 'TAIKO LABS',
+    division: 'arcade' as const,
+    venueName: 'TAIKO LABS · 서울',
     venueImage: '/branding/venue-seoul.png',
+    tag: 'OFFLINE',
+    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
+    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
+  },
+  {
+    date: '03.28',
+    fullDate: '2026-03-28',
+    name: '오프라인 예선',
+    division: 'arcade' as const,
+    venueName: '싸이뮤직 게임월드 · 대전',
+    venueImage: '/branding/venue-daejeon.png',
+    tag: 'OFFLINE',
+    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
+    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
+  },
+  {
+    date: '04.04',
+    fullDate: '2026-04-04',
+    name: '오프라인 예선',
+    division: 'arcade' as const,
+    venueName: '게임플라자 · 광주',
+    venueImage: '/branding/venue-gwangju.png',
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
@@ -59,7 +93,8 @@ const SCHEDULE_ITEMS = [
     date: '04.11',
     fullDate: '2026-04-11',
     name: '오프라인 예선',
-    venueName: '게임D',
+    division: 'arcade' as const,
+    venueName: '게임D · 부산',
     venueImage: '/branding/venue-busan.png',
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
@@ -69,6 +104,7 @@ const SCHEDULE_ITEMS = [
     date: '05.23',
     fullDate: '2026-05-23',
     name: '결선 → PlayX4',
+    division: 'all' as const,
     sub: '콘솔 · 아케이드 동시 진행',
     tag: 'FINALS',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
@@ -138,13 +174,13 @@ function HomePage() {
           {/* Text + CTA */}
           <div className='absolute inset-x-0 bottom-0 flex flex-col items-end gap-4 px-6 pb-7 text-right sm:px-8 sm:pb-9 md:px-10 md:pb-10'>
             <div>
-              <div className='mb-1 font-mono text-[11px] font-semibold tracking-[2.5px] text-white/70 uppercase sm:text-xs'>
+              <div className='mb-1 font-mono text-[11px] font-semibold tracking-[1px] text-white/70 uppercase sm:text-xs'>
                 Taiko Korea Championship
               </div>
               <h1 className='bg-gradient-to-r from-[#e86e3a] to-[#f5a623] bg-clip-text text-[clamp(28px,5vw,44px)] leading-tight font-extrabold tracking-tight text-transparent'>
                 2026
               </h1>
-              <p className='mt-1.5 text-sm text-white/75 sm:text-[15px]'>
+              <p className='mt-1.5 text-sm leading-[1.55] text-white/75 sm:text-[15px]'>
                 지금 참가 신청을 받고 있습니다
               </p>
             </div>
@@ -180,12 +216,12 @@ function HomePage() {
       {/* ── SCHEDULE ── */}
       <section className='mt-16 md:mt-20'>
         <FadeIn>
-          <SectionHead label='Schedule' title='다가오는 일정'>
+          <SectionHead label='Schedule' title='일정'>
             <Link
               to='/schedule'
               className='text-sm text-white/55 transition-colors hover:text-[#e86e3a]'
             >
-              전체 일정 보기 →
+              자세히 보기 →
             </Link>
           </SectionHead>
         </FadeIn>
@@ -216,7 +252,7 @@ function HomePage() {
             />
           </div>
 
-          <div className='flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-sm font-semibold tracking-wide text-white/65 md:justify-end'>
+          <div className='flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-sm font-semibold tracking-normal text-white/65 md:justify-end'>
             {partners
               .slice()
               .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -277,7 +313,7 @@ function SectionHead({
   return (
     <div className='mb-6 flex items-end justify-between gap-4'>
       <div>
-        <div className='mb-1.5 font-mono text-sm font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+        <div className='mb-1.5 font-mono text-sm font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
           {label}
         </div>
         <h2 className='text-[clamp(24px,4vw,32px)] font-extrabold tracking-tight text-white/95'>
@@ -329,7 +365,7 @@ function DivisionCard({
             </h3>
           </div>
 
-          <p className='mb-5 text-[15px] leading-relaxed break-keep text-white/70'>
+          <p className='mb-5 text-[15px] leading-[1.55] break-keep text-white/70'>
             {description}
           </p>
 
@@ -569,7 +605,7 @@ function YouTubeEmbed() {
         <div className='text-[15px] font-semibold text-white/90'>
           TAIKO LABS
         </div>
-        <div className='mt-0.5 text-sm text-white/55'>
+        <div className='mt-0.5 text-sm leading-[1.55] text-white/55'>
           이제 우리는 그 너머로 향합니다.
         </div>
       </div>

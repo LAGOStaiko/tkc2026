@@ -133,13 +133,13 @@ function SectionBlock({
   return (
     <section id={id} data-section={id} className='mb-20'>
       <FadeIn>
-        <div className='mb-2 font-mono text-xs font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
           Section {num}
         </div>
         <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
           {title}
         </h2>
-        <p className='mb-8 max-w-[640px] text-[15px] leading-relaxed font-light break-keep text-white/55'>
+        <p className='mb-8 max-w-[640px] text-[15px] leading-[1.55] font-light break-keep text-white/55'>
           {desc}
         </p>
       </FadeIn>
@@ -157,7 +157,7 @@ function MatchCard({
 }) {
   return (
     <div className='overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
-      <div className='border-b border-[#1e1e1e] bg-white/[0.02] px-3 py-1.5 text-center font-mono text-[10px] font-semibold tracking-[1.5px] text-white/35 uppercase'>
+      <div className='border-b border-[#1e1e1e] bg-white/[0.02] px-3 py-1.5 text-center font-mono text-[10px] font-semibold tracking-[1px] text-white/35 uppercase'>
         {label}
       </div>
       {rows.map((r, i) => (
@@ -259,7 +259,7 @@ function BracketSection() {
       <div className='hidden gap-4 sm:grid sm:grid-cols-3'>
         {/* Quarterfinals */}
         <div>
-          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[2px] text-white/35 uppercase'>
+          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
             Quarterfinals
           </div>
           <div className='space-y-2'>
@@ -278,7 +278,7 @@ function BracketSection() {
 
         {/* Semifinals */}
         <div>
-          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[2px] text-white/35 uppercase'>
+          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
             Semifinals
           </div>
           <div className='space-y-2'>
@@ -297,7 +297,7 @@ function BracketSection() {
 
         {/* Grand Final */}
         <div>
-          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[2px] text-white/35 uppercase'>
+          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
             Grand Final
           </div>
           <MatchCard
@@ -313,7 +313,7 @@ function BracketSection() {
       {/* Mobile Bracket */}
       <div className='space-y-4 sm:hidden'>
         <div>
-          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[2px] text-white/35 uppercase'>
+          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
             Quarterfinals
           </div>
           <div className='space-y-2'>
@@ -333,7 +333,7 @@ function BracketSection() {
           ▼ 승자 진출
         </div>
         <div>
-          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[2px] text-white/35 uppercase'>
+          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
             Semifinals
           </div>
           <div className='space-y-2'>
@@ -353,7 +353,7 @@ function BracketSection() {
           ▼ 승자 진출
         </div>
         <div>
-          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[2px] text-white/35 uppercase'>
+          <div className='mb-2.5 border-b-2 border-[#e86e3a] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
             Grand Final
           </div>
           <MatchCard
@@ -369,7 +369,7 @@ function BracketSection() {
       {/* 3rd Place Match */}
       <FadeIn delay={100}>
         <div className='mx-auto max-w-[300px]'>
-          <div className='mb-2.5 border-b-2 border-[#f5a623] pb-2 text-center font-mono text-xs font-semibold tracking-[2px] text-white/35 uppercase'>
+          <div className='mb-2.5 border-b-2 border-[#f5a623] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
             3·4위전
           </div>
           <MatchCard
@@ -458,7 +458,7 @@ function PrepSection() {
             <div className='flex size-7 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-[#e86e3a] font-mono text-base font-extrabold text-[#e86e3a]'>
               {rule.num}
             </div>
-            <div className='text-[15px] leading-relaxed break-keep text-white/55'>
+            <div className='text-[15px] leading-[1.55] break-keep text-white/55'>
               {rule.text}
             </div>
           </div>
@@ -502,7 +502,7 @@ function BanPickSection() {
                   background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
                 }}
               />
-              <div className='mb-2.5 font-mono text-[10px] font-semibold tracking-[1.5px] text-white/35'>
+              <div className='mb-2.5 font-mono text-[10px] font-semibold tracking-[1px] text-white/35'>
                 {s.step}
               </div>
               <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
@@ -536,7 +536,7 @@ function BanPickSection() {
                   background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
                 }}
               />
-              <div className='mb-2 font-mono text-[10px] font-semibold tracking-[1.5px] text-white/35'>
+              <div className='mb-2 font-mono text-[10px] font-semibold tracking-[1px] text-white/35'>
                 {s.step}
               </div>
               <div className='mb-2 text-[28px] font-extrabold text-white/90'>
@@ -578,7 +578,7 @@ function BanPickSection() {
                   background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
                 }}
               />
-              <div className='mb-2.5 font-mono text-[10px] font-semibold tracking-[1.5px] text-white/35'>
+              <div className='mb-2.5 font-mono text-[10px] font-semibold tracking-[1px] text-white/35'>
                 {s.step}
               </div>
               <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
@@ -612,7 +612,7 @@ function BanPickSection() {
                   background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
                 }}
               />
-              <div className='mb-2 font-mono text-[10px] font-semibold tracking-[1.5px] text-white/35'>
+              <div className='mb-2 font-mono text-[10px] font-semibold tracking-[1px] text-white/35'>
                 {s.step}
               </div>
               <div className='mb-2 text-[28px] font-extrabold text-white/90'>
@@ -767,7 +767,7 @@ function PlayRulesSection() {
               </div>
               <div className='text-[17px] font-bold text-white/90'>{rule.title}</div>
             </div>
-            <div className='space-y-1.5 text-[15px] leading-[1.8] text-white/55'>
+            <div className='space-y-1.5 text-[15px] leading-[1.55] text-white/55'>
               {rule.lines.map((line, i) => (
                 <div key={i}>
                   {line.bold ? (
