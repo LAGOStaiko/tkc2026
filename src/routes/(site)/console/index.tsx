@@ -148,7 +148,7 @@ function RankingVisual() {
             </div>
             <div className='h-1.5 flex-1 overflow-hidden rounded-full bg-[#1e1e1e]'>
               <div
-                className={`h-full rounded-full transition-all duration-800 ease-out ${qualify ? 'bg-gradient-to-r from-[#f7d154] to-[#f5a623]' : 'bg-white/25'}`}
+                className={`h-full rounded-full transition-all duration-800 ease-out ${qualify ? 'bg-gradient-to-r from-[#f7d154] to-[#f7d154]' : 'bg-white/25'}`}
                 style={{
                   width: animated ? `${score}%` : '0%',
                   transitionDelay: `${i * 80}ms`,
@@ -235,7 +235,7 @@ function ConsoleQualifierPage() {
           summary={
             <>
               <strong className='text-white/90'>希望へのメロディー</strong>{' '}
-              <span className='rounded bg-[#f5a623]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f5a623]'>
+              <span className='rounded bg-[#f7d154]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f7d154]'>
                 뒷보면 ★9
               </span>{' '}
               와 <strong className='text-white/90'>TAIKO-TONGUE-TWISTER</strong>{' '}

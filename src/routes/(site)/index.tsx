@@ -48,7 +48,9 @@ const SCHEDULE_ITEMS = [
   {
     date: '03.21',
     fullDate: '2026-03-21',
-    name: '오프라인 예선 → TAIKO LABS · 서울',
+    name: '오프라인 예선',
+    venueName: 'TAIKO LABS',
+    venueImage: '/branding/venue-seoul.png',
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
@@ -56,7 +58,9 @@ const SCHEDULE_ITEMS = [
   {
     date: '04.11',
     fullDate: '2026-04-11',
-    name: '오프라인 예선 → 게임D · 부산',
+    name: '오프라인 예선',
+    venueName: '게임D',
+    venueImage: '/branding/venue-busan.png',
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
@@ -402,6 +406,25 @@ function ScheduleStrip() {
               <div className='mb-1.5 text-sm font-medium text-white/75'>
                 {item.name}
               </div>
+              {'venueName' in item && item.venueName && (
+                <div className='mb-2 flex items-center justify-center gap-2'>
+                  <img
+                    src={item.venueImage ?? ASSETS.arcadeIcon}
+                    alt={item.venueName}
+                    className='size-7 rounded-md object-cover'
+                    loading='lazy'
+                    onError={(e) => {
+                      const img = e.currentTarget
+                      if (img.dataset.fallbackApplied === 'true') return
+                      img.dataset.fallbackApplied = 'true'
+                      img.src = ASSETS.arcadeIcon
+                    }}
+                  />
+                  <span className='text-[12px] font-semibold text-white/80'>
+                    {item.venueName}
+                  </span>
+                </div>
+              )}
               {'sub' in item && item.sub && (
                 <div className='mb-2 text-[12px] text-white/50'>
                   {item.sub}
@@ -450,6 +473,25 @@ function ScheduleStrip() {
                 <div className='text-sm font-medium text-white/75'>
                   {item.name}
                 </div>
+                {'venueName' in item && item.venueName && (
+                  <div className='mt-1 flex items-center gap-2'>
+                    <img
+                      src={item.venueImage ?? ASSETS.arcadeIcon}
+                      alt={item.venueName}
+                      className='size-6 rounded-md object-cover'
+                      loading='lazy'
+                      onError={(e) => {
+                        const img = e.currentTarget
+                        if (img.dataset.fallbackApplied === 'true') return
+                        img.dataset.fallbackApplied = 'true'
+                        img.src = ASSETS.arcadeIcon
+                      }}
+                    />
+                    <span className='text-[11px] font-semibold text-white/70'>
+                      {item.venueName}
+                    </span>
+                  </div>
+                )}
                 {'sub' in item && item.sub && (
                   <div className='text-[11px] text-white/50'>{item.sub}</div>
                 )}
