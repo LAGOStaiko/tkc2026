@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ARCADE_SONGS } from '@/content/arcade-songs'
 import { t } from '@/text'
@@ -340,178 +340,7 @@ function RegionTable() {
 }
 
 /* ================================================================== */
-/*  (4) MatchVisual — 1경기 = 2곡 합산                                 */
-/* ================================================================== */
-
-function MatchVisual() {
-  return (
-    <div className='flex flex-col items-center gap-3'>
-      <div className='flex w-full gap-3'>
-        <div className='flex-1 rounded-2xl border border-[#E63B2E]/[0.15] bg-[#E63B2E]/[0.06] px-4 py-5 text-center'>
-          <div className='mb-2 font-mono text-sm tracking-widest text-[#E63B2E]'>
-            SONG 1
-          </div>
-          <div className='mb-1.5 text-2xl'>🥁</div>
-          <div className='text-sm font-semibold text-white/75'>
-            내가 고른 곡
-          </div>
-          <div className='mt-1.5 text-sm text-white/45'>내가 사이드 선택</div>
-        </div>
-        <div className='flex-1 rounded-2xl border border-[#3B8BE6]/[0.15] bg-[#3B8BE6]/[0.06] px-4 py-5 text-center'>
-          <div className='mb-2 font-mono text-sm tracking-widest text-[#3B8BE6]'>
-            SONG 2
-          </div>
-          <div className='mb-1.5 text-2xl'>🥁</div>
-          <div className='text-sm font-semibold text-white/75'>
-            상대가 고른 곡
-          </div>
-          <div className='mt-1.5 text-sm text-white/45'>상대가 사이드 선택</div>
-        </div>
-      </div>
-
-      <svg
-        width='24'
-        height='24'
-        viewBox='0 0 24 24'
-        className='opacity-25'
-        aria-hidden
-      >
-        <path
-          d='M12 0 L12 16 M6 12 L12 18 L18 12'
-          stroke='#f0f0f0'
-          strokeWidth='2'
-          fill='none'
-        />
-      </svg>
-
-      <div className='w-full rounded-2xl border border-[#FFD700]/10 bg-[#FFD700]/5 p-4 text-center'>
-        <span className='text-base font-bold break-keep text-[#FFD700]/75'>
-          2곡 합산 점수 → 고득점자 승리 🏆
-        </span>
-      </div>
-    </div>
-  )
-}
-
-/* ================================================================== */
-/*  (5) SwissVisual — 스위스 라운드 R1-R4                               */
-/* ================================================================== */
-
-const SWISS_DATA = [
-  {
-    round: 'R1',
-    groups: [
-      { record: '1-0', count: 8, color: '#4CAF50', status: '진행' },
-      { record: '0-1', count: 8, color: '#FF9800', status: '진행' },
-    ],
-  },
-  {
-    round: 'R2',
-    groups: [
-      { record: '2-0', count: 4, color: '#4CAF50', status: '진행' },
-      { record: '1-1', count: 8, color: '#FF9800', status: '진행' },
-      { record: '0-2', count: 4, color: '#F44336', status: '탈락' },
-    ],
-  },
-  {
-    round: 'R3',
-    groups: [
-      { record: '3-0', count: 2, color: '#4CAF50', status: '진행' },
-      { record: '2-1', count: 6, color: '#FF9800', status: '진행' },
-      { record: '1-2', count: 4, color: '#F44336', status: '탈락' },
-    ],
-  },
-  {
-    round: 'R4',
-    groups: [
-      { record: '4-0', count: 1, color: '#4CAF50', status: '자동 진출' },
-      { record: '3-1', count: 4, color: '#F5A623', status: '결정전' },
-      { record: '2-2', count: 3, color: '#F44336', status: '탈락' },
-    ],
-  },
-] as const
-
-function SwissGroupRow({
-  g,
-}: {
-  g: { record: string; count: number; color: string; status: string }
-}) {
-  return (
-    <div
-      className='flex items-center justify-between rounded-lg px-3 py-2'
-      style={{
-        background:
-          g.status === '탈락'
-            ? 'rgba(244,67,54,0.06)'
-            : g.status === '자동 진출'
-              ? 'rgba(76,175,80,0.08)'
-              : 'rgba(255,255,255,0.02)',
-        border: `1px solid ${g.color}20`,
-      }}
-    >
-      <span
-        className='font-mono text-base font-bold'
-        style={{ color: g.color }}
-      >
-        {g.record}
-      </span>
-      <span className='text-sm opacity-70' style={{ color: g.color }}>
-        {g.status}
-      </span>
-    </div>
-  )
-}
-
-function SwissVisual() {
-  return (
-    <>
-      {/* Mobile: vertical stack */}
-      <div className='md:hidden'>
-        <div className='flex flex-col gap-2.5'>
-          {SWISS_DATA.map((r) => (
-            <div
-              key={r.round}
-              className='rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4'
-            >
-              <div className='mb-2.5 font-mono text-sm font-bold tracking-widest text-white/50'>
-                {r.round}
-              </div>
-              <div className='flex flex-col gap-2'>
-                {r.groups.map((g) => (
-                  <SwissGroupRow key={g.record} g={g} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Desktop: horizontal 4-col */}
-      <div className='hidden md:block'>
-        <div className='flex gap-2'>
-          {SWISS_DATA.map((r) => (
-            <div
-              key={r.round}
-              className='flex-1 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-4'
-            >
-              <div className='mb-3 text-center font-mono text-sm font-bold tracking-widest text-white/50'>
-                {r.round}
-              </div>
-              <div className='flex flex-col gap-2'>
-                {r.groups.map((g) => (
-                  <SwissGroupRow key={g.record} g={g} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
-  )
-}
-
-/* ================================================================== */
-/*  (6) SeedingMatchTable — 1라운드 시드 매칭                           */
+/*  SeedingMatchTable — 1라운드 시드 매칭                               */
 /* ================================================================== */
 
 const SEEDING_MATCHES = [
@@ -598,78 +427,6 @@ function SeedingMatchTable() {
 }
 
 /* ================================================================== */
-/*  (7) QualificationPath — 진출 조건                                   */
-/* ================================================================== */
-
-function QualificationPath() {
-  return (
-    <div className='flex flex-col gap-3'>
-      {/* 4-0 자동 진출 */}
-      <div className='flex items-center gap-4 rounded-2xl border border-[#4CAF50]/15 bg-[#4CAF50]/[0.06] p-5'>
-        <div className='flex size-12 shrink-0 items-center justify-center rounded-full bg-[#4CAF50]/[0.12] text-2xl'>
-          ✅
-        </div>
-        <div>
-          <div className='font-mono text-lg font-bold text-[#4CAF50]'>
-            4-0 → 자동 진출
-          </div>
-          <div className='mt-1 text-sm break-keep text-white/55'>
-            전승 기록자 1명 바로 확정
-          </div>
-        </div>
-      </div>
-
-      {/* 3-1 결정전 */}
-      <div className='rounded-2xl border border-[#F5A623]/15 bg-[#F5A623]/[0.06] p-5'>
-        <div className='mb-4 flex items-center gap-4'>
-          <div className='flex size-12 shrink-0 items-center justify-center rounded-full bg-[#F5A623]/[0.12] text-2xl'>
-            ⚔️
-          </div>
-          <div>
-            <div className='font-mono text-lg font-bold text-[#F5A623]'>
-              3-1 → 결정전
-            </div>
-            <div className='mt-1 text-sm break-keep text-white/55'>
-              스코어 어택으로 1명 추가 선발
-            </div>
-          </div>
-        </div>
-        <div className='flex flex-col gap-1.5 rounded-xl bg-black/20 px-4 py-3.5'>
-          <div className='flex justify-between'>
-            <span className='text-sm text-white/50'>방식</span>
-            <span className='text-sm font-semibold text-white/75'>
-              스코어 어택 1회
-            </span>
-          </div>
-          <div className='flex justify-between'>
-            <span className='text-sm text-white/50'>과제곡</span>
-            <span className='text-sm font-semibold text-white/75'>
-              {ARCADE_SONGS.decider31.title} ★{ARCADE_SONGS.decider31.level}
-            </span>
-          </div>
-          <div className='flex justify-between'>
-            <span className='text-sm text-white/50'>비고</span>
-            <span className='text-sm font-semibold text-[#ff2a00]'>
-              사전 비공개
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2패 탈락 */}
-      <div className='flex items-center gap-4 rounded-2xl border border-[#F44336]/10 bg-[#F44336]/[0.04] p-4 opacity-60'>
-        <div className='flex size-12 shrink-0 items-center justify-center rounded-full bg-[#F44336]/10 text-xl'>
-          ❌
-        </div>
-        <div className='font-mono text-base font-bold text-[#F44336]'>
-          2패 → 탈락
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ================================================================== */
 /*  (8) BracketVisual — 8강 크로스 시딩                                 */
 /* ================================================================== */
 
@@ -747,46 +504,701 @@ function BracketVisual() {
 }
 
 /* ================================================================== */
-/*  (9) SideAndTiebreakRules                                           */
+/*  OfflineOverview — 오프라인 예선 개요 스탯                            */
 /* ================================================================== */
 
-function SideAndTiebreakRules() {
-  return (
-    <div className='flex flex-col gap-3'>
-      <InfoCard icon='🎮' title='사이드(자리) 규칙'>
-        <div className='flex gap-2.5'>
-          <div className='flex-1 rounded-xl bg-[#E63B2E]/5 px-4 py-3.5 text-center'>
-            <div className='mb-1.5 font-mono text-sm tracking-wider text-[#E63B2E]'>
-              내 곡
-            </div>
-            <div className='text-sm font-semibold text-white/75'>내가 선택</div>
-          </div>
-          <div className='flex-1 rounded-xl bg-[#3B8BE6]/5 px-4 py-3.5 text-center'>
-            <div className='mb-1.5 font-mono text-sm tracking-wider text-[#3B8BE6]'>
-              상대 곡
-            </div>
-            <div className='text-sm font-semibold text-white/75'>
-              상대가 선택
-            </div>
-          </div>
-        </div>
-      </InfoCard>
+const OVERVIEW_STATS = [
+  { value: '4회', label: '오프라인 예선', color: '#E63B2E' },
+  { value: '16명', label: '지역별 참가자', color: '#F5A623' },
+  { value: '2명', label: '회차별 진출', color: '#FFD700' },
+  { value: 'Top 8', label: '결선 진출 인원', color: '#4CAF50' },
+] as const
 
-      <InfoCard icon='⚖️' title='동점 시'>
-        <div className='rounded-xl bg-black/15 px-4 py-3.5 text-sm leading-relaxed break-keep text-white/70'>
-          선곡풀에서{' '}
-          <span className='font-semibold text-[#F5A623]'>랜덤 1곡</span> 선정 →
-          단판 재경기
-          <br />
-          사이드: 온라인 순위 상위자가 선택
+function OfflineOverview() {
+  return (
+    <div className='space-y-5'>
+      {/* Stats Grid */}
+      <div className='grid grid-cols-2 gap-2.5 sm:grid-cols-4'>
+        {OVERVIEW_STATS.map((s) => (
+          <div
+            key={s.label}
+            className='relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-5 text-center'
+          >
+            <div
+              className='absolute top-0 right-0 left-0 h-0.5'
+              style={{ background: s.color }}
+            />
+            <div
+              className='font-mono text-2xl font-extrabold'
+              style={{ color: s.color }}
+            >
+              {s.value}
+            </div>
+            <div className='mt-1 text-xs text-white/50'>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Region Timeline */}
+      <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5'>
+        <div className='mb-4 text-sm font-semibold text-white/50'>
+          예선 일정
         </div>
-      </InfoCard>
+        {/* Mobile */}
+        <div className='flex flex-col gap-3 sm:hidden'>
+          {REGIONS.map((r) => (
+            <div
+              key={r.num}
+              className='flex items-center gap-3.5 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3'
+            >
+              <div className='flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-[#E63B2E] font-mono text-sm font-bold text-[#E63B2E]'>
+                {r.num.charAt(0)}
+              </div>
+              <div>
+                <div className='text-base font-semibold text-white/80'>
+                  {r.city}
+                </div>
+                <div className='text-xs text-white/40'>{r.num} 예선</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Desktop */}
+        <div className='hidden items-center sm:flex'>
+          {REGIONS.map((r, i) => (
+            <div key={r.num} className='relative flex-1 text-center'>
+              <div className='mx-auto mb-2.5 flex size-9 items-center justify-center rounded-full border-2 border-[#E63B2E] font-mono text-sm font-bold text-[#E63B2E]'>
+                {r.num.charAt(0)}
+              </div>
+              <div className='text-sm font-semibold text-white/80'>
+                {r.city}
+              </div>
+              <div className='text-xs text-white/40'>{r.num} 예선</div>
+              {i < REGIONS.length - 1 && (
+                <div className='absolute top-4 left-[55%] h-px w-[90%] bg-white/10' />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <SNote>
+        각 지역 온라인 예선 상위 16명이 오프라인 예선에 참가하며, 각 예선에서
+        2명이 진출하여 총 8명으로 결선을 구성합니다.
+      </SNote>
     </div>
   )
 }
 
 /* ================================================================== */
-/*  (10) FinalsStructure — 결선 구조 테이블                             */
+/*  (11) SwissStageSection — 스위스 스테이지 상세                       */
+/* ================================================================== */
+
+type SwissGroup = {
+  record: string
+  cls: string
+  color: string
+  tag: string
+  count: number
+  eliminated?: boolean
+  qualified?: boolean
+  advance?: boolean
+}
+
+const SWISS_ROUND_DATA: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
+  1: [
+    {
+      record: '1-0',
+      cls: 'border-[#4CAF50]/15 bg-[#4CAF50]/[0.06]',
+      color: '#4CAF50',
+      tag: '승리 그룹',
+      count: 8,
+    },
+    {
+      record: '0-1',
+      cls: 'border-[#F5A623]/15 bg-[#F5A623]/[0.06]',
+      color: '#F5A623',
+      tag: '패배 1회',
+      count: 8,
+    },
+  ],
+  2: [
+    {
+      record: '2-0',
+      cls: 'border-[#4CAF50]/15 bg-[#4CAF50]/[0.06]',
+      color: '#4CAF50',
+      tag: '전승 유지',
+      count: 4,
+    },
+    {
+      record: '1-1',
+      cls: 'border-[#FFD700]/15 bg-[#FFD700]/[0.06]',
+      color: '#FFD700',
+      tag: '생존',
+      count: 8,
+    },
+    {
+      record: '0-2',
+      cls: 'border-[#F44336]/15 bg-[#F44336]/[0.06]',
+      color: '#F44336',
+      tag: '탈락',
+      count: 4,
+      eliminated: true,
+    },
+  ],
+  3: [
+    {
+      record: '3-0',
+      cls: 'border-[#4CAF50]/15 bg-[#4CAF50]/[0.06]',
+      color: '#4CAF50',
+      tag: '전승 유지',
+      count: 2,
+    },
+    {
+      record: '2-1',
+      cls: 'border-[#3B8BE6]/15 bg-[#3B8BE6]/[0.06]',
+      color: '#3B8BE6',
+      tag: '생존',
+      count: 6,
+    },
+    {
+      record: '1-2',
+      cls: 'border-[#F44336]/15 bg-[#F44336]/[0.06]',
+      color: '#F44336',
+      tag: '탈락',
+      count: 4,
+      eliminated: true,
+    },
+  ],
+  4: [
+    {
+      record: '4-0',
+      cls: 'border-[#4CAF50]/15 bg-[#4CAF50]/[0.06]',
+      color: '#4CAF50',
+      tag: '자동 진출',
+      count: 1,
+      qualified: true,
+    },
+    {
+      record: '3-1',
+      cls: 'border-[#F5A623]/15 bg-[#F5A623]/[0.06]',
+      color: '#F5A623',
+      tag: '선발전 진출',
+      count: 4,
+      advance: true,
+    },
+    {
+      record: '2-2',
+      cls: 'border-[#F44336]/15 bg-[#F44336]/[0.06]',
+      color: '#F44336',
+      tag: '탈락',
+      count: 3,
+      eliminated: true,
+    },
+  ],
+}
+
+function SwissStageSection() {
+  const [activeRound, setActiveRound] = useState<1 | 2 | 3 | 4>(1)
+  const groups = SWISS_ROUND_DATA[activeRound]
+
+  return (
+    <div className='space-y-5'>
+      {/* Warning callout */}
+      <div className='flex gap-3 rounded-xl border border-[#F44336]/15 bg-[#F44336]/[0.04] p-4'>
+        <span className='mt-0.5 shrink-0 text-sm'>⚠️</span>
+        <p className='text-sm leading-relaxed break-keep text-white/70'>
+          <strong className='text-[#F44336]'>2패 누적 시 즉시 탈락</strong> —
+          패배가 2회 누적되는 순간 스테이지가 종료되며, 이후 라운드에 배정되지
+          않습니다.
+        </p>
+      </div>
+
+      {/* R1 Seed Matching */}
+      <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5'>
+        <div className='mb-1 text-sm font-bold text-white/80'>
+          라운드 1 — 시드 매칭
+        </div>
+        <div className='mb-4 text-xs text-white/40'>
+          온라인 예선 순위를 기반으로 상위 vs 하위 대진 편성
+        </div>
+        <SeedingMatchTable />
+      </div>
+
+      {/* Matching Rules */}
+      <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5'>
+        <div className='mb-4 text-sm font-bold text-white/80'>
+          라운드 2 이후 — 매칭 규칙
+        </div>
+        {[
+          {
+            num: 'A',
+            title: '동일 전적 그룹 내 매칭',
+            desc: '같은 승-패 기록의 참가자끼리만 매칭합니다. (예: 1-0끼리, 0-1끼리)',
+          },
+          {
+            num: 'B',
+            title: '그룹 내 시드 기반 매칭',
+            desc: '초기 시드(온라인 순위) 기준으로 정렬 후, 상위 vs 하위로 매칭합니다.',
+          },
+          {
+            num: 'C',
+            title: '홀수 인원 처리',
+            desc: '노쇼·기권으로 홀수가 발생할 경우, 남는 1명에게 부전승(Bye) 1승을 부여합니다.',
+          },
+        ].map((rule) => (
+          <div
+            key={rule.num}
+            className='flex gap-3.5 border-b border-white/[0.06] py-3.5 last:border-b-0'
+          >
+            <div className='flex size-7 shrink-0 items-center justify-center rounded-lg border border-[#E63B2E]/40 font-mono text-sm font-bold text-[#E63B2E]'>
+              {rule.num}
+            </div>
+            <div>
+              <div className='text-sm font-semibold text-white/80'>
+                {rule.title}
+              </div>
+              <div className='mt-0.5 text-sm break-keep text-white/50'>
+                {rule.desc}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Swiss Round Animator */}
+      <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5'>
+        <div className='mb-1 text-sm font-bold text-white/80'>
+          라운드별 전적 그룹 변화
+        </div>
+        <div className='mb-5 text-xs text-white/40'>
+          라운드를 선택하여 그룹 구성 변화를 확인하세요
+        </div>
+
+        {/* Round Buttons */}
+        <div className='mb-5 flex gap-1.5'>
+          {([1, 2, 3, 4] as const).map((r) => (
+            <button
+              key={r}
+              type='button'
+              aria-pressed={activeRound === r}
+              onClick={() => setActiveRound(r)}
+              className={`flex-1 rounded-lg border py-2.5 text-sm font-semibold transition-all focus-visible:ring-2 focus-visible:ring-[#E63B2E]/50 focus-visible:outline-none ${
+                activeRound === r
+                  ? 'border-[#E63B2E] bg-[#E63B2E]/[0.06] text-white'
+                  : 'border-white/10 text-white/40 hover:border-white/20 hover:text-white/60'
+              }`}
+            >
+              R{r} 후
+            </button>
+          ))}
+        </div>
+
+        {/* Groups */}
+        <div className='flex flex-col gap-2.5'>
+          {groups.map((g) => (
+            <div key={g.record} className={`rounded-xl border p-4 ${g.cls}`}>
+              <div className='flex items-center gap-2.5'>
+                <span
+                  className='rounded-md px-2.5 py-1 font-mono text-sm font-bold'
+                  style={{
+                    color: g.color,
+                    background: `${g.color}15`,
+                  }}
+                >
+                  {g.record}
+                </span>
+                <span
+                  className={`text-xs font-semibold ${
+                    g.eliminated
+                      ? 'rounded bg-[#F44336]/10 px-2 py-0.5 text-[#F44336]'
+                      : g.qualified
+                        ? 'rounded bg-[#4CAF50]/10 px-2 py-0.5 text-[#4CAF50]'
+                        : g.advance
+                          ? 'rounded bg-[#F5A623]/10 px-2 py-0.5 text-[#F5A623]'
+                          : 'text-white/40'
+                  }`}
+                >
+                  {g.eliminated || g.qualified || g.advance
+                    ? g.tag
+                    : `${g.tag} · ${g.count}명`}
+                </span>
+                {(g.eliminated || g.qualified || g.advance) && (
+                  <span className='text-xs text-white/40'>{g.count}명</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ================================================================== */
+/*  (12) MatchRulesSection — 경기 규칙                                  */
+/* ================================================================== */
+
+function MatchRulesSection() {
+  return (
+    <div className='space-y-5'>
+      {/* Match Flow */}
+      <div>
+        {/* Mobile: vertical */}
+        <div className='flex flex-col gap-0 md:hidden'>
+          {[
+            {
+              label: 'A 선수의 곡',
+              desc: 'A가 사전 제출한 해당 라운드 곡',
+              mono: 'SONG A',
+            },
+            {
+              label: 'B 선수의 곡',
+              desc: 'B가 사전 제출한 해당 라운드 곡',
+              mono: 'SONG B',
+            },
+            {
+              label: '2곡 합산',
+              desc: '두 곡 점수를 합산, 고득점자 승리',
+              mono: 'TOTAL',
+            },
+          ].map((step, i) => (
+            <div key={step.mono}>
+              <div className='rounded-none border border-white/10 bg-white/[0.03] px-4 py-5 text-center first:rounded-t-2xl last:rounded-b-2xl'>
+                <div className='mb-1 font-mono text-xs tracking-widest text-[#E63B2E]/60'>
+                  {step.mono}
+                </div>
+                <div className='text-sm font-bold text-white/80'>
+                  {step.label}
+                </div>
+                <div className='mt-1 text-xs break-keep text-white/45'>
+                  {step.desc}
+                </div>
+              </div>
+              {i < 2 && (
+                <div className='flex justify-center text-[#E63B2E]/40'>
+                  <span className='text-xs'>▼</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        {/* Desktop: horizontal */}
+        <div className='hidden items-stretch gap-0 md:flex'>
+          {[
+            {
+              label: 'A 선수의 곡',
+              desc: 'A가 사전 제출한\n해당 라운드 곡',
+              mono: 'SONG A',
+            },
+            {
+              label: 'B 선수의 곡',
+              desc: 'B가 사전 제출한\n해당 라운드 곡',
+              mono: 'SONG B',
+            },
+            {
+              label: '2곡 합산',
+              desc: '두 곡 점수를 합산\n고득점자 승리',
+              mono: 'TOTAL',
+            },
+          ].map((step, i) => (
+            <div key={step.mono} className='flex flex-1 items-center'>
+              <div
+                className={`flex-1 border border-white/10 bg-white/[0.03] px-4 py-5 text-center ${
+                  i === 0 ? 'rounded-l-2xl' : i === 2 ? 'rounded-r-2xl' : ''
+                }`}
+              >
+                <div className='mb-1 font-mono text-xs tracking-widest text-[#E63B2E]/60'>
+                  {step.mono}
+                </div>
+                <div className='text-sm font-bold text-white/80'>
+                  {step.label}
+                </div>
+                <div className='mt-1 text-xs whitespace-pre-line text-white/45'>
+                  {step.desc}
+                </div>
+              </div>
+              {i < 2 && (
+                <span className='shrink-0 px-1 text-sm text-[#E63B2E]/40'>
+                  →
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Song Submission R1-R4 */}
+      <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5'>
+        <div className='mb-1 text-sm font-bold text-white/80'>
+          사전 선곡 제출
+        </div>
+        <div className='mb-4 text-xs text-white/40'>
+          참가자는 신청 시점에 최대 4라운드까지 사용할 곡을 미리 제출합니다
+        </div>
+        <div className='grid grid-cols-2 gap-2.5 sm:grid-cols-4'>
+          {(['R1', 'R2', 'R3', 'R4'] as const).map((r) => (
+            <div
+              key={r}
+              className='relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] px-3 py-4 text-center'
+            >
+              <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#F5A623]/50' />
+              <div className='font-mono text-xl font-extrabold text-[#F5A623]'>
+                {r}
+              </div>
+              <div className='mt-1 text-xs text-white/40'>신청 시 제출</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <SNote>
+        해당 라운드 매치에서 사용되는 "자기 곡"은 사전 제출된 해당 라운드 곡으로
+        고정됩니다. (예: R3 배정 시 → 자신이 제출한 R3 곡 사용)
+      </SNote>
+    </div>
+  )
+}
+
+/* ================================================================== */
+/*  (13) SideRulesSection — 사이드 규칙                                 */
+/* ================================================================== */
+
+function SideRulesSection() {
+  return (
+    <div className='space-y-5'>
+      {/* 1P / 2P Visual */}
+      <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5'>
+        {/* Mobile: vertical */}
+        <div className='flex flex-col items-center gap-4 sm:hidden'>
+          <div className='flex w-24 flex-col items-center justify-center rounded-xl border-2 border-[#E63B2E] bg-[#E63B2E]/[0.06] py-5'>
+            <div className='mb-1 text-3xl'>🥁</div>
+            <div className='font-bold text-[#E63B2E]'>1P</div>
+          </div>
+          <div className='text-center text-xs text-white/40'>
+            자기 곡 차례에
+            <br />
+            <strong className='text-[#F5A623]'>곡 제공자가 선택</strong>
+          </div>
+          <div className='flex w-24 flex-col items-center justify-center rounded-xl border-2 border-[#3B8BE6] bg-[#3B8BE6]/[0.06] py-5'>
+            <div className='mb-1 text-3xl'>🥁</div>
+            <div className='font-bold text-[#3B8BE6]'>2P</div>
+          </div>
+        </div>
+        {/* Desktop: horizontal */}
+        <div className='hidden items-center justify-center gap-8 sm:flex'>
+          <div className='flex w-24 flex-col items-center justify-center rounded-xl border-2 border-[#E63B2E] bg-[#E63B2E]/[0.06] py-5'>
+            <div className='mb-1 text-3xl'>🥁</div>
+            <div className='font-bold text-[#E63B2E]'>1P</div>
+          </div>
+          <div className='text-center text-xs text-white/40'>
+            자기 곡 차례에
+            <br />
+            <strong className='text-[#F5A623]'>곡 제공자가 선택</strong>
+          </div>
+          <div className='flex w-24 flex-col items-center justify-center rounded-xl border-2 border-[#3B8BE6] bg-[#3B8BE6]/[0.06] py-5'>
+            <div className='mb-1 text-3xl'>🥁</div>
+            <div className='font-bold text-[#3B8BE6]'>2P</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Per-song side selection */}
+      <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5'>
+        <div className='mb-4 text-sm font-bold text-white/80'>
+          곡별 사이드 선택
+        </div>
+        <div className='grid grid-cols-2 gap-2.5'>
+          <div className='rounded-xl border border-[#E63B2E]/15 bg-[#E63B2E]/[0.04] p-4 text-center'>
+            <div className='mb-1 text-xs font-semibold text-[#E63B2E]'>
+              A의 곡 진행 시
+            </div>
+            <div className='text-sm font-bold text-white/80'>
+              A가 사이드 선택
+            </div>
+          </div>
+          <div className='rounded-xl border border-[#3B8BE6]/15 bg-[#3B8BE6]/[0.04] p-4 text-center'>
+            <div className='mb-1 text-xs font-semibold text-[#3B8BE6]'>
+              B의 곡 진행 시
+            </div>
+            <div className='text-sm font-bold text-white/80'>
+              B가 사이드 선택
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className='flex gap-3 rounded-xl border border-[#F5A623]/15 bg-[#F5A623]/[0.04] p-4'>
+        <span className='mt-0.5 shrink-0 text-sm'>⚡</span>
+        <p className='text-sm leading-relaxed break-keep text-white/60'>
+          재경기 등 운영상 우선권이 필요한 경우,{' '}
+          <strong className='text-white/80'>
+            온라인 예선 순위가 더 높은 선수
+          </strong>
+          가 사이드 선택 우선권을 가집니다.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/* ================================================================== */
+/*  (14) TiebreakSection — 동점 처리                                    */
+/* ================================================================== */
+
+function TiebreakSection() {
+  const steps = [
+    { title: '2곡 합산 결과', desc: '두 선수의 점수 합산이 동일' },
+    { title: '선곡풀 랜덤 1곡', desc: '선곡풀에서 랜덤으로 1곡을 선정' },
+    { title: '재경기 단판', desc: '1곡 재경기로 승패 결정' },
+  ]
+
+  return (
+    <div className='space-y-5'>
+      {/* Tiebreak Flow */}
+      <div className='flex flex-col items-center gap-0'>
+        {steps.map((step, i) => (
+          <div
+            key={step.title}
+            className='flex w-full max-w-md flex-col items-center'
+          >
+            <div className='w-full rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center'>
+              <div className='text-sm font-bold text-white/80'>
+                {step.title}
+              </div>
+              <div className='mt-1 text-xs text-white/45'>{step.desc}</div>
+            </div>
+            {i < steps.length - 1 && (
+              <>
+                <div className='h-5 w-0.5 bg-white/10' />
+                {i === 0 && (
+                  <>
+                    <div className='rounded-md border border-dashed border-[#E63B2E]/25 bg-[#E63B2E]/[0.04] px-4 py-1.5 text-xs font-semibold text-[#F5A623]'>
+                      동점 발생
+                    </div>
+                    <div className='h-5 w-0.5 bg-white/10' />
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <SNote>
+        재경기 시 사이드 선택 우선권은 온라인 예선 상위 순위 선수에게
+        부여됩니다.
+      </SNote>
+    </div>
+  )
+}
+
+/* ================================================================== */
+/*  (15) AdvancementSection — 진출자 선발                               */
+/* ================================================================== */
+
+function AdvancementSection() {
+  return (
+    <div className='space-y-5'>
+      {/* Two paths */}
+      <div className='grid gap-3 sm:grid-cols-2'>
+        {/* 4-0 Auto */}
+        <div className='relative overflow-hidden rounded-2xl border border-[#4CAF50]/20 bg-[#4CAF50]/[0.04] p-6 text-center'>
+          <div className='mb-2 text-3xl'>👑</div>
+          <div className='text-lg font-bold text-[#4CAF50]'>자동 진출</div>
+          <div className='my-2 font-mono text-3xl font-extrabold text-[#4CAF50]'>
+            4-0
+          </div>
+          <div className='text-sm break-keep text-white/55'>
+            4승 0패 달성자는
+            <br />
+            자동으로 결선 진출이 확정됩니다
+          </div>
+        </div>
+        {/* 3-1 Playoff */}
+        <div className='relative overflow-hidden rounded-2xl border border-[#F5A623]/20 bg-[#F5A623]/[0.04] p-6 text-center'>
+          <div className='mb-2 text-3xl'>⚔️</div>
+          <div className='text-lg font-bold text-[#F5A623]'>진출자 선발전</div>
+          <div className='my-2 font-mono text-3xl font-extrabold text-[#F5A623]'>
+            3-1
+          </div>
+          <div className='text-sm break-keep text-white/55'>
+            3승 1패 참가자 전원 대상
+            <br />
+            스코어 어택으로 1명 추가 진출
+          </div>
+        </div>
+      </div>
+
+      {/* Decider details */}
+      <div className='rounded-2xl border border-white/10 bg-white/[0.03] p-5'>
+        <div className='mb-1 text-sm font-bold text-white/80'>
+          진출자 선발전 상세
+        </div>
+        <div className='mb-4 text-xs text-white/40'>
+          3-1 기록자 전원 대상 스코어 어택
+        </div>
+
+        <div className='relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] p-5 text-center'>
+          <div className='absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-[#b275f0] to-[#3B8BE6]' />
+          <div className='text-xs tracking-widest text-white/40 uppercase'>
+            과제곡
+          </div>
+          <div className='my-2 text-xl font-extrabold text-white/90'>
+            {ARCADE_SONGS.decider31.title}
+          </div>
+          <div className='inline-flex items-center gap-2 text-sm text-white/50'>
+            <span>귀신(오니)</span>
+            <span className='rounded bg-[#F5A623] px-2 py-0.5 text-xs font-bold text-white'>
+              ★{ARCADE_SONGS.decider31.level}
+            </span>
+          </div>
+          <div className='mt-3.5 rounded-lg border border-[#F5A623]/15 bg-[#F5A623]/[0.04] px-4 py-2.5 text-sm break-keep text-white/55'>
+            과제곡은 사전에 비공개 · 각 1회 플레이 · 최고점 1명이 추가 진출
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ================================================================== */
+/*  (16) SeedingSection — 시드 산정                                     */
+/* ================================================================== */
+
+function SeedingSection() {
+  return (
+    <div className='space-y-5'>
+      <div className='relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-center'>
+        <div className='absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-[#b275f0] to-[#3B8BE6]' />
+        <div className='text-xs tracking-widest text-white/40 uppercase'>
+          시드 산정 과제곡
+        </div>
+        <div className='my-2 text-xl font-extrabold text-white/90'>
+          {ARCADE_SONGS.seeding.title}
+        </div>
+        <div className='inline-flex items-center gap-2 text-sm text-white/50'>
+          <span>귀신(오니)</span>
+          <span className='rounded bg-[#b275f0] px-2 py-0.5 text-xs font-bold text-white'>
+            ★{ARCADE_SONGS.seeding.level}
+          </span>
+        </div>
+        <div className='mt-3.5 rounded-lg border border-[#b275f0]/15 bg-[#b275f0]/[0.04] px-4 py-2.5 text-sm break-keep text-white/55'>
+          이 단계에서는 승패로 탈락/우승을 결정하지 않으며, 순수하게 시드 산정용
+          기록으로만 활용됩니다.
+        </div>
+      </div>
+
+      <SNote>
+        시드 과제곡은 사전에 비공개이며, 진출 확정 후 현장에서 각 1회
+        플레이합니다.
+      </SNote>
+    </div>
+  )
+}
+
+/* ================================================================== */
+/*  (17) FinalsStructure — 결선 구조 테이블                             */
 /* ================================================================== */
 
 const FINALS_ROUNDS = [
@@ -1012,60 +1424,72 @@ function ArcadePage() {
         <TabsContent value='offline'>
           <div className='space-y-12 md:space-y-16'>
             <p className='text-base leading-relaxed break-keep text-white/60'>
-              스위스 시스템 4라운드로 진행됩니다. 각 매치는 양측이 1곡씩
-              제공하여 2곡 합산으로 승패를 결정하며, 2패 시 탈락합니다.
+              전국 4개 지역 오프라인 예선을 거쳐, 총 8명이 최종 결선에
+              진출합니다. 2패 탈락 스위스 시스템의 모든 것을 안내합니다.
             </p>
 
-            <Section
-              num='01'
-              title='1경기 = 2곡 합산'
-              subtitle='Match = 2-Song Aggregate'
-            >
-              <p className='mb-4 text-base leading-relaxed break-keep text-white/60'>
-                한 매치에서 나와 상대가 각각 1곡씩 제공합니다. 두 곡 모두 양쪽이
-                플레이한 뒤, 2곡 점수 합산으로 승패가 결정됩니다.
-              </p>
-              <MatchVisual />
-              <SNote>
-                선곡은 대회 신청 시 R1~R4 각 라운드별로 미리 제출해야 합니다.
-                해당 라운드에 배정되면 사전 제출한 곡이 그대로 사용됩니다.
-              </SNote>
+            <Section num='01' title='개요' subtitle='Overview'>
+              <OfflineOverview />
             </Section>
 
             <Section
               num='02'
-              title='스위스 라운드'
-              subtitle='Swiss Round Progression'
+              title='스위스 스테이지'
+              subtitle='Swiss Stage — Double Elimination'
             >
               <p className='mb-4 text-base leading-relaxed break-keep text-white/60'>
-                매 라운드마다 같은 전적의 선수끼리 매칭됩니다. 1라운드는 온라인
-                순위 시드로, 2라운드부터는 전적 그룹 내에서 매칭됩니다.
+                같은 전적의 참가자끼리 매칭하는 스위스 시스템으로 최대 4라운드를
+                진행합니다.
               </p>
-              <SeedingMatchTable />
-              <SwissVisual />
-              <SNote>
-                2패가 누적되면 즉시 탈락하며, 이후 라운드에 배정되지 않습니다.
-                홀수 인원이 발생하면 남는 1명에게 부전승(Bye)이 부여됩니다.
-              </SNote>
+              <SwissStageSection />
             </Section>
 
-            <Section num='03' title='진출 조건' subtitle='Qualification Path'>
+            <Section
+              num='03'
+              title='1경기(매치) 규칙: 2곡 합산'
+              subtitle='Match Rules — 2-Song Aggregate'
+            >
               <p className='mb-4 text-base leading-relaxed break-keep text-white/60'>
-                각 예선에서 2명이 Top 8 결선에 진출합니다. 진출 방식은 아래 두
-                가지입니다.
+                각 선수가 1곡씩 제공하여, 총 2곡의 점수를 합산해 승패를
+                결정합니다.
               </p>
-              <QualificationPath />
+              <MatchRulesSection />
             </Section>
 
             <Section
               num='04'
-              title='추가 규칙'
-              subtitle='Side & Tiebreak Rules'
+              title='사이드(자리) 규칙'
+              subtitle='Side Selection Rules'
             >
               <p className='mb-4 text-base leading-relaxed break-keep text-white/60'>
-                사이드(1P/2P) 선택권과 동점 시 처리 방식입니다.
+                곡 제공자가 원하는 사이드를 선택할 수 있습니다.
               </p>
-              <SideAndTiebreakRules />
+              <SideRulesSection />
+            </Section>
+
+            <Section num='05' title='동점 처리' subtitle='Tiebreak'>
+              <p className='mb-4 text-base leading-relaxed break-keep text-white/60'>
+                2곡 합산 점수가 동점일 경우, 다음 절차로 처리합니다.
+              </p>
+              <TiebreakSection />
+            </Section>
+
+            <Section num='06' title='진출자 선발' subtitle='Advancement'>
+              <p className='mb-4 text-base leading-relaxed break-keep text-white/60'>
+                각 예선에서 총 2명이 진출합니다. 자동 진출 1명 + 선발전 1명.
+              </p>
+              <AdvancementSection />
+            </Section>
+
+            <Section
+              num='07'
+              title='결선(Top 8) 시드 산정'
+              subtitle='Finals Seeding'
+            >
+              <p className='mb-4 text-base leading-relaxed break-keep text-white/60'>
+                각 지역 진출자 2명이 시드 산정용 과제곡을 플레이합니다.
+              </p>
+              <SeedingSection />
             </Section>
           </div>
         </TabsContent>
