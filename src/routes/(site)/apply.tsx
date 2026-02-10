@@ -8,25 +8,13 @@ import { t } from '@/text'
 import { ChevronDown, Download } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRegister, useSite, useSongPools } from '@/lib/api'
-import { Button } from '@/components/ui/button'
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import {
   Select,
   SelectContent,
@@ -34,8 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { GlassCard } from '@/components/tkc/glass-card'
-import { PageHero, TkcSection } from '@/components/tkc/layout'
+import { FadeIn } from '@/components/tkc/guide-shared'
 
 declare global {
   interface Window {
@@ -95,8 +82,6 @@ type RegisterPayload = {
   privacyAgree: boolean
 }
 
-const LABEL_CONSOLE = t('nav.console')
-const LABEL_ARCADE = t('nav.arcade')
 const LABEL_CLOSED = t('apply.closed')
 
 const REGIONS = [
@@ -232,6 +217,63 @@ const defaultValues: ApplyFormValues = {
   privacyAgree: false,
 }
 
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Styled field components                                           */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function FieldLabel({
+  children,
+  required,
+}: {
+  children: React.ReactNode
+  required?: boolean
+}) {
+  return (
+    <div className='mb-1.5 text-[14px] font-semibold text-white/90'>
+      {children}
+      {required && (
+        <span className='ml-1.5 text-[11px] font-bold text-[#e86e3a]'>*</span>
+      )}
+    </div>
+  )
+}
+
+function FieldHint({ children }: { children: React.ReactNode }) {
+  return (
+    <div className='mt-1.5 text-[13px] leading-[1.5] text-white/40'>
+      {children}
+    </div>
+  )
+}
+
+function SectionDivider() {
+  return <div className='my-7 h-px bg-[#1e1e1e]' />
+}
+
+function SectionLabel({
+  title,
+  desc,
+}: {
+  title: string
+  desc?: string
+}) {
+  return (
+    <div className='mb-5'>
+      <div className='text-[18px] font-bold text-white/90'>{title}</div>
+      {desc && (
+        <div className='mt-1 text-[14px] text-white/40'>{desc}</div>
+      )}
+    </div>
+  )
+}
+
+const inputClass =
+  'w-full rounded-[10px] border border-[#1e1e1e] bg-[#0e0e0e] px-4 py-3.5 text-[15px] text-white/90 outline-none transition-[border-color,box-shadow] placeholder:text-white/25 focus:border-[#e86e3a]/40 focus:shadow-[0_0_0_3px_rgba(232,110,58,0.08)] disabled:cursor-not-allowed disabled:opacity-50'
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Main page                                                          */
+/* ════════════════════════════════════════════════════════════════════ */
+
 function ApplyPage() {
   const { data, isError } = useSite<SiteData>()
   const { data: poolsData } = useSongPools<SongPoolsData>()
@@ -255,6 +297,9 @@ function ApplyPage() {
   )
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || undefined
 
+  const [privacyOpen, setPrivacyOpen] = React.useState(false)
+  const [videoGuideOpen, setVideoGuideOpen] = React.useState(false)
+
   const form = useForm<ApplyFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -276,7 +321,6 @@ function ApplyPage() {
   const submitError = registerMutation.error ? t('apply.submitFailed') : null
   const turnstileFieldError = form.formState.errors.turnstileToken?.message
 
-  // Get available songs for each selector, filtering out songs with the same title already selected
   const getAvailableSongs = (currentIndex: number) => {
     const selected = [offlineSong1, offlineSong2, offlineSong3, offlineSong4]
     const currentValue = selected[currentIndex]
@@ -407,488 +451,776 @@ function ApplyPage() {
     )
   }
 
+  /* ── step indicators ── */
+  const STEPS = [
+    { num: '01', label: '참가 정보' },
+    { num: '02', label: isConsole ? '영상 제출' : '예선 정보' },
+    { num: '03', label: '동의 및 확인' },
+  ]
+
   return (
-    <TkcSection>
-      <PageHero badge='REGISTRATION' title={t('apply.title')} subtitle={t('apply.subtitle')} />
+    <div className='mx-auto max-w-[720px] px-4 md:px-6'>
+      {/* ── Hero ── */}
+      <section className='relative overflow-hidden pt-12 pb-8 sm:pt-16 sm:pb-10 md:pt-24 md:pb-14'>
+        <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(232,110,58,0.15)_0%,transparent_70%)]' />
+        <div className='relative'>
+          <FadeIn>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e86e3a]/20 bg-[#e86e3a]/[0.08] px-3.5 py-1.5 font-mono text-[12px] font-semibold tracking-[1.5px] text-[#e86e3a]'>
+              <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a]' />
+              REGISTRATION
+            </div>
+          </FadeIn>
+          <FadeIn delay={100}>
+            <h1 className='text-[clamp(36px,6vw,52px)] leading-[1.1] font-extrabold tracking-tight'>
+              <span className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'>
+                {t('apply.title')}
+              </span>
+            </h1>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <p className='mt-3 text-[18px] font-light text-white/55'>
+              TKC 2026 참가 신청
+            </p>
+          </FadeIn>
+        </div>
+      </section>
 
       {isError && (
-        <p className='text-sm text-destructive'>{t('apply.failedStatus')}</p>
+        <p className='mb-4 text-sm text-[#e86e3a]'>{t('apply.failedStatus')}</p>
       )}
 
-      <GlassCard>
-        <CardHeader className='p-5 md:p-7'>
-          <CardTitle className='text-xl text-white md:text-2xl'>
-            {t('apply.formTitle')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className='p-5 pt-0 md:p-7 md:pt-0'>
+      {/* ── Form Card ── */}
+      <FadeIn delay={300}>
+        <div className='mb-10 overflow-hidden rounded-[20px] border border-[#1e1e1e] bg-[#111]'>
+          {/* Step indicator */}
+          <div className='flex border-b border-[#1e1e1e]'>
+            {STEPS.map((step, i) => (
+              <div
+                key={step.num}
+                className={`relative flex-1 py-4 text-center text-[14px] font-semibold ${
+                  i < STEPS.length - 1 ? 'border-r border-[#1e1e1e]' : ''
+                } text-white/90`}
+              >
+                <span className='mr-1.5 font-mono text-[11px] font-semibold text-[#e86e3a]'>
+                  {step.num}
+                </span>
+                {step.label}
+              </div>
+            ))}
+          </div>
+
+          {/* Form body */}
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-              {/* Honeypot field (should remain empty). */}
-              <input
-                type='text'
-                tabIndex={-1}
-                autoComplete='off'
-                className='sr-only'
-                aria-hidden='true'
-                {...form.register('website')}
-              />
-              {turnstileSiteKey ? (
-                <div className='space-y-2'>
-                  <div ref={turnstileRef} />
-                  {turnstileError ? (
-                    <p className='text-xs text-destructive'>{turnstileError}</p>
-                  ) : null}
-                  {turnstileFieldError ? (
-                    <p className='text-xs text-destructive'>
-                      {turnstileFieldError}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-              <fieldset disabled={isDisabled} className='space-y-6'>
-                {/* ── Division ── */}
-                <FormField
-                  control={form.control}
-                  name='division'
-                  render={({ field }) => (
-                    <FormItem className='space-y-3'>
-                      <FormLabel>{t('apply.field.division')}</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className='grid gap-3 md:grid-cols-2'
-                        >
-                          <FormItem className='flex items-center gap-2 rounded-md border p-3'>
-                            <FormControl>
-                              <RadioGroupItem value='console' />
-                            </FormControl>
-                            <FormLabel className='font-normal'>
-                              {LABEL_CONSOLE}
-                            </FormLabel>
-                          </FormItem>
-                          <FormItem className='flex items-center gap-2 rounded-md border p-3'>
-                            <FormControl>
-                              <RadioGroupItem value='arcade' />
-                            </FormControl>
-                            <FormLabel className='font-normal'>
-                              {LABEL_ARCADE}
-                            </FormLabel>
-                          </FormItem>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage className='text-xs text-white/60' />
-                    </FormItem>
-                  )}
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className='p-7 sm:p-9'>
+                {/* Honeypot */}
+                <input
+                  type='text'
+                  tabIndex={-1}
+                  autoComplete='off'
+                  className='sr-only'
+                  aria-hidden='true'
+                  {...form.register('website')}
                 />
 
-                {/* ── Common Fields ── */}
-                <div className='grid gap-4 md:grid-cols-2'>
-                  <FormField
-                    control={form.control}
-                    name='name'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('apply.field.name')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder={t('apply.placeholder.name')}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className='text-xs text-white/60' />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='nickname'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('apply.field.nickname')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder={t('apply.placeholder.nickname')}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className='text-xs text-white/60' />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className='grid gap-4 md:grid-cols-2'>
-                  <FormField
-                    control={form.control}
-                    name='phone'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('apply.field.phone')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='tel'
-                            inputMode='tel'
-                            autoComplete='tel'
-                            placeholder={t('apply.placeholder.phone')}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className='text-xs text-white/60' />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='email'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('apply.field.email')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='email'
-                            autoComplete='email'
-                            placeholder={t('apply.placeholder.email')}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className='text-xs text-white/60' />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name='namcoId'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('apply.field.namcoId')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          autoComplete='off'
-                          placeholder={t('apply.placeholder.namcoId')}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className='text-xs text-white/60' />
-                    </FormItem>
-                  )}
-                />
-
-                {/* ── Console Only: Video Link ── */}
-                {isConsole && (
-                  <div className='space-y-3'>
-                    <FormField
-                      control={form.control}
-                      name='videoLink'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('apply.field.videoLink')}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type='url'
-                              placeholder={t('apply.placeholder.videoLink')}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormDescription className='text-xs text-white/60'>
-                            {t('apply.field.videoLinkHelp')}
-                          </FormDescription>
-                          <FormMessage className='text-xs text-white/60' />
-                        </FormItem>
-                      )}
-                    />
-                    <Collapsible>
-                      <CollapsibleTrigger className='flex items-center gap-1 text-xs text-white/50 hover:text-white/80'>
-                        <ChevronDown className='size-3.5' />
-                        {t('apply.field.videoLinkGuideTitle')}
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className='mt-2 rounded-lg border border-white/10 bg-white/5 p-3'>
-                        <p className='text-xs leading-relaxed whitespace-pre-line text-white/60'>
-                          {t('apply.field.videoLinkGuide')}
-                        </p>
-                      </CollapsibleContent>
-                    </Collapsible>
+                {/* Turnstile */}
+                {turnstileSiteKey ? (
+                  <div className='mb-6 space-y-2'>
+                    <div ref={turnstileRef} />
+                    {turnstileError ? (
+                      <p className='text-xs text-[#e86e3a]'>{turnstileError}</p>
+                    ) : null}
+                    {turnstileFieldError ? (
+                      <p className='text-xs text-[#e86e3a]'>
+                        {turnstileFieldError}
+                      </p>
+                    ) : null}
                   </div>
-                )}
+                ) : null}
 
-                {/* ── Arcade Only ── */}
-                {isArcade && (
-                  <>
+                <fieldset disabled={isDisabled} className='space-y-0'>
+                  {/* ═══ SECTION 1: 부문 선택 ═══ */}
+                  <SectionLabel
+                    title='부문 선택'
+                    desc='참가할 부문을 선택해 주세요.'
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='division'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className='grid grid-cols-2 gap-2.5 sm:gap-3'>
+                            {(
+                              [
+                                {
+                                  value: 'console' as const,
+                                  label: '콘솔',
+                                  sub: '태고 마스터 페스티벌',
+                                },
+                                {
+                                  value: 'arcade' as const,
+                                  label: '아케이드',
+                                  sub: '니지이로 ver.',
+                                },
+                              ] as const
+                            ).map((opt) => {
+                              const active = field.value === opt.value
+                              return (
+                                <label
+                                  key={opt.value}
+                                  className={`flex cursor-pointer items-center gap-3 rounded-[10px] border p-3.5 transition-all sm:p-4 ${
+                                    active
+                                      ? 'border-[#e86e3a] bg-[#e86e3a]/[0.04]'
+                                      : 'border-[#1e1e1e] bg-[#0e0e0e] hover:border-[#2a2a2a]'
+                                  }`}
+                                >
+                                  <input
+                                    type='radio'
+                                    className='sr-only'
+                                    name='division'
+                                    value={opt.value}
+                                    checked={active}
+                                    onChange={() => field.onChange(opt.value)}
+                                  />
+                                  <span
+                                    className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                                      active
+                                        ? 'border-[#e86e3a]'
+                                        : 'border-[#2a2a2a]'
+                                    }`}
+                                  >
+                                    {active && (
+                                      <span className='size-2 rounded-full bg-[#e86e3a]' />
+                                    )}
+                                  </span>
+                                  <div>
+                                    <div className='text-[15px] font-semibold text-white/90'>
+                                      {opt.label}
+                                    </div>
+                                    <div className='text-[12px] text-white/40'>
+                                      {opt.sub}
+                                    </div>
+                                  </div>
+                                </label>
+                              )
+                            })}
+                          </div>
+                        </FormControl>
+                        <FormMessage className='mt-2 text-xs text-[#e86e3a]' />
+                      </FormItem>
+                    )}
+                  />
+
+                  <SectionDivider />
+
+                  {/* ═══ SECTION 1b: 참가자 정보 ═══ */}
+                  <SectionLabel
+                    title='참가자 정보'
+                    desc='정확한 정보를 입력해 주세요.'
+                  />
+
+                  <div className='space-y-4'>
+                    {/* Name + Nickname */}
+                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+                      <FormField
+                        control={form.control}
+                        name='name'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FieldLabel required>{t('apply.field.name')}</FieldLabel>
+                            <FormControl>
+                              <input
+                                className={inputClass}
+                                placeholder={t('apply.placeholder.name')}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='nickname'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FieldLabel required>{t('apply.field.nickname')}</FieldLabel>
+                            <FormControl>
+                              <input
+                                className={inputClass}
+                                placeholder={t('apply.placeholder.nickname')}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Phone + Email */}
+                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+                      <FormField
+                        control={form.control}
+                        name='phone'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FieldLabel required>{t('apply.field.phone')}</FieldLabel>
+                            <FormControl>
+                              <input
+                                type='tel'
+                                inputMode='tel'
+                                autoComplete='tel'
+                                className={inputClass}
+                                placeholder={t('apply.placeholder.phone')}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='email'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FieldLabel required>{t('apply.field.email')}</FieldLabel>
+                            <FormControl>
+                              <input
+                                type='email'
+                                autoComplete='email'
+                                className={inputClass}
+                                placeholder={t('apply.placeholder.email')}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Namco ID */}
                     <FormField
                       control={form.control}
-                      name='dohirobaNo'
+                      name='namcoId'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('apply.field.dohirobaNo')}</FormLabel>
+                          <FieldLabel required>{t('apply.field.namcoId')}</FieldLabel>
                           <FormControl>
-                            <Input
-                              inputMode='numeric'
+                            <input
                               autoComplete='off'
-                              placeholder={t('apply.placeholder.dohirobaNo')}
+                              className={inputClass}
+                              placeholder={t('apply.placeholder.namcoId')}
                               {...field}
                             />
                           </FormControl>
-                          <FormMessage className='text-xs text-white/60' />
+                          <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
                         </FormItem>
                       )}
                     />
+                  </div>
 
-                    <FormField
-                      control={form.control}
-                      name='qualifierRegion'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {t('apply.field.qualifierRegion')}
-                          </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
+                  <SectionDivider />
+
+                  {/* ═══ SECTION 2: Console → Video / Arcade → Songs ═══ */}
+                  {isConsole && (
+                    <>
+                      <SectionLabel
+                        title='동영상 링크'
+                        desc='본인의 플레이 영상을 유튜브에 일부공개로 업로드하고 링크를 입력해 주세요.'
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name='videoLink'
+                        render={({ field }) => (
+                          <FormItem>
                             <FormControl>
-                              <SelectTrigger className='w-full'>
-                                <SelectValue
-                                  placeholder={t(
-                                    'apply.validation.qualifierRegionRequired'
+                              <input
+                                type='url'
+                                className={inputClass}
+                                placeholder={t('apply.placeholder.videoLink')}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FieldHint>
+                              <button
+                                type='button'
+                                onClick={() => setVideoGuideOpen(!videoGuideOpen)}
+                                className='inline-flex items-center gap-1 text-[#e86e3a]/70 transition-colors hover:text-[#e86e3a]'
+                              >
+                                <ChevronDown
+                                  className={`size-3.5 transition-transform ${videoGuideOpen ? 'rotate-180' : ''}`}
+                                />
+                                {t('apply.field.videoLinkGuideTitle')}
+                              </button>
+                            </FieldHint>
+                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                          </FormItem>
+                        )}
+                      />
+
+                      {videoGuideOpen && (
+                        <div className='mt-3 rounded-[10px] border border-[#1e1e1e] bg-[#0e0e0e] p-4'>
+                          <p className='text-[13px] leading-[1.7] whitespace-pre-line text-white/40'>
+                            {t('apply.field.videoLinkGuide')}
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {isArcade && (
+                    <>
+                      <SectionLabel
+                        title='아케이드 예선 정보'
+                        desc='북번호, 예선 지역, 오프라인 예선곡을 입력해 주세요.'
+                      />
+
+                      <div className='space-y-4'>
+                        <FormField
+                          control={form.control}
+                          name='dohirobaNo'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FieldLabel required>
+                                {t('apply.field.dohirobaNo')}
+                              </FieldLabel>
+                              <FormControl>
+                                <input
+                                  inputMode='numeric'
+                                  autoComplete='off'
+                                  className={inputClass}
+                                  placeholder={t('apply.placeholder.dohirobaNo')}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name='qualifierRegion'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FieldLabel required>
+                                {t('apply.field.qualifierRegion')}
+                              </FieldLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className={`${inputClass} flex items-center justify-between`}>
+                                    <SelectValue
+                                      placeholder={t(
+                                        'apply.validation.qualifierRegionRequired'
+                                      )}
+                                    />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {REGIONS.map((r) => (
+                                    <SelectItem key={r.value} value={r.value}>
+                                      {r.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Offline songs */}
+                        <div>
+                          <FieldLabel required>
+                            {t('apply.field.offlineSongs')}
+                          </FieldLabel>
+                          <FieldHint>
+                            {t('apply.field.offlineSongsHelp')}
+                          </FieldHint>
+                          {songPool.length === 0 ? (
+                            <p className='mt-3 text-xs text-white/40'>
+                              {t('apply.songPoolEmpty')}
+                            </p>
+                          ) : (
+                            <div className='mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2'>
+                              {(
+                                [
+                                  'offlineSong1',
+                                  'offlineSong2',
+                                  'offlineSong3',
+                                  'offlineSong4',
+                                ] as const
+                              ).map((fieldName, index) => (
+                                <FormField
+                                  key={fieldName}
+                                  control={form.control}
+                                  name={fieldName}
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <div className='mb-1 text-[12px] font-medium text-white/50'>
+                                        {t('apply.field.offlineSongLabel')}{' '}
+                                        {index + 1}
+                                      </div>
+                                      <Select
+                                        onValueChange={field.onChange}
+                                        value={field.value}
+                                      >
+                                        <FormControl>
+                                          <SelectTrigger className={`${inputClass} flex items-center justify-between`}>
+                                            <SelectValue
+                                              placeholder={t(
+                                                'apply.field.offlineSongPlaceholder'
+                                              )}
+                                            />
+                                          </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                          {getAvailableSongs(index).map(
+                                            (song) => (
+                                              <SelectItem
+                                                key={song}
+                                                value={song}
+                                              >
+                                                {parseSongOption(song)?.label ??
+                                                  song}
+                                              </SelectItem>
+                                            )
+                                          )}
+                                        </SelectContent>
+                                      </Select>
+                                      <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                                    </FormItem>
                                   )}
                                 />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {REGIONS.map((r) => (
-                                <SelectItem key={r.value} value={r.value}>
-                                  {r.label}
-                                </SelectItem>
                               ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage className='text-xs text-white/60' />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <SectionDivider />
+
+                  {/* ═══ SECTION 3: 확인 및 동의 ═══ */}
+                  <SectionLabel
+                    title='확인 및 동의'
+                    desc='아래 항목을 확인하고 동의해 주세요.'
+                  />
+
+                  <div className='space-y-2.5'>
+                    {/* Spectator */}
+                    <FormField
+                      control={form.control}
+                      name='spectator'
+                      render={({ field }) => (
+                        <FormItem>
+                          <label
+                            className={`flex cursor-pointer items-start gap-3.5 rounded-xl border p-4 transition-all sm:p-5 ${
+                              field.value
+                                ? 'border-[#e86e3a] bg-[#e86e3a]/[0.03]'
+                                : 'border-[#1e1e1e] bg-[#0e0e0e] hover:border-[#2a2a2a]'
+                            }`}
+                          >
+                            <FormControl>
+                              <input
+                                type='checkbox'
+                                className='sr-only'
+                                checked={field.value}
+                                onChange={(e) =>
+                                  field.onChange(e.target.checked)
+                                }
+                              />
+                            </FormControl>
+                            <span
+                              className={`mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+                                field.value
+                                  ? 'border-[#e86e3a] bg-[#e86e3a]'
+                                  : 'border-[#2a2a2a]'
+                              }`}
+                            >
+                              {field.value && (
+                                <svg
+                                  viewBox='0 0 24 24'
+                                  fill='none'
+                                  stroke='#fff'
+                                  strokeWidth={3}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='size-3'
+                                >
+                                  <polyline points='20 6 9 17 4 12' />
+                                </svg>
+                              )}
+                            </span>
+                            <div>
+                              <div className='text-[15px] font-semibold text-white/90'>
+                                {t('apply.field.spectator')}
+                              </div>
+                              <div className='mt-0.5 text-[13px] leading-[1.5] text-white/40'>
+                                {t('apply.field.spectatorHelp')}
+                              </div>
+                            </div>
+                          </label>
                         </FormItem>
                       )}
                     />
 
-                    {/* Offline Song Selection */}
-                    <div className='space-y-3'>
-                      <FormLabel>{t('apply.field.offlineSongs')}</FormLabel>
-                      <FormDescription className='text-xs text-white/60'>
-                        {t('apply.field.offlineSongsHelp')}
-                      </FormDescription>
-                      {songPool.length === 0 ? (
-                        <p className='text-xs text-white/40'>
-                          {t('apply.songPoolEmpty')}
-                        </p>
-                      ) : (
-                        <div className='grid gap-3 md:grid-cols-2'>
-                          {(
-                            [
-                              'offlineSong1',
-                              'offlineSong2',
-                              'offlineSong3',
-                              'offlineSong4',
-                            ] as const
-                          ).map((fieldName, index) => (
-                            <FormField
-                              key={fieldName}
-                              control={form.control}
-                              name={fieldName}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel className='text-xs text-white/70'>
-                                    {t('apply.field.offlineSongLabel')}{' '}
-                                    {index + 1}
-                                  </FormLabel>
-                                  <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value}
-                                  >
-                                    <FormControl>
-                                      <SelectTrigger className='w-full'>
-                                        <SelectValue
-                                          placeholder={t(
-                                            'apply.field.offlineSongPlaceholder'
-                                          )}
-                                        />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      {getAvailableSongs(index).map((song) => (
-                                        <SelectItem key={song} value={song}>
-                                          {parseSongOption(song)?.label ?? song}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  <FormMessage className='text-xs text-white/60' />
-                                </FormItem>
+                    {/* Minor */}
+                    <FormField
+                      control={form.control}
+                      name='isMinor'
+                      render={({ field }) => (
+                        <FormItem>
+                          <label
+                            className={`flex cursor-pointer items-start gap-3.5 rounded-xl border p-4 transition-all sm:p-5 ${
+                              field.value
+                                ? 'border-[#e86e3a] bg-[#e86e3a]/[0.03]'
+                                : 'border-[#1e1e1e] bg-[#0e0e0e] hover:border-[#2a2a2a]'
+                            }`}
+                          >
+                            <FormControl>
+                              <input
+                                type='checkbox'
+                                className='sr-only'
+                                checked={field.value}
+                                onChange={(e) =>
+                                  field.onChange(e.target.checked)
+                                }
+                              />
+                            </FormControl>
+                            <span
+                              className={`mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+                                field.value
+                                  ? 'border-[#e86e3a] bg-[#e86e3a]'
+                                  : 'border-[#2a2a2a]'
+                              }`}
+                            >
+                              {field.value && (
+                                <svg
+                                  viewBox='0 0 24 24'
+                                  fill='none'
+                                  stroke='#fff'
+                                  strokeWidth={3}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='size-3'
+                                >
+                                  <polyline points='20 6 9 17 4 12' />
+                                </svg>
                               )}
-                            />
-                          ))}
-                        </div>
+                            </span>
+                            <div>
+                              <div className='text-[15px] font-semibold text-white/90'>
+                                {t('apply.field.isMinor')}
+                              </div>
+                              <div className='mt-0.5 text-[13px] leading-[1.5] text-white/40'>
+                                {t('apply.field.isMinorHelp')}
+                              </div>
+                            </div>
+                          </label>
+                        </FormItem>
                       )}
-                    </div>
-                  </>
-                )}
+                    />
 
-                {/* ── Common Checkboxes ── */}
-                <div className='space-y-4'>
-                  {/* Spectator */}
-                  <FormField
-                    control={form.control}
-                    name='spectator'
-                    render={({ field }) => (
-                      <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className='mt-0.5 size-5'
-                          />
-                        </FormControl>
-                        <div className='space-y-1 leading-none'>
-                          <FormLabel className='text-base'>
-                            {t('apply.field.spectator')}
-                          </FormLabel>
-                          <FormDescription className='text-xs text-white/60'>
-                            {t('apply.field.spectatorHelp')}
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Minor */}
-                  <FormField
-                    control={form.control}
-                    name='isMinor'
-                    render={({ field }) => (
-                      <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className='mt-0.5 size-5'
-                          />
-                        </FormControl>
-                        <div className='space-y-1 leading-none'>
-                          <FormLabel className='text-base'>
-                            {t('apply.field.isMinor')}
-                          </FormLabel>
-                          <FormDescription className='text-xs text-white/60'>
-                            {t('apply.field.isMinorHelp')}
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Privacy */}
-                  <div className='space-y-3'>
+                    {/* Privacy */}
                     <FormField
                       control={form.control}
                       name='privacyAgree'
                       render={({ field }) => (
-                        <FormItem className='flex items-start gap-4 rounded-lg border p-4 sm:p-5'>
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              className='mt-0.5 size-5'
-                            />
-                          </FormControl>
-                          <div className='space-y-1 leading-none'>
-                            <FormLabel className='text-base'>
-                              {t('apply.field.privacy')}
-                            </FormLabel>
-                            <FormDescription className='text-xs text-white/60'>
-                              {t('apply.field.privacyHelp')}
-                            </FormDescription>
-                          </div>
-                          <FormMessage className='text-xs text-white/60' />
-                        </FormItem>
-                      )}
-                    />
-                    <Collapsible>
-                      <CollapsibleTrigger className='flex items-center gap-1 text-xs text-white/50 hover:text-white/80'>
-                        <ChevronDown className='size-3.5' />
-                        개인정보 수집 및 이용 세부사항
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className='mt-2 rounded-lg border border-white/10 bg-white/5 p-3'>
-                        <p className='text-xs leading-relaxed whitespace-pre-line text-white/60'>
-                          {t('apply.field.privacyDetail')}
-                        </p>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </div>
-                </div>
-
-                {/* Minor consent section */}
-                {isMinor && (
-                  <div className='space-y-3 rounded-lg border border-white/10 bg-white/5 p-4'>
-                    <p className='text-sm font-medium text-white/90'>
-                      {t('apply.field.consentLink')}
-                    </p>
-                    <a
-                      href={CONSENT_PDF_URL}
-                      download
-                      className='inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/10'
-                    >
-                      <Download className='size-4' />
-                      {t('apply.field.consentDownload')}
-                    </a>
-                    <FormField
-                      control={form.control}
-                      name='consentLink'
-                      render={({ field }) => (
                         <FormItem>
-                          <FormControl>
-                            <Input
-                              placeholder={t('apply.placeholder.consentLink')}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormDescription className='text-xs text-white/60'>
-                            {t('apply.field.consentLinkHelp')}
-                          </FormDescription>
-                          <FormMessage className='text-xs text-white/60' />
+                          <label
+                            className={`flex cursor-pointer items-start gap-3.5 rounded-xl border p-4 transition-all sm:p-5 ${
+                              field.value
+                                ? 'border-[#e86e3a] bg-[#e86e3a]/[0.03]'
+                                : 'border-[#1e1e1e] bg-[#0e0e0e] hover:border-[#2a2a2a]'
+                            }`}
+                          >
+                            <FormControl>
+                              <input
+                                type='checkbox'
+                                className='sr-only'
+                                checked={field.value}
+                                onChange={(e) =>
+                                  field.onChange(e.target.checked)
+                                }
+                              />
+                            </FormControl>
+                            <span
+                              className={`mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+                                field.value
+                                  ? 'border-[#e86e3a] bg-[#e86e3a]'
+                                  : 'border-[#2a2a2a]'
+                              }`}
+                            >
+                              {field.value && (
+                                <svg
+                                  viewBox='0 0 24 24'
+                                  fill='none'
+                                  stroke='#fff'
+                                  strokeWidth={3}
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  className='size-3'
+                                >
+                                  <polyline points='20 6 9 17 4 12' />
+                                </svg>
+                              )}
+                            </span>
+                            <div className='min-w-0 flex-1'>
+                              <div className='text-[15px] font-semibold text-white/90'>
+                                {t('apply.field.privacy')}{' '}
+                                <span className='text-[11px] font-bold text-[#e86e3a]'>
+                                  *
+                                </span>
+                              </div>
+                              <div className='mt-0.5 text-[13px] text-white/40'>
+                                {t('apply.field.privacyHelp')}
+                              </div>
+
+                              {/* Privacy accordion */}
+                              <div className='mt-2.5 border-t border-[#1e1e1e] pt-2.5'>
+                                <button
+                                  type='button'
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    setPrivacyOpen(!privacyOpen)
+                                  }}
+                                  className='flex items-center gap-1 text-[13px] text-white/40 transition-colors hover:text-white/60'
+                                >
+                                  <ChevronDown
+                                    className={`size-3.5 transition-transform ${privacyOpen ? 'rotate-180' : ''}`}
+                                  />
+                                  개인정보 수집 및 이용 세부사항
+                                </button>
+                                {privacyOpen && (
+                                  <div className='mt-2.5 text-[13px] leading-[1.7] text-white/40'>
+                                    <strong className='text-white/70'>
+                                      수집 항목:
+                                    </strong>{' '}
+                                    이름, 전화번호, 이메일, 남코 아이디, 동더
+                                    네임
+                                    <br />
+                                    <strong className='text-white/70'>
+                                      수집 목적:
+                                    </strong>{' '}
+                                    대회 참가 접수 및 운영, 결과 안내
+                                    <br />
+                                    <strong className='text-white/70'>
+                                      보유 기간:
+                                    </strong>{' '}
+                                    대회 종료 후 3개월
+                                    <br />
+                                    <br />
+                                    동의를 거부할 수 있으나, 거부 시 대회 참가가
+                                    불가합니다.
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </label>
+                          <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
                         </FormItem>
                       )}
                     />
+                  </div>
+
+                  {/* Minor consent section */}
+                  {isMinor && (
+                    <div className='mt-5 space-y-3 rounded-xl border border-[#1e1e1e] bg-[#0e0e0e] p-5'>
+                      <p className='text-[15px] font-semibold text-white/90'>
+                        {t('apply.field.consentLink')}
+                      </p>
+                      <a
+                        href={CONSENT_PDF_URL}
+                        download
+                        className='inline-flex items-center gap-2 rounded-[10px] border border-[#1e1e1e] bg-white/[0.03] px-4 py-2.5 text-[14px] font-medium text-white/70 transition-colors hover:border-[#2a2a2a] hover:bg-white/[0.06]'
+                      >
+                        <Download className='size-4' />
+                        {t('apply.field.consentDownload')}
+                      </a>
+                      <FormField
+                        control={form.control}
+                        name='consentLink'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <input
+                                className={inputClass}
+                                placeholder={t('apply.placeholder.consentLink')}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FieldHint>
+                              {t('apply.field.consentLinkHelp')}
+                            </FieldHint>
+                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                </fieldset>
+
+                {/* Completed banner */}
+                {isCompleted && (
+                  <div className='mt-6 rounded-xl border border-[#4ecb71]/30 bg-[#4ecb71]/[0.06] p-5 text-center'>
+                    <p className='text-[15px] font-bold text-white/90'>
+                      {t('apply.completed')}
+                    </p>
+                    <p className='mt-1 text-[13px] text-white/55'>
+                      {t('apply.receiptId')}
+                    </p>
+                    <p className='mt-2 font-mono text-2xl font-bold break-all text-white/90'>
+                      {receiptId || t('common.none')}
+                    </p>
                   </div>
                 )}
-              </fieldset>
 
-              {submitError && (
-                <p className='text-sm text-destructive'>{submitError}</p>
-              )}
+                {submitError && (
+                  <p className='mt-4 text-sm text-[#e86e3a]'>{submitError}</p>
+                )}
+              </div>
 
-              {isCompleted && (
-                <div className='rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-center sm:text-left'>
-                  <p className='text-sm font-semibold text-white'>
-                    {t('apply.completed')}
-                  </p>
-                  <p className='text-sm text-white/60'>
-                    {t('apply.receiptId')}
-                  </p>
-                  <p className='text-2xl font-semibold break-all sm:text-xl'>
-                    {receiptId || t('common.none')}
-                  </p>
+              {/* Submit bar */}
+              <div className='flex flex-col items-center justify-between gap-4 border-t border-[#1e1e1e] px-7 py-6 sm:flex-row sm:px-9'>
+                <div className='text-[13px] text-white/40'>
+                  <span className='text-[#e86e3a]'>*</span> 표시는 필수 입력
+                  항목입니다.
                 </div>
-              )}
-
-              <Button
-                type='submit'
-                disabled={isDisabled}
-                className='w-full sm:w-auto'
-              >
-                {isSubmitting ? t('apply.submitting') : t('apply.submit')}
-              </Button>
+                <button
+                  type='submit'
+                  disabled={isDisabled}
+                  className='w-full shrink-0 cursor-pointer rounded-[10px] bg-[#e86e3a] px-10 py-3.5 text-[16px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
+                  style={{
+                    boxShadow: '0 4px 24px rgba(232,110,58,0.25)',
+                  }}
+                >
+                  {isSubmitting ? t('apply.submitting') : t('apply.submit')}
+                </button>
+              </div>
             </form>
           </Form>
-        </CardContent>
-      </GlassCard>
-    </TkcSection>
+        </div>
+      </FadeIn>
+
+      {/* ── Footer ── */}
+      <footer className='border-t border-[#1e1e1e] py-10 text-center'>
+        <p className='text-[14px] leading-[1.8] text-white/35'>
+          TKC 2026 — 태고 코리아 챔피언십
+          <br />
+          주최: 타이코랩스 · 협력: BNEK
+        </p>
+      </footer>
+    </div>
   )
 }
