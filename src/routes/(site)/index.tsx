@@ -35,103 +35,99 @@ const DIVISIONS = [
   },
 ]
 
-const SCHEDULE_ITEMS = [
+/* ── Schedule Data ── */
+
+type RangeEvent = {
+  type: 'range'
+  name: string
+  detail: string
+  startDate: string
+  endDate: string
+  division: 'console' | 'arcade'
+}
+type SingleEvent = {
+  type: 'single'
+  name: string
+  fullDate: string
+  venueName: string
+  venueImage?: string
+}
+type DeadlineEvent = {
+  type: 'deadline'
+  name: string
+  detail: string
+  fullDate: string
+}
+type FinalsEvent = {
+  type: 'finals'
+  name: string
+  detail: string
+  fullDate: string
+  venueName: string
+}
+type ScheduleEvent = RangeEvent | SingleEvent | DeadlineEvent | FinalsEvent
+
+const SCHEDULE_MONTHS: {
+  label: string
+  labelEn: string
+  isFinals?: boolean
+  events: ScheduleEvent[]
+}[] = [
   {
-    date: '03.02',
-    fullDate: '2026-03-02',
-    endDate: '2026-04-30',
-    name: '콘솔 예선',
-    division: 'console' as const,
-    tag: 'ONLINE',
-    tagCls: 'bg-[#f5a623]/[0.08] text-[#f5a623]',
-    dotCls: 'bg-[#e86e3a] shadow-[0_0_10px_rgba(232,110,58,0.4)]',
+    label: '3월',
+    labelEn: 'MARCH',
+    events: [
+      { type: 'range', name: '콘솔 예선', detail: '온라인 · 약 2개월간 진행', startDate: '2026-03-02', endDate: '2026-04-30', division: 'console' },
+      { type: 'range', name: '아케이드 온라인 예선', detail: '2주간 진행', startDate: '2026-03-02', endDate: '2026-03-16', division: 'arcade' },
+      { type: 'single', name: '오프라인 예선 → 서울', fullDate: '2026-03-21', venueName: 'TAIKO LABS · 서울', venueImage: '/branding/venue-seoul.png' },
+      { type: 'single', name: '오프라인 예선 → 대전', fullDate: '2026-03-28', venueName: '싸이뮤직 게임월드 · 대전', venueImage: '/branding/venue-daejeon.png' },
+    ],
   },
   {
-    date: '03.02',
-    fullDate: '2026-03-02',
-    endDate: '2026-03-16',
-    name: '아케이드 온라인 예선',
-    division: 'arcade' as const,
-    tag: 'ONLINE',
-    tagCls: 'bg-[#f5a623]/[0.08] text-[#f5a623]',
-    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
+    label: '4월',
+    labelEn: 'APRIL',
+    events: [
+      { type: 'single', name: '오프라인 예선 → 광주', fullDate: '2026-04-04', venueName: '게임플라자 · 광주', venueImage: '/branding/venue-gwangju.png' },
+      { type: 'single', name: '오프라인 예선 → 부산', fullDate: '2026-04-11', venueName: '게임D · 부산', venueImage: '/branding/venue-busan.png' },
+      { type: 'deadline', name: '콘솔 예선 마감', detail: '온라인 예선 제출 종료', fullDate: '2026-04-30' },
+    ],
   },
   {
-    date: '03.21',
-    fullDate: '2026-03-21',
-    name: '오프라인 예선',
-    division: 'arcade' as const,
-    venueName: 'TAIKO LABS · 서울',
-    venueImage: '/branding/venue-seoul.png',
-    tag: 'OFFLINE',
-    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
-    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
-  },
-  {
-    date: '03.28',
-    fullDate: '2026-03-28',
-    name: '오프라인 예선',
-    division: 'arcade' as const,
-    venueName: '싸이뮤직 게임월드 · 대전',
-    venueImage: '/branding/venue-daejeon.png',
-    tag: 'OFFLINE',
-    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
-    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
-  },
-  {
-    date: '04.04',
-    fullDate: '2026-04-04',
-    name: '오프라인 예선',
-    division: 'arcade' as const,
-    venueName: '게임플라자 · 광주',
-    venueImage: '/branding/venue-gwangju.png',
-    tag: 'OFFLINE',
-    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
-    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
-  },
-  {
-    date: '04.11',
-    fullDate: '2026-04-11',
-    name: '오프라인 예선',
-    division: 'arcade' as const,
-    venueName: '게임D · 부산',
-    venueImage: '/branding/venue-busan.png',
-    tag: 'OFFLINE',
-    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
-    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
-  },
-  {
-    date: '05.23',
-    fullDate: '2026-05-23',
-    name: '결선 → PlayX4',
-    division: 'all' as const,
-    sub: '콘솔 · 아케이드 동시 진행',
-    tag: 'FINALS',
-    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
-    dotCls: 'bg-[#e86e3a] shadow-[0_0_10px_rgba(232,110,58,0.4)]',
-    highlight: true as const,
+    label: '5월',
+    labelEn: 'MAY',
+    isFinals: true,
+    events: [
+      { type: 'finals', name: '결선 → PlayX4', detail: '콘솔 · 아케이드 동시 진행', fullDate: '2026-05-23', venueName: '킨텍스 · PlayExpo 2026' },
+    ],
   },
 ]
 
-type ScheduleStatus = '예정' | '진행중' | '종료'
+function getDateProgress(startDate: string, endDate: string) {
+  const start = new Date(startDate + 'T00:00:00')
+  const end = new Date(endDate + 'T23:59:59')
+  const today = new Date()
+  if (today < start) return 0
+  if (today > end) return 100
+  return Math.round(((today.getTime() - start.getTime()) / (end.getTime() - start.getTime())) * 100)
+}
 
-function getScheduleStatus(item: (typeof SCHEDULE_ITEMS)[number]): ScheduleStatus {
+function getEventStatus(fullDate: string, endDate?: string) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const start = new Date(item.fullDate + 'T00:00:00')
-  const end = 'endDate' in item && item.endDate
-    ? new Date(item.endDate + 'T23:59:59')
-    : new Date(item.fullDate + 'T23:59:59')
-
+  const start = new Date(fullDate + 'T00:00:00')
+  const end = endDate ? new Date(endDate + 'T23:59:59') : new Date(fullDate + 'T23:59:59')
   if (today < start) return '예정'
   if (today <= end) return '진행중'
   return '종료'
 }
 
-const STATUS_STYLES: Record<ScheduleStatus, string> = {
-  예정: 'bg-white/[0.06] text-white/60',
-  진행중: 'bg-emerald-500/15 text-emerald-400',
-  종료: 'bg-white/[0.05] text-white/50',
+function fmtDate(d: string) {
+  const date = new Date(d + 'T00:00:00')
+  return `${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
+}
+
+function fmtDay(d: string) {
+  return ['일', '월', '화', '수', '목', '금', '토'][new Date(d + 'T00:00:00').getDay()]
 }
 
 type Partner = {
@@ -408,80 +404,241 @@ function DivisionCard({
 /*  Schedule Strip                                                    */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function ScheduleStrip() {
+function StatusTag({ status }: { status: string }) {
+  const cls =
+    status === '진행중'
+      ? 'bg-emerald-500/15 text-emerald-400'
+      : status === '종료'
+        ? 'bg-white/[0.03] text-white/35'
+        : 'border border-[#1e1e1e] bg-white/[0.03] text-white/45'
   return (
-    <Link
-      to='/schedule'
-      className='tkc-motion-surface block overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'
+    <span
+      className={`rounded-[5px] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider ${cls}`}
     >
-      <div className='divide-y divide-[#1e1e1e]'>
-        {SCHEDULE_ITEMS.map((item) => {
-          const status = getScheduleStatus(item)
-          const isHighlight = 'highlight' in item && item.highlight
-          return (
-            <div
-              key={`${item.fullDate}-${item.name}`}
-              className={`flex items-center gap-4 px-5 py-4 transition-colors hover:bg-white/[0.02] sm:px-6 ${
-                isHighlight ? 'bg-[#e86e3a]/[0.03]' : ''
+      {status}
+    </span>
+  )
+}
+
+function ScheduleStrip() {
+  const overall = getDateProgress('2026-03-02', '2026-05-23')
+  const monthMarkers = [
+    { label: '3월', pct: 0 },
+    { label: '4월', pct: 37 },
+    { label: '5월', pct: 74 },
+  ]
+
+  return (
+    <div className='space-y-10'>
+      {/* ── Progress Bar ── */}
+      <div className='relative mt-2 mb-4 h-1 rounded-full bg-[#1e1e1e]'>
+        <div
+          className='absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-[#e86e3a] to-[#f5a623] transition-all duration-1000'
+          style={{ width: `${overall}%` }}
+        />
+        <div className='absolute -top-2 inset-x-0 flex justify-between'>
+          {monthMarkers.map((m) => {
+            const active = overall >= m.pct
+            return (
+              <div key={m.label} className='flex flex-col items-center'>
+                <div
+                  className={`size-2 rounded-full border-2 border-[#0a0a0a] ${
+                    active
+                      ? 'bg-[#e86e3a] shadow-[0_0_8px_rgba(232,110,58,0.3)]'
+                      : 'bg-[#2a2a2a]'
+                  }`}
+                />
+                <span
+                  className={`mt-2.5 font-mono text-[11px] font-semibold ${
+                    active ? 'text-[#e86e3a]' : 'text-white/35'
+                  }`}
+                >
+                  {m.label}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* ── Month Groups ── */}
+      {SCHEDULE_MONTHS.map((group) => (
+        <div key={group.label}>
+          {/* Month label */}
+          <div className='mb-3.5 flex items-center gap-2.5'>
+            <span
+              className={`rounded-md border px-3 py-1 font-mono text-[12px] font-semibold tracking-wider ${
+                group.isFinals
+                  ? 'border-[#e86e3a]/20 bg-[#e86e3a]/[0.04] text-[#e86e3a]'
+                  : 'border-[#1e1e1e] bg-white/[0.02] text-white/40'
               }`}
             >
-              <div
-                className={`size-2 shrink-0 rounded-full ${item.dotCls}`}
-              />
-              <div
-                className={`w-14 shrink-0 font-mono text-lg font-extrabold tracking-tight sm:w-16 sm:text-xl ${
-                  isHighlight
-                    ? 'bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'
-                    : 'text-white/95'
-                }`}
-              >
-                {item.date}
-              </div>
-              <div className='min-w-0 flex-1'>
-                <div className='text-sm font-medium text-white/75 sm:text-[15px]'>
-                  {item.name}
-                </div>
-                {'venueName' in item && item.venueName && (
-                  <div className='mt-1 flex items-center gap-2'>
-                    {'venueImage' in item && item.venueImage && (
-                      <img
-                        src={item.venueImage}
-                        alt=''
-                        className='size-5 rounded object-cover sm:size-6'
-                        loading='lazy'
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none'
-                        }}
-                      />
-                    )}
-                    <span className='text-[11px] font-semibold text-white/55 sm:text-[12px]'>
-                      {item.venueName}
+              {group.label} {group.labelEn}
+              {group.isFinals && ' → FINALS'}
+            </span>
+            <div className='h-px flex-1 bg-[#1e1e1e]' />
+          </div>
+
+          {/* Events */}
+          <div className='space-y-2'>
+            {group.events.map((ev) => {
+              if (ev.type === 'range') {
+                const progress = getDateProgress(ev.startDate, ev.endDate)
+                const status = getEventStatus(ev.startDate, ev.endDate)
+                return (
+                  <div
+                    key={ev.name}
+                    className='rounded-xl border border-[#1e1e1e] bg-[#111] p-4 transition-colors hover:border-[#2a2a2a] sm:p-5'
+                  >
+                    <div className='flex flex-wrap items-center gap-x-4 gap-y-2'>
+                      <div className='flex items-center gap-2'>
+                        <span className='font-mono text-xl font-extrabold tracking-tight text-white/95 sm:text-[22px]'>
+                          {fmtDate(ev.startDate)}
+                        </span>
+                        <span className='font-mono text-sm text-white/25'>
+                          →
+                        </span>
+                        <span className='font-mono text-xl font-extrabold tracking-tight text-white/95 sm:text-[22px]'>
+                          {fmtDate(ev.endDate)}
+                        </span>
+                      </div>
+                      <div className='min-w-0 flex-1'>
+                        <div className='text-[15px] font-bold text-white/90'>
+                          {ev.name}
+                        </div>
+                        <div className='text-[13px] text-white/40'>
+                          {ev.detail}
+                        </div>
+                      </div>
+                      <div className='flex gap-1.5'>
+                        <span className='rounded-[5px] bg-[#4a9eff]/[0.08] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider text-[#4a9eff]'>
+                          ONLINE
+                        </span>
+                        <StatusTag status={status} />
+                      </div>
+                    </div>
+                    <div className='mt-3 flex items-center gap-2'>
+                      <div className='h-[3px] flex-1 overflow-hidden rounded-full bg-[#1e1e1e]'>
+                        <div
+                          className={`h-full rounded-full transition-all duration-1000 ${
+                            ev.division === 'console'
+                              ? 'bg-[#e86e3a]'
+                              : 'bg-[#f5a623]'
+                          }`}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      <span className='font-mono text-[11px] text-white/40'>
+                        {progress}%
+                      </span>
+                    </div>
+                  </div>
+                )
+              }
+
+              if (ev.type === 'single') {
+                const status = getEventStatus(ev.fullDate)
+                return (
+                  <div
+                    key={ev.fullDate}
+                    className='flex items-center gap-4 rounded-xl border border-[#1e1e1e] bg-[#111] px-4 py-3.5 transition-colors hover:border-[#2a2a2a] sm:px-5'
+                  >
+                    <div className='w-[60px] shrink-0 text-center sm:w-[72px]'>
+                      <div className='font-mono text-lg font-extrabold tracking-tight text-white/95 sm:text-2xl'>
+                        {fmtDate(ev.fullDate)}
+                      </div>
+                      <div className='font-mono text-[11px] text-white/40'>
+                        {fmtDay(ev.fullDate)}
+                      </div>
+                    </div>
+                    <div className='min-w-0 flex-1'>
+                      <div className='text-[15px] font-bold text-white/90'>
+                        {ev.name}
+                      </div>
+                      <div className='mt-0.5 flex items-center gap-1.5 text-[13px] text-white/40'>
+                        <span className='size-1 rounded-full bg-white/25' />
+                        {ev.venueName}
+                      </div>
+                    </div>
+                    <div className='flex shrink-0 gap-1.5'>
+                      <span className='rounded-[5px] bg-[#e86e3a]/[0.08] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider text-[#e86e3a]'>
+                        OFFLINE
+                      </span>
+                      <StatusTag status={status} />
+                    </div>
+                  </div>
+                )
+              }
+
+              if (ev.type === 'deadline') {
+                return (
+                  <div
+                    key={ev.fullDate}
+                    className='flex items-center gap-4 rounded-xl border border-dashed border-[#e86e3a]/15 bg-[#111] px-4 py-3.5 sm:px-5'
+                  >
+                    <div className='w-[60px] shrink-0 text-center sm:w-[72px]'>
+                      <div className='font-mono text-lg text-white/40 sm:text-xl'>
+                        {fmtDate(ev.fullDate)}
+                      </div>
+                    </div>
+                    <div className='min-w-0 flex-1'>
+                      <div className='text-[15px] font-bold text-white/55'>
+                        {ev.name}
+                      </div>
+                      <div className='text-[13px] text-white/35'>
+                        {ev.detail}
+                      </div>
+                    </div>
+                    <span className='rounded-[5px] border border-[#1e1e1e] bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider text-white/40'>
+                      마감
                     </span>
                   </div>
-                )}
-                {'sub' in item && item.sub && (
-                  <div className='mt-0.5 text-[11px] text-white/50'>
-                    {item.sub}
+                )
+              }
+
+              if (ev.type === 'finals') {
+                const status = getEventStatus(ev.fullDate)
+                return (
+                  <div
+                    key={ev.fullDate}
+                    className='flex items-center gap-4 rounded-xl border border-[#e86e3a]/20 bg-gradient-to-br from-[#e86e3a]/[0.03] to-[#111] px-5 py-5 transition-colors hover:border-[#e86e3a]/35 sm:px-6'
+                  >
+                    <div className='w-[60px] shrink-0 text-center sm:w-[72px]'>
+                      <div className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text font-mono text-2xl font-extrabold tracking-tight text-transparent sm:text-[32px]'>
+                        {fmtDate(ev.fullDate)}
+                      </div>
+                      <div className='font-mono text-[11px] text-[#e86e3a]/70'>
+                        {fmtDay(ev.fullDate)}
+                      </div>
+                    </div>
+                    <div className='min-w-0 flex-1'>
+                      <div className='text-lg font-bold text-white/90'>
+                        {ev.name}
+                      </div>
+                      <div className='text-[13px] text-white/40'>
+                        {ev.detail}
+                      </div>
+                      <div className='mt-1 flex items-center gap-1.5 text-[13px] text-white/40'>
+                        <span className='size-1 rounded-full bg-white/25' />
+                        {ev.venueName}
+                      </div>
+                    </div>
+                    <div className='flex shrink-0 gap-1.5'>
+                      <span className='rounded-[5px] border border-[#e86e3a]/20 bg-[#e86e3a]/[0.12] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider text-[#e86e3a]'>
+                        FINALS
+                      </span>
+                      <StatusTag status={status} />
+                    </div>
                   </div>
-                )}
-              </div>
-              <div className='flex shrink-0 flex-col items-end gap-1'>
-                <span
-                  className={`rounded px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider ${item.tagCls}`}
-                >
-                  {item.tag}
-                </span>
-                <span
-                  className={`rounded px-2 py-0.5 text-[11px] font-semibold ${STATUS_STYLES[status]}`}
-                >
-                  {status}
-                </span>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </Link>
+                )
+              }
+
+              return null
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
 

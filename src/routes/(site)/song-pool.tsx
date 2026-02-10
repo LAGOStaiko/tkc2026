@@ -3,7 +3,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSongPools } from '@/lib/api'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
 import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { LevelBadge } from '@/components/tkc/level-badge'
 
@@ -130,9 +129,9 @@ function SongPoolPage() {
       {isLoading && !data ? (
         <p className='text-sm text-white/60'>선곡풀을 불러오는 중...</p>
       ) : isEmpty ? (
-        <div className='rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-8 text-center'>
+        <div className='rounded-2xl border border-[#1e1e1e] bg-[#111] px-6 py-8 text-center'>
           <p className='text-sm text-white/50'>표시할 선곡풀이 없습니다.</p>
-          <p className='mt-1 text-xs text-white/50'>
+          <p className='mt-1 text-xs text-white/40'>
             시트 데이터 또는 difficulty 값(oni/ura)을 확인해 주세요.
           </p>
         </div>
@@ -146,14 +145,14 @@ function SongPoolPage() {
                 type='button'
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  'flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-[15px] font-semibold whitespace-nowrap transition-all',
+                  'flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold whitespace-nowrap transition-all',
                   activeTab === tab.key
-                    ? 'border-white/15 bg-white/[0.06] text-white'
-                    : 'border-transparent text-white/40 hover:bg-white/[0.03] hover:text-white/60'
+                    ? 'border-[#2a2a2a] bg-[#1a1a1a] text-white'
+                    : 'border-transparent text-white/40 hover:bg-[#111] hover:text-white/60'
                 )}
               >
                 <span
-                  className='size-2 flex-shrink-0 rounded-full'
+                  className='size-2 shrink-0 rounded-full'
                   style={{ backgroundColor: tab.dotColor }}
                 />
                 {tab.label}
@@ -172,6 +171,10 @@ function SongPoolPage() {
     </TkcSection>
   )
 }
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Pool Section                                                       */
+/* ════════════════════════════════════════════════════════════════════ */
 
 function PoolSection({
   label,
@@ -197,14 +200,14 @@ function PoolSection({
       <div className='mb-5 flex items-center justify-between gap-4'>
         <div className='flex items-center gap-2.5'>
           <span
-            className='size-2.5 flex-shrink-0 rounded-full'
+            className='size-2.5 shrink-0 rounded-full'
             style={{ backgroundColor: dotColor }}
           />
           <h2 className='text-xl font-bold tracking-tight md:text-2xl'>
             {label}
           </h2>
         </div>
-        <span className='shrink-0 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1 font-mono text-sm font-semibold text-white/40'>
+        <span className='shrink-0 rounded-lg border border-[#1e1e1e] bg-[#111] px-3 py-1 font-mono text-sm font-semibold text-white/40'>
           {countLabel}
         </span>
       </div>
@@ -217,14 +220,14 @@ function PoolSection({
             className={cn(
               'rounded-xl border px-4 py-3',
               song.revealed
-                ? 'border-white/10 bg-white/[0.03]'
-                : 'border-white/[0.06] bg-white/[0.015]'
+                ? 'border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'
+                : 'border-[#1e1e1e] bg-[#111]/60'
             )}
           >
             {song.revealed ? (
               <>
                 <div className='flex items-start gap-3'>
-                  <span className='mt-0.5 shrink-0 font-mono text-xs font-semibold text-white/30'>
+                  <span className='mt-0.5 shrink-0 font-mono text-xs font-semibold text-white/25'>
                     {index + 1}
                   </span>
                   <p className='flex-1 leading-relaxed font-semibold break-words text-white'>
@@ -233,37 +236,34 @@ function PoolSection({
                 </div>
                 <div className='mt-2 flex items-center gap-4 pl-6'>
                   <div className='flex items-center gap-1.5'>
-                    <span className='text-xs text-white/40'>귀신</span>
+                    <span className='text-xs text-white/35'>귀신</span>
                     {song.oni != null ? (
                       <LevelBadge level={song.oni} />
                     ) : (
-                      <span className='text-xs text-white/20'>—</span>
+                      <span className='text-xs text-white/15'>—</span>
                     )}
                   </div>
                   <div className='flex items-center gap-1.5'>
-                    <span className='text-xs text-white/40'>뒷보면</span>
+                    <span className='text-xs text-white/35'>뒷보면</span>
                     {song.ura != null ? (
                       <LevelBadge level={song.ura} isUra />
                     ) : (
-                      <span className='text-xs text-white/20'>—</span>
+                      <span className='text-xs text-white/15'>—</span>
                     )}
                   </div>
                 </div>
               </>
             ) : (
               <div className='flex items-center gap-3'>
-                <span className='shrink-0 font-mono text-xs font-semibold text-white/30'>
+                <span className='shrink-0 font-mono text-xs font-semibold text-white/25'>
                   {index + 1}
                 </span>
-                <span className='font-semibold tracking-widest text-white/30'>
+                <span className='font-semibold tracking-widest text-white/25'>
                   ???
                 </span>
-                <Badge
-                  variant='outline'
-                  className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[10px] text-[#ff8c66]'
-                >
+                <span className='rounded bg-[#e86e3a]/[0.08] px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-[#e86e3a]'>
                   추후 공지
-                </Badge>
+                </span>
               </div>
             )}
           </div>
@@ -271,21 +271,21 @@ function PoolSection({
       </div>
 
       {/* Desktop: table */}
-      <div className='hidden overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] md:block'>
+      <div className='hidden overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] md:block'>
         <table className='w-full text-[15px]'>
           <caption className='sr-only'>{label} 선곡풀</caption>
           <thead>
-            <tr className='border-b border-white/[0.08] bg-white/[0.015]'>
-              <th className='w-12 px-4 py-3.5 text-center font-mono text-[11px] font-semibold tracking-widest text-white/35 uppercase'>
+            <tr className='border-b border-[#1e1e1e] bg-[#1a1a1a]'>
+              <th className='w-12 px-4 py-3.5 text-center font-mono text-[11px] font-semibold tracking-wider text-white/35 uppercase'>
                 #
               </th>
-              <th className='px-4 py-3.5 text-left font-mono text-[11px] font-semibold tracking-widest text-white/35 uppercase'>
+              <th className='px-4 py-3.5 text-left font-mono text-[11px] font-semibold tracking-wider text-white/35 uppercase'>
                 곡명
               </th>
-              <th className='w-20 px-4 py-3.5 text-center font-mono text-[11px] font-semibold tracking-widest text-white/35 uppercase'>
+              <th className='w-20 px-4 py-3.5 text-center font-mono text-[11px] font-semibold tracking-wider text-white/35 uppercase'>
                 귀신
               </th>
-              <th className='w-20 px-4 py-3.5 text-center font-mono text-[11px] font-semibold tracking-widest text-white/35 uppercase'>
+              <th className='w-20 px-4 py-3.5 text-center font-mono text-[11px] font-semibold tracking-wider text-white/35 uppercase'>
                 뒷보면
               </th>
             </tr>
@@ -295,11 +295,11 @@ function PoolSection({
               <tr
                 key={`${song.title || `tbd-${index}`}-${index}`}
                 className={cn(
-                  'border-b border-white/[0.04] transition-colors last:border-b-0',
-                  song.revealed && 'hover:bg-white/[0.03]'
+                  'border-b border-[#1e1e1e]/60 transition-colors last:border-b-0',
+                  song.revealed && 'hover:bg-white/[0.02]'
                 )}
               >
-                <td className='px-4 py-3.5 text-center font-mono text-sm font-semibold text-white/25'>
+                <td className='px-4 py-3.5 text-center font-mono text-sm font-semibold text-white/20'>
                   {index + 1}
                 </td>
                 {song.revealed ? (
@@ -311,7 +311,7 @@ function PoolSection({
                       {song.oni != null ? (
                         <LevelBadge level={song.oni} />
                       ) : (
-                        <span className='font-mono text-sm text-white/[0.12]'>
+                        <span className='font-mono text-sm text-white/10'>
                           —
                         </span>
                       )}
@@ -320,7 +320,7 @@ function PoolSection({
                       {song.ura != null ? (
                         <LevelBadge level={song.ura} isUra />
                       ) : (
-                        <span className='font-mono text-sm text-white/[0.12]'>
+                        <span className='font-mono text-sm text-white/10'>
                           —
                         </span>
                       )}
@@ -330,24 +330,21 @@ function PoolSection({
                   <>
                     <td className='px-4 py-3.5'>
                       <div className='flex items-center gap-2'>
-                        <span className='font-semibold tracking-widest text-white/30'>
+                        <span className='font-semibold tracking-widest text-white/25'>
                           ???
                         </span>
-                        <Badge
-                          variant='outline'
-                          className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[10px] text-[#ff8c66]'
-                        >
+                        <span className='rounded bg-[#e86e3a]/[0.08] px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-[#e86e3a]'>
                           추후 공지
-                        </Badge>
+                        </span>
                       </div>
                     </td>
                     <td className='px-4 py-3.5 text-center'>
-                      <span className='font-mono text-sm text-white/[0.12]'>
+                      <span className='font-mono text-sm text-white/10'>
                         —
                       </span>
                     </td>
                     <td className='px-4 py-3.5 text-center'>
-                      <span className='font-mono text-sm text-white/[0.12]'>
+                      <span className='font-mono text-sm text-white/10'>
                         —
                       </span>
                     </td>
