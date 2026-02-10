@@ -6,7 +6,7 @@ export const ko = {
     '미성년자는 보호자 동의서를 다운로드하여 작성 후, 스캔본 또는 사진을 클라우드(Google Drive, Naver MYBOX 등)에 업로드하고 공유 링크를 입력해 주세요.',
   'apply.field.consentDownload': '보호자 동의서 양식 다운로드',
   'apply.field.division': '부문',
-  'apply.field.dohirobaNo': '북번호 (동더히로바)',
+  'apply.field.dohirobaNo': '북번호 (동더 광장)',
   'apply.field.email': '이메일',
   'apply.field.isMinor': '미성년자 여부',
   'apply.field.isMinorHelp':
@@ -18,7 +18,7 @@ export const ko = {
   'apply.field.privacy': '개인정보 수집 및 이용 동의',
   'apply.field.privacyHelp': '아래 내용을 확인하고 동의해 주세요.',
   'apply.field.privacyDetail':
-    '수집 항목: 이름, 전화번호, 이메일, 닉네임, 남코 아이디\n수집 목적: 대회 참가 접수, 본인 확인, 대회 안내 연락\n보유 기간: 대회 종료 후 3개월 이내 파기\n동의를 거부할 수 있으나, 거부 시 대회 참가가 불가합니다.',
+    '수집 항목: 이름, 전화번호, 이메일, 동더 네임, 남코 아이디\n수집 목적: 대회 참가 접수, 본인 확인, 대회 안내 연락\n보유 기간: 대회 종료 후 3개월 이내 파기\n동의를 거부할 수 있으나, 거부 시 대회 참가가 불가합니다.',
   'apply.field.qualifierRegion': '온라인 예선 차수',
   'apply.field.offlineSongs': '오프라인 예선곡 선택',
   'apply.field.offlineSongsHelp':
@@ -189,7 +189,7 @@ export const ko = {
   'results.console.badge.pre2': '2\uCC28 \uC9C4\uCD9C',
   'results.console.badge.final': '\uACB0\uC120 \uC9C4\uCD9C',
   'results.console.searchPlaceholder':
-    '\uB2C9\uB124\uC784 \uB610\uB294 Entry ID \uAC80\uC0C9',
+    '\uB3D9\uB354 \uB124\uC784 \uB610\uB294 Entry ID \uAC80\uC0C9',
   'schedule.empty': '\uC544\uC9C1 \uC77C\uC815\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.',
   'schedule.failed':
     '\uC77C\uC815\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',

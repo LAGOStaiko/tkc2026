@@ -72,7 +72,7 @@ const RANKING_SCORES = [97, 91, 85, 80, 74, 68]
 
 const APPLY_FIELDS = [
   { label: '이름', value: '실명 기재' },
-  { label: '닉네임', value: '게임 내 닉네임' },
+  { label: '동더 네임', value: '게임 내 동더 네임' },
   { label: '전화번호', value: '본인 연락처' },
   { label: '이메일', value: '본인 이메일 주소' },
   { label: '개인정보활용 동의', value: '필수', isBadge: true },
@@ -479,13 +479,13 @@ function ConsoleQualifierPage() {
               <div className='mt-4'>
                 <DetailSubtitle>중복 참가 규정</DetailSubtitle>
                 <DetailRow
-                  label='아케이드 · 콘솔 예선 참가'
+                  label='아케이드·콘솔 예선 참가'
                   value='가능'
                   isBadge={false}
                   accentColor='#e86e3a'
                 />
                 <DetailRow
-                  label='아케이드 · 콘솔 동시 결선 진출'
+                  label='아케이드·콘솔 동시 결선 진출'
                   value='불가'
                   isBadge={false}
                   accentColor='#e86e3a'

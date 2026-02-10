@@ -1549,7 +1549,7 @@ function ArcadeOpsControlPage() {
                     <thead className='bg-white/[0.07] text-white/70'>
                       <tr>
                         <th className='px-3 py-2'>순위</th>
-                        <th className='px-3 py-2'>닉네임</th>
+                        <th className='px-3 py-2'>동더 네임</th>
                         <th className='px-3 py-2'>전적</th>
                         <th className='px-3 py-2'>상태</th>
                       </tr>

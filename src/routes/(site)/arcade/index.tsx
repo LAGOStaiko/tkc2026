@@ -73,7 +73,7 @@ const REQUIRED_INFO = [
 
 const APPLY_FIELDS = [
   { label: '이름', value: '실명 기재' },
-  { label: '닉네임', value: '게임 내 닉네임' },
+  { label: '동더 네임', value: '게임 내 동더 네임' },
   { label: '전화번호', value: '본인 연락처' },
   { label: '이메일', value: '본인 이메일 주소' },
   { label: '남코 아이디', value: '필수', isBadge: true },
@@ -81,7 +81,7 @@ const APPLY_FIELDS = [
   { label: '동더 광장 북번호', value: '필수', isBadge: true },
   { label: '개인정보활용 동의', value: '필수', isBadge: true },
   { label: '참가 차수', value: '필수', isBadge: true },
-  { label: '오프라인 사용곡 4곡', value: '필수', isBadge: true },
+  { label: '오프라인 예선곡 4곡', value: '필수', isBadge: true },
   { label: '부모님 동의서', value: '미성년자 한정 · PDF' },
 ] as const
 
@@ -191,7 +191,7 @@ function AdvanceVisual() {
       </div>
 
       <div className='text-[13px] font-semibold tracking-wider text-[#f5a623]'>
-        오프라인 스위스 진출
+        스위스 스테이지 진출
       </div>
       <div className='mt-1 text-[26px] font-extrabold tracking-tight text-white/90'>
         차수별 Top 16
@@ -199,7 +199,7 @@ function AdvanceVisual() {
       <div className='mx-auto mt-2 mb-6 max-w-[300px] text-[13px] leading-relaxed text-white/55'>
         해당 차수 통산 점수 상위 16명이
         <br />
-        오프라인 스위스 스테이지에 진출
+        스위스 스테이지에 진출
       </div>
 
       {/* Slots */}
@@ -299,7 +299,7 @@ function ArcadeOnlinePage() {
               </strong>{' '}
               가능합니다. 신청 시{' '}
               <span className='rounded bg-[#f7d154]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f7d154]'>
-                오프라인 예선 사용곡 4곡
+                오프라인 예선곡 4곡
               </span>
               도 함께 선택해야 합니다.
             </>
@@ -311,7 +311,7 @@ function ArcadeOnlinePage() {
             tag='중요'
             tagCls='bg-[#f5a623]/[0.08] text-[#f5a623]'
           >
-            차수는 <strong>오프라인 스위스 스테이지가 열리는 장소</strong>를
+            차수는 <strong>스위스 스테이지가 열리는 장소</strong>를
             의미합니다.
             <br />
             예를 들어, 1차수(서울 · TAIKO LABS)에 신청하면 <strong>
@@ -350,11 +350,11 @@ function ArcadeOnlinePage() {
           </div>
 
           <HighlightCard
-            title='오프라인 예선 사용곡 선택'
+            title='오프라인 예선곡 선택'
             tag='필수'
             tagCls='bg-[#f5a623]/[0.08] text-[#f5a623]'
           >
-            신청 시 <strong>오프라인 스위스 스테이지에서 사용할 곡 4곡</strong>
+            신청 시 <strong>스위스 스테이지에서 사용할 곡 4곡</strong>
             을 미리 선택해야 합니다. 이 곡은 오프라인 대회에서 사이드 선택 시
             활용되며, 신청 이후에는 변경할 수 없습니다.
           </HighlightCard>
@@ -456,17 +456,17 @@ function ArcadeOnlinePage() {
           </div>
         </StepCard>
 
-        {/* ── Step 03: 오프라인 스위스 스테이지 진출 ── */}
+        {/* ── Step 03: 스위스 스테이지 진출 ── */}
         <StepCard
           num='03'
-          heading='오프라인 스위스 스테이지 진출'
+          heading='스위스 스테이지 진출'
           summary={
             <>
               2곡 합산 통산 점수{' '}
               <span className='rounded bg-[#f7d154]/[0.08] px-1.5 py-0.5 font-mono text-[11px] font-bold text-[#f7d154]'>
                 차수별 상위 16명
               </span>
-              이 해당 차수의 오프라인 스위스 스테이지에 진출합니다. 스위스
+              이 해당 차수의 스위스 스테이지에 진출합니다. 스위스
               스테이지를 거쳐 최종 결선 진출자가 결정됩니다.
             </>
           }
@@ -513,7 +513,7 @@ function ArcadeOnlinePage() {
           </div>
           <div className='min-w-0 flex-1'>
             <div className='text-sm font-bold text-white/90'>
-              오프라인 스위스 스테이지 규정 보기
+              스위스 스테이지 규정 보기
             </div>
             <div className='text-xs text-white/35'>
               2패 탈락 스위스 시스템, 매치 룰, 진출 조건 등 상세 규정

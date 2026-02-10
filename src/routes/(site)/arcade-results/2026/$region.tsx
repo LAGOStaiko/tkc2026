@@ -343,7 +343,7 @@ function ArcadeRegionDetailPage() {
                     <tr>
                       <th className='px-4 py-2.5 whitespace-nowrap'>순위</th>
                       <th className='px-4 py-2.5 whitespace-nowrap'>엔트리</th>
-                      <th className='px-4 py-2.5 whitespace-nowrap'>닉네임</th>
+                      <th className='px-4 py-2.5 whitespace-nowrap'>동더 네임</th>
                       <th className='px-4 py-2.5 text-right whitespace-nowrap'>
                         점수
                       </th>
@@ -403,7 +403,7 @@ function ArcadeRegionDetailPage() {
                     <tr>
                       <th className='px-4 py-2.5 whitespace-nowrap'>순위</th>
                       <th className='px-4 py-2.5 whitespace-nowrap'>엔트리</th>
-                      <th className='px-4 py-2.5 whitespace-nowrap'>닉네임</th>
+                      <th className='px-4 py-2.5 whitespace-nowrap'>동더 네임</th>
                       <th className='px-4 py-2.5 text-right whitespace-nowrap'>
                         점수
                       </th>
@@ -463,7 +463,7 @@ function ArcadeRegionDetailPage() {
                 <thead className='bg-white/[0.07] text-xs font-semibold text-white/70'>
                   <tr>
                     <th className='px-4 py-2.5 whitespace-nowrap'>순위</th>
-                    <th className='px-4 py-2.5 whitespace-nowrap'>닉네임</th>
+                    <th className='px-4 py-2.5 whitespace-nowrap'>동더 네임</th>
                     <th className='px-4 py-2.5 text-right whitespace-nowrap'>
                       시드
                     </th>
@@ -599,7 +599,7 @@ function ArcadeRegionDetailPage() {
                   <tr>
                     <th className='px-4 py-2.5 whitespace-nowrap'>순위</th>
                     <th className='px-4 py-2.5 whitespace-nowrap'>엔트리</th>
-                    <th className='px-4 py-2.5 whitespace-nowrap'>닉네임</th>
+                    <th className='px-4 py-2.5 whitespace-nowrap'>동더 네임</th>
                     <th className='px-4 py-2.5 text-right whitespace-nowrap'>
                       과제곡 1
                     </th>

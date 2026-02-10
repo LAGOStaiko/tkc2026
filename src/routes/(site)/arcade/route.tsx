@@ -29,7 +29,7 @@ const NAV_ITEMS = [
     to: '/arcade/swiss',
     exact: false,
     phase: 'PHASE 2',
-    label: '오프라인 스위스',
+    label: '스위스 스테이지',
     desc: '차수별 Top 16',
     color: '#f7d154',
   },

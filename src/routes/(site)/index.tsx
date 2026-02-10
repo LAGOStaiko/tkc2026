@@ -1,5 +1,6 @@
-﻿import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useSite } from '@/lib/api'
+import { FadeIn } from '@/components/tkc/guide-shared'
 
 export const Route = createFileRoute('/(site)/')({
   component: HomePage,
@@ -13,6 +14,63 @@ const ASSETS = {
 }
 const HOME_YOUTUBE_ID = 'DQKIfLMIgXY'
 const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
+
+const DIVISIONS = [
+  {
+    iconSrc: ASSETS.consoleIcon,
+    title: '콘솔',
+    description: '동더! 원더풀 페스티벌로 진행하는 대회입니다.',
+    accent: '#e86e3a',
+    chips: ['03.02 ~ 04.30', 'ONLINE'],
+    detailTo: '/console' as const,
+  },
+  {
+    iconSrc: ASSETS.arcadeIcon,
+    title: '아케이드',
+    description: '태고의 달인 니지이로 ver.로 진행하는 대회입니다.',
+    accent: '#f5a623',
+    chips: ['03.02 ~ 04.11', 'ONLINE + OFFLINE'],
+    detailTo: '/arcade' as const,
+  },
+]
+
+const SCHEDULE_ITEMS = [
+  {
+    date: '03.02',
+    name: '콘솔 예선 시작',
+    tag: 'ONLINE',
+    tagCls: 'bg-[#f5a623]/[0.08] text-[#f5a623]',
+    dotCls: 'bg-[#e86e3a] shadow-[0_0_10px_rgba(232,110,58,0.4)]',
+  },
+  {
+    date: '03.21',
+    name: '오프라인 예선 → 서울',
+    tag: 'OFFLINE',
+    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
+    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
+  },
+  {
+    date: '04.11',
+    name: '오프라인 예선 → 부산',
+    tag: 'OFFLINE',
+    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
+    dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
+  },
+  {
+    date: '05.23',
+    name: '결선 → PlayX4',
+    tag: 'FINALS',
+    tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
+    dotCls: 'bg-[#e86e3a] shadow-[0_0_10px_rgba(232,110,58,0.4)]',
+    highlight: true as const,
+  },
+]
+
+const FINALS_INFO = [
+  { value: '05.23', label: '날짜' },
+  { value: 'PlayX4', label: '장소' },
+  { value: '콘솔 + 아케이드', label: '부문' },
+] as const
 
 type Partner = {
   order?: number
@@ -37,8 +95,8 @@ function HomePage() {
       ]
 
   return (
-    <div className='space-y-7 md:space-y-9'>
-      {/* HERO */}
+    <div>
+      {/* ── HERO ── */}
       <section className='relative -mt-20 overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-[0_10px_40px_rgba(0,0,0,0.45)] md:-mt-24'>
         <div className='relative h-[250px] sm:h-[300px] md:h-[400px] lg:h-[440px]'>
           <img
@@ -50,51 +108,72 @@ function HomePage() {
         </div>
       </section>
 
-      {/* CONSOLE / ARCADE CARDS */}
-      <section className='grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-7'>
-        <ModeCard
-          iconSrc={ASSETS.consoleIcon}
-          title='콘솔'
-          description='동더! 원더풀 페스티벌로 진행하는 대회입니다.'
-          detailTo='/console'
-        />
-        <ModeCard
-          iconSrc={ASSETS.arcadeIcon}
-          title='아케이드'
-          description='태고의 달인 니지이로 ver.로 진행하는 대회입니다.'
-          detailTo='/arcade'
-        />
+      {/* ── DIVISIONS ── */}
+      <section className='mt-10 grid grid-cols-1 gap-4 md:mt-14 md:grid-cols-2 md:gap-5'>
+        {DIVISIONS.map((d) => (
+          <DivisionCard key={d.title} {...d} />
+        ))}
       </section>
 
-      {/* PLAYX4 FINAL INFO */}
-      <section className='rounded-2xl border border-white/10 bg-white/5 p-5 text-center shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-7'>
-        <div className='text-xl font-semibold text-white/90 md:text-2xl'>
-          플레이엑스포 결선 안내
-        </div>
-        <div className='mt-2 text-base text-white/60'>
-          추후 공개 예정입니다.
-        </div>
+      {/* ── SCHEDULE ── */}
+      <section className='mt-16 md:mt-20'>
+        <FadeIn>
+          <SectionHead label='Schedule' title='다가오는 일정'>
+            <Link
+              to='/schedule'
+              className='text-sm text-white/40 transition-colors hover:text-[#e86e3a]'
+            >
+              전체 일정 보기 →
+            </Link>
+          </SectionHead>
+        </FadeIn>
+        <FadeIn delay={100}>
+          <ScheduleStrip />
+        </FadeIn>
       </section>
 
-      {/* VIDEO */}
-      <section className='rounded-2xl border border-white/10 bg-white/5 p-5 shadow-[0_10px_40px_rgba(0,0,0,0.35)] md:p-7'>
-        <div className='mx-auto w-full max-w-[1100px]'>
-          <div className='aspect-video overflow-hidden rounded-xl border border-white/10 bg-black'>
-            <iframe
-              className='h-full w-full'
-              src={HOME_YOUTUBE_EMBED}
-              title='TKC2026 Opening Movie'
-              loading='lazy'
-              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
-              referrerPolicy='strict-origin-when-cross-origin'
-              allowFullScreen
-            />
+      {/* ── FINALS ── */}
+      <section className='mt-16 md:mt-20'>
+        <FadeIn>
+          <SectionHead label='Finals' title='결선 토너먼트' />
+        </FadeIn>
+        <FadeIn delay={100}>
+          <FinalsCard />
+        </FadeIn>
+      </section>
+
+      {/* ── VIDEO ── */}
+      <section className='mt-16 md:mt-20'>
+        <FadeIn>
+          <SectionHead label='Video' title='영상' />
+        </FadeIn>
+        <FadeIn delay={100}>
+          <div className='overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
+            <div className='aspect-video bg-black'>
+              <iframe
+                className='h-full w-full'
+                src={HOME_YOUTUBE_EMBED}
+                title='TKC2026 Opening Movie'
+                loading='lazy'
+                allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+                referrerPolicy='strict-origin-when-cross-origin'
+                allowFullScreen
+              />
+            </div>
+            <div className='border-t border-[#1e1e1e] px-5 py-4'>
+              <div className='text-[15px] font-semibold text-white/90'>
+                TAIKO LABS
+              </div>
+              <div className='mt-0.5 text-sm text-white/40'>
+                이제 우리는 그 너머로 향합니다.
+              </div>
+            </div>
           </div>
-        </div>
+        </FadeIn>
       </section>
 
-      {/* FOOT STRIP (Partners) */}
-      <section className='pt-6 pb-7'>
+      {/* ── FOOTER STRIP ── */}
+      <section className='mt-16 border-t border-[#1e1e1e] pt-8 pb-7 md:mt-20'>
         <div className='flex flex-col items-center justify-between gap-5 md:flex-row'>
           <div className='flex items-center gap-3'>
             <img
@@ -150,53 +229,241 @@ function HomePage() {
   )
 }
 
-function ModeCard({
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Section Head                                                      */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function SectionHead({
+  label,
+  title,
+  children,
+}: {
+  label: string
+  title: string
+  children?: React.ReactNode
+}) {
+  return (
+    <div className='mb-6 flex items-end justify-between gap-4'>
+      <div>
+        <div className='mb-1.5 font-mono text-sm font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+          {label}
+        </div>
+        <h2 className='text-[clamp(24px,4vw,32px)] font-extrabold tracking-tight text-white/95'>
+          {title}
+        </h2>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Division Card                                                     */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function DivisionCard({
   iconSrc,
   title,
   description,
+  accent,
+  chips,
   detailTo,
-}: {
-  iconSrc: string
-  title: string
-  description: string
-  detailTo: '/console' | '/arcade'
-}) {
+}: (typeof DIVISIONS)[number]) {
   return (
-    <div className='flex flex-col rounded-2xl bg-white/5 p-7 shadow-[0_10px_40px_rgba(0,0,0,0.35)] ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_15px_50px_rgba(0,0,0,0.45)] hover:ring-white/20'>
-      <div className='flex items-start gap-5'>
-        {/* icon block (시안의 빨간 네모) */}
-        <div className='grid h-14 w-14 place-items-center rounded-xl bg-[#ff2a00]'>
-          <img
-            src={iconSrc}
-            alt=''
-            className='h-8 w-8 object-contain'
-            loading='lazy'
-            draggable={false}
-          />
-        </div>
+    <FadeIn>
+      <div className='group relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] transition-all duration-400 hover:-translate-y-1 hover:border-[#2a2a2a]'>
+        <div
+          className='absolute top-0 right-0 left-0 h-0.5'
+          style={{ background: accent }}
+        />
+        <div
+          className='pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full opacity-50 transition-opacity group-hover:opacity-100'
+          style={{
+            background: `radial-gradient(circle, ${accent}10, transparent 70%)`,
+          }}
+        />
 
-        <div className='min-w-0'>
-          <h3 className='text-xl font-bold text-white'>{title}</h3>
-          <p className='mt-2 text-base break-keep text-white/70'>
+        <div className='relative flex h-full flex-col p-6 sm:p-7'>
+          <div className='mb-3.5 flex items-center gap-3.5'>
+            <div
+              className='flex size-11 shrink-0 items-center justify-center rounded-lg'
+              style={{
+                background: `${accent}18`,
+                border: `1px solid ${accent}30`,
+                boxShadow: `0 0 16px ${accent}14`,
+              }}
+            >
+              <img
+                src={iconSrc}
+                alt=''
+                className='size-6 object-contain'
+                loading='lazy'
+                draggable={false}
+              />
+            </div>
+            <h3 className='text-xl font-bold text-white/95 sm:text-2xl'>
+              {title}
+            </h3>
+          </div>
+
+          <p className='mb-5 text-[15px] leading-relaxed break-keep text-white/60'>
             {description}
           </p>
+
+          <div className='mb-5 flex flex-wrap gap-2'>
+            {chips.map((chip) => (
+              <span
+                key={chip}
+                className='rounded-md border border-[#1e1e1e] bg-white/[0.03] px-3 py-1 font-mono text-[12px] font-semibold tracking-wide text-white/50'
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+
+          <div className='mt-auto flex gap-2.5'>
+            <Link
+              to={detailTo}
+              className='flex-1 rounded-lg border border-[#2a2a2a] bg-transparent py-2.5 text-center text-sm font-semibold text-white/60 transition-all hover:border-white/30 hover:bg-white/[0.04] hover:text-white/90'
+            >
+              자세히 보기
+            </Link>
+            <Link
+              to='/apply'
+              className='flex-1 rounded-lg py-2.5 text-center text-sm font-semibold text-white transition-all hover:brightness-110'
+              style={{
+                background: accent,
+                boxShadow: `0 4px 20px ${accent}33`,
+              }}
+            >
+              대회 신청하기
+            </Link>
+          </div>
         </div>
       </div>
+    </FadeIn>
+  )
+}
 
-      {/* buttons: 모바일 full-width 스택, sm 이상 row */}
-      <div className='mt-auto grid grid-cols-1 gap-3 pt-6 sm:grid-cols-2'>
-        <Link
-          className='grid h-11 place-items-center rounded-full border border-white/15 bg-white/5 text-base text-white transition-all hover:border-white/30 hover:bg-white/10 active:scale-[0.98]'
-          to={detailTo}
-        >
-          자세히 보기
-        </Link>
-        <Link
-          className='grid h-11 place-items-center rounded-full border border-white/15 bg-white/5 text-base text-white transition-all hover:border-white/30 hover:bg-white/10 active:scale-[0.98]'
-          to='/apply'
-        >
-          대회 신청하기
-        </Link>
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Schedule Strip                                                    */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function ScheduleStrip() {
+  return (
+    <div className='overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111]'>
+      {/* Desktop */}
+      <div className='hidden sm:grid sm:grid-cols-4'>
+        {SCHEDULE_ITEMS.map((item, i) => (
+          <div
+            key={item.date}
+            className={`relative px-4 py-7 text-center transition-colors hover:bg-white/[0.02] ${
+              'highlight' in item && item.highlight
+                ? 'bg-[#e86e3a]/[0.03]'
+                : ''
+            }`}
+          >
+            <div
+              className={`mx-auto mb-3 size-2 rounded-full ${item.dotCls}`}
+            />
+            <div
+              className={`mb-1.5 font-mono text-[28px] font-extrabold tracking-tight ${
+                'highlight' in item && item.highlight
+                  ? 'bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'
+                  : 'text-white/95'
+              }`}
+            >
+              {item.date}
+            </div>
+            <div className='mb-2 text-sm font-medium text-white/60'>
+              {item.name}
+            </div>
+            <span
+              className={`inline-block rounded px-2.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider ${item.tagCls}`}
+            >
+              {item.tag}
+            </span>
+            {i < SCHEDULE_ITEMS.length - 1 && (
+              <div className='absolute top-[20%] right-0 bottom-[20%] w-px bg-[#1e1e1e]' />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile */}
+      <div className='divide-y divide-[#1e1e1e] sm:hidden'>
+        {SCHEDULE_ITEMS.map((item) => (
+          <div
+            key={item.date}
+            className={`flex items-center gap-4 px-5 py-4 ${
+              'highlight' in item && item.highlight
+                ? 'bg-[#e86e3a]/[0.03]'
+                : ''
+            }`}
+          >
+            <div
+              className={`size-2 shrink-0 rounded-full ${item.dotCls}`}
+            />
+            <div className='w-14 shrink-0 font-mono text-lg font-extrabold tracking-tight text-white/95'>
+              {item.date}
+            </div>
+            <div className='min-w-0 flex-1 text-sm font-medium text-white/60'>
+              {item.name}
+            </div>
+            <span
+              className={`shrink-0 rounded px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider ${item.tagCls}`}
+            >
+              {item.tag}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Finals Card                                                       */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function FinalsCard() {
+  return (
+    <div className='relative overflow-hidden rounded-2xl'>
+      <div className='absolute inset-0 rounded-2xl bg-gradient-to-br from-[#e86e3a]/30 via-transparent to-[#f5a623]/30' />
+
+      <div className='relative m-px overflow-hidden rounded-2xl bg-[#111]'>
+        <div className='pointer-events-none absolute -top-16 left-[30%] h-[200px] w-[300px] rounded-full bg-[radial-gradient(ellipse,rgba(232,110,58,0.06),transparent_70%)] blur-xl' />
+        <div className='pointer-events-none absolute -bottom-10 right-[20%] h-[150px] w-[250px] rounded-full bg-[radial-gradient(ellipse,rgba(245,166,35,0.04),transparent_70%)] blur-xl' />
+
+        <div className='relative px-6 py-14 text-center sm:px-10 sm:py-16'>
+          <div className='mb-4 font-mono text-[13px] font-semibold tracking-[3px] text-[#e86e3a] uppercase'>
+            PlayX4 2026
+          </div>
+          <h3 className='mb-2.5 text-[clamp(24px,5vw,36px)] font-extrabold tracking-tight text-white/95'>
+            플레이엑스포 결선 토너먼트
+          </h3>
+          <p className='mb-8 text-[16px] text-white/55'>
+            콘솔·아케이드 결선이 동시 진행됩니다.
+          </p>
+
+          <div className='mx-auto inline-flex flex-col items-stretch overflow-hidden rounded-xl border border-[#e86e3a]/15 bg-[#e86e3a]/[0.04] sm:flex-row'>
+            {FINALS_INFO.map((info, i) => (
+              <div
+                key={info.label}
+                className={`flex items-center gap-3 px-7 py-4 sm:flex-col sm:gap-1 sm:py-5 ${
+                  i > 0
+                    ? 'border-t border-[#e86e3a]/10 sm:border-t-0 sm:border-l'
+                    : ''
+                }`}
+              >
+                <span className='text-lg font-bold text-white/95 sm:text-xl'>
+                  {info.value}
+                </span>
+                <span className='text-xs text-white/40'>{info.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )

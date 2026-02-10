@@ -56,7 +56,7 @@ function GroupSeedTable({
                 <th className='px-4 py-2.5 whitespace-nowrap'>시드</th>
                 <th className='px-4 py-2.5 whitespace-nowrap'>지역</th>
                 <th className='px-4 py-2.5 whitespace-nowrap'>엔트리</th>
-                <th className='px-4 py-2.5 whitespace-nowrap'>닉네임</th>
+                <th className='px-4 py-2.5 whitespace-nowrap'>동더 네임</th>
                 <th className='px-4 py-2.5 text-right whitespace-nowrap'>
                   배정전 점수
                 </th>
