@@ -1,0 +1,779 @@
+{
+  "checkedAt": "2026-02-10T14:28:44.421Z",
+  "baseUrl": "http://127.0.0.1:4173",
+  "routeCount": 15,
+  "viewportCount": 2,
+  "issueCount": 2,
+  "issues": [
+    "mobile-375 /arcade/swiss: tiny text 3",
+    "mobile-390 /arcade/swiss: tiny text 3"
+  ],
+  "results": [
+    {
+      "viewport": "mobile-375",
+      "route": "/",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div > div:nth-of-type(1) > div > div",
+          "left": -20.58,
+          "right": -1.78,
+          "width": 18.81,
+          "text": ""
+        },
+        {
+          "selector": "div > section.relative.-mt-20:nth-of-type(1) > div.relative.flex:nth-of-type(2) > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": -64,
+          "right": 236,
+          "width": 300,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/apply",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div > div:nth-of-type(1) > div > div",
+          "left": -20.58,
+          "right": -1.78,
+          "width": 18.81,
+          "text": ""
+        },
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/archive",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/contact",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > section.space-y-10.md:space-y-14 > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "section.space-y-10.md:space-y-14 > div.grid.gap-4:nth-of-type(1) > div.flex.flex-col:nth-of-type(1) > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 262,
+          "right": 390,
+          "width": 128,
+          "text": ""
+        },
+        {
+          "selector": "section.space-y-10.md:space-y-14 > div.grid.gap-4:nth-of-type(1) > div.flex.flex-col:nth-of-type(2) > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 262,
+          "right": 390,
+          "width": 128,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/results",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div > div:nth-of-type(1) > div > div",
+          "left": -20.58,
+          "right": -1.78,
+          "width": 18.81,
+          "text": ""
+        },
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > section.space-y-8.md:space-y-10 > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.tkc-motion-reveal.translate-y-0:nth-of-type(1) > a.tkc-arc-glow.group > div.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 238,
+          "right": 398,
+          "width": 160,
+          "text": ""
+        },
+        {
+          "selector": "div.tkc-motion-reveal.translate-y-0:nth-of-type(2) > div.tkc-arc-glow.rounded-2xl > div.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 238,
+          "right": 398,
+          "width": 160,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/schedule",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "main.flex.w-full > div.mx-auto.max-w-[1200px] > section.relative.overflow-hidden:nth-of-type(1) > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "section.mb-20:nth-of-type(4) > div.space-y-5:nth-of-type(2) > div.relative.overflow-hidden:nth-of-type(1) > div.pointer-events-none.absolute:nth-of-type(2)",
+          "left": -12.5,
+          "right": 387.5,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/song-pool",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > section.md:space-y-14.space-y-8 > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "section.md:space-y-14.space-y-8 > div.space-y-8 > div.-mx-4.flex:nth-of-type(1) > button.flex.shrink-0:nth-of-type(3)",
+          "left": 359.7,
+          "right": 469.44,
+          "width": 109.73,
+          "text": "콘솔 결선"
+        },
+        {
+          "selector": "div.space-y-8 > div.-mx-4.flex:nth-of-type(1) > button.flex.shrink-0:nth-of-type(3) > span.size-2.shrink-0",
+          "left": 380.7,
+          "right": 388.7,
+          "width": 8,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/songs",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div > div:nth-of-type(1) > div > div",
+          "left": -20.58,
+          "right": -1.78,
+          "width": 18.81,
+          "text": ""
+        },
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > section.md:space-y-14.space-y-8 > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/console",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/console/finals",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(5)",
+          "left": 342.86,
+          "right": 447.45,
+          "width": 104.59,
+          "text": "라운드별 규정"
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(6)",
+          "left": 453.45,
+          "right": 546.81,
+          "width": 93.36,
+          "text": "플레이 규정"
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/arcade",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.overflow-hidden.transition-all:nth-of-type(2) > div.border-t.border-[#1e1e1e] > div.relative.overflow-hidden:nth-of-type(2) > div.tkc-motion-glow.pointer-events-none:nth-of-type(1)",
+          "left": -78.75,
+          "right": 193.75,
+          "width": 272.5,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/arcade/finals",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(5)",
+          "left": 342.86,
+          "right": 447.45,
+          "width": 104.59,
+          "text": "라운드별 규정"
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(6)",
+          "left": 453.45,
+          "right": 546.81,
+          "width": 93.36,
+          "text": "플레이 규정"
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/arcade/swiss",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(4)",
+          "left": 288.44,
+          "right": 381.8,
+          "width": 93.36,
+          "text": "사이드 규칙"
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(5)",
+          "left": 387.8,
+          "right": 469.92,
+          "width": 82.13,
+          "text": "동점 처리"
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(6)",
+          "left": 475.92,
+          "right": 569.28,
+          "width": 93.36,
+          "text": "진출자 선발"
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(7)",
+          "left": 575.28,
+          "right": 657.41,
+          "width": 82.13,
+          "text": "시드 산정"
+        }
+      ],
+      "tinyText": [
+        {
+          "selector": "div.space-y-5:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.relative.h-7:nth-of-type(2) > span.absolute.-bottom-1",
+          "fontSize": 8,
+          "text": "▼"
+        },
+        {
+          "selector": "div.space-y-5:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.relative.h-7:nth-of-type(4) > span.absolute.-bottom-1",
+          "fontSize": 8,
+          "text": "▼"
+        },
+        {
+          "selector": "div.space-y-5:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.relative.h-7:nth-of-type(6) > span.absolute.-bottom-1",
+          "fontSize": 8,
+          "text": "▼"
+        }
+      ]
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/arcade-results/2026",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "section.space-y-8.md:space-y-10 > div.space-y-3:nth-of-type(1) > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/arcade-results/2026/finals",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "section.space-y-8.md:space-y-10 > div.space-y-3:nth-of-type(1) > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 151,
+          "right": 551,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div > div:nth-of-type(1) > div > div",
+          "left": -21.4,
+          "right": -1.84,
+          "width": 19.56,
+          "text": ""
+        },
+        {
+          "selector": "div > section.relative.-mt-20:nth-of-type(1) > div.relative.flex:nth-of-type(2) > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": -64,
+          "right": 236,
+          "width": 300,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/apply",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div > div:nth-of-type(1) > div > div",
+          "left": -21.4,
+          "right": -1.84,
+          "width": 19.56,
+          "text": ""
+        },
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/archive",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/contact",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > section.space-y-10.md:space-y-14 > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "section.space-y-10.md:space-y-14 > div.grid.gap-4:nth-of-type(1) > div.flex.flex-col:nth-of-type(1) > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 277,
+          "right": 405,
+          "width": 128,
+          "text": ""
+        },
+        {
+          "selector": "section.space-y-10.md:space-y-14 > div.grid.gap-4:nth-of-type(1) > div.flex.flex-col:nth-of-type(2) > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 277,
+          "right": 405,
+          "width": 128,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/results",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div > div:nth-of-type(1) > div > div",
+          "left": -21.4,
+          "right": -1.84,
+          "width": 19.56,
+          "text": ""
+        },
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > section.space-y-8.md:space-y-10 > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.tkc-motion-reveal.translate-y-0:nth-of-type(1) > a.tkc-arc-glow.group > div.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 253,
+          "right": 413,
+          "width": 160,
+          "text": ""
+        },
+        {
+          "selector": "div.tkc-motion-reveal.translate-y-0:nth-of-type(2) > div.tkc-arc-glow.rounded-2xl > div.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 253,
+          "right": 413,
+          "width": 160,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/schedule",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "main.flex.w-full > div.mx-auto.max-w-[1200px] > section.relative.overflow-hidden:nth-of-type(1) > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "section.mb-20:nth-of-type(4) > div.space-y-5:nth-of-type(2) > div.relative.overflow-hidden:nth-of-type(1) > div.pointer-events-none.absolute:nth-of-type(2)",
+          "left": -5,
+          "right": 395,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/song-pool",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > section.md:space-y-14.space-y-8 > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "section.md:space-y-14.space-y-8 > div.space-y-8 > div.-mx-4.flex:nth-of-type(1) > button.flex.shrink-0:nth-of-type(3)",
+          "left": 359.7,
+          "right": 469.44,
+          "width": 109.73,
+          "text": "콘솔 결선"
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/songs",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div > div:nth-of-type(1) > div > div",
+          "left": -21.4,
+          "right": -1.84,
+          "width": 19.56,
+          "text": ""
+        },
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > section.md:space-y-14.space-y-8 > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/console",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/console/finals",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(5)",
+          "left": 342.86,
+          "right": 447.45,
+          "width": 104.59,
+          "text": "라운드별 규정"
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(6)",
+          "left": 453.45,
+          "right": 546.81,
+          "width": 93.36,
+          "text": "플레이 규정"
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/arcade",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.overflow-hidden.transition-all:nth-of-type(2) > div.border-t.border-[#1e1e1e] > div.relative.overflow-hidden:nth-of-type(2) > div.tkc-motion-glow.pointer-events-none:nth-of-type(1)",
+          "left": -71.23,
+          "right": 201.23,
+          "width": 272.45,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/arcade/finals",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(5)",
+          "left": 342.86,
+          "right": 447.45,
+          "width": 104.59,
+          "text": "라운드별 규정"
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(6)",
+          "left": 453.45,
+          "right": 546.81,
+          "width": 93.36,
+          "text": "플레이 규정"
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/arcade/swiss",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "div.mx-auto.max-w-[1200px] > div.w-full > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(5)",
+          "left": 387.8,
+          "right": 469.92,
+          "width": 82.13,
+          "text": "동점 처리"
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(6)",
+          "left": 475.92,
+          "right": 569.28,
+          "width": 93.36,
+          "text": "진출자 선발"
+        },
+        {
+          "selector": "div.w-full > nav.sticky.top-0 > div.flex.gap-1.5 > a.shrink-0.rounded-full:nth-of-type(7)",
+          "left": 575.28,
+          "right": 657.41,
+          "width": 82.13,
+          "text": "시드 산정"
+        }
+      ],
+      "tinyText": [
+        {
+          "selector": "div.space-y-5:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.relative.h-7:nth-of-type(2) > span.absolute.-bottom-1",
+          "fontSize": 8,
+          "text": "▼"
+        },
+        {
+          "selector": "div.space-y-5:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.relative.h-7:nth-of-type(4) > span.absolute.-bottom-1",
+          "fontSize": 8,
+          "text": "▼"
+        },
+        {
+          "selector": "div.space-y-5:nth-of-type(2) > div.flex.flex-col:nth-of-type(1) > div.relative.h-7:nth-of-type(6) > span.absolute.-bottom-1",
+          "fontSize": 8,
+          "text": "▼"
+        }
+      ]
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/arcade-results/2026",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "section.space-y-8.md:space-y-10 > div.space-y-3:nth-of-type(1) > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "/arcade-results/2026/finals",
+      "status": 200,
+      "horizontalOverflowPx": 0,
+      "overflowOffenders": [
+        {
+          "selector": "section.space-y-8.md:space-y-10 > div.space-y-3:nth-of-type(1) > section.relative.overflow-hidden > div.pointer-events-none.absolute:nth-of-type(1)",
+          "left": 166,
+          "right": 566,
+          "width": 400,
+          "text": ""
+        }
+      ],
+      "tinyText": []
+    }
+  ],
+  "previewLogs": [
+    "\n> shadcn-admin@2.2.1 preview C:\\Users\\LAGOS\\OneDrive\\문서\\GitHub\\tkc2026\n> vite preview \"--host\" \"127.0.0.1\" \"--port\" \"4173\" \"--strictPort\"\n\n",
+    "  \u001b[32m➜\u001b[39m  \u001b[1mLocal\u001b[22m:   \u001b[36mhttp://127.0.0.1:\u001b[1m4173\u001b[22m/\u001b[39m\n"
+  ]
+}
