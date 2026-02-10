@@ -55,6 +55,13 @@ function groupByTitle(entries: PoolEntry[]): GroupedSong[] {
   ]
 }
 
+type TabDef = {
+  key: string
+  label: string
+  dotColor: string
+  pool: GroupedSong[]
+}
+
 function SongPoolPage() {
   const { data, isLoading, isError } = useSongPools<SongPoolsData>()
   const title = t('nav.songPool')
@@ -72,34 +79,31 @@ function SongPoolPage() {
     [data?.consoleFinals]
   )
 
-  const tabs = useMemo(
-    () =>
-      [
-        {
-          key: 'arcadeSwiss',
-          label: '아케이드 스위스 스테이지',
-          iconSrc: '/branding/arcade-icon.png',
-          pool: arcadeSwiss,
-        },
-        {
-          key: 'arcadeFinals',
-          label: '아케이드 결선',
-          iconSrc: '/branding/arcade-icon.png',
-          pool: arcadeFinals,
-        },
-        {
-          key: 'consoleFinals',
-          label: '콘솔 결선',
-          iconSrc: '/branding/console-icon.png',
-          pool: consoleFinals,
-        },
-      ] as const,
+  const tabs: TabDef[] = useMemo(
+    () => [
+      {
+        key: 'arcadeSwiss',
+        label: '아케이드 스위스 스테이지',
+        dotColor: '#f5a623',
+        pool: arcadeSwiss,
+      },
+      {
+        key: 'arcadeFinals',
+        label: '아케이드 결선',
+        dotColor: '#f5a623',
+        pool: arcadeFinals,
+      },
+      {
+        key: 'consoleFinals',
+        label: '콘솔 결선',
+        dotColor: '#e86e3a',
+        pool: consoleFinals,
+      },
+    ],
     [arcadeSwiss, arcadeFinals, consoleFinals]
   )
 
-  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]['key']>(
-    tabs[0].key
-  )
+  const [activeTab, setActiveTab] = useState(tabs[0].key)
   const active = tabs.find((t) => t.key === activeTab) ?? tabs[0]
   const isEmpty = tabs.every((t) => t.pool.length === 0)
 
@@ -133,35 +137,34 @@ function SongPoolPage() {
           </p>
         </div>
       ) : (
-        <div className='space-y-6'>
-          {/* Tab buttons */}
-          <div className='flex gap-2 overflow-x-auto'>
+        <div className='space-y-8'>
+          {/* Tab bar */}
+          <div className='-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 scrollbar-none md:mx-0 md:px-0'>
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 type='button'
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  'flex shrink-0 items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors',
+                  'flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-[15px] font-semibold whitespace-nowrap transition-all',
                   activeTab === tab.key
-                    ? 'border-[#ff2a00]/40 bg-[#ff2a00]/10 text-white'
-                    : 'border-white/10 bg-white/[0.03] text-white/50 hover:bg-white/[0.06] hover:text-white/70'
+                    ? 'border-white/15 bg-white/[0.06] text-white'
+                    : 'border-transparent text-white/40 hover:bg-white/[0.03] hover:text-white/60'
                 )}
               >
-                <img
-                  src={tab.iconSrc}
-                  alt=''
-                  className='h-5 w-5 rounded object-contain'
+                <span
+                  className='size-2 flex-shrink-0 rounded-full'
+                  style={{ backgroundColor: tab.dotColor }}
                 />
                 {tab.label}
               </button>
             ))}
           </div>
 
-          {/* Active pool content */}
-          <SongPoolSection
+          {/* Active pool */}
+          <PoolSection
             label={active.label}
-            iconSrc={active.iconSrc}
+            dotColor={active.dotColor}
             pool={active.pool}
           />
         </div>
@@ -170,34 +173,47 @@ function SongPoolPage() {
   )
 }
 
-function SongPoolSection({
+function PoolSection({
   label,
-  iconSrc,
+  dotColor,
   pool,
 }: {
   label: string
-  iconSrc: string
+  dotColor: string
   pool: GroupedSong[]
 }) {
   if (pool.length === 0) return null
 
+  const revealedCount = pool.filter((s) => s.revealed).length
+  const totalCount = pool.length
+  const countLabel =
+    revealedCount === totalCount
+      ? `${totalCount}곡`
+      : `${revealedCount}/${totalCount}곡`
+
   return (
     <div>
-      <div className='mb-4 flex items-center gap-3 md:mb-6'>
-        <img
-          src={iconSrc}
-          alt=''
-          className='h-7 w-7 rounded-lg object-contain'
-        />
-        <h2 className='text-xl font-bold text-white md:text-2xl'>{label}</h2>
-        <span className='ml-auto text-sm text-white/50'>{pool.length}곡</span>
+      {/* Pool header */}
+      <div className='mb-5 flex items-center justify-between gap-4'>
+        <div className='flex items-center gap-2.5'>
+          <span
+            className='size-2.5 flex-shrink-0 rounded-full'
+            style={{ backgroundColor: dotColor }}
+          />
+          <h2 className='text-xl font-bold tracking-tight md:text-2xl'>
+            {label}
+          </h2>
+        </div>
+        <span className='shrink-0 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1 font-mono text-sm font-semibold text-white/40'>
+          {countLabel}
+        </span>
       </div>
 
-      {/* Mobile: Card list */}
-      <div className='space-y-2.5 md:hidden'>
+      {/* Mobile: card list */}
+      <div className='space-y-2 md:hidden'>
         {pool.map((song, index) => (
           <div
-            key={`m-${song.title || `hidden-${index}`}-${index}`}
+            key={`m-${song.title || `tbd-${index}`}-${index}`}
             className={cn(
               'rounded-xl border px-4 py-3',
               song.revealed
@@ -207,118 +223,133 @@ function SongPoolSection({
           >
             {song.revealed ? (
               <>
-                <p className='leading-relaxed font-medium break-words text-white'>
-                  {song.title}
-                </p>
-                <div className='mt-2 flex items-center gap-4'>
+                <div className='flex items-start gap-3'>
+                  <span className='mt-0.5 shrink-0 font-mono text-xs font-semibold text-white/30'>
+                    {index + 1}
+                  </span>
+                  <p className='flex-1 leading-relaxed font-semibold break-words text-white'>
+                    {song.title}
+                  </p>
+                </div>
+                <div className='mt-2 flex items-center gap-4 pl-6'>
                   <div className='flex items-center gap-1.5'>
-                    <span className='text-xs text-white/50'>귀신</span>
+                    <span className='text-xs text-white/40'>귀신</span>
                     {song.oni != null ? (
                       <LevelBadge level={song.oni} />
                     ) : (
-                      <span className='text-xs text-white/40'>—</span>
+                      <span className='text-xs text-white/20'>—</span>
                     )}
                   </div>
                   <div className='flex items-center gap-1.5'>
-                    <span className='text-xs text-white/50'>뒷보면</span>
+                    <span className='text-xs text-white/40'>뒷보면</span>
                     {song.ura != null ? (
                       <LevelBadge level={song.ura} isUra />
                     ) : (
-                      <span className='text-xs text-white/40'>—</span>
+                      <span className='text-xs text-white/20'>—</span>
                     )}
                   </div>
                 </div>
               </>
             ) : (
-              <>
-                <p className='leading-relaxed font-medium text-white/50'>
-                  <span className='font-bold tracking-widest'>???</span>
-                  <Badge
-                    variant='outline'
-                    className='ml-2 border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[#ff8c66]'
-                  >
-                    추후 공지
-                  </Badge>
-                </p>
-                <div className='mt-2 flex items-center gap-4'>
-                  <div className='flex items-center gap-1.5'>
-                    <span className='text-xs text-white/50'>귀신</span>
-                    <span className='text-xs text-white/40'>—</span>
-                  </div>
-                  <div className='flex items-center gap-1.5'>
-                    <span className='text-xs text-white/50'>뒷보면</span>
-                    <span className='text-xs text-white/40'>—</span>
-                  </div>
-                </div>
-              </>
+              <div className='flex items-center gap-3'>
+                <span className='shrink-0 font-mono text-xs font-semibold text-white/30'>
+                  {index + 1}
+                </span>
+                <span className='font-semibold tracking-widest text-white/30'>
+                  ???
+                </span>
+                <Badge
+                  variant='outline'
+                  className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[10px] text-[#ff8c66]'
+                >
+                  추후 공지
+                </Badge>
+              </div>
             )}
           </div>
         ))}
       </div>
 
-      {/* Desktop: Table */}
-      <div className='hidden overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.03] md:block'>
-        <table className='w-full text-sm md:text-base'>
+      {/* Desktop: table */}
+      <div className='hidden overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] md:block'>
+        <table className='w-full text-[15px]'>
           <caption className='sr-only'>{label} 선곡풀</caption>
           <thead>
-            <tr className='border-b border-white/10 text-left text-xs font-semibold tracking-wider text-white/50 uppercase'>
-              <th className='px-4 py-3 text-center'>#</th>
-              <th className='px-4 py-3'>곡명</th>
-              <th className='px-4 py-3 text-center'>귀신</th>
-              <th className='px-4 py-3 text-center'>뒷보면</th>
+            <tr className='border-b border-white/[0.08] bg-white/[0.015]'>
+              <th className='w-12 px-4 py-3.5 text-center font-mono text-[11px] font-semibold tracking-widest text-white/35 uppercase'>
+                #
+              </th>
+              <th className='px-4 py-3.5 text-left font-mono text-[11px] font-semibold tracking-widest text-white/35 uppercase'>
+                곡명
+              </th>
+              <th className='w-20 px-4 py-3.5 text-center font-mono text-[11px] font-semibold tracking-widest text-white/35 uppercase'>
+                귀신
+              </th>
+              <th className='w-20 px-4 py-3.5 text-center font-mono text-[11px] font-semibold tracking-widest text-white/35 uppercase'>
+                뒷보면
+              </th>
             </tr>
           </thead>
           <tbody>
             {pool.map((song, index) => (
               <tr
-                key={`${song.title || `hidden-${index}`}-${index}`}
+                key={`${song.title || `tbd-${index}`}-${index}`}
                 className={cn(
-                  'border-b border-white/[0.06] transition-colors',
-                  song.revealed && 'hover:bg-white/[0.04]',
-                  index === pool.length - 1 && 'border-b-0'
+                  'border-b border-white/[0.04] transition-colors last:border-b-0',
+                  song.revealed && 'hover:bg-white/[0.03]'
                 )}
               >
-                <td className='px-4 py-3 text-center text-white/40'>
+                <td className='px-4 py-3.5 text-center font-mono text-sm font-semibold text-white/25'>
                   {index + 1}
                 </td>
                 {song.revealed ? (
                   <>
-                    <td className='px-4 py-3 leading-relaxed font-medium break-words text-white'>
+                    <td className='px-4 py-3.5 font-semibold text-white'>
                       {song.title}
                     </td>
-                    <td className='px-4 py-3 text-center'>
+                    <td className='px-4 py-3.5 text-center'>
                       {song.oni != null ? (
                         <LevelBadge level={song.oni} />
                       ) : (
-                        <span className='text-white/50'>—</span>
+                        <span className='font-mono text-sm text-white/[0.12]'>
+                          —
+                        </span>
                       )}
                     </td>
-                    <td className='px-4 py-3 text-center'>
+                    <td className='px-4 py-3.5 text-center'>
                       {song.ura != null ? (
                         <LevelBadge level={song.ura} isUra />
                       ) : (
-                        <span className='text-white/50'>—</span>
+                        <span className='font-mono text-sm text-white/[0.12]'>
+                          —
+                        </span>
                       )}
                     </td>
                   </>
                 ) : (
                   <>
-                    <td className='px-4 py-3 leading-relaxed font-medium text-white/50'>
+                    <td className='px-4 py-3.5'>
                       <div className='flex items-center gap-2'>
-                        <span className='font-bold tracking-widest'>???</span>
+                        <span className='font-semibold tracking-widest text-white/30'>
+                          ???
+                        </span>
                         <Badge
                           variant='outline'
-                          className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[#ff8c66]'
+                          className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[10px] text-[#ff8c66]'
                         >
                           추후 공지
                         </Badge>
                       </div>
                     </td>
-                    <td className='px-4 py-3 text-center'>
-                      <span className='text-white/50'>—</span>
+                    <td className='px-4 py-3.5 text-center'>
+                      <span className='font-mono text-sm text-white/[0.12]'>
+                        —
+                      </span>
                     </td>
-                    <td className='px-4 py-3 text-center'>
-                      <span className='text-white/50'>—</span>
+                    <td className='px-4 py-3.5 text-center'>
+                      <span className='font-mono text-sm text-white/[0.12]'>
+                        —
+                      </span>
                     </td>
                   </>
                 )}
