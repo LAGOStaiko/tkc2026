@@ -111,28 +111,28 @@ type VenueAsset = {
 const VENUE_ASSETS: VenueAsset[] = [
   {
     image: '/branding/venue-seoul.png',
-    dates: ['2026-03-21'],
-    keywords: ['taiko labs'],
+    dates: ['2026-03-21', '03.21', '3.21', '03-21'],
+    keywords: ['taiko labs', 'taikolabs', '서울', 'seoul'],
   },
   {
     image: '/branding/venue-daejeon.png',
-    dates: ['2026-03-28'],
-    keywords: ['cygameworld'],
+    dates: ['2026-03-28', '03.28', '3.28', '03-28'],
+    keywords: ['싸이뮤직', 'cygameworld', '대전', 'daejeon'],
   },
   {
     image: '/branding/venue-gwangju.png',
-    dates: ['2026-04-04'],
-    keywords: ['gameplaza'],
+    dates: ['2026-04-04', '04.04', '4.04', '04-04'],
+    keywords: ['게임플라자', 'gameplaza', '광주', 'gwangju'],
   },
   {
     image: '/branding/venue-busan.png',
-    dates: ['2026-04-11'],
-    keywords: ['game d', 'gamed'],
+    dates: ['2026-04-11', '04.11', '4.11', '04-11'],
+    keywords: ['게임d', '게임디', 'game d', 'gamed', '부산', 'busan'],
   },
 ]
 
 const normalizeMatchText = (value?: string) =>
-  (value ?? '').toLowerCase().replace(/\s+/g, '')
+  (value ?? '').toLowerCase().replace(/[\s.\-·,/()]+/g, '')
 
 const findVenueAsset = (item: ApiScheduleItem) => {
   const haystack = normalizeMatchText(`${item.title ?? ''} ${item.location ?? ''}`)
@@ -539,6 +539,8 @@ type TimelineEntry = {
   meta?: string
   mode?: 'online' | 'offline'
   isFinals?: boolean
+  venueLabel?: string
+  venueImage?: string
 }
 
 type TimelineGroupData = { dateLabel: string; entries: TimelineEntry[] }
@@ -565,6 +567,9 @@ const buildTimelineEntries = (
       const mode = inferMode(item)
       const title = item.title ?? '일정'
       const isFinals = division === 'all'
+      const locationMeta =
+        item.location && !looksLikeUrl(item.location) ? item.location : undefined
+      const venue = mode === 'offline' ? findVenueAsset(item) : undefined
 
       if (start && end && start.getTime() !== end.getTime()) {
         entries.push({
@@ -591,12 +596,11 @@ const buildTimelineEntries = (
           dateLabel: formatDateObj(d),
           division,
           title,
-          meta:
-            item.location && !looksLikeUrl(item.location)
-              ? item.location
-              : undefined,
+          meta: item.note && !looksLikeUrl(item.note) ? item.note : undefined,
           mode,
           isFinals,
+          venueLabel: venue ? locationMeta ?? title : undefined,
+          venueImage: venue?.image,
         })
       }
     }
@@ -724,25 +728,16 @@ function SchedulePanel({
   variant: 'console' | 'arcade'
   events: DisplayEvent[]
 }) {
-  const iconCls =
-    variant === 'console'
-      ? 'bg-[#e86e3a]/10 border-[#e86e3a]/15'
-      : 'bg-[#f5a623]/10 border-[#f5a623]/15'
-
   return (
     <div className='overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
       <div className='flex items-center gap-3.5 border-b border-[#1e1e1e] px-6 py-5'>
-        <div
-          className={`grid h-[42px] w-[42px] shrink-0 place-items-center rounded-[10px] border ${iconCls}`}
-        >
-          <img
-            src={iconSrc}
-            alt=''
-            className='h-5 w-5'
-            loading='lazy'
-            draggable={false}
-          />
-        </div>
+        <img
+          src={iconSrc}
+          alt=''
+          className='h-11 w-11 shrink-0 rounded-xl object-cover'
+          loading='lazy'
+          draggable={false}
+        />
         <div>
           <div className='text-lg font-bold text-white/90'>{title}</div>
           <div className='text-[13px] text-white/35'>{subtitle}</div>
@@ -863,10 +858,29 @@ function Timeline({ groups }: { groups: TimelineGroupData[] }) {
                   <div className='text-[15px] font-semibold break-keep text-white/90'>
                     {entry.title}
                   </div>
-                  {entry.meta && (
+                  {entry.venueLabel ? (
+                    <div className='mt-1 flex items-center gap-2'>
+                      <img
+                        src={entry.venueImage ?? DEFAULT_VENUE_IMAGE}
+                        alt={entry.venueLabel}
+                        className='size-6 rounded-md object-cover'
+                        loading='lazy'
+                        onError={(event) => {
+                          const image = event.currentTarget
+                          if (image.dataset.fallbackApplied === 'true') return
+                          image.dataset.fallbackApplied = 'true'
+                          image.src = DEFAULT_VENUE_IMAGE
+                        }}
+                      />
+                      <span className='text-[13px] text-white/40'>{entry.venueLabel}</span>
+                    </div>
+                  ) : entry.meta ? (
                     <div className='mt-0.5 text-[13px] text-white/35'>
                       {entry.meta}
                     </div>
+                  ) : null}
+                  {entry.venueLabel && entry.meta && (
+                    <div className='mt-1 text-[12px] text-white/30'>{entry.meta}</div>
                   )}
                 </div>
                 {entry.mode && <ModeTag mode={entry.mode} />}
@@ -1010,14 +1024,14 @@ function SchedulePage() {
       >
         <div className='grid gap-5 lg:grid-cols-2'>
           <SchedulePanel
-            icon='/branding/console-icon.png'
+            icon='/branding/v2/icon-console.png'
             title='콘솔'
             subtitle='콘솔 일정 및 경기 정보'
             variant='console'
             events={consoleEvents}
           />
           <SchedulePanel
-            icon='/branding/arcade-icon.png'
+            icon='/branding/v2/icon-arcade.png'
             title='아케이드'
             subtitle='아케이드 일정 및 경기 정보'
             variant='arcade'

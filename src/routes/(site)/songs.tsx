@@ -3,9 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSongs } from '@/lib/api'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
 import { PageHero, TkcSection } from '@/components/tkc/layout'
-import { LevelBadge } from '@/components/tkc/level-badge'
 
 export const Route = createFileRoute('/(site)/songs')({
   component: SongsPage,
@@ -25,6 +23,19 @@ type SongStage = {
 
 type SongsData = {
   songs?: SongStage[]
+}
+
+const DIFF_LABEL: Record<string, string> = {
+  ura: '뒷보면',
+  oni: '귀신',
+}
+
+function diffBadgeClass(level: number | null): string {
+  if (level == null) return 'bg-[#e86e3a]/10 text-[#e86e3a]'
+  if (level >= 10)
+    return 'bg-[#e8403a]/15 text-[#e8403a] shadow-[0_0_6px_rgba(232,64,58,0.08)]'
+  if (level >= 9) return 'bg-[#e8403a]/10 text-[#e8403a]'
+  return 'bg-[#e86e3a]/10 text-[#e86e3a]'
 }
 
 function SongsPage() {
@@ -51,7 +62,11 @@ function SongsPage() {
 
   return (
     <TkcSection className='space-y-8'>
-      <PageHero badge='SONGS' title={title} subtitle='결승전까지 가는 여정 —' />
+      <PageHero
+        badge='TASK SONGS'
+        title={title}
+        subtitle='각 단계별 과제곡 목록입니다.'
+      />
 
       {isError && (
         <p className='text-sm text-destructive'>
@@ -63,19 +78,17 @@ function SongsPage() {
         <p className='text-sm text-white/60'>과제곡을 불러오는 중...</p>
       ) : null}
 
-      <div className='grid gap-8 md:gap-14 lg:grid-cols-2'>
-        <DivisionTimeline
+      <div className='grid gap-14 lg:grid-cols-2'>
+        <DivisionColumn
           label='콘솔 부문'
-          iconSrc='/branding/console-icon.png'
+          variant='console'
           songs={consoleSongs}
-          emptyText='콘솔 과제곡이 아직 준비되지 않았습니다.'
           isLoading={isLoading}
         />
-        <DivisionTimeline
+        <DivisionColumn
           label='아케이드 부문'
-          iconSrc='/branding/arcade-icon.png'
+          variant='arcade'
           songs={arcadeSongs}
-          emptyText='아케이드 과제곡이 아직 준비되지 않았습니다.'
           isLoading={isLoading}
         />
       </div>
@@ -83,163 +96,175 @@ function SongsPage() {
   )
 }
 
-function DivisionTimeline({
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Division Column                                                    */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function DivisionColumn({
   label,
-  iconSrc,
+  variant,
   songs,
-  emptyText,
   isLoading,
 }: {
   label: string
-  iconSrc: string
+  variant: 'console' | 'arcade'
   songs: SongStage[]
-  emptyText: string
   isLoading: boolean
 }) {
+  const accent = variant === 'console' ? '#e86e3a' : '#f5a623'
+
   return (
     <div>
-      {/* Division header */}
-      <div className='mb-6 flex items-center gap-3 md:mb-8'>
-        <img
-          src={iconSrc}
-          alt=''
-          className='h-7 w-7 rounded-lg object-contain'
-        />
-        <h2 className='text-xl font-bold text-white md:text-2xl'>{label}</h2>
+      {/* Column header */}
+      <div className='mb-8 flex items-center gap-3'>
+        <div
+          className='flex size-9 shrink-0 items-center justify-center rounded-lg'
+          style={{
+            background: `${accent}1a`,
+            border: `1px solid ${accent}33`,
+            boxShadow: `0 0 12px ${accent}0f`,
+          }}
+        >
+          <span
+            className='size-2 rounded-full'
+            style={{ backgroundColor: accent }}
+          />
+        </div>
+        <h2 className='text-[22px] font-extrabold tracking-tight text-white'>
+          {label}
+        </h2>
       </div>
 
+      {/* Timeline */}
       {songs.length > 0 ? (
-        <div className='relative pl-5 md:pl-8'>
-          {/* Vertical connector line */}
-          <div className='absolute top-2 bottom-2 left-[9px] w-px bg-gradient-to-b from-[#ff2a00]/60 via-white/15 to-[#ff2a00]/80 md:left-[15px]' />
+        <div className='relative pl-7'>
+          <div className='absolute left-[5px] top-1.5 bottom-1.5 w-0.5 bg-[#1e1e1e]' />
 
-          {/* Stage nodes */}
-          <div className='space-y-5 md:space-y-6'>
-            {songs.map((song, index) => (
-              <TimelineNode
-                key={song.stageKey}
-                song={song}
-                isFinals={
-                  /final|결승/i.test(song.stageKey) ||
-                  /결승/.test(song.stageLabel) ||
-                  index === songs.length - 1
-                }
-              />
-            ))}
+          <div className='space-y-6'>
+            {songs.map((song, index) => {
+              const isRevealed = song.revealed && !!song.songTitle
+              const isFinals =
+                /final|결승/i.test(song.stageKey) ||
+                /결승/.test(song.stageLabel) ||
+                index === songs.length - 1
+
+              return (
+                <TaskCard
+                  key={song.stageKey}
+                  song={song}
+                  isRevealed={isRevealed}
+                  isFinals={!isRevealed && isFinals}
+                />
+              )
+            })}
           </div>
         </div>
       ) : !isLoading ? (
-        <p className='py-4 text-sm text-white/50'>{emptyText}</p>
+        <p className='py-4 text-sm text-white/50'>
+          과제곡이 아직 준비되지 않았습니다.
+        </p>
       ) : null}
     </div>
   )
 }
 
-function TimelineNode({
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Task Card                                                          */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function TaskCard({
   song,
+  isRevealed,
   isFinals,
 }: {
   song: SongStage
+  isRevealed: boolean
   isFinals: boolean
 }) {
-  const isRevealed = song.revealed && !!song.songTitle
-
   return (
     <div className='relative'>
       {/* Timeline dot */}
       <div
         className={cn(
-          'absolute top-3.5 z-10 md:top-4',
-          isFinals
-            ? '-left-5 -ml-[3px] md:-left-8 md:-ml-[4px]'
-            : '-left-5 -ml-[1px] md:-left-8 md:-ml-[1px]'
+          'absolute -left-7 top-[18px] z-10 size-3 rounded-full',
+          isRevealed
+            ? 'border-2 border-[#0a0a0a] bg-[#f5a623] shadow-[0_0_0_3px_rgba(245,166,35,0.15),0_0_10px_rgba(245,166,35,0.2)]'
+            : isFinals
+              ? 'border-2 border-[#0a0a0a] bg-[#e86e3a] shadow-[0_0_0_3px_rgba(232,110,58,0.2),0_0_12px_rgba(232,110,58,0.3)]'
+              : 'border-2 border-[#808080]/50 bg-transparent'
         )}
-      >
-        <div
-          className={cn(
-            'rounded-full',
-            isFinals
-              ? 'h-4 w-4 bg-[#ff2a00] shadow-[0_0_12px_rgba(255,42,0,0.6)]'
-              : isRevealed
-                ? 'h-2.5 w-2.5 bg-[#ff2a00]'
-                : 'h-2.5 w-2.5 border-2 border-white/30 bg-white/10'
-          )}
-        />
-        {isFinals && (
-          <div className='tkc-motion-dot absolute -inset-1 rounded-full border border-[#ff2a00]/40' />
-        )}
-      </div>
+      />
 
       {/* Card */}
       <div
         className={cn(
-          'rounded-2xl border p-4 transition-colors duration-300 md:p-6',
-          isFinals
-            ? 'border-[#ff2a00]/30 bg-[#ff2a00]/[0.06] shadow-[0_0_30px_rgba(255,42,0,0.08)]'
-            : isRevealed
-              ? 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]'
-              : 'border-white/[0.06] bg-white/[0.015]'
+          'overflow-hidden rounded-[14px] bg-[#111] transition-all duration-300',
+          isRevealed
+            ? 'border border-[#f5a623]/15 border-l-[3px] border-l-[#f5a623] hover:-translate-y-0.5 hover:border-[#f5a623]/30'
+            : isFinals
+              ? 'relative border border-[#e86e3a]/20 border-l-[3px] border-l-[#e86e3a] hover:-translate-y-0.5 hover:border-[#e86e3a]/35'
+              : 'border border-[#1e1e1e] hover:border-[#2a2a2a]'
         )}
       >
-        {/* Stage label */}
-        <div className='flex items-center gap-2.5'>
-          <span
-            className={cn(
-              'text-sm leading-tight font-bold break-keep md:text-base',
-              isFinals ? 'text-[#ff2a00]' : 'text-[#ff8c66]'
-            )}
-          >
-            {song.stageLabel}
-          </span>
-          {!isRevealed && (
-            <Badge
-              variant='outline'
-              className='border-[#ff2a00]/30 bg-[#ff2a00]/5 text-[#ff8c66]'
-            >
-              추후 공지
-            </Badge>
-          )}
-        </div>
+        {isFinals && (
+          <div className='pointer-events-none absolute inset-0 rounded-[14px] bg-gradient-to-br from-[#e86e3a]/[0.03] to-transparent' />
+        )}
 
-        {/* Song content */}
-        <div className='mt-3'>
+        <div className='relative p-5'>
+          {/* Stage label */}
+          <div className='mb-2.5 flex items-center gap-2'>
+            <span
+              className={cn(
+                'text-sm font-semibold break-keep',
+                isRevealed ? 'text-[#f5a623]' : 'text-[#e86e3a]'
+              )}
+            >
+              {song.stageLabel}
+            </span>
+            {!isRevealed && (
+              <span className='rounded bg-[#e86e3a]/[0.08] px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wider text-[#e86e3a]'>
+                추후 공지
+              </span>
+            )}
+          </div>
+
+          {/* Song content */}
           {isRevealed ? (
-            <div className='space-y-2'>
-              <div className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
-                <span
-                  className={cn(
-                    'leading-relaxed font-bold break-words text-white',
-                    isFinals ? 'text-base md:text-xl' : 'text-base md:text-lg'
-                  )}
-                >
+            <div>
+              <div className='flex flex-wrap items-center gap-2.5'>
+                <span className='text-[22px] font-extrabold leading-tight text-white'>
                   {song.songTitle}
                 </span>
                 {song.difficulty && (
-                  <span className='text-sm text-white/70 md:text-base'>
-                    {song.difficulty === 'ura'
-                      ? '뒷보면'
-                      : song.difficulty === 'oni'
-                        ? '귀신'
-                        : song.difficulty}
+                  <span className='inline-flex items-center gap-1.5 text-sm font-medium text-[#808080]'>
+                    {DIFF_LABEL[song.difficulty] ?? song.difficulty}
+                    {song.level != null && (
+                      <span
+                        className={cn(
+                          'rounded px-2 py-0.5 font-mono text-xs font-bold',
+                          diffBadgeClass(song.level)
+                        )}
+                      >
+                        ★{song.level}
+                      </span>
+                    )}
                   </span>
-                )}
-                {song.level != null && (
-                  <LevelBadge
-                    level={song.level}
-                    isUra={song.difficulty === 'ura'}
-                  />
                 )}
               </div>
               {song.descriptionMd && (
-                <p className='text-sm leading-relaxed break-keep text-white/75 md:text-base'>
+                <p className='mt-1 text-[15px] text-[#808080] break-keep'>
                   {song.descriptionMd}
                 </p>
               )}
             </div>
           ) : (
-            <div className='flex items-center gap-2 text-white/50'>
-              <span className='text-2xl font-bold tracking-widest'>???</span>
-              <span className='text-sm'>추후 공개 예정입니다.</span>
+            <div>
+              <p className='font-mono text-2xl font-bold tracking-[2px] text-[#808080]/40'>
+                ???
+              </p>
+              <p className='mt-1 text-sm text-[#808080]/60'>
+                추후 공개 예정입니다.
+              </p>
             </div>
           )}
         </div>
