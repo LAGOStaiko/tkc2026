@@ -235,7 +235,7 @@ function ConsoleLayout() {
             </h1>
           </FadeIn>
           <FadeIn delay={240}>
-            <p className='mt-4 max-w-[520px] text-[15px] font-light break-keep text-white/55'>
+            <p className='mt-4 max-w-[520px] text-[15px] leading-[1.55] font-light break-keep text-white/55'>
               과제곡 2곡을 플레이하고 영상을 제출하세요. 합산 점수 상위 4명이
               결선에 진출합니다.
             </p>

@@ -414,122 +414,55 @@ function ScheduleStrip() {
       to='/schedule'
       className='tkc-motion-surface block overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'
     >
-      {/* Desktop */}
-      <div className='hidden sm:grid sm:grid-cols-4'>
-        {SCHEDULE_ITEMS.map((item, i) => {
+      <div className='divide-y divide-[#1e1e1e]'>
+        {SCHEDULE_ITEMS.map((item) => {
           const status = getScheduleStatus(item)
+          const isHighlight = 'highlight' in item && item.highlight
           return (
             <div
-              key={item.date}
-              className={`relative px-4 py-7 text-center transition-colors hover:bg-white/[0.02] ${
-                'highlight' in item && item.highlight
-                  ? 'bg-[#e86e3a]/[0.03]'
-                  : ''
+              key={`${item.fullDate}-${item.name}`}
+              className={`flex items-center gap-4 px-5 py-4 transition-colors hover:bg-white/[0.02] sm:px-6 ${
+                isHighlight ? 'bg-[#e86e3a]/[0.03]' : ''
               }`}
             >
               <div
-                className={`mx-auto mb-3 size-2 rounded-full ${item.dotCls}`}
+                className={`size-2 shrink-0 rounded-full ${item.dotCls}`}
               />
               <div
-                className={`mb-1.5 font-mono text-[28px] font-extrabold tracking-tight ${
-                  'highlight' in item && item.highlight
+                className={`w-14 shrink-0 font-mono text-lg font-extrabold tracking-tight sm:w-16 sm:text-xl ${
+                  isHighlight
                     ? 'bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'
                     : 'text-white/95'
                 }`}
               >
                 {item.date}
               </div>
-              <div className='mb-1.5 text-sm font-medium text-white/75'>
-                {item.name}
-              </div>
-              {'venueName' in item && item.venueName && (
-                <div className='mb-2 flex items-center justify-center gap-2'>
-                  <img
-                    src={item.venueImage ?? ASSETS.arcadeIcon}
-                    alt={item.venueName}
-                    className='size-7 rounded-md object-cover'
-                    loading='lazy'
-                    onError={(e) => {
-                      const img = e.currentTarget
-                      if (img.dataset.fallbackApplied === 'true') return
-                      img.dataset.fallbackApplied = 'true'
-                      img.src = ASSETS.arcadeIcon
-                    }}
-                  />
-                  <span className='text-[12px] font-semibold text-white/80'>
-                    {item.venueName}
-                  </span>
-                </div>
-              )}
-              {'sub' in item && item.sub && (
-                <div className='mb-2 text-[12px] text-white/50'>
-                  {item.sub}
-                </div>
-              )}
-              <div className='flex items-center justify-center gap-1.5'>
-                <span
-                  className={`inline-block rounded px-2.5 py-0.5 font-mono text-[11px] font-semibold tracking-wider ${item.tagCls}`}
-                >
-                  {item.tag}
-                </span>
-                <span
-                  className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${STATUS_STYLES[status]}`}
-                >
-                  {status}
-                </span>
-              </div>
-              {i < SCHEDULE_ITEMS.length - 1 && (
-                <div className='absolute top-[20%] right-0 bottom-[20%] w-px bg-[#1e1e1e]' />
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Mobile */}
-      <div className='divide-y divide-[#1e1e1e] sm:hidden'>
-        {SCHEDULE_ITEMS.map((item) => {
-          const status = getScheduleStatus(item)
-          return (
-            <div
-              key={item.date}
-              className={`flex items-center gap-4 px-5 py-4 ${
-                'highlight' in item && item.highlight
-                  ? 'bg-[#e86e3a]/[0.03]'
-                  : ''
-              }`}
-            >
-              <div
-                className={`size-2 shrink-0 rounded-full ${item.dotCls}`}
-              />
-              <div className='w-14 shrink-0 font-mono text-lg font-extrabold tracking-tight text-white/95'>
-                {item.date}
-              </div>
               <div className='min-w-0 flex-1'>
-                <div className='text-sm font-medium text-white/75'>
+                <div className='text-sm font-medium text-white/75 sm:text-[15px]'>
                   {item.name}
                 </div>
                 {'venueName' in item && item.venueName && (
                   <div className='mt-1 flex items-center gap-2'>
-                    <img
-                      src={item.venueImage ?? ASSETS.arcadeIcon}
-                      alt={item.venueName}
-                      className='size-6 rounded-md object-cover'
-                      loading='lazy'
-                      onError={(e) => {
-                        const img = e.currentTarget
-                        if (img.dataset.fallbackApplied === 'true') return
-                        img.dataset.fallbackApplied = 'true'
-                        img.src = ASSETS.arcadeIcon
-                      }}
-                    />
-                    <span className='text-[11px] font-semibold text-white/70'>
+                    {'venueImage' in item && item.venueImage && (
+                      <img
+                        src={item.venueImage}
+                        alt=''
+                        className='size-5 rounded object-cover sm:size-6'
+                        loading='lazy'
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
+                    )}
+                    <span className='text-[11px] font-semibold text-white/55 sm:text-[12px]'>
                       {item.venueName}
                     </span>
                   </div>
                 )}
                 {'sub' in item && item.sub && (
-                  <div className='text-[11px] text-white/50'>{item.sub}</div>
+                  <div className='mt-0.5 text-[11px] text-white/50'>
+                    {item.sub}
+                  </div>
                 )}
               </div>
               <div className='flex shrink-0 flex-col items-end gap-1'>

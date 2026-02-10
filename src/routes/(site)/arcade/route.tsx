@@ -243,7 +243,7 @@ function ArcadeLayout() {
             </h1>
           </FadeIn>
           <FadeIn delay={240}>
-            <p className='mt-4 max-w-[520px] text-[15px] font-light break-keep text-white/55'>
+            <p className='mt-4 max-w-[520px] text-[15px] leading-[1.55] font-light break-keep text-white/55'>
               동더 광장 연동으로 점수를 제출하고, 차수별 상위 16명이 오프라인
               스위스 스테이지에 진출합니다.
             </p>

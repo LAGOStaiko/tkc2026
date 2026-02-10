@@ -894,7 +894,7 @@ function FinalsTeaser({ title, meta }: { title: string; meta: string }) {
         <div className='mb-2 text-2xl font-extrabold tracking-tight text-white/90 md:text-[30px]'>
           {title}
         </div>
-        <p className='text-[15px] break-keep text-white/55'>
+        <p className='text-[15px] leading-[1.55] break-keep text-white/55'>
           콘솔 · 아케이드 결선이 동시 진행됩니다.
         </p>
         <div className='mt-6 inline-flex items-center gap-2 rounded-[10px] border border-dashed border-[#e86e3a]/20 bg-[#e86e3a]/[0.06] px-6 py-3 font-mono text-[15px] font-semibold tracking-wide text-white/55'>
