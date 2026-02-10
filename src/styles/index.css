@@ -171,6 +171,16 @@
   }
 }
 
+@keyframes tkc-gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 @keyframes tkc-soft-pulse {
   0%,
   100% {
@@ -250,6 +260,11 @@
     animation: tkc-slow-spin 20s linear infinite;
   }
 
+  .tkc-hero-year {
+    background-size: 200% 200%;
+    animation: tkc-gradient-shift 5s ease infinite;
+  }
+
   .site-scope .rounded-3xl {
     border-radius: 0.75rem;
   }
@@ -319,6 +334,7 @@
   .tkc-motion-dot,
   .tkc-motion-glow,
   .tkc-motion-spin-slow,
+  .tkc-hero-year,
   .site-scope .transition-all,
   .site-scope .transition-colors,
   .site-scope .transition-transform,

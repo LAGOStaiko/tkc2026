@@ -97,7 +97,7 @@ const SCHEDULE_MONTHS: {
     labelEn: 'MAY',
     isFinals: true,
     events: [
-      { type: 'finals', name: '결선 → PlayX4', detail: '콘솔 · 아케이드 동시 진행', fullDate: '2026-05-23', venueName: '킨텍스 · PlayExpo 2026' },
+      { type: 'finals', name: '결선 → PlayX4', detail: '콘솔 · 아케이드 동시 진행', fullDate: '2026-05-23', venueName: '킨텍스 · PlayX4 2026' },
     ],
   },
 ]
@@ -155,49 +155,129 @@ function HomePage() {
   return (
     <div>
       {/* ── HERO ── */}
-      <section className='relative -mt-20 overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-[0_10px_40px_rgba(0,0,0,0.45)] md:-mt-24'>
-        <div className='relative h-[300px] sm:h-[340px] md:h-[420px] lg:h-[480px]'>
+      <section className='relative -mt-20 grid grid-cols-1 overflow-hidden md:-mt-24 md:grid-cols-2'>
+        {/* ── Image side ── */}
+        <div className='relative min-h-[280px] overflow-hidden sm:min-h-[320px] md:min-h-[420px] lg:min-h-[480px]'>
           <img
             src={ASSETS.hero}
             alt='TKC2026 Hero'
-            className='h-full w-full origin-left scale-[1.04] object-cover object-left'
+            className='absolute inset-0 h-full w-full object-cover object-left'
             loading='eager'
           />
+          {/* Top darkening for header readability */}
+          <div className='absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent' />
+          {/* Mobile: bottom fade */}
+          <div className='absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black md:hidden' />
+          {/* Desktop: right fade */}
+          <div className='absolute inset-0 hidden bg-gradient-to-r from-transparent via-transparent to-black md:block' />
+          {/* Desktop: bottom edge */}
+          <div className='absolute inset-x-0 bottom-0 hidden h-20 bg-gradient-to-t from-black to-transparent md:block' />
 
-          {/* Gradient overlay */}
-          <div className='absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent' />
+          {/* Slogan */}
+          <div className='absolute bottom-8 left-6 z-10 sm:bottom-12 sm:left-8 md:bottom-12 md:left-10'>
+            <FadeIn>
+              <h2
+                className='text-[clamp(26px,4.5vw,48px)] leading-[1.15] font-black tracking-[-0.5px] text-white'
+                style={{ textShadow: '0 2px 40px rgba(0,0,0,0.5)' }}
+              >
+                꿈을 현실로,
+                <br />
+                현실을 기적으로.
+              </h2>
+            </FadeIn>
+            <FadeIn delay={150}>
+              <p className='mt-2.5 text-[15px] tracking-[2px] text-white/70'>
+                타이코 코리아 챔피언십 2026
+              </p>
+            </FadeIn>
+          </div>
+        </div>
 
-          {/* Text + CTA */}
-          <div className='absolute inset-x-0 bottom-0 flex flex-col items-end gap-4 px-6 pb-7 text-right sm:px-8 sm:pb-9 md:px-10 md:pb-10'>
-            <div>
-              <div className='mb-1 font-mono text-[11px] font-semibold tracking-[1px] text-white/70 uppercase sm:text-xs'>
-                Taiko Korea Championship
+        {/* ── Content side ── */}
+        <div className='relative flex flex-col justify-center px-6 py-10 sm:px-8 md:px-12 md:py-16'>
+          {/* Ambient glow */}
+          <div
+            className='pointer-events-none absolute top-[20%] -left-20 h-[300px] w-[300px] rounded-full blur-[40px]'
+            style={{
+              background:
+                'radial-gradient(circle, rgba(232,110,58,0.06), transparent 70%)',
+            }}
+          />
+
+          <div className='relative'>
+            {/* Badge */}
+            <FadeIn delay={200}>
+              <div className='mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-[#e86e3a]/20 bg-[#e86e3a]/[0.08] px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e86e3a]'>
+                <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a] shadow-[0_0_8px_#e86e3a]' />
+                TAIKO KOREA CHAMPIONSHIP
               </div>
-              <h1 className='bg-gradient-to-r from-[#e86e3a] to-[#f5a623] bg-clip-text text-[clamp(28px,5vw,44px)] leading-tight font-extrabold tracking-tight text-transparent'>
+            </FadeIn>
+
+            {/* Year */}
+            <FadeIn delay={300}>
+              <div className='tkc-hero-year mb-2 bg-gradient-to-br from-[#e86e3a] via-[#f5a623] to-[#ffcc5f] bg-clip-text text-[clamp(64px,10vw,100px)] leading-none font-black tracking-[-2px] text-transparent md:tracking-[-4px]'>
                 2026
-              </h1>
-              <p className='mt-1.5 text-sm leading-[1.55] text-white/75 sm:text-[15px]'>
+              </div>
+            </FadeIn>
+
+            {/* CTA text */}
+            <FadeIn delay={400}>
+              <p className='mb-7 text-[17px] text-white/65'>
                 지금 참가 신청을 받고 있습니다
               </p>
-            </div>
-            <div className='flex flex-col gap-2.5 sm:flex-row sm:items-center'>
-              <Link
-                to='/apply'
-                className='tkc-motion-lift inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white hover:brightness-110 sm:w-auto'
-                style={{
-                  background: '#e86e3a',
-                  boxShadow: '0 4px 24px rgba(232,110,58,0.35)',
-                }}
-              >
-                대회 신청하기
-              </Link>
-              <Link
-                to='/schedule'
-                className='tkc-motion-lift inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white/80 backdrop-blur-sm hover:border-white/35 hover:bg-white/10 hover:text-white sm:w-auto'
-              >
-                일정 보기 →
-              </Link>
-            </div>
+            </FadeIn>
+
+            {/* Actions */}
+            <FadeIn delay={500}>
+              <div className='flex flex-col gap-2.5 sm:flex-row'>
+                <Link
+                  to='/apply'
+                  className='tkc-motion-lift inline-flex items-center justify-center rounded-lg px-7 py-3 text-[15px] font-semibold text-white hover:brightness-110'
+                  style={{
+                    background: '#e86e3a',
+                    boxShadow: '0 4px 24px rgba(232,110,58,0.25)',
+                  }}
+                >
+                  대회 신청하기
+                </Link>
+                <Link
+                  to='/schedule'
+                  className='tkc-motion-lift inline-flex items-center justify-center rounded-lg border border-[#1e1e1e] px-6 py-3 text-[15px] font-semibold text-white/65 hover:border-white/30 hover:bg-white/[0.03] hover:text-white'
+                >
+                  일정 보기 →
+                </Link>
+              </div>
+            </FadeIn>
+
+            {/* Stats */}
+            <FadeIn delay={600}>
+              <div className='mt-8 flex gap-5 border-t border-[#1e1e1e] pt-6 md:gap-6'>
+                <div>
+                  <div className='text-xl font-extrabold tracking-[-0.5px] md:text-2xl'>
+                    2
+                  </div>
+                  <div className='mt-0.5 text-[13px] text-white/50'>
+                    부문
+                  </div>
+                </div>
+                <div>
+                  <div className='text-xl font-extrabold tracking-[-0.5px] md:text-2xl'>
+                    4
+                  </div>
+                  <div className='mt-0.5 text-[13px] text-white/50'>
+                    지역
+                  </div>
+                </div>
+                <div>
+                  <div className='text-xl font-extrabold tracking-[-0.5px] md:text-2xl'>
+                    05.23
+                  </div>
+                  <div className='mt-0.5 text-[13px] text-white/50'>
+                    결선
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
           </div>
         </div>
       </section>
@@ -543,8 +623,8 @@ function ScheduleStrip() {
                     key={ev.fullDate}
                     className='flex items-center gap-4 rounded-xl border border-[#1e1e1e] bg-[#111] px-4 py-3.5 transition-colors hover:border-[#2a2a2a] sm:px-5'
                   >
-                    <div className='w-[60px] shrink-0 text-center sm:w-[72px]'>
-                      <div className='font-mono text-lg font-extrabold tracking-tight text-white/95 sm:text-2xl'>
+                    <div className='w-[72px] shrink-0 text-center sm:w-[84px]'>
+                      <div className='text-lg leading-none font-extrabold tracking-tight whitespace-nowrap text-white/95 sm:text-2xl'>
                         {fmtDate(ev.fullDate)}
                       </div>
                       <div className='text-[11px] text-white/40'>
@@ -576,8 +656,8 @@ function ScheduleStrip() {
                     key={ev.fullDate}
                     className='flex items-center gap-4 rounded-xl border border-dashed border-[#e86e3a]/15 bg-[#111] px-4 py-3.5 sm:px-5'
                   >
-                    <div className='w-[60px] shrink-0 text-center sm:w-[72px]'>
-                      <div className='font-mono text-lg text-white/40 sm:text-xl'>
+                    <div className='w-[72px] shrink-0 text-center sm:w-[84px]'>
+                      <div className='text-lg leading-none font-semibold whitespace-nowrap text-white/40 sm:text-xl'>
                         {fmtDate(ev.fullDate)}
                       </div>
                     </div>
@@ -603,8 +683,8 @@ function ScheduleStrip() {
                     key={ev.fullDate}
                     className='flex items-center gap-4 rounded-xl border border-[#e86e3a]/20 bg-gradient-to-br from-[#e86e3a]/[0.03] to-[#111] px-5 py-5 transition-colors hover:border-[#e86e3a]/35 sm:px-6'
                   >
-                    <div className='w-[60px] shrink-0 text-center sm:w-[72px]'>
-                      <div className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text font-mono text-2xl font-extrabold tracking-tight text-transparent sm:text-[32px]'>
+                    <div className='w-[72px] shrink-0 text-center sm:w-[88px]'>
+                      <div className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-2xl leading-none font-extrabold tracking-tight whitespace-nowrap text-transparent sm:text-[32px]'>
                         {fmtDate(ev.fullDate)}
                       </div>
                       <div className='text-[11px] text-[#e86e3a]/70'>
