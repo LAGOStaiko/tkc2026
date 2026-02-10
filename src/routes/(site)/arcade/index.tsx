@@ -10,6 +10,7 @@ import {
   DetailSubtitle,
   DetailRow,
 } from '@/components/tkc/guide-shared'
+import { ARCADE_SONGS } from '@/content/arcade-songs'
 
 export const Route = createFileRoute('/(site)/arcade/')({
   component: ArcadeOnlinePage,
@@ -51,14 +52,14 @@ const LINK_FLOW = [
 const SONGS = [
   {
     label: '과제곡 1',
-    name: 'ちりつもの唄',
+    name: ARCADE_SONGS.online1.title,
     genre: '뒷보면',
     level: 8,
     levelColor: '#b275f0',
   },
   {
     label: '과제곡 2',
-    name: '輝く汗を求めて',
+    name: ARCADE_SONGS.online2.title,
     genre: '귀신',
     level: 8,
     levelColor: '#b275f0',

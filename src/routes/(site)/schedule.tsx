@@ -561,6 +561,11 @@ function SectionBlock({
 }
 
 function SectionNav({ activeId }: { activeId: string }) {
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
     <nav className='sticky top-0 z-50 -mx-4 mb-10 border-b border-[#1e1e1e] bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-2xl md:-mx-6 md:px-6'>
       <div
@@ -568,9 +573,10 @@ function SectionNav({ activeId }: { activeId: string }) {
         style={{ scrollbarWidth: 'none' }}
       >
         {NAV_ITEMS.map((item) => (
-          <a
+          <button
             key={item.id}
-            href={`#${item.id}`}
+            type='button'
+            onClick={() => scrollTo(item.id)}
             className={`shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-all ${
               activeId === item.id
                 ? 'border-[#2a2a2a] bg-[#111] text-white/90'
@@ -578,7 +584,7 @@ function SectionNav({ activeId }: { activeId: string }) {
             }`}
           >
             {item.label}
-          </a>
+          </button>
         ))}
       </div>
     </nav>

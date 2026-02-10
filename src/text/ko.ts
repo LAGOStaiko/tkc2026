@@ -81,6 +81,10 @@ export const ko = {
     '\uB0B4\uC6A9\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
   'contact.failedInfo':
     '\uBB38\uC758 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
+  'contact.faqTitle': '자주 묻는 질문',
+  'contact.faqDesc': '문의 전 확인해 주세요.',
+  'contact.notice':
+    '대회 관련 주요 공지는 공식 채널을 통해 안내됩니다. 운영 관련 긴급 문의는 카카오 채널을 이용해 주세요.',
   'contact.labelEmail': '\uC774\uBA54\uC77C',
   'contact.labelKakao': '\uCE74\uCE74\uC624 \uCC44\uB110',
   'contact.loadingContent':

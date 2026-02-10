@@ -5,6 +5,7 @@ import LoadingBar, { type LoadingBarRef } from 'react-top-loading-bar'
 function isSameSectionNav(from: string, to: string): boolean {
   const a = from.replace(/\/$/, '')
   const b = to.replace(/\/$/, '')
+  if (a === b) return true
   const isArcade = (p: string) => p === '/arcade' || p.startsWith('/arcade/')
   const isConsole = (p: string) => p === '/console' || p.startsWith('/console/')
   if (isArcade(a) && isArcade(b)) return true

@@ -98,13 +98,49 @@ function HomePage() {
     <div>
       {/* ── HERO ── */}
       <section className='relative -mt-20 overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-[0_10px_40px_rgba(0,0,0,0.45)] md:-mt-24'>
-        <div className='relative h-[250px] sm:h-[300px] md:h-[400px] lg:h-[440px]'>
+        <div className='relative h-[300px] sm:h-[340px] md:h-[420px] lg:h-[480px]'>
           <img
             src={ASSETS.hero}
             alt='TKC2026 Hero'
             className='h-full w-full origin-left scale-[1.04] object-cover object-left'
             loading='eager'
           />
+
+          {/* Gradient overlay */}
+          <div className='absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent' />
+
+          {/* Text + CTA */}
+          <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-6 pb-7 sm:px-8 sm:pb-9 md:px-10 md:pb-10'>
+            <div>
+              <div className='mb-1 font-mono text-[11px] font-semibold tracking-[2.5px] text-[#e86e3a] uppercase sm:text-xs'>
+                Taiko Korea Championship
+              </div>
+              <h1 className='text-[clamp(28px,5vw,44px)] leading-tight font-extrabold tracking-tight text-white'>
+                2026
+              </h1>
+              <p className='mt-1.5 text-sm text-white/65 sm:text-[15px]'>
+                지금 참가 신청을 받고 있습니다
+              </p>
+            </div>
+            <div className='flex flex-col gap-2.5 sm:flex-row sm:items-center'>
+              <Link
+                to='/apply'
+                className='inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-110 sm:w-auto'
+                style={{
+                  background: '#e86e3a',
+                  boxShadow: '0 4px 24px rgba(232,110,58,0.35)',
+                }}
+              >
+                대회 신청하기
+              </Link>
+              <Link
+                to='/schedule'
+                className='inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10 hover:text-white sm:w-auto'
+              >
+                일정 보기 →
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
