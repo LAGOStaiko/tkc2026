@@ -229,7 +229,7 @@ function ArcadeLayout() {
         <div className='relative'>
           <FadeIn>
             <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#f5a623]/20 bg-[#f5a623]/[0.08] px-3.5 py-1.5 text-[13px] font-medium tracking-wide text-[#f5a623]'>
-              <span className='size-1.5 animate-pulse rounded-full bg-[#f5a623]' />
+              <span className='tkc-motion-dot size-1.5 rounded-full bg-[#f5a623]' />
               ARCADE DIVISION
             </div>
           </FadeIn>

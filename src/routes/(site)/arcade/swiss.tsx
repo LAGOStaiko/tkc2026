@@ -30,9 +30,9 @@ const STAT_ITEMS = [
 
 const REGIONS = [
   { num: 1, name: '서울', detail: '1차 예선', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.png' },
-  { num: 2, name: '대전', detail: '2차 예선', arcade: 'CYGameworld', image: '/branding/venue-daejeon.png' },
-  { num: 3, name: '광주', detail: '3차 예선', arcade: 'GAMEPLAZA', image: '/branding/venue-gwangju.png' },
-  { num: 4, name: '부산', detail: '4차 예선', arcade: 'GAME D', image: '/branding/venue-busan.png' },
+  { num: 2, name: '대전', detail: '2차 예선', arcade: '싸이뮤직', image: '/branding/venue-daejeon.png' },
+  { num: 3, name: '광주', detail: '3차 예선', arcade: '게임플라자', image: '/branding/venue-gwangju.png' },
+  { num: 4, name: '부산', detail: '4차 예선', arcade: '게임D', image: '/branding/venue-busan.png' },
 ] as const
 
 const SEED_MATCHES = [

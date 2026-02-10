@@ -48,7 +48,7 @@ const SCHEDULE_ITEMS = [
   {
     date: '03.21',
     fullDate: '2026-03-21',
-    name: '오프라인 예선 → 서울',
+    name: '오프라인 예선 → TAIKO LABS · 서울',
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
@@ -56,7 +56,7 @@ const SCHEDULE_ITEMS = [
   {
     date: '04.11',
     fullDate: '2026-04-11',
-    name: '오프라인 예선 → 부산',
+    name: '오프라인 예선 → 게임D · 부산',
     tag: 'OFFLINE',
     tagCls: 'bg-[#e86e3a]/[0.08] text-[#e86e3a]',
     dotCls: 'bg-[#f5a623] shadow-[0_0_10px_rgba(245,166,35,0.4)]',
@@ -147,7 +147,7 @@ function HomePage() {
             <div className='flex flex-col gap-2.5 sm:flex-row sm:items-center'>
               <Link
                 to='/apply'
-                className='inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-110 sm:w-auto'
+                className='tkc-motion-lift inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white hover:brightness-110 sm:w-auto'
                 style={{
                   background: '#e86e3a',
                   boxShadow: '0 4px 24px rgba(232,110,58,0.35)',
@@ -157,7 +157,7 @@ function HomePage() {
               </Link>
               <Link
                 to='/schedule'
-                className='inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/35 hover:bg-white/10 hover:text-white sm:w-auto'
+                className='tkc-motion-lift inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white/80 backdrop-blur-sm hover:border-white/35 hover:bg-white/10 hover:text-white sm:w-auto'
               >
                 일정 보기 →
               </Link>
@@ -299,7 +299,7 @@ function DivisionCard({
 }: (typeof DIVISIONS)[number]) {
   return (
     <FadeIn>
-      <div className='group relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] transition-all duration-400 hover:-translate-y-1 hover:border-[#2a2a2a]'>
+      <div className='tkc-motion-lift group relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'>
         <div
           className='absolute top-0 right-0 left-0 h-0.5'
           style={{ background: accent }}
@@ -343,13 +343,13 @@ function DivisionCard({
           <div className='mt-auto flex gap-2.5'>
             <Link
               to={detailTo}
-              className='flex-1 rounded-lg border border-[#2a2a2a] bg-transparent py-2.5 text-center text-sm font-semibold text-white/70 transition-all hover:border-white/30 hover:bg-white/[0.04] hover:text-white/90'
+              className='tkc-motion-surface flex-1 rounded-lg border border-[#2a2a2a] bg-transparent py-2.5 text-center text-sm font-semibold text-white/70 hover:border-white/30 hover:bg-white/[0.04] hover:text-white/90'
             >
               자세히 보기
             </Link>
             <Link
               to='/apply'
-              className='flex-1 rounded-lg py-2.5 text-center text-sm font-semibold text-white transition-all hover:brightness-110'
+              className='tkc-motion-surface flex-1 rounded-lg py-2.5 text-center text-sm font-semibold text-white hover:brightness-110'
               style={{
                 background: accent,
                 boxShadow: `0 4px 20px ${accent}33`,
@@ -372,7 +372,7 @@ function ScheduleStrip() {
   return (
     <Link
       to='/schedule'
-      className='block overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
+      className='tkc-motion-surface block overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'
     >
       {/* Desktop */}
       <div className='hidden sm:grid sm:grid-cols-4'>
@@ -484,7 +484,7 @@ function YouTubeEmbed() {
   const [playing, setPlaying] = useState(false)
 
   return (
-    <div className='overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
+    <div className='tkc-motion-surface overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'>
       <div className='aspect-video bg-black'>
         {playing ? (
           <iframe

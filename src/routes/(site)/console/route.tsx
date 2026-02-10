@@ -221,7 +221,7 @@ function ConsoleLayout() {
         <div className='relative'>
           <FadeIn>
             <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e86e3a]/20 bg-[#e86e3a]/[0.08] px-3.5 py-1.5 text-[13px] font-medium tracking-wide text-[#e86e3a]'>
-              <span className='size-1.5 animate-pulse rounded-full bg-[#e86e3a]' />
+              <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a]' />
               CONSOLE DIVISION
             </div>
           </FadeIn>

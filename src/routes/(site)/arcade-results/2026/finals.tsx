@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useResults } from '@/lib/api'
 import {
+  getRegionDefinitions,
   resolveArcadeSeasonArchive,
   type ArcadeFinalCrossMatch,
   type ArcadeFinalSeedRow,
@@ -75,6 +76,10 @@ function GroupSeedTable({
                     </td>
                     <td className='px-4 py-3 whitespace-nowrap text-white/75'>
                       {row.regionLabel}
+                      {(() => {
+                        const def = getRegionDefinitions().find(d => d.key === row.regionKey)
+                        return def ? <span className='ml-1.5 text-xs text-white/45'>{def.arcade}</span> : null
+                      })()}
                     </td>
                     <td className='px-4 py-3 font-mono text-xs whitespace-nowrap text-white/60'>
                       {row.entryId}

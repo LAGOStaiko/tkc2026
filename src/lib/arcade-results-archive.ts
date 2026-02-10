@@ -1,10 +1,10 @@
 ﻿import { formatSongLabel } from '@/content/arcade-songs'
 
 const REGION_DEFINITIONS = [
-  { key: 'seoul', label: '1차 서울', shortLabel: '서울' },
-  { key: 'daejeon', label: '2차 대전', shortLabel: '대전' },
-  { key: 'gwangju', label: '3차 광주', shortLabel: '광주' },
-  { key: 'busan', label: '4차 부산', shortLabel: '부산' },
+  { key: 'seoul', label: '1차 서울', shortLabel: '서울', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.png' },
+  { key: 'daejeon', label: '2차 대전', shortLabel: '대전', arcade: '싸이뮤직', image: '/branding/venue-daejeon.png' },
+  { key: 'gwangju', label: '3차 광주', shortLabel: '광주', arcade: '게임플라자', image: '/branding/venue-gwangju.png' },
+  { key: 'busan', label: '4차 부산', shortLabel: '부산', arcade: '게임D', image: '/branding/venue-busan.png' },
 ] as const
 
 export type ArcadeRegionKey = (typeof REGION_DEFINITIONS)[number]['key']
@@ -13,6 +13,8 @@ type RegionDefinition = {
   key: ArcadeRegionKey
   label: string
   shortLabel: string
+  arcade: string
+  image: string
 }
 
 export type ArcadeParticipant = {
@@ -73,6 +75,8 @@ export type ArcadeRegionArchive = {
   key: ArcadeRegionKey
   label: string
   shortLabel: string
+  arcade: string
+  image: string
   updatedAt?: string
   onlineRows: ArcadeOnlineRow[]
   swissMatches: ArcadeSwissMatch[]
@@ -175,6 +179,8 @@ function buildEmptyRegion(key: ArcadeRegionKey): ArcadeRegionArchive {
     key,
     label: def.label,
     shortLabel: def.shortLabel,
+    arcade: def.arcade,
+    image: def.image,
     onlineRows: [],
     swissMatches: [],
     swissStandings: [],

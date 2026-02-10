@@ -59,7 +59,7 @@ export function FadeIn({
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${
+      className={`tkc-motion-reveal ${
         visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'
       } ${className}`}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
@@ -95,7 +95,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-[#1e1e1e] bg-[#111] p-4 transition-colors hover:border-[#2a2a2a] sm:p-7 ${className}`}
+      className={`tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] p-4 hover:border-[#2a2a2a] sm:p-7 ${className}`}
     >
       {children}
     </div>
@@ -113,7 +113,7 @@ export function Accordion({
   const contentRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className='rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
+    <div className='tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'>
       <button
         type='button'
         onClick={() => setOpen((v) => !v)}
@@ -158,7 +158,7 @@ export function StepCard({
 
   return (
     <FadeIn>
-      <div className='rounded-2xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
+      <div className='tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'>
         {/* Main */}
         <div className='flex items-start gap-3 p-4 sm:gap-4 sm:p-6'>
           <div

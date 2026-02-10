@@ -127,9 +127,20 @@ function ArcadeResults2026Page() {
                 className='rounded-xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-[#ff2a00]/30 hover:bg-white/[0.06]'
               >
                 <div className='flex items-center justify-between gap-3'>
-                  <h3 className='text-base font-bold text-white'>
-                    {region.label}
-                  </h3>
+                  <div className='flex items-center gap-2.5'>
+                    <img
+                      src={region.image}
+                      alt={region.arcade}
+                      className='size-8 shrink-0 rounded-lg object-cover'
+                      loading='lazy'
+                    />
+                    <div>
+                      <h3 className='text-base font-bold text-white'>
+                        {region.label}
+                      </h3>
+                      <div className='text-xs text-white/50'>{region.arcade}</div>
+                    </div>
+                  </div>
                   <span
                     className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                       hasAny

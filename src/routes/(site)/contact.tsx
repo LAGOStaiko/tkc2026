@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSite } from '@/lib/api'
@@ -15,61 +15,513 @@ type SiteData = {
   kakaoChannelUrl?: string
 }
 
-const FAQ_ITEMS = [
+/* ════════════════════════════════════════════════════════════════════ */
+/*  FAQ Data                                                          */
+/* ════════════════════════════════════════════════════════════════════ */
+
+type FaqItemData = {
+  question: string
+  answer: ReactNode
+}
+
+type FaqSectionData = {
+  title: string
+  tag?: 'console' | 'arcade'
+  items: FaqItemData[]
+}
+
+const FAQ_SECTIONS: FaqSectionData[] = [
   {
-    question: '대회 참가 자격이 어떻게 되나요?',
-    answer:
-      '참가 자격 등 세부 조건은 각 부문 안내 페이지에서 확인하실 수 있습니다. 콘솔과 아케이드 부문별로 참가 조건이 다르니 해당 페이지를 확인해 주세요.',
+    title: '참가 신청 관련',
+    items: [
+      {
+        question: '누가 참가할 수 있나요?',
+        answer:
+          '대한민국 국적을 보유하고, 대한민국에 거주하는 분이면 누구나 참가 가능합니다. 연령 제한은 별도로 없으나, 미성년자는 보호자 동의가 필요합니다.',
+      },
+      {
+        question: '신청 기간은 언제인가요?',
+        answer:
+          '2026년 3월 2일(월) ~ 4월 30일(목)입니다. TKC 2026 공식 홈페이지를 통해 온라인으로 신청합니다.',
+      },
+      {
+        question: '신청 시 어떤 정보를 제출해야 하나요?',
+        answer: (
+          <>
+            부문에 따라 약간 다릅니다.
+            <FaqList
+              items={[
+                '공통 : 이름, 닉네임, 전화번호, 이메일, 개인정보활용 동의, 영상 링크',
+                '아케이드 부문 추가 : 반코 아이디(Bandai Namco 계정 ID)',
+                '미성년자 : 부모님 동의서(PDF) 추가 제출',
+              ]}
+            />
+          </>
+        ),
+      },
+      {
+        question: '미성년자도 참가할 수 있나요?',
+        answer:
+          '네, 참가 가능합니다. 단, 보호자 동의서(PDF)를 작성하여 신청 시 함께 업로드해야 합니다. 연령 제한은 별도로 없습니다.',
+      },
+      {
+        question: 'PlayX4 직관 참여란 무엇인가요?',
+        answer:
+          '신청 시 PlayX4 현장 참여 여부를 선택할 수 있습니다. 현장 참여자에게는 행사 명찰이 배부되며, 불참 시 명찰은 미지급됩니다.',
+      },
+    ],
   },
   {
-    question: '두 부문(콘솔 · 아케이드) 동시 참가가 가능한가요?',
-    answer:
-      '네, 콘솔과 아케이드 부문은 별도로 운영되므로 두 부문 모두 참가 가능합니다.',
+    title: '부문 및 중복 참가',
+    items: [
+      {
+        question: '콘솔과 아케이드 모두 참가할 수 있나요?',
+        answer: (
+          <>
+            예선은 양쪽 모두 참가 가능합니다. 다만,{' '}
+            <strong className='text-white/90'>
+              결선은 한쪽만 진출할 수 있습니다
+            </strong>
+            (택1 구조).
+          </>
+        ),
+      },
+      {
+        question: '아케이드 부문은 예선 차수를 여러 개 신청할 수 있나요?',
+        answer: (
+          <>
+            아니요. 아케이드 예선은{' '}
+            <strong className='text-white/90'>1개의 차수만 참가 가능</strong>
+            하며, 온라인 예선에서 탈락하더라도 다른 차수에 도전할 수 없습니다.
+            차수 선택은 신중하게 결정해 주세요.
+          </>
+        ),
+      },
+      {
+        question: '대리 참가나 중복 참가가 발각되면 어떻게 되나요?',
+        answer:
+          '즉시 실격 처리되며, 운영 측이 인정하는 향후 대회 참가에도 불이익이 있을 수 있습니다.',
+      },
+    ],
   },
   {
-    question: '결선은 어디에서 진행되나요?',
-    answer:
-      '결선은 5월 23일 팩토리에서 열리는 플레이엑스포(PlayX4) 2026에서 진행됩니다. 콘솔과 아케이드 결선이 동시에 진행됩니다.',
+    title: '영상 제출',
+    items: [
+      {
+        question: '영상은 어떻게 제출하나요?',
+        answer: (
+          <>
+            유튜브에 업로드 →{' '}
+            <strong className='text-white/90'>일부공개</strong> 설정 → 링크를
+            신청서에 첨부하면 됩니다.
+          </>
+        ),
+      },
+      {
+        question: '영상에 반드시 포함되어야 하는 것은?',
+        answer: (
+          <>
+            다음 두 가지가 반드시 포함되어야 합니다.
+            <FaqList
+              items={[
+                '플레이 화면 : 곡명 / 점수 / 결과 화면이 식별 가능해야 함',
+                '플레이 장면 : 손 / 컨트롤러 조작이 확인 가능해야 함',
+              ]}
+            />
+            <FaqNote>
+              운영 측 지정 촬영 가이드(약관)를 반드시 준수해야 하며, 규제 미준수
+              시 심사 대상에서 제외될 수 있습니다.
+            </FaqNote>
+          </>
+        ),
+      },
+    ],
   },
   {
-    question: '문의 응답까지 얼마나 걸리나요?',
-    answer:
-      '이메일 및 카카오 채널을 통한 문의는 영업일 기준 1~2일 이내에 답변드리고 있습니다. 대회 기간 중에는 다소 지연될 수 있습니다.',
+    title: '콘솔 부문 예선',
+    tag: 'console',
+    items: [
+      {
+        question: '콘솔 예선 과제곡은 무엇인가요?',
+        answer: (
+          <>
+            과제곡 2곡의 점수를 합산하여 순위를 산정합니다.
+            <FaqList
+              items={[
+                '希望への旋律 뒷보면 9레벨',
+                'TAIKO-TONGUE-TWISTER 귀신 8레벨',
+              ]}
+            />
+          </>
+        ),
+      },
+      {
+        question: '콘솔 예선에서 몇 명이 결선에 진출하나요?',
+        answer: (
+          <>
+            <strong className='text-white/90'>상위 4명</strong>이 결선에
+            진출합니다.
+          </>
+        ),
+      },
+      {
+        question: '콘솔 부문에서 사용 가능한 컨트롤러는?',
+        answer: (
+          <>
+            다음 중 선택할 수 있으며, 한 번 선택하면 대회 종료까지 변경할 수
+            없습니다.
+            <FaqList
+              items={[
+                '타코 컨트롤러 + 북채 (허용)',
+                '조이콘 (허용)',
+                '터치 조작 (불가)',
+              ]}
+            />
+            <FaqNote>
+              결선에서는 BNEK가 준비한 본체 및 컨트롤러만 사용합니다.
+            </FaqNote>
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    title: '콘솔 부문 결선',
+    tag: 'console',
+    items: [
+      {
+        question: '콘솔 결선은 어떻게 진행되나요?',
+        answer: (
+          <>
+            상위 4명이 싱글 엘리미네이션 토너먼트로 경쟁합니다.
+            <FaqList
+              items={[
+                '4강: 1위 vs 4위 / 2위 vs 3위',
+                '3·4위전: 4강 패자 2인',
+                '결승: 4강 승자 2인',
+              ]}
+            />
+          </>
+        ),
+      },
+      {
+        question: '콘솔 결선에서 곡은 어떻게 준비하나요?',
+        answer: (
+          <>
+            1인당 <strong className='text-white/90'>4곡</strong>을 사전에
+            제출합니다. 한 번 사용한 곡은 결선 전체에서 재사용할 수 없으며, 각
+            매치마다 상대 곡 1개를 밴할 수 있습니다.
+          </>
+        ),
+      },
+      {
+        question: '콘솔 결선 경기 구성은?',
+        answer: (
+          <>
+            라운드별로 다릅니다.
+            <FaqList
+              items={[
+                '4강 / 3·4위전 : 각자 1곡 + 과제곡 1곡 = 총 3곡 점수 합산',
+                '결승 : 각자 2곡 + 과제곡 1곡 = 총 5곡 점수 합산',
+              ]}
+            />
+            <FaqNote>과제곡은 추후 공지 예정입니다.</FaqNote>
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    title: '아케이드 부문 예선',
+    tag: 'arcade',
+    items: [
+      {
+        question: '아케이드 예선은 어떤 구조인가요?',
+        answer: (
+          <>
+            <strong className='text-white/90'>온라인 예선</strong>(스코어 어택) →{' '}
+            <strong className='text-white/90'>오프라인 예선</strong>(스위스
+            스테이지) → <strong className='text-white/90'>결선</strong>(Top 8)
+            순서로 진행됩니다.
+          </>
+        ),
+      },
+      {
+        question: '아케이드 예선 차수는 어떻게 나뉘나요?',
+        answer: (
+          <>
+            4개 차수로 나뉘며, 각 차수는 지역과 연결됩니다.
+            <FaqList
+              items={[
+                '1차수: 서울 / 2차수: 대전 / 3차수: 광주 / 4차수: 부산',
+              ]}
+            />
+            <FaqNote>
+              차수별 별도 집계되며, 신청 시 지역을 선택해야 합니다. 지역 구성은
+              변경될 수 있습니다.
+            </FaqNote>
+          </>
+        ),
+      },
+      {
+        question: '아케이드 온라인 예선 과제곡은?',
+        answer: (
+          <>
+            과제곡 2곡의 점수를 합산하여 순위를 산정합니다.
+            <FaqList
+              items={[
+                'もものけ姫 앞보면 8레벨',
+                '輝く未来を 귀신 8레벨',
+              ]}
+            />
+            <FaqNote>
+              각 차수별 상위 16명이 오프라인 예선에 진출합니다.
+            </FaqNote>
+          </>
+        ),
+      },
+      {
+        question: '오프라인 예선(스위스 스테이지)은 어떻게 진행되나요?',
+        answer: (
+          <>
+            스위스 시스템으로 진행됩니다. 같은 전적 끼리 매칭하며,{' '}
+            <strong className='text-white/90'>2패 누적 시 탈락</strong>합니다.
+            최대 4라운드까지 진행되며, 4-0 기록자는 자동 결선 진출, 3-1 기록자 중
+            추가 선발을 통해 1명이 추가 진출합니다.
+          </>
+        ),
+      },
+      {
+        question: '신청 시 오프라인 예선 사용곡도 미리 선택해야 하나요?',
+        answer: (
+          <>
+            네, 신청 단계에서 오프라인 예선(스위스 스테이지)에서 사용할{' '}
+            <strong className='text-white/90'>곡 4곡</strong>을 미리 선택해야
+            합니다.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    title: '아케이드 부문 결선',
+    tag: 'arcade',
+    items: [
+      {
+        question: '아케이드 결선은 어떻게 구성되나요?',
+        answer: (
+          <>
+            4개 오프라인 예선에서 각 2명씩,{' '}
+            <strong className='text-white/90'>총 8명</strong>이 참가하는
+            토너먼트입니다. A그룹(4-0 진출자)과 B그룹(3-1 진출자)을 크로스
+            시드로 배치합니다.
+            <FaqList
+              items={[
+                'A1 vs B4 / A2 vs B3 / A3 vs B2 / A4 vs B1',
+              ]}
+            />
+          </>
+        ),
+      },
+      {
+        question: '아케이드 결선에서 곡은 어떻게 준비하나요?',
+        answer: (
+          <>
+            1인당 <strong className='text-white/90'>5곡</strong>을 사전에
+            제출합니다. 한 번 사용한 곡은 이후 라운드에서 재사용할 수 없으나,{' '}
+            <strong className='text-white/90'>
+              밴빙한 곡은 소모되지 않아
+            </strong>{' '}
+            다음 라운드에서 재사용 가능합니다.
+          </>
+        ),
+      },
+      {
+        question: '아케이드 결선 경기 구성은?',
+        answer: (
+          <>
+            라운드별로 다릅니다.
+            <FaqList
+              items={[
+                '8강 / 4강 / 3·4위전 : 각자 1곡 + 과제곡 1곡 = 총 3곡 점수 합산',
+                '결승 : 각자 2곡 + 과제곡 1곡 = 총 5곡 점수 합산',
+              ]}
+            />
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    title: '공통 경기 규칙',
+    items: [
+      {
+        question: '옵션(진폭, 배속 등)을 사용할 수 있나요?',
+        answer: (
+          <>
+            예선에서는 공정성 확보를 위해{' '}
+            <strong className='text-white/90'>
+              모든 옵션 사용이 금지
+            </strong>
+            됩니다(진폭, 배속 등 일체 불가). 아케이드 결선에서는 배속 조절 외
+            다른 옵션(랜덤, 미러 등)을 사용할 수 있습니다.
+          </>
+        ),
+      },
+      {
+        question: '동점이 발생하면 어떻게 되나요?',
+        answer:
+          '결선에서 합산 점수가 동점일 경우, 마지막 곡을 동일 조건으로 재대결합니다. 재대결에서도 동점이면 해당 곡의 양(良) 개수가 많은 선수가 승리합니다. 예선 동점 순위는 먼저 엔트리한 참가자가 우선권을 가집니다.',
+      },
+      {
+        question: '기기 오류가 발생하면 어떻게 되나요?',
+        answer:
+          '프레임 드롭, 입력 불량 등 기기 오류가 발생한 경우 해당 곡을 재경기합니다. 재경기 여부는 대회 운영진이 판단하며, 선수 과실에 의한 미스는 재경기 사유가 아닙니다.',
+      },
+      {
+        question: '서브 번호란 무엇인가요?',
+        answer:
+          '모든 참가자에게 서브 번호가 부여됩니다. 진출자가 기권하거나 불참할 경우, 서브 넘버 기준으로 대체 진행됩니다.',
+      },
+    ],
+  },
+  {
+    title: '기타',
+    items: [
+      {
+        question: '룰북 내용이 변경될 수도 있나요?',
+        answer:
+          '네, 대회 운영 상황에 따라 변경될 수 있으며, 변경 시 공식 채널을 통해 사전 공지됩니다.',
+      },
+      {
+        question: '대회 중 분쟁이 발생하면 어떻게 하나요?',
+        answer:
+          '대회 중 발생하는 모든 분쟁 사항에 대한 최종 판단은 운영 측에 있습니다.',
+      },
+    ],
   },
 ]
 
+const COMPARE_ROWS: { label: string; console: string; arcade: string }[] = [
+  {
+    label: '예선 방식',
+    console: '스코어 어택 → 결선',
+    arcade: '스코어 어택 → 스위스 → 결선',
+  },
+  {
+    label: '예선 진출 인원',
+    console: '상위 4명',
+    arcade: '차수별 16명 → 2명',
+  },
+  {
+    label: '결선 참가 인원',
+    console: '4명',
+    arcade: '8명 (4차수 × 2명)',
+  },
+  { label: '결선 사전 제출곡', console: '4곡', arcade: '5곡' },
+  {
+    label: '밴빙한 곡 재사용',
+    console: '× (별도 명시 없음)',
+    arcade: '가능 (소모 안 됨)',
+  },
+  {
+    label: '결선 구조',
+    console: '4강 → 3·4위전 / 결승',
+    arcade: '8강 → 4강 → 3·4위전 / 결승',
+  },
+  {
+    label: '컨트롤러',
+    console: '타코컨/조이콘 (터치 불가)',
+    arcade: '아케이드 기기 사용',
+  },
+]
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Helper Components                                                  */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function FaqList({ items }: { items: string[] }) {
+  return (
+    <ul className='mt-2 space-y-1'>
+      {items.map((item, i) => (
+        <li key={i} className='flex gap-2 text-sm text-white/70'>
+          <span className='mt-0.5 shrink-0 text-[#ff8c66]'>›</span>
+          <span className='break-keep'>{item}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function FaqNote({ children }: { children: ReactNode }) {
+  return (
+    <p className='mt-2 text-xs text-white/40'>※ {children}</p>
+  )
+}
+
+const TAG_STYLES = {
+  console: 'border-amber-400/30 bg-amber-400/10 text-amber-400',
+  arcade: 'border-violet-400/30 bg-violet-400/10 text-violet-400',
+} as const
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  FAQ Item                                                           */
+/* ════════════════════════════════════════════════════════════════════ */
+
 function FaqItem({
+  num,
   question,
   answer,
+  tag,
   isOpen,
   onToggle,
 }: {
+  num: number
   question: string
-  answer: string
+  answer: ReactNode
+  tag?: 'console' | 'arcade'
   isOpen: boolean
   onToggle: () => void
 }) {
+  const numColor = tag === 'console'
+    ? 'text-amber-400 bg-amber-400/10'
+    : tag === 'arcade'
+      ? 'text-violet-400 bg-violet-400/10'
+      : 'text-sky-400 bg-sky-400/10'
+
+  const hoverBorder = tag === 'console'
+    ? 'hover:border-amber-400/20'
+    : tag === 'arcade'
+      ? 'hover:border-violet-400/20'
+      : 'hover:border-sky-400/20'
+
   return (
     <GlassCard
       className={cn(
         'overflow-hidden transition-all',
+        hoverBorder,
         isOpen && 'border-white/20 bg-white/[0.05]'
       )}
     >
       <button
         type='button'
-        className='flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-white/[0.02] md:gap-4 md:px-6 md:py-5'
+        className='flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-white/[0.02] md:gap-4 md:px-6 md:py-4'
         onClick={onToggle}
       >
-        <span className='flex size-8 flex-shrink-0 items-center justify-center rounded-lg border border-[#ff2a00]/50 text-sm font-extrabold text-[#ff2a00] md:size-9 md:text-base'>
-          Q
+        <span
+          className={cn(
+            'shrink-0 rounded px-2 py-0.5 font-mono text-[11px] font-bold',
+            numColor
+          )}
+        >
+          Q{num}
         </span>
-        <span className='flex-1 text-sm font-semibold break-keep md:text-base'>
+        <span className='flex-1 text-sm font-medium break-keep text-white/90 md:text-[15px]'>
           {question}
         </span>
         <svg
           className={cn(
-            'size-5 flex-shrink-0 text-white/40 transition-transform duration-300',
+            'size-5 flex-shrink-0 text-white/30 transition-transform duration-300',
             isOpen && 'rotate-180'
           )}
           viewBox='0 0 24 24'
@@ -88,7 +540,7 @@ function FaqItem({
         )}
       >
         <div className='overflow-hidden'>
-          <div className='px-5 pb-5 pl-16 text-sm leading-relaxed text-white/70 break-keep md:px-6 md:pb-6 md:pl-[4.5rem] md:text-base'>
+          <div className='border-t border-white/[0.06] px-4 pt-3 pb-4 pl-[3.2rem] text-sm leading-relaxed text-white/65 break-keep md:px-6 md:pt-4 md:pb-5 md:pl-[4.2rem]'>
             {answer}
           </div>
         </div>
@@ -97,9 +549,13 @@ function FaqItem({
   )
 }
 
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Page                                                               */
+/* ════════════════════════════════════════════════════════════════════ */
+
 function ContactPage() {
   const { data: siteData, isError: isSiteError } = useSite<SiteData>()
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [openFaq, setOpenFaq] = useState<string | null>(null)
 
   const contactEmail = siteData?.contactEmail ?? ''
   const kakaoChannelUrl = siteData?.kakaoChannelUrl ?? ''
@@ -108,6 +564,8 @@ function ContactPage() {
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('contact.title')}`
   }, [])
+
+  let globalNum = 0
 
   return (
     <TkcSection>
@@ -243,7 +701,7 @@ function ContactPage() {
       </div>
 
       {/* FAQ Section */}
-      <div className='space-y-4'>
+      <div className='space-y-6'>
         <div className='space-y-2'>
           <p className='text-xs font-semibold tracking-[3px] text-[#ff2a00] uppercase'>
             FAQ
@@ -251,22 +709,133 @@ function ContactPage() {
           <h2 className='text-2xl font-bold tracking-tight md:text-3xl'>
             {t('contact.faqTitle')}
           </h2>
-          <p className='text-sm text-white/60 md:text-base'>
-            {t('contact.faqDesc')}
+          <p className='text-sm text-white/50 break-keep md:text-base'>
+            룰북 기반 자주 묻는 질문 30선
           </p>
         </div>
 
-        <div className='flex flex-col gap-2'>
-          {FAQ_ITEMS.map((item, index) => (
-            <FaqItem
-              key={index}
-              question={item.question}
-              answer={item.answer}
-              isOpen={openFaq === index}
-              onToggle={() =>
-                setOpenFaq(openFaq === index ? null : index)
-              }
-            />
+        <div className='space-y-8'>
+          {FAQ_SECTIONS.map((section, sIdx) => {
+            return (
+              <div key={sIdx} className='space-y-2.5'>
+                {/* Section header */}
+                <div className='flex items-center gap-2.5 pb-1'>
+                  <h3 className='text-base font-bold tracking-tight text-white/80 md:text-lg'>
+                    {section.title}
+                  </h3>
+                  {section.tag && (
+                    <span
+                      className={cn(
+                        'rounded px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase',
+                        TAG_STYLES[section.tag]
+                      )}
+                    >
+                      {section.tag}
+                    </span>
+                  )}
+                </div>
+
+                {/* Items */}
+                <div className='flex flex-col gap-2'>
+                  {section.items.map((item, iIdx) => {
+                    globalNum++
+                    const key = `${sIdx}-${iIdx}`
+                    return (
+                      <FaqItem
+                        key={key}
+                        num={globalNum}
+                        question={item.question}
+                        answer={item.answer}
+                        tag={section.tag}
+                        isOpen={openFaq === key}
+                        onToggle={() =>
+                          setOpenFaq(openFaq === key ? null : key)
+                        }
+                      />
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Comparison Table */}
+      <div className='space-y-4'>
+        <div className='space-y-2'>
+          <p className='text-xs font-semibold tracking-[3px] text-[#ff2a00] uppercase'>
+            COMPARE
+          </p>
+          <h2 className='text-2xl font-bold tracking-tight md:text-3xl'>
+            부문별 비교 요약
+          </h2>
+        </div>
+
+        {/* Desktop table */}
+        <div className='hidden overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] md:block'>
+          <table className='w-full text-sm'>
+            <caption className='sr-only'>콘솔 · 아케이드 부문 비교</caption>
+            <thead>
+              <tr className='border-b border-white/[0.08] bg-white/[0.015]'>
+                <th className='px-5 py-3.5 text-left text-xs font-semibold tracking-wider text-white/40 uppercase'>
+                  항목
+                </th>
+                <th className='px-5 py-3.5 text-left text-xs font-semibold tracking-wider text-amber-400 uppercase'>
+                  콘솔
+                </th>
+                <th className='px-5 py-3.5 text-left text-xs font-semibold tracking-wider text-violet-400 uppercase'>
+                  아케이드
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARE_ROWS.map((row, i) => (
+                <tr
+                  key={i}
+                  className='border-b border-white/[0.04] last:border-b-0'
+                >
+                  <td className='px-5 py-3 font-medium text-white/50 break-keep'>
+                    {row.label}
+                  </td>
+                  <td className='px-5 py-3 text-white/70 break-keep'>
+                    {row.console}
+                  </td>
+                  <td className='px-5 py-3 text-white/70 break-keep'>
+                    {row.arcade}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile cards */}
+        <div className='space-y-2.5 md:hidden'>
+          {COMPARE_ROWS.map((row, i) => (
+            <GlassCard key={i} className='px-4 py-3'>
+              <p className='mb-2 text-xs font-semibold text-white/40'>
+                {row.label}
+              </p>
+              <div className='grid grid-cols-2 gap-3'>
+                <div>
+                  <p className='mb-0.5 text-[10px] font-semibold text-amber-400 uppercase'>
+                    콘솔
+                  </p>
+                  <p className='text-sm text-white/70 break-keep'>
+                    {row.console}
+                  </p>
+                </div>
+                <div>
+                  <p className='mb-0.5 text-[10px] font-semibold text-violet-400 uppercase'>
+                    아케이드
+                  </p>
+                  <p className='text-sm text-white/70 break-keep'>
+                    {row.arcade}
+                  </p>
+                </div>
+              </div>
+            </GlassCard>
           ))}
         </div>
       </div>

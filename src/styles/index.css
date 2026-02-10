@@ -6,6 +6,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  --tkc-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --tkc-motion-duration-fast: 220ms;
+  --tkc-motion-duration-base: 320ms;
+  --tkc-motion-duration-slow: 680ms;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -164,7 +171,85 @@
   }
 }
 
+@keyframes tkc-soft-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes tkc-soft-glow {
+  0%,
+  100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -2%) scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes tkc-slow-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @layer utilities {
+  .site-scope .transition-all,
+  .site-scope .transition-colors,
+  .site-scope .transition-transform,
+  .site-scope .transition-opacity {
+    transition-timing-function: var(--tkc-motion-ease);
+  }
+
+  .tkc-motion-reveal {
+    transition-property: opacity, transform;
+    transition-duration: var(--tkc-motion-duration-slow);
+    transition-timing-function: var(--tkc-motion-ease);
+    will-change: opacity, transform;
+  }
+
+  .tkc-motion-surface {
+    transition-property: border-color, background-color, box-shadow, color;
+    transition-duration: var(--tkc-motion-duration-base);
+    transition-timing-function: var(--tkc-motion-ease);
+  }
+
+  .tkc-motion-lift {
+    transition-property: transform, border-color, background-color, box-shadow,
+      color, opacity;
+    transition-duration: var(--tkc-motion-duration-base);
+    transition-timing-function: var(--tkc-motion-ease);
+    will-change: transform;
+  }
+
+  .tkc-motion-lift:hover {
+    transform: translateY(-4px);
+  }
+
+  .tkc-motion-dot {
+    animation: tkc-soft-pulse 1.8s var(--tkc-motion-ease) infinite;
+    transform-origin: center;
+  }
+
+  .tkc-motion-glow {
+    animation: tkc-soft-glow 3.2s var(--tkc-motion-ease) infinite;
+  }
+
+  .tkc-motion-spin-slow {
+    animation: tkc-slow-spin 20s linear infinite;
+  }
+
   .site-scope .rounded-3xl {
     border-radius: 0.75rem;
   }
@@ -185,5 +270,25 @@
   }
   .site-scope .rounded-sm {
     border-radius: 0.0625rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tkc-motion-reveal,
+  .tkc-motion-surface,
+  .tkc-motion-lift,
+  .tkc-motion-dot,
+  .tkc-motion-glow,
+  .tkc-motion-spin-slow,
+  .site-scope .transition-all,
+  .site-scope .transition-colors,
+  .site-scope .transition-transform,
+  .site-scope .transition-opacity {
+    transition-duration: 1ms !important;
+    animation: none !important;
+  }
+
+  .tkc-motion-lift:hover {
+    transform: none;
   }
 }

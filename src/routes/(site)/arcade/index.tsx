@@ -38,9 +38,9 @@ const GLANCE_ITEMS: GlanceItem[] = [
 
 const REGIONS = [
   { num: 1, label: '1차수', venue: '서울', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.png' },
-  { num: 2, label: '2차수', venue: '대전', arcade: 'CYGameworld', image: '/branding/venue-daejeon.png' },
-  { num: 3, label: '3차수', venue: '광주', arcade: 'GAMEPLAZA', image: '/branding/venue-gwangju.png' },
-  { num: 4, label: '4차수', venue: '부산', arcade: 'GAME D', image: '/branding/venue-busan.png' },
+  { num: 2, label: '2차수', venue: '대전', arcade: '싸이뮤직', image: '/branding/venue-daejeon.png' },
+  { num: 3, label: '3차수', venue: '광주', arcade: '게임플라자', image: '/branding/venue-gwangju.png' },
+  { num: 4, label: '4차수', venue: '부산', arcade: '게임D', image: '/branding/venue-busan.png' },
 ] as const
 
 const LINK_FLOW = [
@@ -174,15 +174,12 @@ function AdvanceVisual() {
       }}
     >
       {/* Glow */}
-      <div className='pointer-events-none absolute -top-16 left-1/2 h-[260px] w-[260px] -translate-x-1/2 animate-pulse rounded-full bg-[radial-gradient(circle,rgba(245,166,35,0.18)_0%,transparent_70%)]' />
+      <div className='tkc-motion-glow pointer-events-none absolute -top-16 left-1/2 h-[260px] w-[260px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(245,166,35,0.18)_0%,transparent_70%)]' />
 
       {/* Ring */}
       <div className='relative mx-auto mb-5 flex size-[100px] items-center justify-center rounded-full border-[3px] border-[#f5a623] shadow-[0_0_30px_rgba(245,166,35,0.2),inset_0_0_20px_rgba(245,166,35,0.05)]'>
         <div className='absolute -inset-2 rounded-full border border-[#f5a623]/12' />
-        <div
-          className='absolute -inset-4 animate-spin rounded-full border border-dashed border-[#f5a623]/8'
-          style={{ animationDuration: '20s' }}
-        />
+        <div className='tkc-motion-spin-slow absolute -inset-4 rounded-full border border-dashed border-[#f5a623]/8' />
         <div className='flex items-baseline gap-0.5'>
           <span className='text-[38px] leading-none font-extrabold text-[#f5a623]'>
             16
@@ -212,7 +209,7 @@ function AdvanceVisual() {
             style={{
               transform: animated ? 'scale(1)' : 'scale(0)',
               opacity: animated ? 1 : 0,
-              transition: `transform 0.4s ease ${i * 50}ms, opacity 0.4s ease ${i * 50}ms`,
+              transition: `transform 420ms cubic-bezier(0.22,1,0.36,1) ${i * 50}ms, opacity 420ms cubic-bezier(0.22,1,0.36,1) ${i * 50}ms`,
             }}
           >
             <span className='size-2 rounded-sm bg-[#f5a623] opacity-70' />

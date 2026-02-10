@@ -38,7 +38,7 @@ export function TkcPageHeader({
     <div className={cn('space-y-2', className)}>
       <h1
         className={cn(
-          'text-3xl font-bold tracking-tight md:text-5xl',
+          'bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-3xl font-bold tracking-tight text-transparent md:text-5xl',
           titleClassName
         )}
       >
@@ -84,7 +84,7 @@ export function PageHero({
             }}
           >
             <span
-              className='size-1.5 animate-pulse rounded-full'
+              className='tkc-motion-dot size-1.5 rounded-full'
               style={{ backgroundColor: accentColor }}
             />
             {badge}

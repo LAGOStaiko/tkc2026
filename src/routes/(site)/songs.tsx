@@ -166,7 +166,7 @@ function TimelineNode({
           )}
         />
         {isFinals && (
-          <div className='absolute -inset-1 rounded-full border border-[#ff2a00]/40 motion-safe:animate-pulse' />
+          <div className='tkc-motion-dot absolute -inset-1 rounded-full border border-[#ff2a00]/40' />
         )}
       </div>
 

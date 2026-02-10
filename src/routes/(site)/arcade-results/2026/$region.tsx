@@ -262,10 +262,18 @@ function ArcadeRegionDetailPage() {
         >
           ← 아케이드 시즌 페이지로 돌아가기
         </a>
-        <TkcPageHeader
-          title={`${regionData.label} 결과 아카이브`}
-          subtitle='온라인 예선 → 스위스 스테이지 → 결선 진출자 선발전 → 시드전까지 전체 경기 로그'
-        />
+        <div className='flex items-center gap-3'>
+          <img
+            src={regionData.image}
+            alt={regionData.arcade}
+            className='size-10 shrink-0 rounded-lg object-cover'
+            loading='lazy'
+          />
+          <TkcPageHeader
+            title={`${regionData.label} · ${regionData.arcade} 결과 아카이브`}
+            subtitle='온라인 예선 → 스위스 스테이지 → 결선 진출자 선발전 → 시드전까지 전체 경기 로그'
+          />
+        </div>
       </div>
 
       <section className='space-y-6'>
