@@ -138,21 +138,21 @@ function SongPoolPage() {
       ) : (
         <div className='space-y-8'>
           {/* Tab bar */}
-          <div className='-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 scrollbar-none md:mx-0 md:px-0'>
+          <div className='flex gap-1.5'>
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 type='button'
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  'flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold whitespace-nowrap transition-all',
+                  'flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold whitespace-nowrap transition-all sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm',
                   activeTab === tab.key
                     ? 'border-[#2a2a2a] bg-[#1a1a1a] text-white'
                     : 'border-transparent text-white/40 hover:bg-[#111] hover:text-white/60'
                 )}
               >
                 <span
-                  className='size-2 shrink-0 rounded-full'
+                  className='size-1.5 shrink-0 rounded-full sm:size-2'
                   style={{ backgroundColor: tab.dotColor }}
                 />
                 {tab.label}
