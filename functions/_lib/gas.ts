@@ -5,7 +5,6 @@ export interface _Env {
 
 export type GasAction =
   | "site"
-  | "schedule"
   | "results"
   | "content"
   | "showcaseSongs"

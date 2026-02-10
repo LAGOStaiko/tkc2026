@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 
 const SITE_STALE_MS = 5 * 60 * 1000
 const CONTENT_STALE_MS = 5 * 60 * 1000
-const SCHEDULE_STALE_MS = 60 * 1000
 const RESULTS_STALE_MS = 60 * 1000
 const SONGS_STALE_MS = 30 * 1000
 const SONG_POOLS_STALE_MS = 30 * 1000
@@ -132,24 +131,6 @@ export function useSite<T = unknown>() {
     initialData: persisted?.data,
     initialDataUpdatedAt: persisted?.updatedAt,
     staleTime: SITE_STALE_MS,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
-}
-
-export function useSchedule<T = unknown>() {
-  const persisted = readPersistedCache<T>('schedule')
-
-  return useQuery({
-    queryKey: ['schedule'],
-    queryFn: async () => {
-      const data = await apiGet<T>('/api/schedule')
-      writePersistedCache('schedule', data)
-      return data
-    },
-    initialData: persisted?.data,
-    initialDataUpdatedAt: persisted?.updatedAt,
-    staleTime: SCHEDULE_STALE_MS,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
