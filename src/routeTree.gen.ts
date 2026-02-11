@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ClerkRouteRouteImport } from './routes/clerk/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as siteRouteRouteImport } from './routes/(site)/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
@@ -31,8 +30,6 @@ import { Route as authSignIn2RouteImport } from './routes/(auth)/sign-in-2'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
-import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
-import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AdminSettingsRouteRouteImport } from './routes/admin/settings/route'
 import { Route as siteConsoleRouteRouteImport } from './routes/(site)/console/route'
 import { Route as siteArcadeRouteRouteImport } from './routes/(site)/arcade/route'
@@ -44,9 +41,6 @@ import { Route as AdminChatsIndexRouteImport } from './routes/admin/chats/index'
 import { Route as AdminAppsIndexRouteImport } from './routes/admin/apps/index'
 import { Route as siteConsoleIndexRouteImport } from './routes/(site)/console/index'
 import { Route as siteArcadeIndexRouteImport } from './routes/(site)/arcade/index'
-import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
-import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
-import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
 import { Route as AdminSettingsNotificationsRouteImport } from './routes/admin/settings/notifications'
 import { Route as AdminSettingsDisplayRouteImport } from './routes/admin/settings/display'
 import { Route as AdminSettingsAppearanceRouteImport } from './routes/admin/settings/appearance'
@@ -61,11 +55,6 @@ import { Route as siteArcadeResults2026IndexRouteImport } from './routes/(site)/
 import { Route as siteArcadeResults2026FinalsRouteImport } from './routes/(site)/arcade-results/2026/finals'
 import { Route as siteArcadeResults2026RegionRouteImport } from './routes/(site)/arcade-results/2026/$region'
 
-const ClerkRouteRoute = ClerkRouteRouteImport.update({
-  id: '/clerk',
-  path: '/clerk',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -170,14 +159,6 @@ const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClerkAuthenticatedRouteRoute = ClerkAuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => ClerkRouteRoute,
-} as any)
-const ClerkauthRouteRoute = ClerkauthRouteRouteImport.update({
-  id: '/(auth)',
-  getParentRoute: () => ClerkRouteRoute,
-} as any)
 const AdminSettingsRouteRoute = AdminSettingsRouteRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -232,22 +213,6 @@ const siteArcadeIndexRoute = siteArcadeIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => siteArcadeRouteRoute,
-} as any)
-const ClerkAuthenticatedUserManagementRoute =
-  ClerkAuthenticatedUserManagementRouteImport.update({
-    id: '/user-management',
-    path: '/user-management',
-    getParentRoute: () => ClerkAuthenticatedRouteRoute,
-  } as any)
-const ClerkauthSignUpRoute = ClerkauthSignUpRouteImport.update({
-  id: '/sign-up',
-  path: '/sign-up',
-  getParentRoute: () => ClerkauthRouteRoute,
-} as any)
-const ClerkauthSignInRoute = ClerkauthSignInRouteImport.update({
-  id: '/sign-in',
-  path: '/sign-in',
-  getParentRoute: () => ClerkauthRouteRoute,
 } as any)
 const AdminSettingsNotificationsRoute =
   AdminSettingsNotificationsRouteImport.update({
@@ -321,7 +286,6 @@ const siteArcadeResults2026RegionRoute =
 
 export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
-  '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
   '/arcade': typeof siteArcadeRouteRouteWithChildren
   '/console': typeof siteConsoleRouteRouteWithChildren
   '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
@@ -354,9 +318,6 @@ export interface FileRoutesByFullPath {
   '/admin/settings/appearance': typeof AdminSettingsAppearanceRoute
   '/admin/settings/display': typeof AdminSettingsDisplayRoute
   '/admin/settings/notifications': typeof AdminSettingsNotificationsRoute
-  '/clerk/sign-in': typeof ClerkauthSignInRoute
-  '/clerk/sign-up': typeof ClerkauthSignUpRoute
-  '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/arcade/': typeof siteArcadeIndexRoute
   '/console/': typeof siteConsoleIndexRoute
   '/admin/apps': typeof AdminAppsIndexRoute
@@ -370,7 +331,6 @@ export interface FileRoutesByFullPath {
   '/arcade-results/2026': typeof siteArcadeResults2026IndexRoute
 }
 export interface FileRoutesByTo {
-  '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -400,9 +360,6 @@ export interface FileRoutesByTo {
   '/admin/settings/appearance': typeof AdminSettingsAppearanceRoute
   '/admin/settings/display': typeof AdminSettingsDisplayRoute
   '/admin/settings/notifications': typeof AdminSettingsNotificationsRoute
-  '/clerk/sign-in': typeof ClerkauthSignInRoute
-  '/clerk/sign-up': typeof ClerkauthSignUpRoute
-  '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/arcade': typeof siteArcadeIndexRoute
   '/console': typeof siteConsoleIndexRoute
   '/admin/apps': typeof AdminAppsIndexRoute
@@ -419,12 +376,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(site)': typeof siteRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
-  '/clerk': typeof ClerkRouteRouteWithChildren
   '/(site)/arcade': typeof siteArcadeRouteRouteWithChildren
   '/(site)/console': typeof siteConsoleRouteRouteWithChildren
   '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
-  '/clerk/(auth)': typeof ClerkauthRouteRouteWithChildren
-  '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/sign-in': typeof authSignInRoute
@@ -454,9 +408,6 @@ export interface FileRoutesById {
   '/admin/settings/appearance': typeof AdminSettingsAppearanceRoute
   '/admin/settings/display': typeof AdminSettingsDisplayRoute
   '/admin/settings/notifications': typeof AdminSettingsNotificationsRoute
-  '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
-  '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
-  '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/(site)/arcade/': typeof siteArcadeIndexRoute
   '/(site)/console/': typeof siteConsoleIndexRoute
   '/admin/apps/': typeof AdminAppsIndexRoute
@@ -473,7 +424,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/admin'
-    | '/clerk'
     | '/arcade'
     | '/console'
     | '/admin/settings'
@@ -506,9 +456,6 @@ export interface FileRouteTypes {
     | '/admin/settings/appearance'
     | '/admin/settings/display'
     | '/admin/settings/notifications'
-    | '/clerk/sign-in'
-    | '/clerk/sign-up'
-    | '/clerk/user-management'
     | '/arcade/'
     | '/console/'
     | '/admin/apps'
@@ -522,7 +469,6 @@ export interface FileRouteTypes {
     | '/arcade-results/2026'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/clerk'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -552,9 +498,6 @@ export interface FileRouteTypes {
     | '/admin/settings/appearance'
     | '/admin/settings/display'
     | '/admin/settings/notifications'
-    | '/clerk/sign-in'
-    | '/clerk/sign-up'
-    | '/clerk/user-management'
     | '/arcade'
     | '/console'
     | '/admin/apps'
@@ -570,12 +513,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/(site)'
     | '/admin'
-    | '/clerk'
     | '/(site)/arcade'
     | '/(site)/console'
     | '/admin/settings'
-    | '/clerk/(auth)'
-    | '/clerk/_authenticated'
     | '/(auth)/forgot-password'
     | '/(auth)/otp'
     | '/(auth)/sign-in'
@@ -605,9 +545,6 @@ export interface FileRouteTypes {
     | '/admin/settings/appearance'
     | '/admin/settings/display'
     | '/admin/settings/notifications'
-    | '/clerk/(auth)/sign-in'
-    | '/clerk/(auth)/sign-up'
-    | '/clerk/_authenticated/user-management'
     | '/(site)/arcade/'
     | '/(site)/console/'
     | '/admin/apps/'
@@ -624,7 +561,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   siteRouteRoute: typeof siteRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
-  ClerkRouteRoute: typeof ClerkRouteRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
   authOtpRoute: typeof authOtpRoute
   authSignInRoute: typeof authSignInRoute
@@ -639,13 +575,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/clerk': {
-      id: '/clerk'
-      path: '/clerk'
-      fullPath: '/clerk'
-      preLoaderRoute: typeof ClerkRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -793,20 +722,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clerk/_authenticated': {
-      id: '/clerk/_authenticated'
-      path: ''
-      fullPath: '/clerk'
-      preLoaderRoute: typeof ClerkAuthenticatedRouteRouteImport
-      parentRoute: typeof ClerkRouteRoute
-    }
-    '/clerk/(auth)': {
-      id: '/clerk/(auth)'
-      path: ''
-      fullPath: '/clerk'
-      preLoaderRoute: typeof ClerkauthRouteRouteImport
-      parentRoute: typeof ClerkRouteRoute
-    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -883,27 +798,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/arcade/'
       preLoaderRoute: typeof siteArcadeIndexRouteImport
       parentRoute: typeof siteArcadeRouteRoute
-    }
-    '/clerk/_authenticated/user-management': {
-      id: '/clerk/_authenticated/user-management'
-      path: '/user-management'
-      fullPath: '/clerk/user-management'
-      preLoaderRoute: typeof ClerkAuthenticatedUserManagementRouteImport
-      parentRoute: typeof ClerkAuthenticatedRouteRoute
-    }
-    '/clerk/(auth)/sign-up': {
-      id: '/clerk/(auth)/sign-up'
-      path: '/sign-up'
-      fullPath: '/clerk/sign-up'
-      preLoaderRoute: typeof ClerkauthSignUpRouteImport
-      parentRoute: typeof ClerkauthRouteRoute
-    }
-    '/clerk/(auth)/sign-in': {
-      id: '/clerk/(auth)/sign-in'
-      path: '/sign-in'
-      fullPath: '/clerk/sign-in'
-      preLoaderRoute: typeof ClerkauthSignInRouteImport
-      parentRoute: typeof ClerkauthRouteRoute
     }
     '/admin/settings/notifications': {
       id: '/admin/settings/notifications'
@@ -1113,53 +1007,9 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
-interface ClerkauthRouteRouteChildren {
-  ClerkauthSignInRoute: typeof ClerkauthSignInRoute
-  ClerkauthSignUpRoute: typeof ClerkauthSignUpRoute
-}
-
-const ClerkauthRouteRouteChildren: ClerkauthRouteRouteChildren = {
-  ClerkauthSignInRoute: ClerkauthSignInRoute,
-  ClerkauthSignUpRoute: ClerkauthSignUpRoute,
-}
-
-const ClerkauthRouteRouteWithChildren = ClerkauthRouteRoute._addFileChildren(
-  ClerkauthRouteRouteChildren,
-)
-
-interface ClerkAuthenticatedRouteRouteChildren {
-  ClerkAuthenticatedUserManagementRoute: typeof ClerkAuthenticatedUserManagementRoute
-}
-
-const ClerkAuthenticatedRouteRouteChildren: ClerkAuthenticatedRouteRouteChildren =
-  {
-    ClerkAuthenticatedUserManagementRoute:
-      ClerkAuthenticatedUserManagementRoute,
-  }
-
-const ClerkAuthenticatedRouteRouteWithChildren =
-  ClerkAuthenticatedRouteRoute._addFileChildren(
-    ClerkAuthenticatedRouteRouteChildren,
-  )
-
-interface ClerkRouteRouteChildren {
-  ClerkauthRouteRoute: typeof ClerkauthRouteRouteWithChildren
-  ClerkAuthenticatedRouteRoute: typeof ClerkAuthenticatedRouteRouteWithChildren
-}
-
-const ClerkRouteRouteChildren: ClerkRouteRouteChildren = {
-  ClerkauthRouteRoute: ClerkauthRouteRouteWithChildren,
-  ClerkAuthenticatedRouteRoute: ClerkAuthenticatedRouteRouteWithChildren,
-}
-
-const ClerkRouteRouteWithChildren = ClerkRouteRoute._addFileChildren(
-  ClerkRouteRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   siteRouteRoute: siteRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
-  ClerkRouteRoute: ClerkRouteRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
   authOtpRoute: authOtpRoute,
   authSignInRoute: authSignInRoute,

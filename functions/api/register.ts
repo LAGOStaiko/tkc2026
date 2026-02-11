@@ -1,10 +1,11 @@
 import { z } from "zod";
 import { badRequest, ok, serverError, tooManyRequests } from "../_lib/response";
 import { callGasJson, type _Env } from "../_lib/gas";
+import { escapeFormulaField } from "../_lib/sanitize";
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 10;
-const CLEANUP_INTERVAL = 100; // Clean up every N requests
+const CLEANUP_INTERVAL = 100;
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 let requestCounter = 0;
 
@@ -15,14 +16,6 @@ const cleanupExpiredEntries = () => {
       rateLimitStore.delete(ip);
     }
   }
-};
-
-const getClientIp = (request: Request) => {
-  const cfIp = request.headers.get("CF-Connecting-IP");
-  if (cfIp) return cfIp.trim();
-  const forwarded = request.headers.get("X-Forwarded-For");
-  if (forwarded) return forwarded.split(",")[0]?.trim() ?? "unknown";
-  return "unknown";
 };
 
 const hitRateLimit = (ip: string) => {
@@ -48,6 +41,14 @@ const hitRateLimit = (ip: string) => {
   }
 
   return { limited: false, retryAfter: Math.ceil((entry.resetAt - now) / 1000) };
+};
+
+const getClientIp = (request: Request) => {
+  const cfIp = request.headers.get("CF-Connecting-IP");
+  if (cfIp) return cfIp.trim();
+  const forwarded = request.headers.get("X-Forwarded-For");
+  if (forwarded) return forwarded.split(",")[0]?.trim() ?? "unknown";
+  return "unknown";
 };
 
 const trimString = (value: unknown) => {
@@ -207,11 +208,16 @@ export const onRequestPost = async ({ env, request }) => {
 
     const payload: RegisterPayload = {
       ...payloadBase,
-      videoLink: parsed.data.videoLink ?? "",
-      dohirobaNo: parsed.data.dohirobaNo ?? "",
+      name: escapeFormulaField(payloadBase.name),
+      phone: escapeFormulaField(payloadBase.phone),
+      email: escapeFormulaField(payloadBase.email),
+      nickname: escapeFormulaField(payloadBase.nickname),
+      namcoId: escapeFormulaField(payloadBase.namcoId),
+      videoLink: escapeFormulaField(parsed.data.videoLink ?? ""),
+      dohirobaNo: escapeFormulaField(parsed.data.dohirobaNo ?? ""),
       qualifierRegion: parsed.data.qualifierRegion ?? "",
-      offlineSongs: parsed.data.offlineSongs ?? [],
-      consentLink: parsed.data.consentLink ?? "",
+      offlineSongs: (parsed.data.offlineSongs ?? []).map(escapeFormulaField),
+      consentLink: escapeFormulaField(parsed.data.consentLink ?? ""),
     };
 
     const gas = await callGasJson(env, "register", {}, payload);

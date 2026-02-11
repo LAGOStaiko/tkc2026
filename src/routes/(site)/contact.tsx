@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSite } from '@/lib/api'
+import { sanitizeUrl } from '@/lib/sanitize-url'
 import { GlassCard } from '@/components/tkc/glass-card'
 import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { cn } from '@/lib/utils'
@@ -531,8 +532,10 @@ function ContactPage() {
   const [openFaq, setOpenFaq] = useState<string | null>(null)
 
   const contactEmail = siteData?.contactEmail ?? ''
-  const kakaoChannelUrl = siteData?.kakaoChannelUrl ?? ''
-  const emailHref = contactEmail ? `mailto:${contactEmail}` : ''
+  const kakaoChannelUrl = sanitizeUrl(siteData?.kakaoChannelUrl)
+  const emailHref = contactEmail
+    ? sanitizeUrl(`mailto:${contactEmail}`)
+    : ''
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('contact.title')}`
@@ -591,7 +594,7 @@ function ContactPage() {
               </span>
             </div>
 
-            {emailHref ? (
+            {emailHref && emailHref !== '#' ? (
               <a
                 href={emailHref}
                 className='flex items-center justify-center gap-2 rounded-xl border border-sky-400/20 bg-sky-400/8 px-5 py-3 text-sm font-semibold text-sky-400 transition-all hover:-translate-y-0.5 hover:border-sky-400/35 hover:bg-sky-400/14 hover:shadow-[0_4px_20px_rgba(74,158,255,0.1)]'
@@ -648,7 +651,7 @@ function ContactPage() {
               </span>
             </div>
 
-            {kakaoChannelUrl ? (
+            {kakaoChannelUrl && kakaoChannelUrl !== '#' ? (
               <a
                 href={kakaoChannelUrl}
                 target='_blank'

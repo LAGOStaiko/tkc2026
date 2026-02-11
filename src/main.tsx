@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { AxiosError } from 'axios'
+import { ClerkProvider } from '@clerk/clerk-react'
 import {
   QueryCache,
   QueryClient,
@@ -9,7 +10,6 @@ import {
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { t } from '@/text'
 import { toast } from 'sonner'
-import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
@@ -54,7 +54,6 @@ const queryClient = new QueryClient({
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
           toast.error(t('toast.sessionExpired'))
-          useAuthStore.getState().auth.reset()
           const redirect = `${router.history.location.href}`
           router.navigate({ to: '/sign-in', search: { redirect } })
         }
@@ -88,21 +87,44 @@ declare module '@tanstack/react-router' {
   }
 }
 
+const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+function AppWithProviders() {
+  const app = (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <FontProvider>
+          <DirectionProvider>
+            <RouterProvider router={router} />
+          </DirectionProvider>
+        </FontProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  )
+
+  if (!CLERK_PUBLISHABLE_KEY) return app
+
+  return (
+    <ClerkProvider
+      publishableKey={CLERK_PUBLISHABLE_KEY}
+      signInUrl='/sign-in'
+      signUpUrl='/sign-up'
+      afterSignOutUrl='/sign-in'
+      signInFallbackRedirectUrl='/admin'
+      signUpFallbackRedirectUrl='/admin'
+    >
+      {app}
+    </ClerkProvider>
+  )
+}
+
 // Render the app
 const rootElement = document.getElementById('root')!
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <FontProvider>
-            <DirectionProvider>
-              <RouterProvider router={router} />
-            </DirectionProvider>
-          </FontProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <AppWithProviders />
     </StrictMode>
   )
 }

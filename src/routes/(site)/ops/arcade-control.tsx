@@ -39,7 +39,6 @@ export const Route = createFileRoute('/(site)/ops/arcade-control')({
   component: ArcadeOpsControlPage,
 })
 
-const OPERATOR_KEY_STORAGE = 'tkc2026:ops:operator-key'
 const DEFAULT_SEASON = '2026'
 const DEFAULT_REGION: OpsRegionKey = 'seoul'
 const REFRESH_MS = 5000
@@ -339,21 +338,6 @@ function ArcadeOpsControlPage() {
     if (bulkRound.trim().length > 0) return
     setBulkRound(String(currentSwissRound ?? 1))
   }, [bulkRound, currentSwissRound, stage])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const stored = window.localStorage.getItem(OPERATOR_KEY_STORAGE)
-    if (stored?.trim()) setOperatorKey(stored.trim())
-  }, [])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (!operatorKey.trim()) {
-      window.localStorage.removeItem(OPERATOR_KEY_STORAGE)
-      return
-    }
-    window.localStorage.setItem(OPERATOR_KEY_STORAGE, operatorKey.trim())
-  }, [operatorKey])
 
   const fetchFeed = useCallback(async () => {
     try {

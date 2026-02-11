@@ -49,6 +49,34 @@ function toBool_(v) {
   return s === 'true' || s === '1' || s === 'yes' || s === 'y';
 }
 
+function sanitizeUrl_(url) {
+  if (!url || typeof url !== 'string') return '';
+  var trimmed = url.trim();
+  if (!trimmed) return '';
+  if (/^https:\/\//i.test(trimmed)) return trimmed;
+  if (/^mailto:/i.test(trimmed)) return trimmed;
+  return '';
+}
+
+function sanitizeEmail_(email) {
+  if (!email || typeof email !== 'string') return '';
+  var trimmed = email.trim();
+  if (trimmed.indexOf('@') < 1) return '';
+  if (/^[a-z]+:/i.test(trimmed)) return '';
+  return trimmed;
+}
+
+function escapeFormula_(value) {
+  if (typeof value !== 'string') return value;
+  var trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  var ch = trimmed.charAt(0);
+  if (ch === '=' || ch === '+' || ch === '-' || ch === '@') {
+    return "'" + trimmed;
+  }
+  return trimmed;
+}
+
 function isoDate_(d) {
   if (!(d instanceof Date)) return '';
   var tz = Session.getScriptTimeZone();
@@ -1678,16 +1706,16 @@ function handleSite_() {
       return {
         order: Number(r.order||0),
         name: String(r.name||'').trim(),
-        logoUrl: String(r.logoUrl||'').trim(),
-        href: String(r.href||'').trim(),
+        logoUrl: sanitizeUrl_(String(r.logoUrl||'').trim()),
+        href: sanitizeUrl_(String(r.href||'').trim()),
       };
     });
 
   var data = {
     eventName: String(map.eventName || ''),
     catchphrase: String(map.catchphrase || ''),
-    contactEmail: String(map.contactEmail || ''),
-    kakaoChannelUrl: String(map.kakaoChannelUrl || ''),
+    contactEmail: sanitizeEmail_(String(map.contactEmail || '')),
+    kakaoChannelUrl: sanitizeUrl_(String(map.kakaoChannelUrl || '')),
     heroBgType: String(map.heroBgType || 'image'),
     heroBgUrl: String(map.heroBgUrl || ''),
     heroBgPosterUrl: String(map.heroBgPosterUrl || ''),
@@ -1921,15 +1949,15 @@ function handleRegister_(payload) {
       createdAt: now,
       receiptId: receiptId,
       division: String(payload.division||'').trim(),
-      name: String(payload.name||'').trim(),
-      phone: String(payload.phone||'').trim(),
-      email: String(payload.email||'').trim(),
-      nickname: String(payload.nickname||'').trim(),
-      cardNo: String(payload.cardNo||'').trim(),
-      dohirobaNo: String(payload.dohirobaNo||'').trim(),
+      name: escapeFormula_(String(payload.name||'').trim()),
+      phone: escapeFormula_(String(payload.phone||'').trim()),
+      email: escapeFormula_(String(payload.email||'').trim()),
+      nickname: escapeFormula_(String(payload.nickname||'').trim()),
+      cardNo: escapeFormula_(String(payload.cardNo||'').trim()),
+      dohirobaNo: escapeFormula_(String(payload.dohirobaNo||'').trim()),
       spectator: toBool_(payload.spectator),
       isMinor: toBool_(payload.isMinor),
-      consentLink: String(payload.consentLink||'').trim(),
+      consentLink: escapeFormula_(String(payload.consentLink||'').trim()),
       privacyAgree: toBool_(payload.privacyAgree),
       status: 'received',
       memo: ''

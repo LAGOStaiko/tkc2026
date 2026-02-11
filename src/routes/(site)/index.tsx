@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useSite } from '@/lib/api'
+import { sanitizeUrl, sanitizeImgSrc } from '@/lib/sanitize-url'
 import { FadeIn } from '@/components/tkc/guide-shared'
 
 export const Route = createFileRoute('/(site)/')({
@@ -289,12 +290,14 @@ function HomePage() {
               .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
               .map((p) => {
                 const key = p.order ?? p.name
-                const hasLogo = !!p.logoUrl && p.logoUrl.trim().length > 0
-                const hasHref = !!p.href && p.href.trim().length > 0
+                const safeLogoUrl = sanitizeImgSrc(p.logoUrl)
+                const safeHref = sanitizeUrl(p.href)
+                const hasLogo = safeLogoUrl.length > 0
+                const hasHref = safeHref !== '#'
 
                 const node = hasLogo ? (
                   <img
-                    src={p.logoUrl}
+                    src={safeLogoUrl}
                     alt={p.name}
                     className='h-6 w-auto opacity-90'
                     loading='lazy'
@@ -306,7 +309,7 @@ function HomePage() {
                 return hasHref ? (
                   <a
                     key={key}
-                    href={p.href}
+                    href={safeHref}
                     target='_blank'
                     rel='noreferrer'
                     className='hover:text-white'
