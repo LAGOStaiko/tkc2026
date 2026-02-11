@@ -110,7 +110,7 @@ test('mobile readability audit on public site routes', async ({ browser }) => {
           return parts.join(' > ')
         }
 
-        const isVisible = (el: Element, style: CSSStyleDeclaration, rect: DOMRect): boolean => {
+        const isVisible = (style: CSSStyleDeclaration, rect: DOMRect): boolean => {
           if (style.display === 'none') return false
           if (style.visibility === 'hidden') return false
           if (Number(style.opacity) === 0) return false
@@ -135,7 +135,7 @@ test('mobile readability audit on public site routes', async ({ browser }) => {
         for (const el of Array.from(document.querySelectorAll('body *'))) {
           const style = window.getComputedStyle(el)
           const rect = el.getBoundingClientRect()
-          if (!isVisible(el, style, rect)) continue
+          if (!isVisible(style, rect)) continue
 
           if (rect.left < -1 || rect.right > viewportWidth + 1) {
             if (overflowOffenders.length < 12) {

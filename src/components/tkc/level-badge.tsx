@@ -12,14 +12,6 @@ const LEVEL_STYLES: Record<number, string> = {
 const URA_STYLE = 'bg-purple-500/15 text-purple-400'
 const FALLBACK_STYLE = 'bg-white/10 text-white/60'
 
-/** Extract numeric level from strings like "Lv.9", "★9", or "9" */
-export function parseLevelNumber(value: string): number | null {
-  const m = value.match(/(\d+)/)
-  if (!m) return null
-  const n = Number(m[1])
-  return Number.isFinite(n) ? n : null
-}
-
 export function LevelBadge({
   level,
   isUra,

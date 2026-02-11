@@ -20,9 +20,11 @@ export function Callout({
   }
   return (
     <div
-      className={`flex gap-3 rounded-xl border p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px] ${cls[type]}`}
+      className={`flex items-center gap-3 rounded-xl border p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px] ${cls[type]}`}
     >
-      <span className='mt-0.5 shrink-0'>{icon}</span>
+      <span className='inline-flex shrink-0 items-center justify-center'>
+        {icon}
+      </span>
       <span className='break-keep'>{children}</span>
     </div>
   )
@@ -120,7 +122,6 @@ export function Accordion({
   children: ReactNode
 }) {
   const [open, setOpen] = useState(false)
-  const contentRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className='tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'>
@@ -136,13 +137,13 @@ export function Accordion({
           ??        </span>
       </button>
       <div
-        ref={contentRef}
-        className='overflow-hidden transition-all duration-400'
-        style={{
-          maxHeight: open ? (contentRef.current?.scrollHeight ?? 2000) : 0,
-        }}
+        className={`grid transition-[grid-template-rows] duration-400 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
       >
-        <div className='border-t border-[#1e1e1e] px-4 py-4 sm:px-6 sm:py-5'>{children}</div>
+        <div className='overflow-hidden'>
+          <div className='border-t border-[#1e1e1e] px-4 py-4 sm:px-6 sm:py-5'>
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -164,7 +165,6 @@ export function StepCard({
   accentColor?: string
 }) {
   const [open, setOpen] = useState(false)
-  const contentRef = useRef<HTMLDivElement>(null)
 
   return (
     <FadeIn>
@@ -202,14 +202,12 @@ export function StepCard({
 
         {/* Detail */}
         <div
-          ref={contentRef}
-          className='overflow-hidden transition-all duration-400'
-          style={{
-            maxHeight: open ? (contentRef.current?.scrollHeight ?? 2000) : 0,
-          }}
+          className={`grid transition-[grid-template-rows] duration-400 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
         >
-          <div className='border-t border-[#1e1e1e] px-4 py-4 [&>*+*]:mt-4 sm:px-6 sm:py-5 sm:[&>*+*]:mt-5'>
-            {children}
+          <div className='overflow-hidden'>
+            <div className='border-t border-[#1e1e1e] px-4 py-4 [&>*+*]:mt-4 sm:px-6 sm:py-5 sm:[&>*+*]:mt-5'>
+              {children}
+            </div>
           </div>
         </div>
       </div>
@@ -253,4 +251,3 @@ export function DetailRow({
     </div>
   )
 }
-

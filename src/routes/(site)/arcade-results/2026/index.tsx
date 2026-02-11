@@ -72,8 +72,8 @@ function ArcadeResults2026Page() {
       </div>
 
       {isError && (
-        <div className='flex gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px]'>
-          <span className='mt-0.5 shrink-0'>⚠</span>
+        <div className='flex items-center gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px]'>
+          <span className='shrink-0'>⚠</span>
           <span className='break-keep'>
             API 연동 데이터가 없어 기본 아카이브 뼈대로 표시 중입니다.
           </span>

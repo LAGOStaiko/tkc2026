@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSite } from '@/lib/api'
@@ -444,8 +444,11 @@ function FaqList({ items }: { items: string[] }) {
   return (
     <ul className='mt-2 space-y-1'>
       {items.map((item, i) => (
-        <li key={i} className='flex gap-2 text-[12px] text-white/55 sm:text-[13px]'>
-          <span className='mt-0.5 shrink-0 font-bold text-[#f5a623]'>›</span>
+        <li
+          key={i}
+          className='flex items-center gap-2 text-[12px] text-white/55 sm:text-[13px]'
+        >
+          <span className='shrink-0 font-bold text-[#f5a623]'>›</span>
           <span className='break-keep'>{item}</span>
         </li>
       ))}
@@ -455,7 +458,7 @@ function FaqList({ items }: { items: string[] }) {
 
 function FaqNote({ children }: { children: ReactNode }) {
   return (
-    <div className='mt-2.5 flex gap-2 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-2.5 text-[11px] leading-[1.55] text-white/50 sm:text-[12px]'>
+    <div className='mt-2.5 flex items-center gap-2 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-2.5 text-[11px] leading-[1.55] text-white/50 sm:text-[12px]'>
       <span className='shrink-0'>※</span>
       <span className='break-keep'>{children}</span>
     </div>
@@ -479,8 +482,6 @@ function FaqItem({
   isOpen: boolean
   onToggle: () => void
 }) {
-  const contentRef = useRef<HTMLDivElement>(null)
-
   return (
     <div
       className={cn(
@@ -509,14 +510,12 @@ function FaqItem({
         </span>
       </button>
       <div
-        ref={contentRef}
-        className='overflow-hidden transition-all duration-400'
-        style={{
-          maxHeight: isOpen ? (contentRef.current?.scrollHeight ?? 2000) : 0,
-        }}
+        className={`grid transition-[grid-template-rows] duration-400 ease-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
       >
-        <div className='border-t border-[#1e1e1e] px-4 py-4 pl-[3.2rem] text-[13px] leading-[1.55] text-white/55 break-keep sm:px-6 sm:py-5 sm:pl-[4.2rem]'>
-          {answer}
+        <div className='overflow-hidden'>
+          <div className='border-t border-[#1e1e1e] px-4 py-4 pl-[3.2rem] text-[13px] leading-[1.55] text-white/55 break-keep sm:px-6 sm:py-5 sm:pl-[4.2rem]'>
+            {answer}
+          </div>
         </div>
       </div>
     </div>
@@ -816,8 +815,8 @@ function ContactPage() {
       </div>
 
       {/* Notice */}
-      <div className='flex gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-[1.55] text-white/55 sm:p-4 sm:text-[13px]'>
-        <span className='mt-0.5 shrink-0'>⚠</span>
+      <div className='flex items-center gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-[1.55] text-white/55 sm:p-4 sm:text-[13px]'>
+        <span className='shrink-0'>⚠</span>
         <span className='break-keep'>{t('contact.notice')}</span>
       </div>
     </TkcSection>

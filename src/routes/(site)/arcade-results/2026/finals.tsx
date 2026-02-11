@@ -191,8 +191,8 @@ function ArcadeFinals2026Page() {
       </div>
 
       {isError && (
-        <div className='flex gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px]'>
-          <span className='mt-0.5 shrink-0'>⚠</span>
+        <div className='flex items-center gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px]'>
+          <span className='shrink-0'>⚠</span>
           <span className='break-keep'>
             결선 아카이브 API가 비어 있어 현재 입력된 데이터만 표시합니다.
           </span>

@@ -549,14 +549,14 @@ function ScheduleStrip() {
                     className='rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
                   >
                     <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5'>
-                      <div className='flex w-[52px] shrink-0 flex-col items-center justify-center text-center sm:w-[72px]'>
-                        <div className='w-[5ch] text-center text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
+                      <div className='flex w-[52px] shrink-0 flex-col items-start justify-center text-left sm:w-[72px] sm:items-center sm:text-center'>
+                        <div className='w-[5ch] text-left text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-center sm:text-lg'>
                           {fmtDate(ev.startDate)}
                         </div>
-                        <div className='my-1 w-[5ch] text-center text-[11px] leading-none text-white/20'>
+                        <div className='my-1 w-[5ch] text-left text-[11px] leading-none text-white/20 sm:text-center'>
                           →
                         </div>
-                        <div className='w-[5ch] text-center text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-lg'>
+                        <div className='w-[5ch] text-left text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-center sm:text-lg'>
                           {fmtDate(ev.endDate)}
                         </div>
                       </div>
@@ -612,11 +612,11 @@ function ScheduleStrip() {
                     className='rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
                   >
                     <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5'>
-                      <div className='flex w-[52px] shrink-0 flex-col items-center justify-center text-center sm:w-[72px]'>
-                        <div className='w-[5ch] text-center text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-xl'>
+                      <div className='flex w-[52px] shrink-0 flex-col items-start justify-center text-left sm:w-[72px] sm:items-center sm:text-center'>
+                        <div className='w-[5ch] text-left text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-center sm:text-xl'>
                           {fmtDate(ev.fullDate)}
                         </div>
-                        <div className='mt-1 w-[5ch] text-center text-[11px] leading-none text-white/35'>
+                        <div className='mt-1 w-[5ch] text-left text-[11px] leading-none text-white/35 sm:text-center'>
                           {fmtDay(ev.fullDate)}
                         </div>
                       </div>
@@ -666,8 +666,8 @@ function ScheduleStrip() {
                     key={ev.fullDate}
                     className='flex items-center gap-3 rounded-xl border border-dashed border-[#1e1e1e] bg-[#111]/60 px-5 py-4 sm:gap-4 sm:px-5'
                   >
-                    <div className='flex w-[52px] shrink-0 flex-col items-center justify-center text-center sm:w-[72px]'>
-                      <div className='w-[5ch] text-center text-[14px] leading-none font-semibold tracking-tight tabular-nums text-white/35 sm:text-[17px]'>
+                    <div className='flex w-[52px] shrink-0 flex-col items-start justify-center text-left sm:w-[72px] sm:items-center sm:text-center'>
+                      <div className='w-[5ch] text-left text-[14px] leading-none font-semibold tracking-tight tabular-nums text-white/35 sm:text-center sm:text-[17px]'>
                         {fmtDate(ev.fullDate)}
                       </div>
                     </div>
@@ -695,11 +695,11 @@ function ScheduleStrip() {
                   >
                     <div className='absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-[#e86e3a] to-[#f5a623]' />
                     <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5 sm:py-5'>
-                      <div className='flex w-[52px] shrink-0 flex-col items-center justify-center text-center sm:w-[72px]'>
-                        <div className='w-[5ch] bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-center text-lg leading-none font-extrabold tracking-tight tabular-nums text-transparent sm:text-2xl'>
+                      <div className='flex w-[52px] shrink-0 flex-col items-start justify-center text-left sm:w-[72px] sm:items-center sm:text-center'>
+                        <div className='w-[5ch] bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-left text-lg leading-none font-extrabold tracking-tight tabular-nums text-transparent sm:text-center sm:text-2xl'>
                           {fmtDate(ev.fullDate)}
                         </div>
-                        <div className='mt-1 w-[5ch] text-center text-[11px] leading-none text-[#e86e3a]/60'>
+                        <div className='mt-1 w-[5ch] text-left text-[11px] leading-none text-[#e86e3a]/60 sm:text-center'>
                           {fmtDay(ev.fullDate)}
                         </div>
                       </div>

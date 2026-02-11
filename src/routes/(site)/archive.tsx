@@ -134,7 +134,6 @@ function Lightbox({
   const p = photos[index]
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       role='dialog'
       aria-modal='true'
@@ -151,7 +150,6 @@ function Lightbox({
         ✕
       </button>
       {/* image area */}
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
         onClick={(e) => e.stopPropagation()}
         className='flex aspect-[4/3] w-[min(88vw,720px)] items-center justify-center overflow-hidden rounded-xl'

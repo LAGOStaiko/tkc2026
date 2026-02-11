@@ -14,7 +14,8 @@ import { buildRegionFinalRanking } from '@/lib/arcade-results-ranking'
 import { cn } from '@/lib/utils'
 import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { FadeIn } from '@/components/tkc/guide-shared'
-import { LevelBadge, parseLevelNumber } from '@/components/tkc/level-badge'
+import { LevelBadge } from '@/components/tkc/level-badge'
+import { parseLevelNumber } from '@/components/tkc/parse-level-number'
 
 export const Route = createFileRoute('/(site)/arcade-results/2026/$region')({
   component: ArcadeRegionDetailPage,

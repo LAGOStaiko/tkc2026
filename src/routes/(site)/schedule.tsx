@@ -753,52 +753,71 @@ function SchedulePanel({
           events.map((e, i) => (
             <div
               key={i}
-              className='group relative flex items-center gap-4 px-6 py-4 transition-colors hover:bg-white/[0.015]'
+              className='group relative flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-white/[0.015] sm:items-center sm:gap-4 sm:px-6 sm:py-4'
             >
               {i < events.length - 1 && (
-                <div className='absolute bottom-0 left-6 right-6 h-px bg-[#1e1e1e]' />
+                <div className='absolute bottom-0 left-4 right-4 h-px bg-[#1e1e1e] sm:left-6 sm:right-6' />
               )}
-              <div className='w-16 shrink-0 font-mono text-[15px] font-semibold leading-tight text-white/55'>
+              <div className='w-12 shrink-0 pt-0.5 font-mono text-[13px] font-semibold leading-tight text-white/55 sm:w-16 sm:pt-0 sm:text-[15px]'>
                 {e.dateMain}
                 {e.dateSub && (
-                  <span className='block text-xs font-medium text-white/30'>
+                  <span className='block text-[11px] font-medium text-white/30 sm:text-xs'>
                     {e.dateSub}
                   </span>
                 )}
               </div>
               <div
-                className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full sm:mt-0 sm:h-2.5 sm:w-2.5 ${
                   variant === 'console' ? 'bg-[#e86e3a]' : 'bg-[#f5a623]'
                 }`}
               />
               <div className='min-w-0 flex-1'>
-                <div className='text-[15px] font-semibold break-keep text-white/90'>
-                  {e.title}
-                </div>
-                {e.venueLabel ? (
-                  <div className='mt-1 flex items-center gap-2'>
-                    <img
-                      src={e.venueImage ?? DEFAULT_VENUE_IMAGE}
-                      alt={e.venueLabel}
-                      className='size-6 rounded-md object-cover'
-                      loading='lazy'
-                      onError={(event) => {
-                        const image = event.currentTarget
-                        if (image.dataset.fallbackApplied === 'true') return
-                        image.dataset.fallbackApplied = 'true'
-                        image.src = DEFAULT_VENUE_IMAGE
-                      }}
-                    />
-                    <span className='text-[13px] text-white/40'>{e.venueLabel}</span>
+                <div className='flex items-start justify-between gap-2'>
+                  <div className='min-w-0'>
+                    <div className='text-[14px] leading-[1.35] font-semibold break-keep text-white/90 sm:text-[15px]'>
+                      {e.title}
+                    </div>
+                    {e.venueLabel ? (
+                      <div className='mt-1 flex items-center gap-1.5 sm:gap-2'>
+                        <img
+                          src={e.venueImage ?? DEFAULT_VENUE_IMAGE}
+                          alt={e.venueLabel}
+                          className='size-5 rounded object-cover sm:size-6 sm:rounded-md'
+                          loading='lazy'
+                          onError={(event) => {
+                            const image = event.currentTarget
+                            if (image.dataset.fallbackApplied === 'true') return
+                            image.dataset.fallbackApplied = 'true'
+                            image.src = DEFAULT_VENUE_IMAGE
+                          }}
+                        />
+                        <span className='text-[12px] text-white/40 sm:text-[13px]'>
+                          {e.venueLabel}
+                        </span>
+                      </div>
+                    ) : e.meta ? (
+                      <div className='mt-0.5 text-[12px] text-white/35 sm:text-[13px]'>
+                        {e.meta}
+                      </div>
+                    ) : null}
+                    {e.venueLabel && e.meta && (
+                      <div className='mt-0.5 text-[11px] text-white/30 sm:mt-1 sm:text-[12px]'>
+                        {e.meta}
+                      </div>
+                    )}
                   </div>
-                ) : e.meta ? (
-                  <div className='mt-0.5 text-[13px] text-white/35'>{e.meta}</div>
-                ) : null}
-                {e.venueLabel && e.meta && (
-                  <div className='mt-1 text-[12px] text-white/30'>{e.meta}</div>
+                  {e.mode && (
+                    <div className='hidden shrink-0 sm:block'>
+                      <ModeTag mode={e.mode} />
+                    </div>
+                  )}
+                </div>
+                {e.mode && (
+                  <div className='mt-1.5 sm:hidden'>
+                    <ModeTag mode={e.mode} />
+                  </div>
                 )}
               </div>
-              {e.mode && <ModeTag mode={e.mode} />}
             </div>
           ))
         )}
@@ -1068,8 +1087,8 @@ function SchedulePage() {
         desc='예선을 통과한 선수들이 겨루는 최종 무대입니다.'
       >
         <FinalsTeaser title={finalTitle} meta={finalMeta} />
-        <div className='flex gap-3 rounded-xl border border-[#4a9eff]/[0.12] bg-[#4a9eff]/[0.04] p-4 text-[13px] leading-[1.55] text-white/55'>
-          <TkcIcon name='info' className='mt-0.5 size-4 shrink-0 opacity-80' />
+        <div className='flex items-center gap-3 rounded-xl border border-[#4a9eff]/[0.12] bg-[#4a9eff]/[0.04] p-4 text-[13px] leading-[1.55] text-white/55'>
+          <TkcIcon name='info' className='size-4 shrink-0 opacity-80' />
           <span className='break-keep'>
             결선 세부 일정 및 진행 방식은 예선 종료 후{' '}
             <strong className='text-white/70'>공식 채널을 통해 공지</strong>됩니다.

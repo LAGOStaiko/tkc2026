@@ -520,9 +520,9 @@ function ConsoleQualifierPage() {
                 {NOTICES.map((html, i) => (
                   <div
                     key={i}
-                    className='flex items-start gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
+                    className='flex items-center gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
                   >
-                    <TkcIcon name='info' className='mt-0.5 size-4 shrink-0 opacity-80' />
+                    <TkcIcon name='info' className='size-4 shrink-0 opacity-80' />
                     <span
                       className='break-keep text-white/55 [&>strong]:text-white/90'
                       dangerouslySetInnerHTML={{ __html: html }}

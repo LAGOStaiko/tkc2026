@@ -86,8 +86,8 @@ function ResultsHubPage() {
       />
 
       {isError && (
-        <div className='flex gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px]'>
-          <span className='mt-0.5 shrink-0'>⚠</span>
+        <div className='flex items-center gap-3 rounded-xl border border-[#f5a623]/[0.12] bg-[#f5a623]/[0.04] p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px]'>
+          <span className='shrink-0'>⚠</span>
           <span className='break-keep'>
             결과 데이터를 불러오지 못했습니다. 기본 아카이브 구조만 표시합니다.
           </span>
