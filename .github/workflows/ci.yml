@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Audit production dependencies
+        run: pnpm audit --prod --audit-level high
+
       - name: Lint the code
         run: pnpm lint
 
@@ -37,5 +40,25 @@ jobs:
       - name: Run Prettier check
         run: pnpm format:check
 
+      - name: Run tests
+        run: pnpm test
+
       - name: Build the project
         run: pnpm build
+
+      - name: Smoke test build output
+        run: |
+          echo "Checking dist/index.html exists..."
+          test -f dist/index.html
+          echo "Checking _headers copied..."
+          test -f dist/_headers
+          echo "Checking SPA fallback routes resolve to index.html..."
+          grep -q '<div id="root">' dist/index.html
+          echo "All smoke checks passed."
+
+      # ── CSP 수동 검증 체크리스트 (배포 후 브라우저 콘솔 확인) ──
+      # 1. / 홈 — 영상 썸네일(i.ytimg.com) 로드, YouTube 임베드 재생
+      # 2. /apply — Turnstile CAPTCHA 위젯 정상 렌더링
+      # 3. /sign-in — Clerk 로그인 페이지 정상 로드
+      # 4. 콘솔에 CSP Report-Only 위반 로그 0건 확인
+      # 5. 위반 0건 확인 후 _headers에서 Report-Only → enforce 전환

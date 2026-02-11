@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
+import { REGISTER_LIMITS as L } from '../../../shared/register-limits'
 import { parseSongOption, parseSongTitle } from '@/content/swiss-song-pool'
 import { t } from '@/text'
 import { ChevronDown, Download } from 'lucide-react'
@@ -115,29 +116,36 @@ const formSchema = z
       error: (iss) =>
         iss.input === undefined ? v.divisionRequired : undefined,
     }),
-    website: z.string().optional(),
-    turnstileToken: z.string().optional(),
-    name: z.string().min(1, { message: v.nameRequired }),
-    phone: z.string().min(1, { message: v.phoneRequired }),
+    website: z.string().max(L.website).optional(),
+    turnstileToken: z.string().max(L.turnstileToken).optional(),
+    name: z.string().min(1, { message: v.nameRequired }).max(L.name),
+    phone: z.string().min(1, { message: v.phoneRequired }).max(L.phone),
     email: z
       .string()
       .min(1, { message: v.emailRequired })
-      .email({ message: v.emailInvalid }),
-    nickname: z.string().min(1, { message: v.nicknameRequired }),
-    namcoId: z.string().min(1, { message: v.namcoIdRequired }),
+      .email({ message: v.emailInvalid })
+      .max(L.email),
+    nickname: z
+      .string()
+      .min(1, { message: v.nicknameRequired })
+      .max(L.nickname),
+    namcoId: z
+      .string()
+      .min(1, { message: v.namcoIdRequired })
+      .max(L.namcoId),
     // Console only
-    videoLink: z.string().optional(),
+    videoLink: z.string().max(L.videoLink).optional(),
     // Arcade only
-    dohirobaNo: z.string().optional(),
-    qualifierRegion: z.string().optional(),
-    offlineSong1: z.string().optional(),
-    offlineSong2: z.string().optional(),
-    offlineSong3: z.string().optional(),
-    offlineSong4: z.string().optional(),
+    dohirobaNo: z.string().max(L.dohirobaNo).optional(),
+    qualifierRegion: z.string().max(L.qualifierRegion).optional(),
+    offlineSong1: z.string().max(L.offlineSong).optional(),
+    offlineSong2: z.string().max(L.offlineSong).optional(),
+    offlineSong3: z.string().max(L.offlineSong).optional(),
+    offlineSong4: z.string().max(L.offlineSong).optional(),
     // Common checkboxes
     spectator: z.boolean(),
     isMinor: z.boolean(),
-    consentLink: z.string().optional(),
+    consentLink: z.string().max(L.consentLink).optional(),
     privacyAgree: z.boolean().refine((val) => val, {
       message: v.privacyRequired,
     }),

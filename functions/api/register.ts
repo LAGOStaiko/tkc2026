@@ -2,6 +2,7 @@ import { z } from "zod";
 import { badRequest, ok, serverError, tooManyRequests } from "../_lib/response";
 import { callGasJson, type _Env } from "../_lib/gas";
 import { escapeFormulaField } from "../_lib/sanitize";
+import { REGISTER_LIMITS as L } from "../../shared/register-limits";
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 10;
@@ -66,31 +67,61 @@ const parseBoolean = (value: unknown) => {
   return false;
 };
 
-const registerSchema = z
+export const registerSchema = z
   .object({
     division: z.preprocess(
       (value) => (typeof value === "string" ? value.trim() : value),
       z.enum(["console", "arcade"])
     ),
     // Honeypot field (should stay empty). Helps block simple bots.
-    website: z.preprocess(trimString, z.string().optional()),
+    website: z.preprocess(trimString, z.string().max(L.website).optional()),
     // Turnstile token (required when TURNSTILE_SECRET_KEY is set).
-    turnstileToken: z.preprocess(trimString, z.string().optional()),
-    name: z.preprocess(trimString, z.string().min(1, "name is required")),
-    phone: z.preprocess(trimString, z.string().min(1, "phone is required")),
-    email: z.preprocess(trimString, z.string().email("valid email is required")),
-    nickname: z.preprocess(trimString, z.string().min(1, "nickname is required")),
-    namcoId: z.preprocess(trimString, z.string().min(1, "namcoId is required")),
+    turnstileToken: z.preprocess(
+      trimString,
+      z.string().max(L.turnstileToken).optional()
+    ),
+    name: z.preprocess(
+      trimString,
+      z.string().min(1, "name is required").max(L.name)
+    ),
+    phone: z.preprocess(
+      trimString,
+      z.string().min(1, "phone is required").max(L.phone)
+    ),
+    email: z.preprocess(
+      trimString,
+      z.string().email("valid email is required").max(L.email)
+    ),
+    nickname: z.preprocess(
+      trimString,
+      z.string().min(1, "nickname is required").max(L.nickname)
+    ),
+    namcoId: z.preprocess(
+      trimString,
+      z.string().min(1, "namcoId is required").max(L.namcoId)
+    ),
     // Console only
-    videoLink: z.preprocess(trimString, z.string().optional()),
+    videoLink: z.preprocess(
+      trimString,
+      z.string().max(L.videoLink).optional()
+    ),
     // Arcade only
-    dohirobaNo: z.preprocess(trimString, z.string().optional()),
-    qualifierRegion: z.preprocess(trimString, z.string().optional()),
-    offlineSongs: z.array(z.string()).optional(),
+    dohirobaNo: z.preprocess(
+      trimString,
+      z.string().max(L.dohirobaNo).optional()
+    ),
+    qualifierRegion: z.preprocess(
+      trimString,
+      z.string().max(L.qualifierRegion).optional()
+    ),
+    offlineSongs: z.array(z.string().max(L.offlineSong)).optional(),
     // Common
     spectator: z.preprocess(parseBoolean, z.boolean()),
     isMinor: z.preprocess(parseBoolean, z.boolean()),
-    consentLink: z.preprocess(trimString, z.string().optional()),
+    consentLink: z.preprocess(
+      trimString,
+      z.string().max(L.consentLink).optional()
+    ),
     privacyAgree: z
       .preprocess(parseBoolean, z.boolean())
       .refine((value) => value === true, {
@@ -151,6 +182,45 @@ const registerSchema = z
         path: ["consentLink"],
         message: "consentLink is required when isMinor=true",
       });
+    }
+
+    // URL scheme allowlist: https only
+    if (data.videoLink?.trim()) {
+      try {
+        const parsed = new URL(data.videoLink.trim());
+        if (parsed.protocol !== "https:") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["videoLink"],
+            message: "videoLink must use https",
+          });
+        }
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["videoLink"],
+          message: "videoLink must be a valid URL",
+        });
+      }
+    }
+
+    if (data.consentLink?.trim()) {
+      try {
+        const parsed = new URL(data.consentLink.trim());
+        if (parsed.protocol !== "https:") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["consentLink"],
+            message: "consentLink must use https",
+          });
+        }
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["consentLink"],
+          message: "consentLink must be a valid URL",
+        });
+      }
     }
   });
 

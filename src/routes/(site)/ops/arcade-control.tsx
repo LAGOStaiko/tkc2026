@@ -340,6 +340,11 @@ function ArcadeOpsControlPage() {
   }, [bulkRound, currentSwissRound, stage])
 
   const fetchFeed = useCallback(async () => {
+    if (!operatorKey.trim()) {
+      setFeedError('운영자 키를 입력해야 피드를 조회할 수 있습니다.')
+      return null
+    }
+
     try {
       setFeedLoading(true)
       setFeedError('')
@@ -349,22 +354,14 @@ function ArcadeOpsControlPage() {
         region,
       })
 
-      const response = await fetch(`/api/ops/feed?${params.toString()}`, {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-      })
-      const payload = (await response
-        .json()
-        .catch(() => null)) as ApiEnvelope | null
+      const data = await requestOpsApi(
+        `/api/ops/feed?${params.toString()}`,
+        'GET',
+        null,
+        operatorKey
+      )
 
-      if (!response.ok || !payload?.ok) {
-        throw new Error(
-          payload?.error || `${response.status} ${response.statusText}`.trim()
-        )
-      }
-
-      const data = payload.data ?? null
-      setFeedRaw(data)
+      setFeedRaw(data ?? null)
       setLastFeedAt(new Date().toLocaleTimeString('ko-KR', { hour12: false }))
       const feedData = data as Record<string, unknown> | null
       if (feedData?.publishMeta) {
@@ -384,7 +381,7 @@ function ArcadeOpsControlPage() {
     } finally {
       setFeedLoading(false)
     }
-  }, [region, season])
+  }, [operatorKey, region, season])
 
   useEffect(() => {
     void fetchFeed()

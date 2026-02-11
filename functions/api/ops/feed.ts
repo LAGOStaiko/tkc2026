@@ -1,12 +1,16 @@
 import { ok, serverError } from "../../_lib/response";
 import { callGasJson } from "../../_lib/gas";
+import { requireOpsAuth } from "../../_lib/ops-auth";
 
 const CACHE_HEADERS = {
-  "Cache-Control": "public, max-age=3, s-maxage=5, stale-while-revalidate=10",
+  "Cache-Control": "private, no-store",
+  Vary: "Authorization, X-OPS-Key",
 };
 
 export const onRequestGet = async ({ request, env }) => {
   try {
+    const authErr = requireOpsAuth(env, request);
+    if (authErr) return authErr;
     const url = new URL(request.url);
     const season = url.searchParams.get("season")?.trim() || "2026";
     const region = url.searchParams.get("region")?.trim() || "";
