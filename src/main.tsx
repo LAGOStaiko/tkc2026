@@ -108,10 +108,8 @@ function AppWithProviders() {
     <ClerkProvider
       publishableKey={CLERK_PUBLISHABLE_KEY}
       signInUrl='/sign-in'
-      signUpUrl='/sign-up'
       afterSignOutUrl='/sign-in'
       signInFallbackRedirectUrl='/admin'
-      signUpFallbackRedirectUrl='/admin'
     >
       {app}
     </ClerkProvider>

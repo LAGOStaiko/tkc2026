@@ -76,7 +76,7 @@ export function AppearanceForm() {
                 </FormControl>
                 <ChevronDownIcon className='absolute end-3 top-2.5 h-4 w-4 opacity-50' />
               </div>
-              <FormDescription className='font-manrope'>
+              <FormDescription>
                 Set the font you want to use in the dashboard.
               </FormDescription>
               <FormMessage />
