@@ -3,7 +3,6 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   Callout,
   FadeIn,
-  TkcIcon,
   Card,
   Accordion,
   StepCard,
@@ -29,7 +28,7 @@ type GlanceItem = {
 }
 
 const GLANCE_ITEMS: GlanceItem[] = [
-  { label: '온라인 예선', value: '스코어 어택', sub: '2곡 합산' },
+  { label: '온라인 예선', value: '2곡 합산\n스코어 어택' },
   { label: '오프라인 예선', value: '스위스 스테이지', color: '#f5a623' },
   { label: '예선 차수', value: '4개 차수' },
   { label: '온라인 → 오프라인', value: '차수별 Top 16', color: '#f7d154' },
@@ -111,6 +110,37 @@ const NOTICES = [
   '대회 중 분쟁사항에 대한 <strong>최종 판단은 운영 측</strong>에 있습니다.',
   '부정행위 적발 시 <strong>실격 및 향후 대회 참가 제한</strong> 조치가 이루어질 수 있습니다.',
 ] as const
+
+const CALLOUT_CHAR_ICONS = {
+  warning: '/characters/callout-warning.png',
+  info: '/characters/callout-info.png',
+  notice: '/characters/notice-info.png',
+} as const
+
+const NOTICE_ROW_ICONS = [
+  '/characters/ika_2_sprite_11.png',
+  '/characters/ika_2_sprite_15.png',
+  '/characters/ika_2_sprite_03.png',
+  '/characters/ika_2_sprite_07.png',
+] as const
+
+function CalloutCharIcon({
+  type,
+  className = 'size-5 shrink-0',
+}: {
+  type: keyof typeof CALLOUT_CHAR_ICONS
+  className?: string
+}) {
+  return (
+    <img
+      src={CALLOUT_CHAR_ICONS[type]}
+      alt=''
+      className={`${className} object-contain`}
+      loading='lazy'
+      draggable={false}
+    />
+  )
+}
 
 /* ════════════════════════════════════════════════════════════════════ */
 /*  Page-specific components                                           */
@@ -245,22 +275,22 @@ function ArcadeOnlinePage() {
             {GLANCE_ITEMS.map((item, i) => (
               <div
                 key={item.label}
-                className={`flex min-h-[96px] flex-col justify-center border-[#1e1e1e] px-6 py-5 ${i < 4 ? 'border-b' : ''} ${i % 2 === 0 ? 'border-r' : ''}`}
+                className={`relative flex min-h-[100px] flex-col items-center justify-center border-[#1e1e1e] px-5 pt-7 pb-4 text-center ${i < 4 ? 'border-b' : ''} ${i % 2 === 0 ? 'border-r' : ''}`}
               >
-                <div className='mb-1 text-[11px] font-medium tracking-wide text-white/35'>
+                <div className='absolute top-2.5 left-3.5 text-[12px] font-medium tracking-wide text-white/35'>
                   {item.label}
                 </div>
                 <div
-                  className='text-[17px] font-bold'
+                  className='whitespace-pre-line text-[24px] font-extrabold tracking-tight sm:whitespace-normal sm:text-[28px]'
                   style={{ color: item.color ?? 'rgba(255,255,255,0.9)' }}
                 >
                   {item.value}
-                  {item.sub && (
-                    <span className='ml-1 text-xs font-normal text-white/55'>
-                      {item.sub}
-                    </span>
-                  )}
                 </div>
+                {item.sub && (
+                  <div className='mt-0.5 text-[12px] text-white/40'>
+                    {item.sub}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -338,7 +368,7 @@ function ArcadeOnlinePage() {
                 </div>
               ))}
             </div>
-            <Callout type='info' icon={<TkcIcon name='info' />}>
+            <Callout type='info' icon={<CalloutCharIcon type='info' />}>
               차수별로 <strong className='text-white/80'>별도 집계</strong>
               됩니다. 같은 차수에 신청한 참가자끼리만 경쟁합니다.
             </Callout>
@@ -434,7 +464,7 @@ function ArcadeOnlinePage() {
                 </div>
               ))}
             </div>
-            <Callout type='danger' icon={<TkcIcon name='warning' />}>
+            <Callout type='danger' icon={<CalloutCharIcon type='warning' />}>
               <strong className='text-[#e86e3a]'>옵션 전면 금지</strong> — 진타,
               배속 등 일체의 옵션 사용이 불가합니다.
             </Callout>
@@ -476,7 +506,7 @@ function ArcadeOnlinePage() {
 
           <AdvanceVisual />
 
-          <Callout type='info' icon={<TkcIcon name='info' />}>
+          <Callout type='info' icon={<CalloutCharIcon type='info' />}>
             참가자 기권 또는 불참 시,{' '}
             <strong className='text-white/80'>예비 순번 기준</strong>으로 대체
             진행됩니다.
@@ -543,7 +573,7 @@ function ArcadeOnlinePage() {
               ))}
               <div className='mt-4'>
                 <DetailSubtitle>대리 참가 · 부정행위</DetailSubtitle>
-                <Callout type='danger' icon={<TkcIcon name='warning' />}>
+                <Callout type='danger' icon={<CalloutCharIcon type='warning' />}>
                   중복 참가 및 대리 참가는{' '}
                   <strong className='text-[#e86e3a]'>엄격히 금지</strong>
                   됩니다. 위반 시 실격 처리되며, 향후 대회 참가에 불이익이 있을
@@ -562,7 +592,7 @@ function ArcadeOnlinePage() {
                   isBadge={'isBadge' in r ? r.isBadge : undefined}
                 />
               ))}
-              <Callout type='info' icon={<TkcIcon name='info' />}>
+              <Callout type='info' icon={<CalloutCharIcon type='info' />}>
                 보호자 동의 요건을 충족하면{' '}
                 <strong className='text-white/80'>연령 제한 없이</strong> 참가할
                 수 있습니다.
@@ -574,7 +604,7 @@ function ArcadeOnlinePage() {
               {PLAYX4_ROWS.map((r) => (
                 <DetailRow key={r.label} label={r.label} value={r.value} />
               ))}
-              <Callout type='info' icon={<TkcIcon name='info' />}>
+              <Callout type='info' icon={<CalloutCharIcon type='info' />}>
                 신청 시 PlayX4 직관 참여 여부를 함께 선택합니다.
               </Callout>
             </Accordion>
@@ -587,7 +617,13 @@ function ArcadeOnlinePage() {
                     key={i}
                     className='flex items-center gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
                   >
-                    <TkcIcon name='info' className='size-4 shrink-0 opacity-80' />
+                    <img
+                      src={NOTICE_ROW_ICONS[i % NOTICE_ROW_ICONS.length]}
+                      alt=''
+                      className='size-6 shrink-0 object-contain opacity-90'
+                      loading='lazy'
+                      draggable={false}
+                    />
                     <span
                       className='break-keep text-white/55 [&>strong]:text-white/90'
                       dangerouslySetInnerHTML={{ __html: html }}

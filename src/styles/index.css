@@ -109,45 +109,27 @@
   }
 }
 
-@keyframes tkcBar {
-  0% {
-    transform: translateX(-120%);
-  }
-  100% {
-    transform: translateX(320%);
-  }
-}
-
-.tkc-loading-bar {
-  height: 6px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.18);
-  overflow: hidden;
-  position: relative;
-}
-
-.tkc-loading-bar::before {
+.tkc-ring::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.85),
-    transparent
-  );
-  background-size: 40% 100%;
-  background-repeat: no-repeat;
-  animation: tkcBarMove 1.15s ease-in-out infinite;
-  will-change: background-position;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.06);
 }
 
-@keyframes tkcBarMove {
-  0% {
-    background-position: -40% 0;
-  }
-  100% {
-    background-position: 140% 0;
+.tkc-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: rgba(255, 255, 255, 0.45);
+  animation: tkcRingSpin 1s linear infinite;
+}
+
+@keyframes tkcRingSpin {
+  to {
+    transform: rotate(360deg);
   }
 }
 

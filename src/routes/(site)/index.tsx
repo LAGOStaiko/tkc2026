@@ -20,9 +20,6 @@ const CHARS = {
   finalsDuo: '/characters/don_katsu_2_sprite_03.png',
   // Schedule decoration
   katsuRun: '/characters/don_katsu_normal_5_sprite_02.png', // 달리는 캇짱
-  // Small scattered decorations
-  donBack: '/characters/don_katsu_normal_9_sprite_05.png',
-  katsuBack: '/characters/don_katsu_normal_9_sprite_06.png',
 }
 
 const DIVISIONS = [
@@ -278,30 +275,6 @@ function HomePage() {
           ))}
         </div>
       </section>
-
-      {/* ── Decorative Character Divider ── */}
-      <div className='relative flex items-center justify-center py-6'>
-        <div className='h-px flex-1 bg-[#1e1e1e]' />
-        <FadeIn>
-          <div className='pointer-events-none mx-4 flex items-center gap-1'>
-            <img
-              src={CHARS.donBack}
-              alt=''
-              className='h-auto w-8 opacity-25'
-              loading='lazy'
-              draggable={false}
-            />
-            <img
-              src={CHARS.katsuBack}
-              alt=''
-              className='h-auto w-8 opacity-25'
-              loading='lazy'
-              draggable={false}
-            />
-          </div>
-        </FadeIn>
-        <div className='h-px flex-1 bg-[#1e1e1e]' />
-      </div>
 
       {/* ── SCHEDULE ── */}
       <section className='mt-10 sm:mt-10 md:mt-14'>

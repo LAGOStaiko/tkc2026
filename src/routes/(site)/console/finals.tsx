@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Callout, Card, FadeIn, TkcIcon } from '@/components/tkc/guide-shared'
 
@@ -103,6 +103,13 @@ const PLAY_RULES: { icon: string; title: string; body: ReactNode; wide?: boolean
   },
 ]
 
+const PLAY_RULE_ICON_MAP: Record<string, string> = {
+  match: '/characters/rule-controller.png',
+  summary: '/characters/rule-score.png',
+  tie: '/characters/rule-tie.png',
+  warning: '/characters/rule-warning.png',
+}
+
 /* ════════════════════════════════════════════════════════════════════ */
 /*  Utility Components                                                 */
 /* ════════════════════════════════════════════════════════════════════ */
@@ -182,26 +189,37 @@ function OverviewSection() {
       desc='4명 단판 토너먼트. 밴픽 전략과 과제곡이 승패를 좌우합니다.'
     >
       {/* Stat Boxes */}
-      <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
-        {OVERVIEW_STATS.map((s) => (
-          <div
-            key={s.label}
-            className='relative flex min-h-[132px] flex-col justify-center overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-6 text-center'
-          >
-            <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#e86e3a] opacity-50' />
+      <Card className='overflow-hidden p-0'>
+        <div className='flex items-center gap-2.5 border-b border-[#1e1e1e] bg-[#111] px-6 py-4'>
+          <span className='size-2 rounded-full bg-[#e86e3a]' />
+          <span className='text-[15px] font-bold text-white/90'>
+            한눈에 보기
+          </span>
+        </div>
+        <div className='grid grid-cols-2 bg-[#111] sm:grid-cols-4'>
+          {OVERVIEW_STATS.map((s, i) => (
             <div
-              className='text-[32px] font-extrabold'
-              style={{ color: s.color ?? 'rgba(255,255,255,0.9)' }}
+              key={s.label}
+              className={`relative flex min-h-[100px] flex-col items-center justify-center border-[#1e1e1e] px-5 pt-7 pb-4 text-center ${i < 2 ? 'border-b sm:border-b-0' : ''} ${i % 2 === 0 ? 'border-r' : i < 3 ? 'sm:border-r' : ''}`}
             >
-              {s.value}
+              <div className='absolute top-2.5 left-3.5 text-[12px] font-medium tracking-wide text-white/35'>
+                {s.label}
+              </div>
+              <div
+                className='text-[24px] font-extrabold tracking-tight sm:text-[28px]'
+                style={{ color: s.color ?? 'rgba(255,255,255,0.9)' }}
+              >
+                {s.value}
+              </div>
+              {s.sub && (
+                <div className='mt-0.5 text-[12px] text-white/40'>
+                  {s.sub}
+                </div>
+              )}
             </div>
-            <div className='mt-1 text-sm font-medium text-white/35'>{s.label}</div>
-            {s.sub && (
-              <div className='mt-1 text-[13px] text-white/35'>{s.sub}</div>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Card>
 
       <Callout type='info' icon={<TkcIcon name='info' />}>
         사전 조사 시 불참자가 있을 경우,{' '}
@@ -428,6 +446,109 @@ function PrepSection() {
 }
 
 function BanPickSection() {
+  const [step, setStep] = useState(-1)
+  const [inView, setInView] = useState(false)
+  const bpRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = bpRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setInView(true)
+          obs.disconnect()
+        }
+      },
+      { threshold: 0.15 },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!inView) return
+    const ids: ReturnType<typeof setTimeout>[] = []
+    let cancelled = false
+
+    const sched = (fn: () => void, ms: number) => {
+      ids.push(setTimeout(() => { if (!cancelled) fn() }, ms))
+    }
+
+    const STEP_MS = 1200
+    const PAUSE_MS = 2000
+    const CYCLE = PAUSE_MS + 4 * STEP_MS
+
+    const cycle = () => {
+      if (cancelled) return
+      setStep(-1)
+      for (let i = 0; i < 4; i++) {
+        sched(() => setStep(i), PAUSE_MS + i * STEP_MS)
+      }
+      sched(cycle, CYCLE)
+    }
+
+    sched(cycle, 500)
+    return () => { cancelled = true; ids.forEach(clearTimeout) }
+  }, [inView])
+
+  const cellStyle = (i: number, finals = false) => ({
+    transition: 'opacity 0.35s ease, box-shadow 0.35s ease',
+    ...(step === i
+      ? {
+          boxShadow: finals && i >= 2
+            ? '0 0 20px 3px rgba(245,166,35,0.15)'
+            : '0 0 20px 3px rgba(232,110,58,0.15)',
+          zIndex: 10 as const,
+        }
+      : step >= 0
+        ? { opacity: 0.3 }
+        : {}),
+  })
+
+  const dots = (finals = false) => (
+    <div className='flex items-center justify-center gap-3 pt-4 pb-1'>
+      <span className='text-[11px] font-medium tracking-wide text-white/20'>
+        순서
+      </span>
+      <div className='flex gap-1.5'>
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className='size-1.5 rounded-full transition-all duration-300'
+            style={{
+              background: step === i
+                ? (finals && i >= 2 ? '#f5a623' : '#e86e3a')
+                : 'rgba(255,255,255,0.12)',
+              transform: step === i ? 'scale(1.4)' : 'scale(1)',
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  )
+
+  const badge = (type: 'ban' | 'pick', finals = false) => {
+    if (type === 'pick' && finals) {
+      return (
+        <span className='inline-block rounded-[5px] bg-[#f5a623]/10 px-3 py-1 font-mono text-xs font-semibold tracking-[1px] text-[#f5a623]'>
+          PICK ×2
+        </span>
+      )
+    }
+    return (
+      <span
+        className={`inline-block rounded-[5px] px-3 py-1 font-mono text-xs font-semibold tracking-[1px] ${
+          type === 'ban'
+            ? 'bg-white/[0.05] text-white/55'
+            : 'bg-[#e86e3a]/10 text-[#e86e3a]'
+        }`}
+      >
+        {type.toUpperCase()}
+      </span>
+    )
+  }
+
   return (
     <SectionBlock
       id='banpick'
@@ -435,156 +556,132 @@ function BanPickSection() {
       title='밴픽 절차'
       desc='시드 상위자(A)가 먼저 밴하고, 교대로 밴/픽을 진행합니다.'
     >
-      {/* Standard: SF / 3rd */}
-      <Card>
-        <div className='mb-4 text-sm font-bold text-white/90'>
-          4강 · 3·4위전
-        </div>
-        {/* Desktop */}
-        <div className='hidden gap-0 sm:flex'>
-          {BP_STANDARD.map((s, i) => (
-            <div
-              key={s.step}
-              className={`relative flex-1 border border-[#1e1e1e] px-3 py-6 text-center ${
-                i === 0 ? 'rounded-l-xl' : i === 3 ? 'rounded-r-xl' : ''
-              } ${i > 0 ? '-ml-px' : ''}`}
-            >
+      <div ref={bpRef} className='space-y-5'>
+        {/* Standard: SF / 3rd */}
+        <Card>
+          <div className='mb-4 text-sm font-bold text-white/90'>
+            4강 · 3·4위전
+          </div>
+          {/* Desktop */}
+          <div className='hidden gap-0 sm:flex'>
+            {BP_STANDARD.map((s, i) => (
               <div
-                className='absolute top-0 right-0 left-0 h-0.5'
-                style={{
-                  background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
-                }}
-              />
-              <div className='mb-2.5 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
-                {s.step}
-              </div>
-              <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
-                {s.player}
-              </div>
-              <span
-                className={`inline-block rounded-[5px] px-3 py-1 font-mono text-xs font-semibold tracking-[1px] ${
-                  s.type === 'ban'
-                    ? 'bg-white/[0.05] text-white/55'
-                    : 'bg-[#e86e3a]/10 text-[#e86e3a]'
-                }`}
+                key={s.step}
+                className={`relative flex-1 border border-[#1e1e1e] px-3 py-6 text-center ${
+                  i === 0 ? 'rounded-l-xl' : i === 3 ? 'rounded-r-xl' : ''
+                } ${i > 0 ? '-ml-px' : ''}`}
+                style={cellStyle(i)}
               >
-                {s.type.toUpperCase()}
-              </span>
-              <div className='mt-2 text-sm text-white/35'>{s.note}</div>
-            </div>
-          ))}
-        </div>
-        {/* Mobile */}
-        <div className='grid grid-cols-2 gap-0 sm:hidden'>
-          {BP_STANDARD.map((s, i) => (
-            <div
-              key={s.step}
-              className={`relative border border-[#1e1e1e] px-3 py-5 text-center ${
-                i === 0 ? 'rounded-tl-xl' : i === 1 ? 'rounded-tr-xl' : i === 2 ? 'rounded-bl-xl' : 'rounded-br-xl'
-              } ${i % 2 === 1 ? '-ml-px' : ''} ${i >= 2 ? '-mt-px' : ''}`}
-            >
+                <div
+                  className='absolute top-0 right-0 left-0 h-0.5'
+                  style={{
+                    background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
+                  }}
+                />
+                <div className='mb-2.5 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
+                  {s.step}
+                </div>
+                <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
+                  {s.player}
+                </div>
+                {badge(s.type)}
+                <div className='mt-2 text-sm text-white/35'>{s.note}</div>
+              </div>
+            ))}
+          </div>
+          {/* Mobile */}
+          <div className='grid grid-cols-2 gap-0 sm:hidden'>
+            {BP_STANDARD.map((s, i) => (
               <div
-                className='absolute top-0 right-0 left-0 h-0.5'
-                style={{
-                  background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
-                }}
-              />
-              <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
-                {s.step}
-              </div>
-              <div className='mb-2 text-[28px] font-extrabold text-white/90'>
-                {s.player}
-              </div>
-              <span
-                className={`inline-block rounded-[5px] px-3 py-1 font-mono text-xs font-semibold tracking-[1px] ${
-                  s.type === 'ban'
-                    ? 'bg-white/[0.05] text-white/55'
-                    : 'bg-[#e86e3a]/10 text-[#e86e3a]'
-                }`}
+                key={s.step}
+                className={`relative border border-[#1e1e1e] px-3 py-5 text-center ${
+                  i === 0 ? 'rounded-tl-xl' : i === 1 ? 'rounded-tr-xl' : i === 2 ? 'rounded-bl-xl' : 'rounded-br-xl'
+                } ${i % 2 === 1 ? '-ml-px' : ''} ${i >= 2 ? '-mt-px' : ''}`}
+                style={cellStyle(i)}
               >
-                {s.type.toUpperCase()}
-              </span>
-              <div className='mt-2 text-sm text-white/35'>{s.note}</div>
-            </div>
-          ))}
-        </div>
-      </Card>
+                <div
+                  className='absolute top-0 right-0 left-0 h-0.5'
+                  style={{
+                    background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
+                  }}
+                />
+                <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
+                  {s.step}
+                </div>
+                <div className='mb-2 text-[28px] font-extrabold text-white/90'>
+                  {s.player}
+                </div>
+                {badge(s.type)}
+                <div className='mt-2 text-sm text-white/35'>{s.note}</div>
+              </div>
+            ))}
+          </div>
+          {dots()}
+        </Card>
 
-      {/* Finals */}
-      <Card>
-        <div className='mb-1 text-sm font-bold text-white/90'>결승</div>
-        <div className='mb-4 text-[13px] text-white/35'>
-          각자 2곡씩 선곡, 총 5곡(선곡 4 + 과제곡 1)
-        </div>
-        {/* Desktop */}
-        <div className='hidden gap-0 sm:flex'>
-          {BP_FINALS.map((s, i) => (
-            <div
-              key={s.step}
-              className={`relative flex-1 border border-[#1e1e1e] px-3 py-6 text-center ${
-                i === 0 ? 'rounded-l-xl' : i === 3 ? 'rounded-r-xl' : ''
-              } ${i > 0 ? '-ml-px' : ''}`}
-            >
+        {/* Finals */}
+        <Card>
+          <div className='mb-1 text-sm font-bold text-white/90'>결승</div>
+          <div className='mb-4 text-[13px] text-white/35'>
+            각자 2곡씩 선곡, 총 5곡(선곡 4 + 과제곡 1)
+          </div>
+          {/* Desktop */}
+          <div className='hidden gap-0 sm:flex'>
+            {BP_FINALS.map((s, i) => (
               <div
-                className='absolute top-0 right-0 left-0 h-0.5'
-                style={{
-                  background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
-                }}
-              />
-              <div className='mb-2.5 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
-                {s.step}
-              </div>
-              <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
-                {s.player}
-              </div>
-              <span
-                className={`inline-block rounded-[5px] px-3 py-1 font-mono text-xs font-semibold tracking-[1px] ${
-                  s.type === 'ban'
-                    ? 'bg-white/[0.05] text-white/55'
-                    : 'bg-[#e86e3a]/10 text-[#e86e3a]'
-                }`}
+                key={s.step}
+                className={`relative flex-1 border border-[#1e1e1e] px-3 py-6 text-center ${
+                  i === 0 ? 'rounded-l-xl' : i === 3 ? 'rounded-r-xl' : ''
+                } ${i > 0 ? '-ml-px' : ''}`}
+                style={cellStyle(i, true)}
               >
-                {s.type.toUpperCase()}
-              </span>
-              <div className='mt-2 text-sm text-white/35'>{s.note}</div>
-            </div>
-          ))}
-        </div>
-        {/* Mobile */}
-        <div className='grid grid-cols-2 gap-0 sm:hidden'>
-          {BP_FINALS.map((s, i) => (
-            <div
-              key={s.step}
-              className={`relative border border-[#1e1e1e] px-3 py-5 text-center ${
-                i === 0 ? 'rounded-tl-xl' : i === 1 ? 'rounded-tr-xl' : i === 2 ? 'rounded-bl-xl' : 'rounded-br-xl'
-              } ${i % 2 === 1 ? '-ml-px' : ''} ${i >= 2 ? '-mt-px' : ''}`}
-            >
+                <div
+                  className='absolute top-0 right-0 left-0 h-0.5'
+                  style={{
+                    background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#f5a623',
+                  }}
+                />
+                <div className='mb-2.5 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
+                  {s.step}
+                </div>
+                <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
+                  {s.player}
+                </div>
+                {badge(s.type, true)}
+                <div className='mt-2 text-sm text-white/35'>{s.note}</div>
+              </div>
+            ))}
+          </div>
+          {/* Mobile */}
+          <div className='grid grid-cols-2 gap-0 sm:hidden'>
+            {BP_FINALS.map((s, i) => (
               <div
-                className='absolute top-0 right-0 left-0 h-0.5'
-                style={{
-                  background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
-                }}
-              />
-              <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
-                {s.step}
-              </div>
-              <div className='mb-2 text-[28px] font-extrabold text-white/90'>
-                {s.player}
-              </div>
-              <span
-                className={`inline-block rounded-[5px] px-3 py-1 font-mono text-xs font-semibold tracking-[1px] ${
-                  s.type === 'ban'
-                    ? 'bg-white/[0.05] text-white/55'
-                    : 'bg-[#e86e3a]/10 text-[#e86e3a]'
-                }`}
+                key={s.step}
+                className={`relative border border-[#1e1e1e] px-3 py-5 text-center ${
+                  i === 0 ? 'rounded-tl-xl' : i === 1 ? 'rounded-tr-xl' : i === 2 ? 'rounded-bl-xl' : 'rounded-br-xl'
+                } ${i % 2 === 1 ? '-ml-px' : ''} ${i >= 2 ? '-mt-px' : ''}`}
+                style={cellStyle(i, true)}
               >
-                {s.type.toUpperCase()}
-              </span>
-              <div className='mt-2 text-sm break-keep text-white/35'>{s.note}</div>
-            </div>
-          ))}
-        </div>
-      </Card>
+                <div
+                  className='absolute top-0 right-0 left-0 h-0.5'
+                  style={{
+                    background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#f5a623',
+                  }}
+                />
+                <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
+                  {s.step}
+                </div>
+                <div className='mb-2 text-[28px] font-extrabold text-white/90'>
+                  {s.player}
+                </div>
+                {badge(s.type, true)}
+                <div className='mt-2 text-sm break-keep text-white/35'>{s.note}</div>
+              </div>
+            ))}
+          </div>
+          {dots(true)}
+        </Card>
+      </div>
 
       <Callout type='info' icon={<TkcIcon name='info' />}>
         A는 <strong className='text-white/80'>시드 상위자</strong>입니다. 밴픽
@@ -723,7 +820,17 @@ function PlayRulesSection() {
             <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#e86e3a] opacity-40' />
             <div className='mb-3 flex items-center gap-2.5'>
               <div className='flex size-[30px] shrink-0 items-center justify-center'>
-                <TkcIcon name={rule.icon} className='size-6' />
+                {PLAY_RULE_ICON_MAP[rule.icon] ? (
+                  <img
+                    src={PLAY_RULE_ICON_MAP[rule.icon]}
+                    alt=''
+                    className='size-7 object-contain'
+                    loading='lazy'
+                    draggable={false}
+                  />
+                ) : (
+                  <TkcIcon name={rule.icon} className='size-6' />
+                )}
               </div>
               <div className='text-[17px] font-bold text-white/90'>{rule.title}</div>
             </div>

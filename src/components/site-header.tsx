@@ -35,7 +35,6 @@ const navItems: NavItem[] = [
   { label: t('nav.songs'), to: '/songs' },
   { label: t('nav.songPool'), to: '/song-pool' },
   { label: t('nav.results'), to: '/results' },
-  { label: t('nav.archive'), to: '/archive' },
   { label: t('nav.apply'), to: '/apply', emphasis: true },
   { label: t('nav.contact'), to: '/contact' },
 ]
@@ -79,7 +78,7 @@ export function SiteHeader() {
               {navItems.map((item) => {
                 const isActive = isActivePath(pathname, item)
                 const baseClass = item.emphasis
-                  ? 'inline-flex h-8 items-center rounded-full bg-white/90 px-3 text-xs font-semibold text-black transition hover:bg-white'
+                  ? 'group/apply relative inline-flex h-8 items-center justify-center rounded-full bg-white/90 px-3 text-xs font-semibold text-black transition hover:bg-white'
                   : 'whitespace-nowrap text-white/85 transition hover:text-white'
                 const activeClass =
                   !item.emphasis && isActive
@@ -93,7 +92,22 @@ export function SiteHeader() {
                     aria-current={isActive ? 'page' : undefined}
                     className={cn(baseClass, activeClass)}
                   >
-                    {item.label}
+                    {item.emphasis ? (
+                      <>
+                        <span className='transition-opacity duration-300 group-hover/apply:opacity-0'>
+                          {item.label}
+                        </span>
+                        <img
+                          src='/characters/don-wink.png'
+                          alt=''
+                          className='pointer-events-none absolute inset-0 m-auto h-5 w-5 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/apply:scale-100 group-hover/apply:opacity-100'
+                          loading='lazy'
+                          draggable={false}
+                        />
+                      </>
+                    ) : (
+                      item.label
+                    )}
                   </Link>
                 )
               })}

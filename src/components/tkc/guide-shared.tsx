@@ -1,5 +1,28 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
+const DROPDOWN_TOGGLE_ICONS = {
+  closed: '/characters/donko_color_description_010.png',
+  open: '/characters/donko_color_description_012.png',
+} as const
+
+function DropdownToggleIcon({
+  open,
+  className = 'size-7 shrink-0 object-contain',
+}: {
+  open: boolean
+  className?: string
+}) {
+  return (
+    <img
+      src={open ? DROPDOWN_TOGGLE_ICONS.open : DROPDOWN_TOGGLE_ICONS.closed}
+      alt=''
+      className={`${className} opacity-90`}
+      loading='lazy'
+      draggable={false}
+    />
+  )
+}
+
 /* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧 */
 /*  Shared utility components for guide pages (arcade / console)       */
 /* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧 */
@@ -15,12 +38,12 @@ export function Callout({
 }) {
   const cls = {
     info: 'bg-[#f5a623]/[0.04] border-[#f5a623]/[0.12]',
-    warning: 'bg-[#f5a623]/[0.04] border-[#f5a623]/[0.12]',
+    warning: 'bg-[#e86e3a]/[0.04] border-[#e86e3a]/[0.12]',
     danger: 'bg-[#e86e3a]/[0.04] border-[#e86e3a]/[0.12]',
   }
   return (
     <div
-      className={`flex items-center gap-3 rounded-xl border p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px] ${cls[type]}`}
+      className={`mt-3 flex items-center gap-3 rounded-xl border p-3.5 text-[12px] leading-relaxed text-white/55 sm:mt-3.5 sm:p-4 sm:text-[13px] ${cls[type]}`}
     >
       <span className='inline-flex shrink-0 items-center justify-center'>
         {icon}
@@ -78,8 +101,13 @@ export function TkcIcon({
   name: string
   className?: string
 }) {
-  const resolveSrc = (iconName: string) => `/branding/v2/emojis/png/${iconName}.png`
-  const fallbackSrc = resolveSrc('info')
+  const iconOverrides: Record<string, string> = {
+    info: '/characters/callout-info.png',
+    warning: '/characters/callout-warning.png',
+  }
+  const resolveSrc = (iconName: string) =>
+    iconOverrides[iconName] ?? `/branding/v2/emojis/png/${iconName}.png`
+  const fallbackSrc = iconOverrides.info
 
   return (
     <img
@@ -131,10 +159,7 @@ export function Accordion({
         className='flex w-full items-center justify-between px-4 py-3.5 text-left sm:px-6 sm:py-4'
       >
         <span className='text-[13px] font-bold text-white/90 sm:text-sm'>{title}</span>
-        <span
-          className={`text-[11px] text-white/35 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
-        >
-          ??        </span>
+        <DropdownToggleIcon open={open} className='size-8 shrink-0 object-contain' />
       </button>
       <div
         className={`grid transition-[grid-template-rows] duration-400 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
@@ -194,10 +219,7 @@ export function StepCard({
           className='flex w-full items-center justify-center gap-1.5 border-t border-[#1e1e1e] py-3 text-[11px] text-white/35 transition-colors hover:text-white/55 sm:py-2.5 sm:text-xs'
         >
           {toggleLabel}
-          <span
-            className={`text-[11px] transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
-          >
-            ??          </span>
+          <DropdownToggleIcon open={open} className='size-6 shrink-0 object-contain' />
         </button>
 
         {/* Detail */}

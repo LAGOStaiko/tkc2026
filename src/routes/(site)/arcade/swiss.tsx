@@ -237,12 +237,37 @@ function SwissAnimator() {
     if (!autoPlay) return
     const id = setInterval(() => {
       setActiveRound((prev) => (prev >= 4 ? 1 : ((prev + 1) as 1 | 2 | 3 | 4)))
-    }, 3000)
+    }, 3500)
     return () => clearInterval(id)
   }, [autoPlay])
 
   return (
     <Card>
+      <style>{`
+        @keyframes swiss-progress {
+          from { transform: scaleX(0); }
+          to { transform: scaleX(1); }
+        }
+        @keyframes swiss-group-in {
+          from { opacity: 0; transform: translateY(14px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes swiss-chip-in {
+          from { opacity: 0; transform: scale(0.7) translateY(4px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes swiss-eliminate {
+          0% { opacity: 0; transform: translateY(14px); border-color: #1e1e1e; }
+          50% { opacity: 1; transform: translateY(0); border-color: rgba(232,110,58,0.4); }
+          100% { opacity: 1; transform: translateY(0); border-color: #1e1e1e; }
+        }
+        @keyframes swiss-qualified-glow {
+          0% { box-shadow: 0 0 0 0 rgba(247,209,84,0); }
+          50% { box-shadow: 0 0 12px 2px rgba(247,209,84,0.15); }
+          100% { box-shadow: 0 0 0 0 rgba(247,209,84,0); }
+        }
+      `}</style>
+
       <div className='mb-1 text-sm font-bold text-white/90'>
         라운드별 전적 그룹 변화
       </div>
@@ -260,26 +285,38 @@ function SwissAnimator() {
               setAutoPlay(false)
               setActiveRound(r)
             }}
-            className={`relative flex-1 overflow-hidden rounded-xl border py-2.5 text-[13px] font-semibold transition-all ${
+            className={`relative flex-1 overflow-hidden rounded-xl border py-2.5 text-[13px] font-semibold transition-all duration-300 ${
               activeRound === r
-                ? 'border-[#f5a623] bg-[#f5a623]/[0.05] text-white/90'
+                ? 'border-[#f5a623] bg-[#f5a623]/[0.05] text-white/90 scale-[1.02]'
                 : 'border-[#1e1e1e] text-white/35 hover:border-[#2a2a2a] hover:text-white/55'
             }`}
           >
             R{r} 후
             {activeRound === r && (
-              <span className='absolute right-0 bottom-0 left-0 h-0.5 bg-[#f5a623]' />
+              <span
+                key={`bar-${activeRound}`}
+                className='absolute right-0 bottom-0 left-0 h-0.5 origin-left bg-[#f5a623]'
+                style={autoPlay ? {
+                  animation: 'swiss-progress 3.5s linear forwards',
+                } : undefined}
+              />
             )}
           </button>
         ))}
       </div>
 
       {/* Groups */}
-      <div className='flex flex-col gap-2.5'>
-        {groups.map((g) => (
+      <div key={activeRound} className='flex flex-col gap-2.5'>
+        {groups.map((g, gi) => (
           <div
             key={g.record}
-            className='rounded-xl border border-[#1e1e1e] bg-white/[0.015] p-4'
+            className={`rounded-xl border border-[#1e1e1e] bg-white/[0.015] p-4 ${
+              g.tagType === 'qualified' ? '' : ''
+            }`}
+            style={{
+              animation: `${g.eliminated ? 'swiss-eliminate' : 'swiss-group-in'} 0.5s ease-out both${g.tagType === 'qualified' ? ', swiss-qualified-glow 1.5s ease-out 0.4s' : ''}`,
+              animationDelay: `${gi * 100}ms`,
+            }}
           >
             <div className='mb-2.5 flex items-center gap-2.5'>
               <span
@@ -309,7 +346,7 @@ function SwissAnimator() {
               )}
             </div>
             <div className='flex flex-wrap gap-1.5'>
-              {g.players.map((p) => (
+              {g.players.map((p, pi) => (
                 <span
                   key={p}
                   className={`rounded-md border px-2.5 py-1 font-mono text-xs ${
@@ -317,6 +354,10 @@ function SwissAnimator() {
                       ? 'border-transparent text-white/20 line-through opacity-30'
                       : 'border-[#1e1e1e] bg-white/[0.04] text-white/55'
                   }`}
+                  style={{
+                    animation: 'swiss-chip-in 0.35s ease-out both',
+                    animationDelay: `${gi * 100 + pi * 35 + 120}ms`,
+                  }}
                 >
                   {p}
                 </span>

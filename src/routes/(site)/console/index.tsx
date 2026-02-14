@@ -3,7 +3,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import {
   Callout,
   FadeIn,
-  TkcIcon,
   Card,
   Accordion,
   StepCard,
@@ -28,7 +27,7 @@ type GlanceItem = {
 }
 
 const GLANCE_ITEMS: GlanceItem[] = [
-  { label: '방식', value: '스코어 어택', sub: '2곡 합산' },
+  { label: '방식', value: '2곡 합산\n스코어 어택' },
   { label: '결선 진출', value: '상위 4명', color: '#f7d154' },
   { label: '신청 기간', value: '3.2 ~ 4.30' },
   { label: '제출 방법', value: '유튜브 영상', color: '#f5a623' },
@@ -108,6 +107,37 @@ const NOTICES = [
 /* ════════════════════════════════════════════════════════════════════ */
 /*  Ranking Visual                                                     */
 /* ════════════════════════════════════════════════════════════════════ */
+
+const CALLOUT_CHAR_ICONS = {
+  warning: '/characters/callout-warning.png',
+  info: '/characters/callout-info.png',
+  notice: '/characters/notice-info.png',
+} as const
+
+const NOTICE_ROW_ICONS = [
+  '/characters/ika_2_sprite_11.png',
+  '/characters/ika_2_sprite_15.png',
+  '/characters/ika_2_sprite_03.png',
+  '/characters/ika_2_sprite_07.png',
+] as const
+
+function CalloutCharIcon({
+  type,
+  className = 'size-5 shrink-0',
+}: {
+  type: keyof typeof CALLOUT_CHAR_ICONS
+  className?: string
+}) {
+  return (
+    <img
+      src={CALLOUT_CHAR_ICONS[type]}
+      alt=''
+      className={`${className} object-contain`}
+      loading='lazy'
+      draggable={false}
+    />
+  )
+}
 
 function RankingVisual() {
   const ref = useRef<HTMLDivElement>(null)
@@ -192,22 +222,22 @@ function ConsoleQualifierPage() {
             {GLANCE_ITEMS.map((item, i) => (
               <div
                 key={item.label}
-                className={`flex min-h-[96px] flex-col justify-center border-[#1e1e1e] px-6 py-5 ${i < 2 ? 'border-b' : ''} ${i % 2 === 0 ? 'border-r' : ''}`}
+                className={`relative flex min-h-[100px] flex-col items-center justify-center border-[#1e1e1e] px-5 pt-7 pb-4 text-center ${i < 2 ? 'border-b' : ''} ${i % 2 === 0 ? 'border-r' : ''}`}
               >
-                <div className='mb-1 text-[11px] font-medium tracking-wide text-white/35'>
+                <div className='absolute top-2.5 left-3.5 text-[12px] font-medium tracking-wide text-white/35'>
                   {item.label}
                 </div>
                 <div
-                  className='text-[17px] font-bold'
+                  className='whitespace-pre-line text-[24px] font-extrabold tracking-tight sm:whitespace-normal sm:text-[28px]'
                   style={{ color: item.color ?? 'rgba(255,255,255,0.9)' }}
                 >
                   {item.value}
-                  {item.sub && (
-                    <span className='ml-1 text-xs font-normal text-white/55'>
-                      {item.sub}
-                    </span>
-                  )}
                 </div>
+                {item.sub && (
+                  <div className='mt-0.5 text-[12px] text-white/40'>
+                    {item.sub}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -290,12 +320,12 @@ function ConsoleQualifierPage() {
                 </span>
               </div>
             ))}
-            <Callout type='warning' icon={<TkcIcon name='warning' />}>
+            <Callout type='warning' icon={<CalloutCharIcon type='warning' />}>
               입력 방식은 한 번 선택하면{' '}
               <strong className='text-white/80'>결선까지 변경 불가</strong>
               입니다.
             </Callout>
-            <Callout type='info' icon={<TkcIcon name='info' />}>
+            <Callout type='info' icon={<CalloutCharIcon type='info' />}>
               결선에서는{' '}
               <strong className='text-white/80'>
                 BNEK가 준비한 본체 및 컨트롤러
@@ -362,7 +392,7 @@ function ConsoleQualifierPage() {
                 </div>
               ))}
             </div>
-            <Callout type='danger' icon={<TkcIcon name='warning' />}>
+            <Callout type='danger' icon={<CalloutCharIcon type='warning' />}>
               규정 미준수 영상은{' '}
               <strong className='text-[#e86e3a]'>심사 대상에서 제외</strong>될
               수 있습니다.
@@ -407,7 +437,7 @@ function ConsoleQualifierPage() {
           <div>
             <DetailSubtitle>순위 예시</DetailSubtitle>
             <RankingVisual />
-            <Callout type='warning' icon={<TkcIcon name='warning' />}>
+            <Callout type='warning' icon={<CalloutCharIcon type='warning' />}>
               아케이드·콘솔 예선 중복 참가도 가능하지만,{' '}
               <strong className='text-white/80'>결선 동시 진출은 불가</strong>
               합니다. (택 1)
@@ -468,7 +498,7 @@ function ConsoleQualifierPage() {
                   isBadge={false}
                   accentColor='#e86e3a'
                 />
-                <Callout type='warning' icon={<TkcIcon name='warning' />}>
+                <Callout type='warning' icon={<CalloutCharIcon type='warning' />}>
                   예선 중복 참가 가능하지만,{' '}
                   <strong className='text-white/80'>결선 진출은 택 1</strong>{' '}
                   구조입니다.
@@ -477,7 +507,7 @@ function ConsoleQualifierPage() {
 
               <div className='mt-4'>
                 <DetailSubtitle>대리 참가 · 부정행위</DetailSubtitle>
-                <Callout type='danger' icon={<TkcIcon name='warning' />}>
+                <Callout type='danger' icon={<CalloutCharIcon type='warning' />}>
                   중복 참가 및 대리 참가는{' '}
                   <strong className='text-[#e86e3a]'>엄격히 금지</strong>
                   됩니다. 위반 시 실격 처리되며, 향후 대회 참가에 불이익이 있을
@@ -497,7 +527,7 @@ function ConsoleQualifierPage() {
                   accentColor='#e86e3a'
                 />
               ))}
-              <Callout type='info' icon={<TkcIcon name='info' />}>
+              <Callout type='info' icon={<CalloutCharIcon type='info' />}>
                 보호자 동의 요건을 충족하면{' '}
                 <strong className='text-white/80'>연령 제한 없이</strong> 참가할
                 수 있습니다.
@@ -509,7 +539,7 @@ function ConsoleQualifierPage() {
               {PLAYX4_ROWS.map((r) => (
                 <DetailRow key={r.label} label={r.label} value={r.value} />
               ))}
-              <Callout type='info' icon={<TkcIcon name='info' />}>
+              <Callout type='info' icon={<CalloutCharIcon type='info' />}>
                 신청 시 PlayX4 직관 참여 여부를 함께 선택합니다.
               </Callout>
             </Accordion>
@@ -522,7 +552,13 @@ function ConsoleQualifierPage() {
                     key={i}
                     className='flex items-center gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
                   >
-                    <TkcIcon name='info' className='size-4 shrink-0 opacity-80' />
+                    <img
+                      src={NOTICE_ROW_ICONS[i % NOTICE_ROW_ICONS.length]}
+                      alt=''
+                      className='size-6 shrink-0 object-contain opacity-90'
+                      loading='lazy'
+                      draggable={false}
+                    />
                     <span
                       className='break-keep text-white/55 [&>strong]:text-white/90'
                       dangerouslySetInnerHTML={{ __html: html }}

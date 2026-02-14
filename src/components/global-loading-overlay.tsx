@@ -1,6 +1,11 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useIsMutating } from '@tanstack/react-query'
 import { useRouterState } from '@tanstack/react-router'
+
+const WORM_SPRITES = Array.from(
+  { length: 6 },
+  (_, i) => `/loading/worm_${i + 1}.png`,
+)
 
 const MIN_VISIBLE_MS = 900
 const FADE_OUT_MS = 350
@@ -101,6 +106,17 @@ export function GlobalLoadingOverlay() {
     }, remaining)
   }, [overlayState, shouldShow])
 
+  const [spriteIdx, setSpriteIdx] = useState(0)
+
+  useEffect(() => {
+    if (overlayState === 'hidden') return
+    setSpriteIdx(0)
+    const id = window.setInterval(() => {
+      setSpriteIdx((prev) => (prev + 1) % WORM_SPRITES.length)
+    }, 280)
+    return () => window.clearInterval(id)
+  }, [overlayState])
+
   const isVisible = overlayState === 'visible'
   const transitionClass = isVisible
     ? 'opacity-100 duration-200 ease-out'
@@ -116,15 +132,28 @@ export function GlobalLoadingOverlay() {
       aria-hidden={overlayState === 'hidden'}
       className={`fixed inset-0 z-[9999] flex transform-gpu items-center justify-center bg-black/55 transition-[opacity,backdrop-filter] will-change-[opacity,backdrop-filter] ${transitionClass} ${visibilityClass} ${blurClass} cursor-wait`}
     >
-      <div className='inline-flex flex-col items-center'>
+      <div className='flex flex-col items-center gap-5'>
         <img
           src='/branding/v2/logo.png'
           alt='TKC2026'
-          className='h-16 w-auto object-contain motion-safe:animate-pulse md:h-20'
+          className='h-14 w-auto object-contain opacity-90 md:h-[68px]'
           loading='eager'
           decoding='async'
         />
-        <div className='tkc-loading-bar mt-4 w-full' />
+        <div className='flex flex-col items-center gap-3'>
+          <div className='relative flex size-[130px] items-center justify-center'>
+            <img
+              src={WORM_SPRITES[spriteIdx]}
+              alt='loading'
+              className='h-[130px] w-auto max-w-none object-contain'
+              loading='eager'
+              decoding='async'
+            />
+          </div>
+          <span className='text-xs font-medium tracking-[0.5px] text-white/35'>
+            Loading...
+          </span>
+        </div>
       </div>
     </div>
   )
