@@ -15,6 +15,16 @@ const ASSETS = {
 const HOME_YOUTUBE_ID = 'DQKIfLMIgXY'
 const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
 
+/* ── Character Assets ── */
+const CHARS = {
+  finalsDuo: '/characters/don_katsu_2_sprite_03.png',
+  // Schedule decoration
+  katsuRun: '/characters/don_katsu_normal_5_sprite_02.png', // 달리는 캇짱
+  // Small scattered decorations
+  donBack: '/characters/don_katsu_normal_9_sprite_05.png',
+  katsuBack: '/characters/don_katsu_normal_9_sprite_06.png',
+}
+
 const DIVISIONS = [
   {
     num: '01',
@@ -25,6 +35,7 @@ const DIVISIONS = [
     periodStart: '03.02',
     periodEnd: '04.30',
     detailTo: '/console' as const,
+    logoSrc: '/branding/taiko-console-logo.png',
   },
   {
     num: '02',
@@ -35,6 +46,7 @@ const DIVISIONS = [
     periodStart: '03.02',
     periodEnd: '04.11',
     detailTo: '/arcade' as const,
+    logoSrc: '/branding/taiko-arcade-logo.png',
   },
 ]
 
@@ -158,81 +170,103 @@ function HomePage() {
   return (
     <div>
       {/* ── HERO ── */}
-      <section className='relative -mt-20 grid grid-cols-1 overflow-hidden md:-mt-24 md:grid-cols-[3fr_2fr]'>
-        {/* ── Image side ── */}
-        <div className='relative h-[270px] overflow-hidden sm:h-[300px] md:h-auto md:min-h-[460px] lg:min-h-[520px]'>
+      <section className='-mt-20 overflow-hidden md:-mt-24'>
+        {/* Image + desktop overlay */}
+        <div className='relative h-[280px] sm:h-[360px] md:h-[520px] lg:h-[560px]'>
           <img
             src={ASSETS.hero}
             alt='TKC2026 Hero'
-            className='absolute inset-0 h-full w-full object-cover object-left'
+            className='absolute inset-0 h-full w-full object-cover object-[center_top] md:object-center'
             loading='eager'
           />
           {/* Top darkening for header readability */}
           <div className='absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent' />
-          {/* Mobile: bottom fade */}
-          <div className='absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black md:hidden' />
-          {/* Desktop: right fade */}
-          <div className='absolute inset-0 hidden bg-gradient-to-r from-transparent via-transparent to-black md:block' />
-          {/* Desktop: bottom edge */}
-          <div className='absolute inset-x-0 bottom-0 hidden h-20 bg-gradient-to-t from-black to-transparent md:block' />
+          {/* Bottom gradient overlay */}
+          <div className='absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black via-black/60 to-transparent' />
+
+          {/* Desktop: overlay buttons */}
+          <div className='absolute inset-x-0 bottom-0 hidden px-8 pb-10 md:block'>
+            <div className='mx-auto max-w-[1200px]'>
+              <FadeIn delay={200}>
+                <div className='mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-[#e86e3a]/20 bg-[#e86e3a]/[0.08] px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e86e3a]'>
+                  <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a] shadow-[0_0_8px_#e86e3a]' />
+                  TAIKO KOREA CHAMPIONSHIP
+                </div>
+              </FadeIn>
+              <FadeIn delay={300}>
+                <div className='flex flex-row items-center gap-3'>
+                  <Link
+                    to='/apply'
+                    className='group/cta tkc-motion-lift relative inline-flex items-center justify-center rounded-lg px-7 py-3 text-[15px] font-semibold text-white'
+                    style={{
+                      background: '#e86e3a',
+                      boxShadow: '0 4px 24px rgba(232,110,58,0.25)',
+                    }}
+                  >
+                    <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
+                      대회 신청하기
+                    </span>
+                    <img
+                      src='/characters/don-wink.png'
+                      alt=''
+                      className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta:scale-100 group-hover/cta:opacity-100'
+                      draggable={false}
+                    />
+                  </Link>
+                  <Link
+                    to='/schedule'
+                    className='group/cta2 tkc-motion-lift relative inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] px-6 py-3 text-[15px] font-semibold text-white/80 backdrop-blur-sm hover:border-white/30 hover:bg-white/[0.1] hover:text-white'
+                  >
+                    <span className='transition-opacity duration-300 group-hover/cta2:opacity-0'>
+                      일정 보기 →
+                    </span>
+                    <img
+                      src='/characters/katsu-wink.png'
+                      alt=''
+                      className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta2:scale-100 group-hover/cta2:opacity-100'
+                      draggable={false}
+                    />
+                  </Link>
+                </div>
+              </FadeIn>
+            </div>
+          </div>
         </div>
 
-        {/* ── Content side ── */}
-        <div className='relative flex flex-col justify-center px-6 py-8 sm:px-8 sm:py-8 md:px-10 md:py-0 lg:px-14'>
-          {/* Ambient glow */}
-          <div
-            className='pointer-events-none absolute top-[20%] -left-20 h-[300px] w-[300px] rounded-full blur-[40px]'
+        {/* Mobile: buttons below image */}
+        <div className='flex flex-col gap-3 px-6 py-6 md:hidden'>
+          <Link
+            to='/apply'
+            className='group/cta tkc-motion-lift relative inline-flex w-full items-center justify-center rounded-lg px-7 py-3 text-[15px] font-semibold text-white'
             style={{
-              background:
-                'radial-gradient(circle, rgba(232,110,58,0.06), transparent 70%)',
+              background: '#e86e3a',
+              boxShadow: '0 4px 24px rgba(232,110,58,0.25)',
             }}
-          />
-
-          <div className='relative'>
-            {/* Badge */}
-            <FadeIn delay={200}>
-              <div className='mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-[#e86e3a]/20 bg-[#e86e3a]/[0.08] px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e86e3a]'>
-                <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a] shadow-[0_0_8px_#e86e3a]' />
-                TAIKO KOREA CHAMPIONSHIP
-              </div>
-            </FadeIn>
-
-            {/* Year */}
-            <FadeIn delay={300}>
-              <h1 className='tkc-hero-year mb-2 bg-gradient-to-br from-[#e86e3a] via-[#f5a623] to-[#ffcc5f] bg-clip-text text-[clamp(64px,12vw,110px)] leading-none font-black tracking-[-2px] text-transparent md:tracking-[-4px]'>
-                2026
-              </h1>
-            </FadeIn>
-
-            {/* CTA text */}
-            <FadeIn delay={400}>
-              <p className='mb-8 text-[15px] text-white/65 sm:mb-7 sm:text-[17px]'>
-                지금 참가 신청을 받고 있습니다
-              </p>
-            </FadeIn>
-
-            {/* Actions */}
-            <FadeIn delay={500}>
-              <div className='flex flex-col gap-3 sm:flex-row'>
-                <Link
-                  to='/apply'
-                  className='tkc-motion-lift inline-flex items-center justify-center rounded-lg px-7 py-3 text-[15px] font-semibold text-white hover:brightness-110'
-                  style={{
-                    background: '#e86e3a',
-                    boxShadow: '0 4px 24px rgba(232,110,58,0.25)',
-                  }}
-                >
-                  대회 신청하기
-                </Link>
-                <Link
-                  to='/schedule'
-                  className='tkc-motion-lift inline-flex items-center justify-center rounded-lg border border-[#1e1e1e] px-6 py-3 text-[15px] font-semibold text-white/65 hover:border-white/30 hover:bg-white/[0.03] hover:text-white'
-                >
-                  일정 보기 →
-                </Link>
-              </div>
-            </FadeIn>
-          </div>
+          >
+            <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
+              대회 신청하기
+            </span>
+            <img
+              src='/characters/don-wink.png'
+              alt=''
+              className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta:scale-100 group-hover/cta:opacity-100'
+              draggable={false}
+            />
+          </Link>
+          <Link
+            to='/schedule'
+            className='group/cta2 tkc-motion-lift relative inline-flex w-full items-center justify-center rounded-lg border border-[#1e1e1e] px-6 py-3 text-[15px] font-semibold text-white/65 hover:border-white/30 hover:bg-white/[0.03] hover:text-white'
+          >
+            <span className='transition-opacity duration-300 group-hover/cta2:opacity-0'>
+              일정 보기 →
+            </span>
+            <img
+              src='/characters/katsu-wink.png'
+              alt=''
+              className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta2:scale-100 group-hover/cta2:opacity-100'
+              draggable={false}
+            />
+          </Link>
         </div>
       </section>
 
@@ -245,17 +279,43 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ── SCHEDULE ── */}
-      <section className='mt-16 sm:mt-16 md:mt-20'>
+      {/* ── Decorative Character Divider ── */}
+      <div className='relative flex items-center justify-center py-6'>
+        <div className='h-px flex-1 bg-[#1e1e1e]' />
         <FadeIn>
-          <SectionHead label='Schedule' title='일정'>
-            <Link
-              to='/schedule'
-              className='text-sm text-white/55 transition-colors hover:text-[#e86e3a]'
-            >
-              자세히 보기 →
-            </Link>
-          </SectionHead>
+          <div className='pointer-events-none mx-4 flex items-center gap-1'>
+            <img
+              src={CHARS.donBack}
+              alt=''
+              className='h-auto w-8 opacity-25'
+              loading='lazy'
+              draggable={false}
+            />
+            <img
+              src={CHARS.katsuBack}
+              alt=''
+              className='h-auto w-8 opacity-25'
+              loading='lazy'
+              draggable={false}
+            />
+          </div>
+        </FadeIn>
+        <div className='h-px flex-1 bg-[#1e1e1e]' />
+      </div>
+
+      {/* ── SCHEDULE ── */}
+      <section className='mt-10 sm:mt-10 md:mt-14'>
+        <FadeIn>
+          <div className='relative'>
+            <SectionHead label='Schedule' title='일정'>
+              <Link
+                to='/schedule'
+                className='text-sm text-white/55 transition-colors hover:text-[#e86e3a]'
+              >
+                자세히 보기 →
+              </Link>
+            </SectionHead>
+          </div>
         </FadeIn>
         <FadeIn delay={100}>
           <ScheduleStrip />
@@ -268,7 +328,9 @@ function HomePage() {
           <SectionHead label='Video' title='영상' />
         </FadeIn>
         <FadeIn delay={100}>
-          <YouTubeEmbed />
+          <div className='relative'>
+            <YouTubeEmbed />
+          </div>
         </FadeIn>
       </section>
 
@@ -372,6 +434,7 @@ function DivisionPanel({
   periodStart,
   periodEnd,
   detailTo,
+  logoSrc,
   index,
 }: (typeof DIVISIONS)[number] & { index: number }) {
   return (
@@ -415,6 +478,17 @@ function DivisionPanel({
             </div>
           </div>
 
+          {/* Game Logo */}
+          {logoSrc && (
+            <img
+              src={logoSrc}
+              alt={title}
+              className='mb-2 h-10 w-auto object-contain opacity-90 sm:h-12'
+              loading='lazy'
+              draggable={false}
+            />
+          )}
+
           {/* Description */}
           <p className='mb-6 text-[14px] leading-[1.7] break-keep text-white/60 sm:mb-7 sm:text-[15px]'>
             {description}
@@ -439,20 +513,36 @@ function DivisionPanel({
           <div className='grid grid-cols-2 gap-2.5'>
             <Link
               to={detailTo}
-              className='tkc-motion-surface inline-flex items-center justify-center rounded-lg border border-[#1e1e1e] px-6 py-2.5 text-sm font-semibold text-white/60 hover:border-white/30 hover:text-white'
+              className='group/detail tkc-motion-surface relative inline-flex items-center justify-center rounded-lg border border-[#1e1e1e] px-6 py-2.5 text-sm font-semibold text-white/60 hover:border-white/30 hover:text-white'
             >
-              자세히 보기
+              <span className='transition-opacity duration-300 group-hover/detail:opacity-0'>
+                자세히 보기
+              </span>
+              <img
+                src='/characters/katsu-wink.png'
+                alt=''
+                className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/detail:scale-100 group-hover/detail:opacity-100'
+                draggable={false}
+              />
             </Link>
             <Link
               to='/apply'
-              className='tkc-motion-surface inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold hover:brightness-110'
+              className='group/cta tkc-motion-surface relative inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold'
               style={{
                 background: accent,
                 color: accent === '#f5a623' ? '#0a0a0a' : '#fff',
                 boxShadow: `0 4px 20px ${accent}33`,
               }}
             >
-              대회 신청하기
+              <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
+                대회 신청하기
+              </span>
+              <img
+                src='/characters/don-wink.png'
+                alt=''
+                className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta:scale-100 group-hover/cta:opacity-100'
+                draggable={false}
+              />
             </Link>
           </div>
         </div>
@@ -497,6 +587,21 @@ function ScheduleStrip() {
           className='absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-[#e86e3a] to-[#f5a623] transition-all duration-1000'
           style={{ width: `${overall}%` }}
         />
+        {/* Progress bar runner — 달리는 캇짱 */}
+        {overall > 0 && overall < 100 && (
+          <div
+            className='pointer-events-none absolute -top-5 z-10 transition-all duration-1000'
+            style={{ left: `${Math.min(overall, 95)}%`, transform: 'translateX(-50%)' }}
+          >
+            <img
+              src={CHARS.katsuRun}
+              alt=''
+              className='h-auto w-6 opacity-50'
+              loading='lazy'
+              draggable={false}
+            />
+          </div>
+        )}
         <div className='absolute -top-2 inset-x-0 flex justify-between'>
           {monthMarkers.map((m) => {
             const active = overall >= m.pct

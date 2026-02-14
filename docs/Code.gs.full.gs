@@ -66,6 +66,24 @@ function sanitizeEmail_(email) {
   return trimmed;
 }
 
+/**
+ * Formula Injection Defense Policy
+ * ----------------------------------
+ * Every user-supplied string that enters a Google Sheets cell MUST pass through
+ * escapeFormula_() to neutralise leading =, +, -, @ characters that could
+ * trigger unintended formula execution.
+ *
+ * Enforced at:
+ *  - handleRegister_()      : all registration text fields
+ *  - handleOpsUpsert_()     : all ops data string fields
+ *  - appendOpsEvent_()      : event message (server-generated, low risk but included)
+ *
+ * NOT required for:
+ *  - opsGuide / opsInlineGuide / opsBeginnerGuide : content is server-generated constants
+ *  - ensureSheetSchema_ header rows               : controlled by code, not user input
+ *  - replaceTableRows_ (pub commit)               : data originates from ops sheets that
+ *                                                    were already escaped on write
+ */
 function escapeFormula_(value) {
   if (typeof value !== 'string') return value;
   var trimmed = value.trim();
@@ -1717,8 +1735,8 @@ function handleSite_() {
     contactEmail: sanitizeEmail_(String(map.contactEmail || '')),
     kakaoChannelUrl: sanitizeUrl_(String(map.kakaoChannelUrl || '')),
     heroBgType: String(map.heroBgType || 'image'),
-    heroBgUrl: String(map.heroBgUrl || ''),
-    heroBgPosterUrl: String(map.heroBgPosterUrl || ''),
+    heroBgUrl: sanitizeUrl_(String(map.heroBgUrl || '')),
+    heroBgPosterUrl: sanitizeUrl_(String(map.heroBgPosterUrl || '')),
     applyOpen: toBool_(map.applyOpen),
     applyNotice: String(map.applyNotice || ''),
     footerInfoMd: String(map.footerInfoMd || ''),
@@ -1809,7 +1827,7 @@ function handleContent_(params) {
         order: Number(r.order||0),
         title: String(r.title||'').trim(),
         bodyMd: String(r.bodyMd||''),
-        imageUrl: String(r.imageUrl||'').trim(),
+        imageUrl: sanitizeUrl_(String(r.imageUrl||'').trim()),
       };
     });
 
@@ -1901,11 +1919,23 @@ function validateRegister_(p) {
     return v;
   }
 
-  var name = req('name');
-  var phone = req('phone');
-  var email = req('email');
-  var nickname = req('nickname');
-  var cardNo = req('cardNo');
+  // --- length limits (mirrors shared/register-limits.ts) ---
+  var LIMITS = { name:100, phone:30, email:254, nickname:50, namcoId:50, consentLink:500 };
+  function maxLen(field, limit) {
+    var v = String(p[field]||'').trim();
+    if (v.length > limit) throw new Error(field + ' exceeds max length (' + limit + ')');
+    return v;
+  }
+
+  var name = req('name');       maxLen('name', LIMITS.name);
+  var phone = req('phone');     maxLen('phone', LIMITS.phone);
+  var email = req('email');     maxLen('email', LIMITS.email);
+  var nickname = req('nickname'); maxLen('nickname', LIMITS.nickname);
+
+  // namcoId is primary; cardNo accepted as backward-compatible alias
+  var namcoId = String(p.namcoId || p.cardNo || '').trim();
+  if (!namcoId) throw new Error('namcoId is required');
+  if (namcoId.length > LIMITS.namcoId) throw new Error('namcoId exceeds max length (' + LIMITS.namcoId + ')');
 
   var privacyAgree = toBool_(p.privacyAgree);
   if (!privacyAgree) throw new Error('privacyAgree must be true');
@@ -1913,6 +1943,10 @@ function validateRegister_(p) {
   var isMinor = toBool_(p.isMinor);
   var consentLink = String(p.consentLink||'').trim();
   if (isMinor && !consentLink) throw new Error('consentLink is required when isMinor=true');
+  if (consentLink) {
+    maxLen('consentLink', LIMITS.consentLink);
+    if (!/^https:\/\//i.test(consentLink)) throw new Error('consentLink must use https');
+  }
 
   // very lightweight email check
   if (email.indexOf('@') < 1) throw new Error('email looks invalid');
@@ -1945,6 +1979,9 @@ function handleRegister_(payload) {
     var now = new Date();
     var receiptId = makeReceiptId_();
 
+    // namcoId is primary; cardNo accepted as backward-compatible alias
+    var namcoIdRaw = String(payload.namcoId || payload.cardNo || '').trim();
+
     var record = {
       createdAt: now,
       receiptId: receiptId,
@@ -1953,8 +1990,12 @@ function handleRegister_(payload) {
       phone: escapeFormula_(String(payload.phone||'').trim()),
       email: escapeFormula_(String(payload.email||'').trim()),
       nickname: escapeFormula_(String(payload.nickname||'').trim()),
-      cardNo: escapeFormula_(String(payload.cardNo||'').trim()),
+      namcoId: escapeFormula_(namcoIdRaw),
+      cardNo: escapeFormula_(namcoIdRaw),  // backward compat: also populate cardNo column
+      videoLink: escapeFormula_(String(payload.videoLink||'').trim()),
       dohirobaNo: escapeFormula_(String(payload.dohirobaNo||'').trim()),
+      qualifierRegion: escapeFormula_(String(payload.qualifierRegion||'').trim()),
+      offlineSongs: escapeFormula_((payload.offlineSongs||[]).join(', ')),
       spectator: toBool_(payload.spectator),
       isMinor: toBool_(payload.isMinor),
       consentLink: escapeFormula_(String(payload.consentLink||'').trim()),
@@ -2113,7 +2154,9 @@ function doPost(e) {
 
     return json_({ ok:false, error:'알 수 없는 action입니다.' });
   } catch (err) {
-    return json_({ ok:false, error:String(err) });
+    // Log full error for server-side debugging; return generic message to client
+    console.error('[doPost] Unhandled error:', err);
+    return json_({ ok:false, error:'Internal Server Error' });
   }
 }
 
@@ -2824,12 +2867,18 @@ function handleOpsUpsert_(payload) {
   }
   if (!schema) return { ok: false, error: 'stage에 해당하는 스키마를 찾을 수 없습니다.' };
 
+  // Formula injection defense: escape all string values before writing to sheet.
+  // Policy: every user-supplied string entering a sheet cell must pass through
+  // escapeFormula_() so that leading =, +, -, @ characters cannot trigger
+  // spreadsheet formula execution.  See also handleRegister_().
   var normalized = {};
   for (var h = 0; h < schema.headers.length; h++) {
     var header = schema.headers[h];
-    if (header === 'season') normalized[header] = season;
-    else if (header === 'region' && normalizedRegion) normalized[header] = normalizedRegion;
-    else normalized[header] = row[header] !== undefined ? row[header] : '';
+    var val;
+    if (header === 'season') val = season;
+    else if (header === 'region' && normalizedRegion) val = normalizedRegion;
+    else val = row[header] !== undefined ? row[header] : '';
+    normalized[header] = typeof val === 'string' ? escapeFormula_(val) : val;
   }
 
   // Small automatic fixes for convenience

@@ -26,6 +26,16 @@
 - [ ] `base-uri 'self'`, `object-src 'none'`, `frame-ancestors 'none'` unchanged
 - [ ] `script-src` does NOT include `unsafe-inline` or `unsafe-eval`
 
+## Regression verification (required for security / API changes)
+
+> Attach request/response captures or logs proving each item. Remove the section if not applicable.
+
+- [ ] Registration success: valid payload → `{ ok: true, receiptId: "..." }`
+- [ ] Registration rejection: field exceeding max length → `400` / validation error
+- [ ] Registration rejection: `http://` or `javascript:` URL scheme → `400` / validation error
+- [ ] Site/Content API: `heroBgUrl`, `heroBgPosterUrl`, `imageUrl` contain only `https://` or empty string
+- [ ] Error response: unhandled exception returns `"Internal Server Error"` (no stack trace / raw error)
+
 ## Further comments
 
 <!-- If this is a relatively large or complex change, kick off the discussion by explaining why you chose the solution you did and what alternatives you considered, etc... -->
