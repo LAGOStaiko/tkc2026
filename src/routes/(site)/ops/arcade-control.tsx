@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   buildCurrentFinalMatchDraft,
@@ -42,6 +42,17 @@ export const Route = createFileRoute('/(site)/ops/arcade-control')({
 const DEFAULT_SEASON = '2026'
 const DEFAULT_REGION: OpsRegionKey = 'seoul'
 const REFRESH_MS = 5000
+const RETRYABLE_HTTP_STATUS = new Set([429, 500, 502, 503, 504])
+const READ_ONLY_POST_PATHS = new Set([
+  '/api/ops/validate',
+  '/api/ops/snapshots',
+  '/api/ops/publish-log',
+])
+
+const wait = (ms: number) =>
+  new Promise<void>((resolve) => {
+    window.setTimeout(resolve, ms)
+  })
 
 const OPS_STAGE_ORDER: OpsStageKey[] = [
   'online',
@@ -61,34 +72,69 @@ type ApiEnvelope = {
   error?: string
 }
 
+function isAbortError(err: unknown) {
+  if (!err || typeof err !== 'object') return false
+  if (!('name' in err)) return false
+  return String((err as { name?: unknown }).name) === 'AbortError'
+}
+
 async function requestOpsApi(
   path: string,
   method: 'GET' | 'POST',
   body: unknown,
-  operatorKey: string
+  operatorKey: string,
+  options?: { signal?: AbortSignal }
 ) {
+  const basePath = path.split('?')[0] || path
+  const isReadOnly =
+    method === 'GET' || (method === 'POST' && READ_ONLY_POST_PATHS.has(basePath))
+
   const headers: Record<string, string> = {
     Accept: 'application/json',
   }
   if (method !== 'GET') headers['Content-Type'] = 'application/json'
   if (operatorKey.trim()) headers['X-OPS-Key'] = operatorKey.trim()
 
-  const response = await fetch(path, {
-    method,
-    headers,
-    body: method === 'GET' ? undefined : JSON.stringify(body),
-  })
-  const payload = (await response
-    .json()
-    .catch(() => null)) as ApiEnvelope | null
+  const maxAttempts = isReadOnly ? 2 : 1
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const response = await fetch(path, {
+        method,
+        headers,
+        body: method === 'GET' ? undefined : JSON.stringify(body),
+        signal: options?.signal,
+      })
+      const payload = (await response
+        .json()
+        .catch(() => null)) as ApiEnvelope | null
 
-  if (!response.ok || !payload?.ok) {
-    throw new Error(
-      payload?.error || `${response.status} ${response.statusText}`.trim()
-    )
+      if (response.ok && payload?.ok) {
+        return payload.data
+      }
+
+      const statusLabel = `${response.status} ${response.statusText}`.trim()
+      const payloadMessage = payload?.error ? String(payload.error).trim() : ''
+      const message = payloadMessage
+        ? `${payloadMessage} (${statusLabel})`
+        : statusLabel
+
+      if (attempt < maxAttempts && RETRYABLE_HTTP_STATUS.has(response.status)) {
+        await wait(250 * attempt)
+        continue
+      }
+
+      throw new Error(message)
+    } catch (err) {
+      if (isAbortError(err)) throw err
+      if (attempt < maxAttempts) {
+        await wait(250 * attempt)
+        continue
+      }
+      throw err instanceof Error ? err : new Error('Request failed')
+    }
   }
 
-  return payload.data
+  throw new Error('Request failed')
 }
 
 function matchLine(match?: OpsProgressMatch) {
@@ -201,6 +247,11 @@ function ArcadeOpsControlPage() {
   const [feedLoading, setFeedLoading] = useState(false)
   const [feedError, setFeedError] = useState('')
   const [lastFeedAt, setLastFeedAt] = useState('')
+  const feedRequestIdRef = useRef(0)
+  const feedInFlightRef = useRef(false)
+  const feedAbortRef = useRef<AbortController | null>(null)
+  const feedErrorStreakRef = useRef(0)
+  const nextFeedRetryAtRef = useRef(0)
 
   const [activeTab, setActiveTab] = useState('input')
   const [publishMeta, setPublishMeta] = useState<{
@@ -339,57 +390,105 @@ function ArcadeOpsControlPage() {
     setBulkRound(String(currentSwissRound ?? 1))
   }, [bulkRound, currentSwissRound, stage])
 
-  const fetchFeed = useCallback(async () => {
-    if (!operatorKey.trim()) {
-      setFeedError('운영자 키를 입력해야 피드를 조회할 수 있습니다.')
-      return null
-    }
+  const fetchFeed = useCallback(
+    async (options?: { force?: boolean }) => {
+      const force = options?.force === true
+      const key = operatorKey.trim()
+      const now = Date.now()
 
-    try {
-      setFeedLoading(true)
-      setFeedError('')
-
-      const params = new URLSearchParams({
-        season: season.trim() || DEFAULT_SEASON,
-        region,
-      })
-
-      const data = await requestOpsApi(
-        `/api/ops/feed?${params.toString()}`,
-        'GET',
-        null,
-        operatorKey
-      )
-
-      setFeedRaw(data ?? null)
-      setLastFeedAt(new Date().toLocaleTimeString('ko-KR', { hour12: false }))
-      const feedData = data as Record<string, unknown> | null
-      if (feedData?.publishMeta) {
-        setPublishMeta(
-          feedData.publishMeta as {
-            lastPublishId: string
-            lastPublishedAt: string
-            lastCommitId: string
-            lastCommittedAt: string
-          }
-        )
+      if (!key) {
+        if (force) {
+          setFeedError('운영자 키를 입력해야 피드를 조회할 수 있습니다.')
+        }
+        return null
       }
-      return data
-    } catch (err) {
-      setFeedError(err instanceof Error ? err.message : '송출 데이터 조회 실패')
-      return null
-    } finally {
-      setFeedLoading(false)
-    }
-  }, [operatorKey, region, season])
+
+      if (feedInFlightRef.current) {
+        if (!force) return null
+        feedAbortRef.current?.abort()
+      }
+      if (!force && now < nextFeedRetryAtRef.current) return null
+
+      feedInFlightRef.current = true
+      const requestId = (feedRequestIdRef.current += 1)
+      const controller = new AbortController()
+      feedAbortRef.current = controller
+
+      try {
+        setFeedLoading(true)
+        setFeedError('')
+
+        const params = new URLSearchParams({
+          season: season.trim() || DEFAULT_SEASON,
+          region,
+        })
+
+        const data = await requestOpsApi(
+          `/api/ops/feed?${params.toString()}`,
+          'GET',
+          null,
+          key,
+          { signal: controller.signal }
+        )
+
+        if (feedRequestIdRef.current !== requestId) return null
+
+        setFeedRaw(data ?? null)
+        setLastFeedAt(
+          new Date().toLocaleTimeString('ko-KR', { hour12: false })
+        )
+        const feedData = data as Record<string, unknown> | null
+        if (feedData?.publishMeta) {
+          setPublishMeta(
+            feedData.publishMeta as {
+              lastPublishId: string
+              lastPublishedAt: string
+              lastCommitId: string
+              lastCommittedAt: string
+            }
+          )
+        }
+
+        feedErrorStreakRef.current = 0
+        nextFeedRetryAtRef.current = 0
+        return data
+      } catch (err) {
+        if (feedRequestIdRef.current !== requestId) return null
+        if (isAbortError(err)) return null
+
+        feedErrorStreakRef.current += 1
+        const backoffMs = Math.min(
+          30000,
+          1000 * 2 ** Math.min(feedErrorStreakRef.current, 4)
+        )
+        nextFeedRetryAtRef.current = Date.now() + backoffMs
+
+        const baseMessage =
+          err instanceof Error ? err.message : '송출 데이터 조회 실패'
+        setFeedError(
+          `${baseMessage} (자동 재시도 ${Math.ceil(backoffMs / 1000)}초 후)`
+        )
+        return null
+      } finally {
+        if (feedRequestIdRef.current === requestId) {
+          feedAbortRef.current = null
+          feedInFlightRef.current = false
+          setFeedLoading(false)
+        }
+      }
+    },
+    [operatorKey, region, season]
+  )
 
   useEffect(() => {
-    void fetchFeed()
+    if (!operatorKey.trim()) return
+
+    void fetchFeed({ force: true })
     const timer = window.setInterval(() => {
       void fetchFeed()
     }, REFRESH_MS)
     return () => window.clearInterval(timer)
-  }, [fetchFeed])
+  }, [fetchFeed, operatorKey])
 
   const validateRequiredFields = () => {
     for (const field of stageDef.fields) {
@@ -592,7 +691,7 @@ function ArcadeOpsControlPage() {
         await requestOpsApi('/api/ops/upsert', 'POST', payload, operatorKey)
       }
 
-      const fresh = await fetchFeed()
+      const fresh = await fetchFeed({ force: true })
       const nextArchive = resolveArcadeSeasonArchive(fresh)
       const nextRegion = getRegionByKey(nextArchive, region)
       applyTemplate(
@@ -626,7 +725,7 @@ function ArcadeOpsControlPage() {
 
       await requestOpsApi('/api/ops/upsert', 'POST', payload, operatorKey)
       setValidationResult(null)
-      const fresh = await fetchFeed()
+      const fresh = await fetchFeed({ force: true })
 
       if (stage === 'swissMatch') {
         const nextArchive = resolveArcadeSeasonArchive(fresh)
@@ -657,7 +756,7 @@ function ArcadeOpsControlPage() {
         operatorKey
       )
       setInfoMessage('운영 DB 탭 초기화 완료')
-      await fetchFeed()
+      await fetchFeed({ force: true })
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'DB 탭 초기화 실패')
     } finally {
@@ -744,7 +843,7 @@ function ArcadeOpsControlPage() {
       setInfoMessage(
         `송출 완료 — publishId: ${data.publishId ?? '?'}, 백업: ${data.snapshotId ?? '?'}, 총 ${data.totalRows ?? 0}행`
       )
-      await fetchFeed()
+      await fetchFeed({ force: true })
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : '송출 실패')
     } finally {
@@ -806,7 +905,7 @@ function ArcadeOpsControlPage() {
       setInfoMessage(
         `롤백 완료 — rollbackId: ${data.rollbackId ?? '?'}, 복원 행: ${data.restoredRows ?? 0}`
       )
-      await fetchFeed()
+      await fetchFeed({ force: true })
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : '롤백 실패')
     } finally {
@@ -953,7 +1052,9 @@ function ArcadeOpsControlPage() {
               variant='outline'
               size='sm'
               className='w-full'
-              onClick={fetchFeed}
+              onClick={() => {
+                void fetchFeed({ force: true })
+              }}
               disabled={feedLoading}
             >
               {feedLoading ? '새로고침 중..' : 'DB 새로고침'}
