@@ -4,7 +4,7 @@ import { useRouterState } from '@tanstack/react-router'
 
 const WORM_SPRITES = Array.from(
   { length: 6 },
-  (_, i) => `/loading/worm_${i + 1}.png`,
+  (_, i) => `/loading/worm_${i + 1}.png`
 )
 
 const WORM_FRAME_MS = 200
@@ -30,6 +30,17 @@ function isSameSectionNav(from: string, to: string): boolean {
 }
 
 export function GlobalLoadingOverlay() {
+  // Preload sprites so the first mobile navigation doesn't show a blank frame.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    WORM_SPRITES.forEach((src) => {
+      const img = new Image()
+      img.src = src
+    })
+    const logo = new Image()
+    logo.src = '/branding/v2/logo.png'
+  }, [])
+
   const { routerStatus, from, to } = useRouterState({
     select: (state) => ({
       routerStatus: state.status,
@@ -38,8 +49,7 @@ export function GlobalLoadingOverlay() {
     }),
   })
   const isMutating = useIsMutating()
-  const isNavigating =
-    routerStatus === 'pending' && !isSameSectionNav(from, to)
+  const isNavigating = routerStatus === 'pending' && !isSameSectionNav(from, to)
   const shouldShow = isNavigating || isMutating > 0
 
   const [overlayState, setOverlayState] = useState<OverlayState>('hidden')
@@ -131,7 +141,7 @@ export function GlobalLoadingOverlay() {
   return (
     <div
       aria-hidden={overlayState === 'hidden'}
-      className={`fixed inset-0 z-[9999] flex transform-gpu items-center justify-center bg-black/55 transition-[opacity,backdrop-filter] will-change-[opacity,backdrop-filter] ${transitionClass} ${visibilityClass} ${blurClass} cursor-wait`}
+      className={`fixed inset-0 z-[9999] flex transform-gpu items-center justify-center bg-black/55 px-4 transition-[opacity,backdrop-filter] will-change-[opacity,backdrop-filter] ${transitionClass} ${visibilityClass} ${blurClass} cursor-wait`}
     >
       <div className='flex flex-col items-center gap-5'>
         <img
@@ -142,15 +152,14 @@ export function GlobalLoadingOverlay() {
           decoding='async'
         />
         <div className='flex flex-col items-center gap-3'>
-          <div className='relative flex size-[130px] items-center justify-center'>
-            <img
-              src={WORM_SPRITES[spriteIdx]}
-              alt='loading'
-              className='h-[130px] w-auto max-w-none object-contain'
-              loading='eager'
-              decoding='async'
-            />
-          </div>
+          <img
+            src={WORM_SPRITES[spriteIdx]}
+            alt='loading'
+            className='h-auto w-[80vw] max-w-[336px] object-contain select-none'
+            loading='eager'
+            decoding='async'
+            draggable={false}
+          />
           <span className='text-xs font-medium tracking-[0.5px] text-white/35'>
             Loading...
           </span>
