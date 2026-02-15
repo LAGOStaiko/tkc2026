@@ -1,24 +1,17 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-
-const DROPDOWN_TOGGLE_ICONS = {
-  closed: '/characters/donko_color_description_010.png',
-  open: '/characters/donko_color_description_012.png',
-} as const
+import { ChevronDown } from 'lucide-react'
 
 function DropdownToggleIcon({
   open,
-  className = 'size-7 shrink-0 object-contain',
+  className = 'size-7 shrink-0',
 }: {
   open: boolean
   className?: string
 }) {
   return (
-    <img
-      src={open ? DROPDOWN_TOGGLE_ICONS.open : DROPDOWN_TOGGLE_ICONS.closed}
-      alt=''
-      className={`${className} opacity-90`}
-      loading='lazy'
-      draggable={false}
+    <ChevronDown
+      aria-hidden={true}
+      className={`${className} opacity-90 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
     />
   )
 }
@@ -156,7 +149,7 @@ export function Accordion({
       <button
         type='button'
         onClick={() => setOpen((v) => !v)}
-        className='flex w-full items-center justify-between px-4 py-3.5 text-left sm:px-6 sm:py-4'
+        className='flex w-full items-center justify-between px-4 py-3.5 text-left text-white/35 transition-colors hover:text-white/55 sm:px-6 sm:py-4'
       >
         <span className='text-[13px] font-bold text-white/90 sm:text-sm'>{title}</span>
         <DropdownToggleIcon open={open} className='size-8 shrink-0 object-contain' />

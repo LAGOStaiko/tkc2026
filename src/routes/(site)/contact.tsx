@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
+import { ChevronDown } from 'lucide-react'
 import { useSite } from '@/lib/api'
 import { sanitizeUrl } from '@/lib/sanitize-url'
 import { GlassCard } from '@/components/tkc/glass-card'
@@ -501,14 +502,13 @@ function FaqItem({
         <span className='flex-1 text-[13px] font-bold break-keep text-white/90 sm:text-sm'>
           {question}
         </span>
-        <span
+        <ChevronDown
+          aria-hidden={true}
           className={cn(
-            'text-[11px] text-white/35 transition-transform duration-300',
+            'shrink-0 size-4 text-white/35 transition-transform duration-300',
             isOpen && 'rotate-180'
           )}
-        >
-          ▾
-        </span>
+        />
       </button>
       <div
         className={`grid transition-[grid-template-rows] duration-400 ease-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
