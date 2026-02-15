@@ -27,3 +27,5 @@ dist-ssr
 
 # Windows reserved device names (accidentally created)
 nul
+# Generated during favicon experimentation
+/tmp/favicon-*.png
