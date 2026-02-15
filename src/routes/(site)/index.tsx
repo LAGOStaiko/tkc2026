@@ -27,7 +27,7 @@ const DIVISIONS = [
     num: '01',
     title: '콘솔',
     description: '쿵딱! 원더풀 페스티벌로 진행하는 대회입니다.',
-    accent: '#e86e3a',
+    accent: '#e74c3c',
     periodLabel: '온라인 예선 접수 기간',
     periodStart: '03.02',
     periodEnd: '04.30',
@@ -169,7 +169,7 @@ function HomePage() {
       {/* ── HERO ── */}
       <section className='-mt-20 overflow-hidden md:-mt-24'>
         {/* Image + desktop overlay */}
-        <div className='relative h-[280px] sm:h-[360px] md:h-[520px] lg:h-[560px]'>
+        <div className='relative h-[340px] sm:h-[380px] md:h-[520px] lg:h-[560px]'>
           <img
             src={ASSETS.hero}
             alt='TKC2026 Hero'
@@ -179,14 +179,38 @@ function HomePage() {
           {/* Top darkening for header readability */}
           <div className='absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent' />
           {/* Bottom gradient overlay */}
-          <div className='absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black via-black/60 to-transparent' />
+          <div className='absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black via-black/70 to-transparent' />
+
+          {/* Mobile: overlay text on hero */}
+          <div className='absolute inset-x-0 bottom-0 px-6 pb-6 md:hidden'>
+            <FadeIn>
+              <div className='mb-3 inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e74c3c] backdrop-blur-md'>
+                <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e74c3c] shadow-[0_0_8px_#e74c3c]' />
+                TAIKO KOREA CHAMPIONSHIP
+              </div>
+            </FadeIn>
+            <FadeIn delay={120}>
+              <h1 className='text-[28px] leading-[1.15] font-extrabold tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)]'>
+                <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-transparent'>
+                  태고 코리아
+                </span>
+                <br />
+                <span className='text-white'>챔피언십 2026</span>
+              </h1>
+            </FadeIn>
+            <FadeIn delay={200}>
+              <p className='mt-2 text-[13px] leading-[1.55] font-light text-white/60 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]'>
+                PlayX4 2026에서 만나는 태고의 달인 공식 대회
+              </p>
+            </FadeIn>
+          </div>
 
           {/* Desktop: overlay buttons */}
           <div className='absolute inset-x-0 bottom-0 hidden px-8 pb-10 md:block'>
             <div className='mx-auto max-w-[1200px]'>
               <FadeIn delay={200}>
-                <div className='mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-[#e86e3a]/20 bg-[#e86e3a]/[0.08] px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e86e3a]'>
-                  <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a] shadow-[0_0_8px_#e86e3a]' />
+                <div className='mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-[#e74c3c]/20 bg-[#e74c3c]/[0.08] px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e74c3c]'>
+                  <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e74c3c] shadow-[0_0_8px_#e74c3c]' />
                   TAIKO KOREA CHAMPIONSHIP
                 </div>
               </FadeIn>
@@ -196,8 +220,8 @@ function HomePage() {
                     to='/apply'
                     className='group/cta tkc-motion-lift relative inline-flex items-center justify-center rounded-lg px-7 py-3 text-[15px] font-semibold text-white'
                     style={{
-                      background: '#e86e3a',
-                      boxShadow: '0 4px 24px rgba(232,110,58,0.25)',
+                      background: '#e74c3c',
+                      boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
                     }}
                   >
                     <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
@@ -231,13 +255,13 @@ function HomePage() {
         </div>
 
         {/* Mobile: buttons below image */}
-        <div className='flex flex-col gap-3 px-6 py-6 md:hidden'>
+        <div className='flex flex-col gap-2.5 px-6 pt-4 pb-6 md:hidden'>
           <Link
             to='/apply'
             className='group/cta tkc-motion-lift relative inline-flex w-full items-center justify-center rounded-lg px-7 py-3 text-[15px] font-semibold text-white'
             style={{
-              background: '#e86e3a',
-              boxShadow: '0 4px 24px rgba(232,110,58,0.25)',
+              background: '#e74c3c',
+              boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
             }}
           >
             <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
@@ -283,7 +307,7 @@ function HomePage() {
             <SectionHead label='Schedule' title='일정'>
               <Link
                 to='/schedule'
-                className='text-sm text-white/55 transition-colors hover:text-[#e86e3a]'
+                className='text-sm text-white/55 transition-colors hover:text-[#e74c3c]'
               >
                 자세히 보기 →
               </Link>
@@ -382,7 +406,7 @@ function SectionHead({
   return (
     <div className='mb-7 flex flex-wrap items-end justify-between gap-3 sm:mb-6'>
       <div>
-        <div className='mb-1.5 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase sm:text-sm'>
+        <div className='mb-1.5 font-mono text-xs font-semibold tracking-[1px] text-[#e74c3c] uppercase sm:text-sm'>
           {label}
         </div>
         <h2 className='text-[clamp(24px,4vw,32px)] font-extrabold tracking-tight text-white/95'>
@@ -557,7 +581,7 @@ function ScheduleStrip() {
       {/* ── Progress Bar ── */}
       <div className='relative mt-2 mb-4 h-1 rounded-full bg-[#1e1e1e]'>
         <div
-          className='absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-[#e86e3a] to-[#f5a623] transition-all duration-1000'
+          className='absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-[#e74c3c] to-[#f5a623] transition-all duration-1000'
           style={{ width: `${overall}%` }}
         />
         {/* Progress bar runner — 달리는 캇짱 */}
@@ -583,13 +607,13 @@ function ScheduleStrip() {
                 <div
                   className={`size-2 rounded-full border-2 border-[#0a0a0a] ${
                     active
-                      ? 'bg-[#e86e3a] shadow-[0_0_8px_rgba(232,110,58,0.3)]'
+                      ? 'bg-[#e74c3c] shadow-[0_0_8px_rgba(231,76,60,0.3)]'
                       : 'bg-[#2a2a2a]'
                   }`}
                 />
                 <span
                   className={`mt-2.5 text-[11px] leading-none font-semibold tracking-[0.02em] ${
-                    active ? 'text-[#e86e3a]' : 'text-white/35'
+                    active ? 'text-[#e74c3c]' : 'text-white/35'
                   }`}
                 >
                   {m.label}
@@ -608,7 +632,7 @@ function ScheduleStrip() {
             <span
               className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1 text-[11px] leading-none font-semibold tracking-[0.08em] ${
                 group.isFinals
-                  ? 'border-[#e86e3a]/20 bg-[#e86e3a]/[0.04] text-[#e86e3a]'
+                  ? 'border-[#e74c3c]/20 bg-[#e74c3c]/[0.04] text-[#e74c3c]'
                   : 'border-[#1e1e1e] bg-white/[0.02] text-white/40'
               }`}
             >
@@ -642,7 +666,7 @@ function ScheduleStrip() {
                         </div>
                       </div>
                       <div className='min-w-0 flex-1'>
-                        <div className='flex items-start justify-between gap-3'>
+                        <div className='flex items-center justify-between gap-3'>
                           <div className='min-w-0'>
                             <div className='text-[14px] leading-[1.4] font-semibold break-keep text-white/90 sm:text-[15px] sm:leading-[1.3]'>
                               {ev.name}
@@ -669,7 +693,7 @@ function ScheduleStrip() {
                             <div
                               className={`h-full rounded-full transition-all duration-1000 ${
                                 ev.division === 'console'
-                                  ? 'bg-[#e86e3a]'
+                                  ? 'bg-[#e74c3c]'
                                   : 'bg-[#f5a623]'
                               }`}
                               style={{ width: `${progress}%` }}
@@ -702,7 +726,7 @@ function ScheduleStrip() {
                         </div>
                       </div>
                       <div className='min-w-0 flex-1'>
-                        <div className='flex items-start justify-between gap-3'>
+                        <div className='flex items-center justify-between gap-3'>
                           <div className='min-w-0'>
                             <div className='text-[14px] leading-[1.35] font-semibold break-keep text-white/90 sm:text-[15px] sm:leading-[1.3]'>
                               {ev.name}
@@ -723,14 +747,14 @@ function ScheduleStrip() {
                             </div>
                           </div>
                           <div className='hidden shrink-0 gap-1.5 sm:flex'>
-                            <span className='rounded-[5px] bg-[#e86e3a]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e86e3a]'>
+                            <span className='rounded-[5px] bg-[#e74c3c]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e74c3c]'>
                               OFFLINE
                             </span>
                             <StatusTag status={status} />
                           </div>
                         </div>
                         <div className='mt-2 flex gap-1.5 sm:hidden'>
-                          <span className='rounded-[5px] bg-[#e86e3a]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e86e3a]'>
+                          <span className='rounded-[5px] bg-[#e74c3c]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e74c3c]'>
                             OFFLINE
                           </span>
                           <StatusTag status={status} />
@@ -772,15 +796,15 @@ function ScheduleStrip() {
                 return (
                   <div
                     key={ev.fullDate}
-                    className='relative overflow-hidden rounded-xl border border-[#e86e3a]/20 bg-[#111] transition-colors hover:border-[#e86e3a]/30'
+                    className='relative overflow-hidden rounded-xl border border-[#e74c3c]/20 bg-[#111] transition-colors hover:border-[#e74c3c]/30'
                   >
-                    <div className='absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-[#e86e3a] to-[#f5a623]' />
+                    <div className='absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-[#e74c3c] to-[#f5a623]' />
                     <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5 sm:py-5'>
                       <div className='flex w-[52px] shrink-0 flex-col items-start justify-center text-left sm:w-[72px] sm:items-center sm:text-center'>
-                        <div className='w-[5ch] bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-left text-lg leading-none font-extrabold tracking-tight tabular-nums text-transparent sm:text-center sm:text-2xl'>
+                        <div className='w-[5ch] bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-left text-lg leading-none font-extrabold tracking-tight tabular-nums text-transparent sm:text-center sm:text-2xl'>
                           {fmtDate(ev.fullDate)}
                         </div>
-                        <div className='mt-1 w-[5ch] text-left text-[11px] leading-none text-[#e86e3a]/60 sm:text-center'>
+                        <div className='mt-1 w-[5ch] text-left text-[11px] leading-none text-[#e74c3c]/60 sm:text-center'>
                           {fmtDay(ev.fullDate)}
                         </div>
                       </div>
@@ -794,19 +818,19 @@ function ScheduleStrip() {
                               {ev.detail}
                             </div>
                             <div className='mt-1 flex items-center gap-1.5 text-[13px] text-white/40'>
-                              <span className='size-1 rounded-full bg-[#e86e3a]/50' />
+                              <span className='size-1 rounded-full bg-[#e74c3c]/50' />
                               <span className='break-keep'>{ev.venueName}</span>
                             </div>
                           </div>
                           <div className='hidden shrink-0 gap-1.5 sm:flex'>
-                            <span className='rounded-[5px] border border-[#e86e3a]/20 bg-[#e86e3a]/[0.12] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e86e3a]'>
+                            <span className='rounded-[5px] border border-[#e74c3c]/20 bg-[#e74c3c]/[0.12] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e74c3c]'>
                               FINALS
                             </span>
                             <StatusTag status={status} />
                           </div>
                         </div>
                         <div className='mt-2 flex gap-1.5 sm:hidden'>
-                          <span className='rounded-[5px] border border-[#e86e3a]/20 bg-[#e86e3a]/[0.12] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e86e3a]'>
+                          <span className='rounded-[5px] border border-[#e74c3c]/20 bg-[#e74c3c]/[0.12] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e74c3c]'>
                             FINALS
                           </span>
                           <StatusTag status={status} />

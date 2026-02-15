@@ -79,6 +79,8 @@ Already used:
 
 - `GAS_WEBAPP_URL`
 - `GAS_API_KEY`
+- `TKC_ENV_TIER` (`production | staging | edit`, optional)
+- `GAS_WEBAPP_URL_PRODUCTION` / `GAS_WEBAPP_URL_STAGING` / `GAS_WEBAPP_URL_EDIT` (optional but recommended)
 
 New:
 

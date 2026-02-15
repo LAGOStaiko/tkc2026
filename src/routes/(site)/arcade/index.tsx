@@ -465,7 +465,7 @@ function ArcadeOnlinePage() {
               ))}
             </div>
             <Callout type='danger' icon={<CalloutCharIcon type='warning' />}>
-              <strong className='text-[#e86e3a]'>옵션 전면 금지</strong> — 진타,
+              <strong className='text-[#e74c3c]'>옵션 전면 금지</strong> — 진타,
               배속 등 일체의 옵션 사용이 불가합니다.
             </Callout>
           </div>
@@ -575,7 +575,7 @@ function ArcadeOnlinePage() {
                 <DetailSubtitle>대리 참가 · 부정행위</DetailSubtitle>
                 <Callout type='danger' icon={<CalloutCharIcon type='warning' />}>
                   중복 참가 및 대리 참가는{' '}
-                  <strong className='text-[#e86e3a]'>엄격히 금지</strong>
+                  <strong className='text-[#e74c3c]'>엄격히 금지</strong>
                   됩니다. 위반 시 실격 처리되며, 향후 대회 참가에 불이익이 있을
                   수 있습니다.
                 </Callout>

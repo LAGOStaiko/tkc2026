@@ -696,7 +696,7 @@ function ContactPage() {
               <div key={sIdx} className='space-y-3'>
                 {/* Section header */}
                 <div className='flex items-center gap-2.5 border-b border-[#1e1e1e] pb-3'>
-                  <span className='size-2 shrink-0 rounded-full bg-[#e86e3a]' />
+                  <span className='size-2 shrink-0 rounded-full bg-[#e74c3c]' />
                   <span className='text-[15px] font-bold text-white/90'>
                     {section.title}
                   </span>

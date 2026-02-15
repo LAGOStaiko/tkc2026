@@ -104,7 +104,7 @@ function DivisionColumn({
   songs: SongStage[]
   isLoading: boolean
 }) {
-  const accent = variant === 'console' ? '#e86e3a' : '#f5a623'
+  const accent = variant === 'console' ? '#e74c3c' : '#f5a623'
 
   return (
     <div>
@@ -183,7 +183,7 @@ function TaskCard({
           isRevealed
             ? 'border-2 border-[#0a0a0a] bg-[#f5a623] shadow-[0_0_0_3px_rgba(245,166,35,0.15),0_0_10px_rgba(245,166,35,0.2)]'
             : isFinals
-              ? 'border-2 border-[#0a0a0a] bg-[#e86e3a] shadow-[0_0_0_3px_rgba(232,110,58,0.2),0_0_12px_rgba(232,110,58,0.3)]'
+              ? 'border-2 border-[#0a0a0a] bg-[#e74c3c] shadow-[0_0_0_3px_rgba(231,76,60,0.2),0_0_12px_rgba(231,76,60,0.3)]'
               : 'border-2 border-[#808080]/50 bg-transparent'
         )}
       />
@@ -195,12 +195,12 @@ function TaskCard({
           isRevealed
             ? 'border border-[#f5a623]/15 border-l-[3px] border-l-[#f5a623] hover:-translate-y-0.5 hover:border-[#f5a623]/30'
             : isFinals
-              ? 'relative border border-[#e86e3a]/20 border-l-[3px] border-l-[#e86e3a] hover:-translate-y-0.5 hover:border-[#e86e3a]/35'
+              ? 'relative border border-[#e74c3c]/20 border-l-[3px] border-l-[#e74c3c] hover:-translate-y-0.5 hover:border-[#e74c3c]/35'
               : 'border border-[#1e1e1e] hover:border-[#2a2a2a]'
         )}
       >
         {isFinals && (
-          <div className='pointer-events-none absolute inset-0 rounded-[14px] bg-gradient-to-br from-[#e86e3a]/[0.03] to-transparent' />
+          <div className='pointer-events-none absolute inset-0 rounded-[14px] bg-gradient-to-br from-[#e74c3c]/[0.03] to-transparent' />
         )}
 
         <div className='relative p-5'>
@@ -209,13 +209,13 @@ function TaskCard({
             <span
               className={cn(
                 'text-sm font-semibold break-keep',
-                isRevealed ? 'text-[#f5a623]' : 'text-[#e86e3a]'
+                isRevealed ? 'text-[#f5a623]' : 'text-[#e74c3c]'
               )}
             >
               {song.stageLabel}
             </span>
             {!isRevealed && (
-              <span className='rounded bg-[#e86e3a]/[0.08] px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider text-[#e86e3a]'>
+              <span className='rounded bg-[#e74c3c]/[0.08] px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider text-[#e74c3c]'>
                 추후 공지
               </span>
             )}

@@ -38,7 +38,7 @@ export function TkcPageHeader({
     <div className={cn('space-y-2', className)}>
       <h1
         className={cn(
-          'bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-3xl font-bold tracking-tight text-transparent md:text-5xl',
+          'bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-3xl font-bold tracking-tight text-transparent md:text-5xl',
           titleClassName
         )}
       >
@@ -62,7 +62,7 @@ export function PageHero({
   badge,
   title,
   subtitle,
-  accentColor = '#e86e3a',
+  accentColor = '#e74c3c',
   gradientTo = '#f5a623',
 }: PageHeroProps) {
   return (

@@ -185,7 +185,7 @@ function ArcadeFinals2026Page() {
           badge='TOP 8 FINALS'
           title={`Top 8 결선`}
           subtitle='A그룹(지역 1위)과 B그룹(지역 2위) 크로스 매칭 기록'
-          accentColor='#e86e3a'
+          accentColor='#e74c3c'
           gradientTo='#f5a623'
         />
       </div>
@@ -217,7 +217,7 @@ function ArcadeFinals2026Page() {
       <FadeIn>
         <section className='space-y-4'>
           <div className='flex items-center gap-2.5'>
-            <span className='size-2 shrink-0 rounded-full bg-[#e86e3a]' />
+            <span className='size-2 shrink-0 rounded-full bg-[#e74c3c]' />
             <h2 className='text-lg font-bold text-white'>Top 8 크로스 대진</h2>
           </div>
 

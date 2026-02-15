@@ -23,7 +23,7 @@ const NAV_ITEMS = [
     phase: 'PHASE 1',
     label: '온라인 예선',
     desc: '스코어 어택',
-    color: '#e86e3a',
+    color: '#e74c3c',
   },
   {
     to: '/console/finals',
@@ -230,14 +230,14 @@ function ConsoleLayout() {
           <div className='absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black via-black/70 to-transparent' />
           <div className='absolute inset-x-0 bottom-0 px-6 pb-8 sm:px-10 sm:pb-10 md:pb-14'>
             <FadeIn>
-              <div className='mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e86e3a] backdrop-blur-md'>
-                <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a] shadow-[0_0_8px_#e86e3a]' />
+              <div className='mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e74c3c] backdrop-blur-md'>
+                <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e74c3c] shadow-[0_0_8px_#e74c3c]' />
                 CONSOLE DIVISION
               </div>
             </FadeIn>
             <FadeIn delay={120}>
               <h1 className='drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] text-[clamp(30px,8.5vw,56px)] leading-[1.1] font-extrabold tracking-tight'>
-                <span className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'>
+                <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-transparent'>
                   콘솔 예선
                 </span>
                 <br />

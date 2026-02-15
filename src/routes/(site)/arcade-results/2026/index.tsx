@@ -140,7 +140,7 @@ function ArcadeResults2026Page() {
             <h2 className='text-lg font-bold text-white'>지역 상세</h2>
             <a
               href='/arcade-results/2026/finals'
-              className='shrink-0 font-mono text-[13px] font-semibold text-[#e86e3a] transition-opacity hover:opacity-70'
+              className='shrink-0 font-mono text-[13px] font-semibold text-[#e74c3c] transition-opacity hover:opacity-70'
             >
               Top 8 결선 상세 →
             </a>

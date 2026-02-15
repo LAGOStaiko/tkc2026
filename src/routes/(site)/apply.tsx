@@ -240,7 +240,7 @@ function FieldLabel({
     <div className='mb-1.5 text-[14px] font-semibold text-white/90'>
       {children}
       {required && (
-        <span className='ml-1.5 text-[11px] font-bold text-[#e86e3a]'>*</span>
+        <span className='ml-1.5 text-[11px] font-bold text-[#e74c3c]'>*</span>
       )}
     </div>
   )
@@ -276,7 +276,7 @@ function SectionLabel({
 }
 
 const inputClass =
-  'w-full rounded-[10px] border border-[#1e1e1e] bg-[#0e0e0e] px-4 py-3.5 text-[15px] text-white/90 outline-none transition-[border-color,box-shadow] placeholder:text-white/25 focus:border-[#e86e3a]/40 focus:shadow-[0_0_0_3px_rgba(232,110,58,0.08)] disabled:cursor-not-allowed disabled:opacity-50'
+  'w-full rounded-[10px] border border-[#1e1e1e] bg-[#0e0e0e] px-4 py-3.5 text-[15px] text-white/90 outline-none transition-[border-color,box-shadow] placeholder:text-white/25 focus:border-[#e74c3c]/40 focus:shadow-[0_0_0_3px_rgba(231,76,60,0.08)] disabled:cursor-not-allowed disabled:opacity-50'
 
 /* ════════════════════════════════════════════════════════════════════ */
 /*  Main page                                                          */
@@ -470,17 +470,17 @@ function ApplyPage() {
     <div className='w-full'>
       {/* ── Hero ── */}
       <section className='relative overflow-hidden pt-12 pb-8 sm:pt-16 sm:pb-10 md:pt-24 md:pb-14'>
-        <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(232,110,58,0.15)_0%,transparent_70%)]' />
+        <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(231,76,60,0.15)_0%,transparent_70%)]' />
         <div className='relative'>
           <FadeIn>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e86e3a]/20 bg-[#e86e3a]/[0.08] px-3.5 py-1.5 font-mono text-[12px] font-semibold tracking-[1.5px] text-[#e86e3a]'>
-              <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a]' />
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e74c3c]/20 bg-[#e74c3c]/[0.08] px-3.5 py-1.5 font-mono text-[12px] font-semibold tracking-[1.5px] text-[#e74c3c]'>
+              <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e74c3c]' />
               REGISTRATION
             </div>
           </FadeIn>
           <FadeIn delay={100}>
             <h1 className='text-[clamp(36px,6vw,52px)] leading-[1.1] font-extrabold tracking-tight'>
-              <span className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'>
+              <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-transparent'>
                 {t('apply.title')}
               </span>
             </h1>
@@ -494,7 +494,7 @@ function ApplyPage() {
       </section>
 
       {isError && (
-        <p className='mb-4 text-sm text-[#e86e3a]'>{t('apply.failedStatus')}</p>
+        <p className='mb-4 text-sm text-[#e74c3c]'>{t('apply.failedStatus')}</p>
       )}
 
       {/* ── Form Card ── */}
@@ -509,7 +509,7 @@ function ApplyPage() {
                   i < STEPS.length - 1 ? 'border-r border-[#1e1e1e]' : ''
                 } text-white/90`}
               >
-                <span className='mr-1.5 font-mono text-[11px] font-semibold text-[#e86e3a]'>
+                <span className='mr-1.5 font-mono text-[11px] font-semibold text-[#e74c3c]'>
                   {step.num}
                 </span>
                 {step.label}
@@ -536,10 +536,10 @@ function ApplyPage() {
                   <div className='mb-6 space-y-2'>
                     <div ref={turnstileRef} />
                     {turnstileError ? (
-                      <p className='text-xs text-[#e86e3a]'>{turnstileError}</p>
+                      <p className='text-xs text-[#e74c3c]'>{turnstileError}</p>
                     ) : null}
                     {turnstileFieldError ? (
-                      <p className='text-xs text-[#e86e3a]'>
+                      <p className='text-xs text-[#e74c3c]'>
                         {turnstileFieldError}
                       </p>
                     ) : null}
@@ -580,7 +580,7 @@ function ApplyPage() {
                                   key={opt.value}
                                   className={`flex cursor-pointer items-center gap-3 rounded-[10px] border p-3.5 transition-all sm:p-4 ${
                                     active
-                                      ? 'border-[#e86e3a] bg-[#e86e3a]/[0.04]'
+                                      ? 'border-[#e74c3c] bg-[#e74c3c]/[0.04]'
                                       : 'border-[#1e1e1e] bg-[#0e0e0e] hover:border-[#2a2a2a]'
                                   }`}
                                 >
@@ -595,12 +595,12 @@ function ApplyPage() {
                                   <span
                                     className={`flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                                       active
-                                        ? 'border-[#e86e3a]'
+                                        ? 'border-[#e74c3c]'
                                         : 'border-[#2a2a2a]'
                                     }`}
                                   >
                                     {active && (
-                                      <span className='size-2 rounded-full bg-[#e86e3a]' />
+                                      <span className='size-2 rounded-full bg-[#e74c3c]' />
                                     )}
                                   </span>
                                   <div>
@@ -616,7 +616,7 @@ function ApplyPage() {
                             })}
                           </div>
                         </FormControl>
-                        <FormMessage className='mt-2 text-xs text-[#e86e3a]' />
+                        <FormMessage className='mt-2 text-xs text-[#e74c3c]' />
                       </FormItem>
                     )}
                   />
@@ -645,7 +645,7 @@ function ApplyPage() {
                                 {...field}
                               />
                             </FormControl>
-                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                            <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                           </FormItem>
                         )}
                       />
@@ -662,7 +662,7 @@ function ApplyPage() {
                                 {...field}
                               />
                             </FormControl>
-                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                            <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                           </FormItem>
                         )}
                       />
@@ -686,7 +686,7 @@ function ApplyPage() {
                                 {...field}
                               />
                             </FormControl>
-                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                            <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                           </FormItem>
                         )}
                       />
@@ -705,7 +705,7 @@ function ApplyPage() {
                                 {...field}
                               />
                             </FormControl>
-                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                            <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                           </FormItem>
                         )}
                       />
@@ -726,7 +726,7 @@ function ApplyPage() {
                               {...field}
                             />
                           </FormControl>
-                          <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                          <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                         </FormItem>
                       )}
                     />
@@ -759,7 +759,7 @@ function ApplyPage() {
                               <button
                                 type='button'
                                 onClick={() => setVideoGuideOpen(!videoGuideOpen)}
-                                className='inline-flex items-center gap-1 text-[#e86e3a]/70 transition-colors hover:text-[#e86e3a]'
+                                className='inline-flex items-center gap-1 text-[#e74c3c]/70 transition-colors hover:text-[#e74c3c]'
                               >
                                 <ChevronDown
                                   className={`size-3.5 transition-transform ${videoGuideOpen ? 'rotate-180' : ''}`}
@@ -767,7 +767,7 @@ function ApplyPage() {
                                 {t('apply.field.videoLinkGuideTitle')}
                               </button>
                             </FieldHint>
-                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                            <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                           </FormItem>
                         )}
                       />
@@ -807,7 +807,7 @@ function ApplyPage() {
                                   {...field}
                                 />
                               </FormControl>
-                              <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                              <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                             </FormItem>
                           )}
                         />
@@ -841,7 +841,7 @@ function ApplyPage() {
                                   ))}
                                 </SelectContent>
                               </Select>
-                              <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                              <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                             </FormItem>
                           )}
                         />
@@ -905,7 +905,7 @@ function ApplyPage() {
                                           )}
                                         </SelectContent>
                                       </Select>
-                                      <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                                      <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                                     </FormItem>
                                   )}
                                 />
@@ -935,7 +935,7 @@ function ApplyPage() {
                           <label
                             className={`flex cursor-pointer items-start gap-3.5 rounded-xl border p-4 transition-all sm:p-5 ${
                               field.value
-                                ? 'border-[#e86e3a] bg-[#e86e3a]/[0.03]'
+                                ? 'border-[#e74c3c] bg-[#e74c3c]/[0.03]'
                                 : 'border-[#1e1e1e] bg-[#0e0e0e] hover:border-[#2a2a2a]'
                             }`}
                           >
@@ -952,7 +952,7 @@ function ApplyPage() {
                             <span
                               className={`mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                                 field.value
-                                  ? 'border-[#e86e3a] bg-[#e86e3a]'
+                                  ? 'border-[#e74c3c] bg-[#e74c3c]'
                                   : 'border-[#2a2a2a]'
                               }`}
                             >
@@ -992,7 +992,7 @@ function ApplyPage() {
                           <label
                             className={`flex cursor-pointer items-start gap-3.5 rounded-xl border p-4 transition-all sm:p-5 ${
                               field.value
-                                ? 'border-[#e86e3a] bg-[#e86e3a]/[0.03]'
+                                ? 'border-[#e74c3c] bg-[#e74c3c]/[0.03]'
                                 : 'border-[#1e1e1e] bg-[#0e0e0e] hover:border-[#2a2a2a]'
                             }`}
                           >
@@ -1009,7 +1009,7 @@ function ApplyPage() {
                             <span
                               className={`mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                                 field.value
-                                  ? 'border-[#e86e3a] bg-[#e86e3a]'
+                                  ? 'border-[#e74c3c] bg-[#e74c3c]'
                                   : 'border-[#2a2a2a]'
                               }`}
                             >
@@ -1049,7 +1049,7 @@ function ApplyPage() {
                           <label
                             className={`flex cursor-pointer items-start gap-3.5 rounded-xl border p-4 transition-all sm:p-5 ${
                               field.value
-                                ? 'border-[#e86e3a] bg-[#e86e3a]/[0.03]'
+                                ? 'border-[#e74c3c] bg-[#e74c3c]/[0.03]'
                                 : 'border-[#1e1e1e] bg-[#0e0e0e] hover:border-[#2a2a2a]'
                             }`}
                           >
@@ -1066,7 +1066,7 @@ function ApplyPage() {
                             <span
                               className={`mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                                 field.value
-                                  ? 'border-[#e86e3a] bg-[#e86e3a]'
+                                  ? 'border-[#e74c3c] bg-[#e74c3c]'
                                   : 'border-[#2a2a2a]'
                               }`}
                             >
@@ -1087,7 +1087,7 @@ function ApplyPage() {
                             <div className='min-w-0 flex-1'>
                               <div className='text-[15px] font-semibold text-white/90'>
                                 {t('apply.field.privacy')}{' '}
-                                <span className='text-[11px] font-bold text-[#e86e3a]'>
+                                <span className='text-[11px] font-bold text-[#e74c3c]'>
                                   *
                                 </span>
                               </div>
@@ -1136,7 +1136,7 @@ function ApplyPage() {
                               </div>
                             </div>
                           </label>
-                          <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                          <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                         </FormItem>
                       )}
                     />
@@ -1171,7 +1171,7 @@ function ApplyPage() {
                             <FieldHint>
                               {t('apply.field.consentLinkHelp')}
                             </FieldHint>
-                            <FormMessage className='mt-1.5 text-xs text-[#e86e3a]' />
+                            <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                           </FormItem>
                         )}
                       />
@@ -1195,22 +1195,22 @@ function ApplyPage() {
                 )}
 
                 {submitError && (
-                  <p className='mt-4 text-sm text-[#e86e3a]'>{submitError}</p>
+                  <p className='mt-4 text-sm text-[#e74c3c]'>{submitError}</p>
                 )}
               </div>
 
               {/* Submit bar */}
               <div className='flex flex-col items-center justify-between gap-4 border-t border-[#1e1e1e] px-7 py-6 sm:flex-row sm:px-9'>
                 <div className='text-[13px] text-white/40'>
-                  <span className='text-[#e86e3a]'>*</span> 표시는 필수 입력
+                  <span className='text-[#e74c3c]'>*</span> 표시는 필수 입력
                   항목입니다.
                 </div>
                 <button
                   type='submit'
                   disabled={isDisabled}
-                  className='w-full shrink-0 cursor-pointer rounded-[10px] bg-[#e86e3a] px-10 py-3.5 text-[16px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
+                  className='w-full shrink-0 cursor-pointer rounded-[10px] bg-[#e74c3c] px-10 py-3.5 text-[16px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
                   style={{
-                    boxShadow: '0 4px 24px rgba(232,110,58,0.25)',
+                    boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
                   }}
                 >
                   {isSubmitting ? t('apply.submitting') : t('apply.submit')}

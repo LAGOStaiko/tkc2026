@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   buildCurrentFinalMatchDraft,
@@ -42,6 +42,7 @@ export const Route = createFileRoute('/(site)/ops/arcade-control')({
 const DEFAULT_SEASON = '2026'
 const DEFAULT_REGION: OpsRegionKey = 'seoul'
 const REFRESH_MS = 5000
+const OPS_KEY_SESSION_KEY = 'tkc2026:ops-operator-key'
 
 const OPS_STAGE_ORDER: OpsStageKey[] = [
   'online',
@@ -92,7 +93,7 @@ async function requestOpsApi(
 }
 
 function matchLine(match?: OpsProgressMatch) {
-  if (!match) return '매치 없음'
+  if (!match) return '留ㅼ튂 ?놁쓬'
   return `${match.label} - ${match.leftName} vs ${match.rightName}`
 }
 
@@ -151,6 +152,8 @@ function parseBulkSwissLines(source: string): BulkSwissSeedRow[] {
 
 function ArcadeOpsControlPage() {
   const [operatorKey, setOperatorKey] = useState('')
+  const [isOperatorVerified, setIsOperatorVerified] = useState(false)
+  const [isOperatorVerifying, setIsOperatorVerifying] = useState(false)
   const [season, setSeason] = useState(DEFAULT_SEASON)
   const [region, setRegion] = useState<OpsRegionKey>(DEFAULT_REGION)
   const [stage, setStage] = useState<OpsStageKey>('swissMatch')
@@ -339,15 +342,28 @@ function ArcadeOpsControlPage() {
     setBulkRound(String(currentSwissRound ?? 1))
   }, [bulkRound, currentSwissRound, stage])
 
-  const fetchFeed = useCallback(async () => {
-    if (!operatorKey.trim()) {
-      setFeedError('운영자 키를 입력해야 피드를 조회할 수 있습니다.')
-      return null
+  const applyFeedData = useCallback((data: unknown) => {
+    setFeedRaw(data ?? null)
+    setLastFeedAt(new Date().toLocaleTimeString('ko-KR', { hour12: false }))
+    const feedData = data as Record<string, unknown> | null
+    if (feedData?.publishMeta) {
+      setPublishMeta(
+        feedData.publishMeta as {
+          lastPublishId: string
+          lastPublishedAt: string
+          lastCommitId: string
+          lastCommittedAt: string
+        }
+      )
     }
+  }, [])
 
-    try {
-      setFeedLoading(true)
-      setFeedError('')
+  const fetchFeedWithKey = useCallback(
+    async (rawOperatorKey: string) => {
+      const key = rawOperatorKey.trim()
+      if (!key) {
+        throw new Error('Operator key is required')
+      }
 
       const params = new URLSearchParams({
         season: season.trim() || DEFAULT_SEASON,
@@ -358,45 +374,78 @@ function ArcadeOpsControlPage() {
         `/api/ops/feed?${params.toString()}`,
         'GET',
         null,
-        operatorKey
+        key
       )
-
-      setFeedRaw(data ?? null)
-      setLastFeedAt(new Date().toLocaleTimeString('ko-KR', { hour12: false }))
-      const feedData = data as Record<string, unknown> | null
-      if (feedData?.publishMeta) {
-        setPublishMeta(
-          feedData.publishMeta as {
-            lastPublishId: string
-            lastPublishedAt: string
-            lastCommitId: string
-            lastCommittedAt: string
-          }
-        )
-      }
+      applyFeedData(data)
       return data
+    },
+    [applyFeedData, region, season]
+  )
+
+  const fetchFeed = useCallback(async () => {
+    try {
+      setFeedLoading(true)
+      setFeedError('')
+      return await fetchFeedWithKey(operatorKey)
     } catch (err) {
-      setFeedError(err instanceof Error ? err.message : '송출 데이터 조회 실패')
+      setFeedError(err instanceof Error ? err.message : 'Failed to load feed')
       return null
     } finally {
       setFeedLoading(false)
     }
-  }, [operatorKey, region, season])
+  }, [fetchFeedWithKey, operatorKey])
+
+  const verifyOperatorKey = useCallback(
+    async (rawOperatorKey: string) => {
+      try {
+        setIsOperatorVerifying(true)
+        setFeedError('')
+        await fetchFeedWithKey(rawOperatorKey)
+        setIsOperatorVerified(true)
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem(
+            OPS_KEY_SESSION_KEY,
+            rawOperatorKey.trim()
+          )
+        }
+      } catch (err) {
+        setIsOperatorVerified(false)
+        setFeedError(
+          err instanceof Error ? err.message : 'Authentication failed'
+        )
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.removeItem(OPS_KEY_SESSION_KEY)
+        }
+      } finally {
+        setIsOperatorVerifying(false)
+      }
+    },
+    [fetchFeedWithKey]
+  )
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    const restored = window.sessionStorage.getItem(OPS_KEY_SESSION_KEY)?.trim()
+    if (!restored) return
+    setOperatorKey(restored)
+    void verifyOperatorKey(restored)
+  }, [verifyOperatorKey])
+
+  useEffect(() => {
+    if (!isOperatorVerified) return
     void fetchFeed()
     const timer = window.setInterval(() => {
       void fetchFeed()
     }, REFRESH_MS)
     return () => window.clearInterval(timer)
-  }, [fetchFeed])
+  }, [fetchFeed, isOperatorVerified])
 
   const validateRequiredFields = () => {
     for (const field of stageDef.fields) {
       if (!field.required) continue
       const value = draft[field.name]
       if (!value || value.trim().length === 0) {
-        throw new Error(`필수 항목 누락: ${field.label}`)
+        throw new Error(`?꾩닔 ??ぉ ?꾨씫: ${field.label}`)
       }
     }
   }
@@ -405,11 +454,11 @@ function ArcadeOpsControlPage() {
     if (stage === 'swissMatch') {
       const template = buildCurrentSwissMatchDraft(regionArchive)
       if (!template) {
-        setErrorMessage('현재 진행중인 Swiss 경기가 없습니다.')
+        setErrorMessage('?꾩옱 吏꾪뻾以묒씤 Swiss 寃쎄린媛 ?놁뒿?덈떎.')
         return
       }
       applyTemplate(template)
-      setInfoMessage('현재 Swiss 경기 정보를 입력폼에 불러왔습니다.')
+      setInfoMessage('?꾩옱 Swiss 寃쎄린 ?뺣낫瑜??낅젰?쇱뿉 遺덈윭?붿뒿?덈떎.')
       setErrorMessage('')
       return
     }
@@ -417,11 +466,11 @@ function ArcadeOpsControlPage() {
     if (stage === 'finalMatch') {
       const template = buildCurrentFinalMatchDraft(archive)
       if (!template) {
-        setErrorMessage('현재 진행중인 Top8 경기가 없습니다.')
+        setErrorMessage('?꾩옱 吏꾪뻾以묒씤 Top8 寃쎄린媛 ?놁뒿?덈떎.')
         return
       }
       applyTemplate(template)
-      setInfoMessage('현재 Top8 경기 정보를 입력폼에 불러왔습니다.')
+      setInfoMessage('?꾩옱 Top8 寃쎄린 ?뺣낫瑜??낅젰?쇱뿉 遺덈윭?붿뒿?덈떎.')
       setErrorMessage('')
     }
   }
@@ -429,14 +478,14 @@ function ArcadeOpsControlPage() {
   const handleLoadNextMatch = () => {
     if (stage === 'swissMatch') {
       applyTemplate(buildNextSwissMatchDraft(regionArchive))
-      setInfoMessage('다음 Swiss 경기 입력 슬롯을 불러왔습니다.')
+      setInfoMessage('?ㅼ쓬 Swiss 寃쎄린 ?낅젰 ?щ’??遺덈윭?붿뒿?덈떎.')
       setErrorMessage('')
       return
     }
 
     if (stage === 'finalMatch') {
       applyTemplate(buildNextFinalMatchDraft(archive))
-      setInfoMessage('다음 Top8 경기 입력 슬롯을 불러왔습니다.')
+      setInfoMessage('?ㅼ쓬 Top8 寃쎄린 ?낅젰 ?щ’??遺덈윭?붿뒿?덈떎.')
       setErrorMessage('')
     }
   }
@@ -637,9 +686,9 @@ function ArcadeOpsControlPage() {
         applyTemplate(buildNextFinalMatchDraft(nextArchive))
       }
 
-      setInfoMessage(`${stageDef.label} 입력 완료`)
+      setInfoMessage(`${stageDef.label} ?낅젰 ?꾨즺`)
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '입력 저장 실패')
+      setErrorMessage(err instanceof Error ? err.message : '?낅젰 ????ㅽ뙣')
     } finally {
       setIsSaving(false)
     }
@@ -656,10 +705,10 @@ function ArcadeOpsControlPage() {
         { scope: 'ops' },
         operatorKey
       )
-      setInfoMessage('운영 DB 탭 초기화 완료')
+      setInfoMessage('?댁쁺 DB ??珥덇린???꾨즺')
       await fetchFeed()
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : 'DB 탭 초기화 실패')
+      setErrorMessage(err instanceof Error ? err.message : 'DB ??珥덇린???ㅽ뙣')
     } finally {
       setIsInitRunning(false)
     }
@@ -673,17 +722,18 @@ function ArcadeOpsControlPage() {
       row?: number
     }
     const toValidateItem = (v: unknown): ValidateItem => {
-      if (typeof v === 'string') return { sheet: '-', rule: '검증', message: v }
+      if (typeof v === 'string')
+        return { sheet: '-', rule: 'Validation', message: v }
       if (v && typeof v === 'object') {
         const o = v as Record<string, unknown>
         return {
           sheet: String(o.sheet ?? '-'),
-          rule: String(o.rule ?? '검증'),
+          rule: String(o.rule ?? 'Validation'),
           message: String(o.message ?? ''),
           row: typeof o.row === 'number' ? o.row : undefined,
         }
       }
-      return { sheet: '-', rule: '검증', message: String(v ?? '') }
+      return { sheet: '-', rule: 'Validation', message: String(v ?? '') }
     }
     try {
       setIsValidating(true)
@@ -707,9 +757,11 @@ function ArcadeOpsControlPage() {
           : [],
       }
       setValidationResult(data)
-      setInfoMessage(data.valid ? '검증 통과' : '검증 실패 — 오류를 확인하세요')
+      setInfoMessage(
+        data.valid ? 'Validation passed' : 'Validation failed. Check errors.'
+      )
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '검증 실패')
+      setErrorMessage(err instanceof Error ? err.message : '寃利??ㅽ뙣')
     } finally {
       setIsValidating(false)
     }
@@ -717,11 +769,11 @@ function ArcadeOpsControlPage() {
 
   const handlePublish = async () => {
     const modeLabel = exportReplaceMode
-      ? 'replace (초기화 후 재송출)'
+      ? 'replace (珥덇린?????ъ넚異?'
       : 'upsert'
     if (
       !confirm(
-        `시즌 ${season || DEFAULT_SEASON} 전체를 ${modeLabel} 모드로 송출합니다.\n\n자동으로 검증 → 백업 → 송출이 실행됩니다. 계속하시겠습니까?`
+        `?쒖쫵 ${season || DEFAULT_SEASON} ?꾩껜瑜?${modeLabel} 紐⑤뱶濡??≪텧?⑸땲??\n\n?먮룞?쇰줈 寃利???諛깆뾽 ???≪텧???ㅽ뻾?⑸땲?? 怨꾩냽?섏떆寃좎뒿?덇퉴?`
       )
     )
       return
@@ -742,11 +794,11 @@ function ArcadeOpsControlPage() {
         operatorKey
       )) as { publishId?: string; snapshotId?: string; totalRows?: number }
       setInfoMessage(
-        `송출 완료 — publishId: ${data.publishId ?? '?'}, 백업: ${data.snapshotId ?? '?'}, 총 ${data.totalRows ?? 0}행`
+        `Publish completed. publishId: ${data.publishId ?? '-'}, backup: ${data.snapshotId ?? '-'}, total rows: ${data.totalRows ?? 0}`
       )
       await fetchFeed()
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '송출 실패')
+      setErrorMessage(err instanceof Error ? err.message : '?≪텧 ?ㅽ뙣')
     } finally {
       setIsPublishing(false)
     }
@@ -774,7 +826,7 @@ function ArcadeOpsControlPage() {
       }
     } catch (err) {
       setErrorMessage(
-        err instanceof Error ? err.message : '스냅샷 목록 조회 실패'
+        err instanceof Error ? err.message : '?ㅻ깄??紐⑸줉 議고쉶 ?ㅽ뙣'
       )
     } finally {
       setIsLoadingSnapshots(false)
@@ -783,16 +835,12 @@ function ArcadeOpsControlPage() {
 
   const handleRollback = async () => {
     if (!selectedSnapshotId) {
-      setErrorMessage('롤백할 스냅샷을 선택하세요')
+      setErrorMessage('Select a snapshot before rollback')
       return
     }
     const snap = snapshots.find((s) => s.snapshotId === selectedSnapshotId)
-    if (
-      !confirm(
-        `스냅샷 "${selectedSnapshotId}"(으)로 롤백합니다.\n\n생성: ${snap?.createdAt ?? '?'}\npublishId: ${snap?.publishId ?? '?'}\n\n현재 pub_* 데이터가 모두 교체됩니다. 계속하시겠습니까?`
-      )
-    )
-      return
+    const confirmMessage = `Rollback snapshot "${selectedSnapshotId}"?\n\nCreated: ${snap?.createdAt ?? '-'}\nPublishId: ${snap?.publishId ?? '-'}\n\nCurrent pub_* data will be replaced. Continue?`
+    if (!confirm(confirmMessage)) return
     try {
       setIsRollingBack(true)
       setErrorMessage('')
@@ -804,11 +852,11 @@ function ArcadeOpsControlPage() {
         operatorKey
       )) as { rollbackId?: string; restoredRows?: number }
       setInfoMessage(
-        `롤백 완료 — rollbackId: ${data.rollbackId ?? '?'}, 복원 행: ${data.restoredRows ?? 0}`
+        `濡ㅻ갚 ?꾨즺 ??rollbackId: ${data.rollbackId ?? '?'}, 蹂듭썝 ?? ${data.restoredRows ?? 0}`
       )
       await fetchFeed()
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : '롤백 실패')
+      setErrorMessage(err instanceof Error ? err.message : '濡ㅻ갚 ?ㅽ뙣')
     } finally {
       setIsRollingBack(false)
     }
@@ -850,7 +898,7 @@ function ArcadeOpsControlPage() {
       )
     } catch (err) {
       setErrorMessage(
-        err instanceof Error ? err.message : '발행 로그 조회 실패'
+        err instanceof Error ? err.message : '諛쒗뻾 濡쒓렇 議고쉶 ?ㅽ뙣'
       )
     } finally {
       setIsLoadingLog(false)
@@ -879,7 +927,7 @@ function ArcadeOpsControlPage() {
             onValueChange={(next) => setDraftField(field.name, next)}
           >
             <SelectTrigger className='w-full'>
-              <SelectValue placeholder={field.placeholder || '선택'} />
+              <SelectValue placeholder={field.placeholder || '?좏깮'} />
             </SelectTrigger>
             <SelectContent>
               {(field.options ?? []).map((option) => (
@@ -918,19 +966,75 @@ function ArcadeOpsControlPage() {
     )
   }
 
+  if (!isOperatorVerified) {
+    return (
+      <TkcSection className='space-y-4 md:space-y-6'>
+        <TkcPageHeader
+          title='Arcade Ops Access'
+          subtitle='Enter the operator key to unlock this page.'
+        />
+        <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
+          <div className='grid gap-3 md:grid-cols-4'>
+            <div className='space-y-1.5 md:col-span-2'>
+              <label className='text-xs font-semibold text-white/70'>
+                Operator key
+              </label>
+              <Input
+                type='password'
+                value={operatorKey}
+                onChange={(event) => {
+                  setOperatorKey(event.target.value)
+                  setFeedError('')
+                }}
+                placeholder='Cloudflare OPS_OPERATOR_KEY'
+                autoComplete='off'
+              />
+            </div>
+            <div className='space-y-1.5'>
+              <label className='text-xs font-semibold text-white/70'>
+                Season
+              </label>
+              <Input
+                value={season}
+                onChange={(event) => setSeason(event.target.value)}
+                placeholder='2026'
+              />
+            </div>
+            <div className='flex items-end'>
+              <Button
+                variant='outline'
+                size='sm'
+                className='w-full'
+                onClick={() => void verifyOperatorKey(operatorKey)}
+                disabled={isOperatorVerifying || !operatorKey.trim()}
+              >
+                {isOperatorVerifying ? 'Verifying...' : 'Unlock'}
+              </Button>
+            </div>
+          </div>
+          {feedError ? (
+            <p className='mt-3 rounded-md border border-red-300/25 bg-red-500/10 px-3 py-2 text-xs text-red-100'>
+              {feedError}
+            </p>
+          ) : null}
+        </section>
+      </TkcSection>
+    )
+  }
+
   return (
     <TkcSection className='space-y-4 md:space-y-6'>
       <TkcPageHeader
-        title='아케이드 운영 콘솔'
-        subtitle='지역은 주간 단위로 전환하고, 경기는 한 매치씩 순차 입력/송출합니다.'
+        title='?꾩??대뱶 ?댁쁺 肄섏넄'
+        subtitle='吏??? 二쇨컙 ?⑥쐞濡??꾪솚?섍퀬, 寃쎄린????留ㅼ튂???쒖감 ?낅젰/?≪텧?⑸땲??'
       />
 
-      {/* ── 인증 + 설정 ── */}
+      {/* ?? ?몄쬆 + ?ㅼ젙 ?? */}
       <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
         <div className='grid gap-3 md:grid-cols-4'>
           <div className='space-y-1.5 md:col-span-2'>
             <label className='text-xs font-semibold text-white/70'>
-              운영자 키
+              ?댁쁺????{' '}
             </label>
             <Input
               type='password'
@@ -941,7 +1045,7 @@ function ArcadeOpsControlPage() {
             />
           </div>
           <div className='space-y-1.5'>
-            <label className='text-xs font-semibold text-white/70'>시즌</label>
+            <label className='text-xs font-semibold text-white/70'>?쒖쫵</label>
             <Input
               value={season}
               onChange={(event) => setSeason(event.target.value)}
@@ -956,7 +1060,7 @@ function ArcadeOpsControlPage() {
               onClick={fetchFeed}
               disabled={feedLoading}
             >
-              {feedLoading ? '새로고침 중..' : 'DB 새로고침'}
+              {feedLoading ? '?덈줈怨좎묠 以?.' : 'DB ?덈줈怨좎묠'}
             </Button>
           </div>
         </div>
@@ -973,12 +1077,12 @@ function ArcadeOpsControlPage() {
         ) : null}
       </section>
 
-      {/* ── 현재 송출 버전 ── */}
+      {/* ?? ?꾩옱 ?≪텧 踰꾩쟾 ?? */}
       <div className='flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm'>
         <div className='flex items-center gap-3'>
-          <span className='text-white/40'>현재 송출</span>
+          <span className='text-white/40'>?꾩옱 ?≪텧</span>
           <span className='font-mono text-[#ff8c66]'>
-            {publishMeta?.lastPublishId || '—'}
+            {publishMeta?.lastPublishId || '-'}
           </span>
         </div>
         <div className='flex items-center gap-4 text-xs text-white/50'>
@@ -991,7 +1095,7 @@ function ArcadeOpsControlPage() {
         </div>
       </div>
 
-      {/* ── 지역 셀렉터 (축소) ── */}
+      {/* ?? 吏????됲꽣 (異뺤냼) ?? */}
       <div className='flex flex-wrap gap-2'>
         {weekStatuses.map((week) => (
           <button
@@ -1019,23 +1123,23 @@ function ArcadeOpsControlPage() {
         ))}
       </div>
 
-      {/* ── 메인 탭 ── */}
+      {/* ?? 硫붿씤 ???? */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className='w-full'>
-          <TabsTrigger value='input'>입력</TabsTrigger>
-          <TabsTrigger value='validate'>검증</TabsTrigger>
-          <TabsTrigger value='publish'>발행</TabsTrigger>
-          <TabsTrigger value='rollback'>롤백</TabsTrigger>
-          <TabsTrigger value='broadcast'>송출확인</TabsTrigger>
-          <TabsTrigger value='log'>로그</TabsTrigger>
+          <TabsTrigger value='input'>?낅젰</TabsTrigger>
+          <TabsTrigger value='validate'>Validate</TabsTrigger>
+          <TabsTrigger value='publish'>諛쒗뻾</TabsTrigger>
+          <TabsTrigger value='rollback'>濡ㅻ갚</TabsTrigger>
+          <TabsTrigger value='broadcast'>?≪텧?뺤씤</TabsTrigger>
+          <TabsTrigger value='log'>濡쒓렇</TabsTrigger>
         </TabsList>
 
-        {/* ════ 입력 탭 ════ */}
+        {/* ?먥븧?먥븧 ?낅젰 ???먥븧?먥븧 */}
         <TabsContent value='input'>
           <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
             <div className='space-y-1.5'>
               <label className='text-xs font-semibold text-white/70'>
-                입력 스테이지
+                ?낅젰 ?ㅽ뀒?댁?
               </label>
               <Select
                 value={stage}
@@ -1058,23 +1162,24 @@ function ArcadeOpsControlPage() {
             {isSequentialStage ? (
               <div className='rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/5 p-3'>
                 <p className='text-xs font-semibold text-[#ffd6cf]'>
-                  순차 진행 가이드 ({stage === 'swissMatch' ? 'Swiss' : 'Top8'})
+                  ?쒖감 吏꾪뻾 媛?대뱶 (
+                  {stage === 'swissMatch' ? 'Swiss' : 'Top8'})
                 </p>
                 <div className='mt-2 grid gap-2 text-xs md:grid-cols-3'>
                   <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                    <div className='text-white/50'>현재 경기</div>
+                    <div className='text-white/50'>?꾩옱 寃쎄린</div>
                     <div className='mt-1 font-medium text-white/85'>
                       {matchLine(stageCurrent)}
                     </div>
                   </div>
                   <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                    <div className='text-white/50'>다음 경기</div>
+                    <div className='text-white/50'>?ㅼ쓬 寃쎄린</div>
                     <div className='mt-1 font-medium text-white/85'>
                       {matchLine(stageNext)}
                     </div>
                   </div>
                   <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                    <div className='text-white/50'>직전 결과</div>
+                    <div className='text-white/50'>吏곸쟾 寃곌낵</div>
                     <div className='mt-1 font-medium text-white/85'>
                       {matchLine(stagePrevious)}
                     </div>
@@ -1086,27 +1191,27 @@ function ArcadeOpsControlPage() {
                     size='sm'
                     onClick={handleLoadCurrentMatch}
                   >
-                    현재 경기 불러오기
+                    ?꾩옱 寃쎄린 遺덈윭?ㅺ린
                   </Button>
                   <Button
                     variant='outline'
                     size='sm'
                     onClick={handleLoadNextMatch}
                   >
-                    다음 경기 슬롯
+                    ?ㅼ쓬 寃쎄린 ?щ’
                   </Button>
                 </div>
               </div>
             ) : null}
 
-            {/* 필수 필드 */}
+            {/* ?꾩닔 ?꾨뱶 */}
             <div className='grid gap-3 md:grid-cols-2'>
               {requiredFields.map(renderFieldInput)}
             </div>
 
             {winnerOptions.length > 0 ? (
               <div className='rounded-lg border border-white/10 bg-black/25 p-3'>
-                <p className='text-xs text-white/60'>승자 빠른 선택</p>
+                <p className='text-xs text-white/60'>?뱀옄 鍮좊Ⅸ ?좏깮</p>
                 <div className='mt-2 flex flex-wrap gap-2'>
                   {winnerOptions.map((option) => (
                     <Button
@@ -1124,11 +1229,11 @@ function ArcadeOpsControlPage() {
               </div>
             ) : null}
 
-            {/* 선택 필드 */}
+            {/* ?좏깮 ?꾨뱶 */}
             {optionalFields.length > 0 ? (
               <details className='group'>
                 <summary className='cursor-pointer text-sm text-white/40 hover:text-white/60'>
-                  추가 필드 ({optionalFields.length}개)
+                  異붽? ?꾨뱶 ({optionalFields.length}媛?
                 </summary>
                 <div className='mt-3 grid gap-3 md:grid-cols-2'>
                   {optionalFields.map(renderFieldInput)}
@@ -1138,14 +1243,14 @@ function ArcadeOpsControlPage() {
 
             <div className='flex flex-wrap gap-2'>
               <Button onClick={handleSaveRow} disabled={isSaving}>
-                {isSaving ? '저장 중..' : 'DB 저장'}
+                {isSaving ? 'Saving...' : 'Save to DB'}
               </Button>
               <Button
                 variant='outline'
                 onClick={resetDraft}
                 disabled={isSaving}
               >
-                입력 초기화
+                ?낅젰 珥덇린??{' '}
               </Button>
             </div>
 
@@ -1162,7 +1267,7 @@ function ArcadeOpsControlPage() {
                     </span>
                   </div>
                   <p className='mt-1 text-xs text-white/55'>
-                    Format: table,p1EntryId,p2EntryId[,note] — Use BYE or - for
+                    Format: table,p1EntryId,p2EntryId[,note] ??Use BYE or - for
                     no opponent.
                   </p>
                   <div className='mt-3 grid gap-2 md:grid-cols-3'>
@@ -1282,7 +1387,7 @@ function ArcadeOpsControlPage() {
               </details>
             ) : null}
 
-            {/* 유틸리티 */}
+            {/* ?좏떥由ы떚 */}
             <div className='flex flex-wrap gap-2 border-t border-white/10 pt-3'>
               <Button
                 variant='outline'
@@ -1290,7 +1395,7 @@ function ArcadeOpsControlPage() {
                 onClick={handleInitOpsTabs}
                 disabled={isInitRunning}
               >
-                {isInitRunning ? '초기화 중..' : '운영 DB 탭 초기화'}
+                {isInitRunning ? 'Initializing...' : 'Initialize ops DB'}
               </Button>
               <Button
                 variant='outline'
@@ -1304,14 +1409,16 @@ function ArcadeOpsControlPage() {
           </div>
         </TabsContent>
 
-        {/* ════ 검증 탭 ════ */}
+        {/* ?먥븧?먥븧 寃利????먥븧?먥븧 */}
         <TabsContent value='validate'>
           <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
             <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>데이터 검증</h2>
+              <h2 className='text-base font-bold text-white'>
+                Data validation
+              </h2>
               <p className='text-xs text-white/60'>
-                운영 DB 데이터의 무결성을 확인합니다 (필수값, 키 중복, 참조
-                무결성).
+                Validate operator DB rows before publish (required fields,
+                duplicates, and references).
               </p>
             </div>
 
@@ -1320,7 +1427,7 @@ function ArcadeOpsControlPage() {
               onClick={handleValidate}
               disabled={isValidating}
             >
-              {isValidating ? '검증 중..' : '데이터 검증 실행'}
+              {isValidating ? 'Validating...' : 'Run validation'}
             </Button>
 
             {validationResult ? (
@@ -1329,8 +1436,8 @@ function ArcadeOpsControlPage() {
                   className={`text-xs font-semibold ${validationResult.valid ? 'text-emerald-300' : 'text-red-300'}`}
                 >
                   {validationResult.valid
-                    ? '검증 통과 — 송출 가능합니다.'
-                    : `검증 실패 — 오류 ${validationResult.errors.length}건`}
+                    ? 'Validation passed. Ready to publish.'
+                    : `Validation failed. ${validationResult.errors.length} errors found.`}
                 </p>
 
                 {validationResult.errors.length > 0 ? (
@@ -1341,7 +1448,7 @@ function ArcadeOpsControlPage() {
                           [{e.sheet}]
                         </span>{' '}
                         {e.rule}: {e.message}
-                        {e.row != null ? ` (행 ${e.row})` : ''}
+                        {e.row != null ? ` (??${e.row})` : ''}
                       </div>
                     ))}
                   </div>
@@ -1363,12 +1470,12 @@ function ArcadeOpsControlPage() {
                 {validationResult.summary.length > 0 ? (
                   <details className='text-xs text-white/60'>
                     <summary className='cursor-pointer hover:text-white/80'>
-                      탭별 행 수 요약 ({validationResult.summary.length}개 탭)
+                      ??퀎 ?????붿빟 ({validationResult.summary.length}媛???
                     </summary>
                     <div className='mt-1 grid grid-cols-2 gap-x-4 gap-y-0.5 font-mono md:grid-cols-3'>
                       {validationResult.summary.map((s, i) => (
                         <span key={i}>
-                          {s.target}: {s.rows}행
+                          {s.target}: {s.rows}??{' '}
                         </span>
                       ))}
                     </div>
@@ -1377,7 +1484,7 @@ function ArcadeOpsControlPage() {
 
                 {validationResult.valid ? (
                   <p className='mt-2 text-sm text-emerald-400'>
-                    검증 통과 — &quot;발행&quot; 탭에서 송출할 수 있습니다.
+                    寃利??듦낵 ??&quot;諛쒗뻾&quot; ??뿉???≪텧?????덉뒿?덈떎.
                   </p>
                 ) : null}
               </div>
@@ -1385,30 +1492,31 @@ function ArcadeOpsControlPage() {
           </div>
         </TabsContent>
 
-        {/* ════ 발행 탭 ════ */}
+        {/* ?먥븧?먥븧 諛쒗뻾 ???먥븧?먥븧 */}
         <TabsContent value='publish'>
           <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
             <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>안전 송출</h2>
+              <h2 className='text-base font-bold text-white'>?덉쟾 ?≪텧</h2>
               <p className='text-xs text-white/60'>
-                자동으로 검증 → 백업(스냅샷) → 송출 → 캐시 초기화가 실행됩니다.
+                ?먮룞?쇰줈 寃利???諛깆뾽(?ㅻ깄?? ???≪텧 ??罹먯떆 珥덇린?붽?
+                ?ㅽ뻾?⑸땲??
               </p>
             </div>
 
             {!validationResult ? (
               <div className='rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-300'>
-                검증을 먼저 실행해 주세요. &quot;검증&quot; 탭에서 데이터 검증을
-                실행할 수 있습니다.
+                寃利앹쓣 癒쇱? ?ㅽ뻾??二쇱꽭?? &quot;寃利?quot;
+                ??뿉???곗씠??寃利앹쓣 ?ㅽ뻾?????덉뒿?덈떎.
               </div>
             ) : !validationResult.valid ? (
               <div className='rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300'>
-                검증 실패 — 오류 {validationResult.errors.length}건을 수정 후
-                다시 검증해 주세요.
+                寃利??ㅽ뙣 ???ㅻ쪟 {validationResult.errors.length}嫄댁쓣 ?섏젙
+                ?? ?ㅼ떆 寃利앺빐 二쇱꽭??
               </div>
             ) : (
               <div className='space-y-3'>
                 <div className='rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300'>
-                  검증 통과 — 송출할 수 있습니다.
+                  寃利??듦낵 ???≪텧?????덉뒿?덈떎.
                 </div>
                 <label className='flex items-center gap-2 text-xs text-white/70'>
                   <input
@@ -1417,24 +1525,24 @@ function ArcadeOpsControlPage() {
                     onChange={(e) => setExportReplaceMode(e.target.checked)}
                     className='accent-[#ff2a00]'
                   />
-                  replace 모드 (기존 아카이브 초기화 후 재송출)
+                  replace 紐⑤뱶 (湲곗〈 ?꾩뭅?대툕 珥덇린?????ъ넚異?
                 </label>
                 <Button onClick={handlePublish} disabled={isPublishing}>
-                  {isPublishing ? '송출 중..' : '검증 + 백업 + 송출'}
+                  {isPublishing ? '?≪텧 以?.' : '寃利?+ 諛깆뾽 + ?≪텧'}
                 </Button>
               </div>
             )}
           </div>
         </TabsContent>
 
-        {/* ════ 롤백 탭 ════ */}
+        {/* ?먥븧?먥븧 濡ㅻ갚 ???먥븧?먥븧 */}
         <TabsContent value='rollback'>
           <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
             <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>롤백</h2>
+              <h2 className='text-base font-bold text-white'>濡ㅻ갚</h2>
               <p className='text-xs text-white/60'>
-                이전 스냅샷으로 pub_* 전체를 복원합니다. 현재 공개 데이터가 모두
-                교체됩니다.
+                ?댁쟾 ?ㅻ깄?룹쑝濡?pub_* ?꾩껜瑜?蹂듭썝?⑸땲?? ?꾩옱 怨듦컻
+                ?곗씠?곌? 紐⑤몢 援먯껜?⑸땲??
               </p>
             </div>
 
@@ -1445,7 +1553,7 @@ function ArcadeOpsControlPage() {
                 onClick={loadSnapshots}
                 disabled={isLoadingSnapshots}
               >
-                {isLoadingSnapshots ? '조회 중..' : '스냅샷 조회'}
+                {isLoadingSnapshots ? '議고쉶 以?.' : '?ㅻ깄??議고쉶'}
               </Button>
               {snapshots.length > 0 ? (
                 <Select
@@ -1453,7 +1561,7 @@ function ArcadeOpsControlPage() {
                   onValueChange={setSelectedSnapshotId}
                 >
                   <SelectTrigger className='w-64'>
-                    <SelectValue placeholder='스냅샷 선택' />
+                    <SelectValue placeholder='?ㅻ깄???좏깮' />
                   </SelectTrigger>
                   <SelectContent>
                     {snapshots.map((snap) => (
@@ -1473,20 +1581,21 @@ function ArcadeOpsControlPage() {
                 disabled={isRollingBack}
               >
                 {isRollingBack
-                  ? '롤백 중..'
-                  : `"${selectedSnapshotId}" 롤백 실행`}
+                  ? '濡ㅻ갚 以?.'
+                  : `"${selectedSnapshotId}" 濡ㅻ갚 ?ㅽ뻾`}
               </Button>
             ) : null}
           </div>
         </TabsContent>
 
-        {/* ════ 송출확인 탭 ════ */}
+        {/* ?먥븧?먥븧 ?≪텧?뺤씤 ???먥븧?먥븧 */}
         <TabsContent value='broadcast'>
           <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
             <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>송출 확인</h2>
+              <h2 className='text-base font-bold text-white'>?≪텧 ?뺤씤</h2>
               <p className='text-xs text-white/60'>
-                현재 공개 중인 데이터의 요약과 실시간 송출 화면을 확인합니다.
+                ?꾩옱 怨듦컻 以묒씤 ?곗씠?곗쓽 ?붿빟怨??ㅼ떆媛??≪텧
+                ?붾㈃???뺤씤?⑸땲??
               </p>
             </div>
 
@@ -1496,10 +1605,10 @@ function ArcadeOpsControlPage() {
               rel='noreferrer'
               className='inline-flex h-9 items-center gap-2 rounded-md border border-[#ff2a00]/30 bg-[#ff2a00]/10 px-4 text-sm font-semibold text-[#ffd6cf] transition-colors hover:bg-[#ff2a00]/20'
             >
-              실시간 송출 화면 열기 &rarr;
+              ?ㅼ떆媛??≪텧 ?붾㈃ ?닿린 &rarr;
             </a>
 
-            {/* 순위 미리보기 */}
+            {/* ?쒖쐞 誘몃━蹂닿린 */}
             <div className='rounded-xl border border-white/10 bg-white/[0.02] p-4'>
               <div className='flex items-center justify-between'>
                 <h3 className='text-sm font-bold text-white'>
@@ -1507,10 +1616,12 @@ function ArcadeOpsControlPage() {
                     OPS_REGION_OPTIONS.find((option) => option.value === region)
                       ?.label
                   }{' '}
-                  지역 순위
+                  吏???쒖쐞
                 </h3>
                 <span className='text-xs text-white/45'>
-                  {lastFeedAt ? `DB ${lastFeedAt} 갱신` : '갱신 대기'}
+                  {lastFeedAt
+                    ? `DB ${lastFeedAt} updated`
+                    : 'Waiting for update'}
                 </span>
               </div>
 
@@ -1522,17 +1633,17 @@ function ArcadeOpsControlPage() {
 
               {finalRanking.length === 0 ? (
                 <p className='mt-3 text-xs text-white/60'>
-                  운영 DB에 순위 데이터가 없습니다.
+                  ?댁쁺 DB???쒖쐞 ?곗씠?곌? ?놁뒿?덈떎.
                 </p>
               ) : (
                 <div className='mt-3 overflow-x-auto rounded-lg border border-white/10'>
                   <table className='min-w-full text-left text-xs'>
                     <thead className='bg-white/[0.07] text-white/70'>
                       <tr>
-                        <th className='px-3 py-2'>순위</th>
-                        <th className='px-3 py-2'>동더 네임</th>
-                        <th className='px-3 py-2'>전적</th>
-                        <th className='px-3 py-2'>상태</th>
+                        <th className='px-3 py-2'>?쒖쐞</th>
+                        <th className='px-3 py-2'>?숇뜑 ?ㅼ엫</th>
+                        <th className='px-3 py-2'>?꾩쟻</th>
+                        <th className='px-3 py-2'>?곹깭</th>
                       </tr>
                     </thead>
                     <tbody className='divide-y divide-white/[0.07]'>
@@ -1564,48 +1675,50 @@ function ArcadeOpsControlPage() {
               )}
             </div>
 
-            {/* 경기 진행 요약 */}
+            {/* 寃쎄린 吏꾪뻾 ?붿빟 */}
             <div className='rounded-xl border border-white/10 bg-white/[0.02] p-4'>
-              <h3 className='text-sm font-bold text-white'>경기 진행 요약</h3>
+              <h3 className='text-sm font-bold text-white'>
+                寃쎄린 吏꾪뻾 ?붿빟
+              </h3>
               <div className='mt-3 grid gap-2 text-xs md:grid-cols-2'>
                 <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
-                  <span className='text-white/55'>Swiss 진행:</span>{' '}
+                  <span className='text-white/55'>Swiss 吏꾪뻾:</span>{' '}
                   <span className='font-semibold text-white/80'>
                     {swissProgress.completed}/{swissProgress.total}
                   </span>
                 </div>
                 <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
-                  <span className='text-white/55'>Top8 진행:</span>{' '}
+                  <span className='text-white/55'>Top8 吏꾪뻾:</span>{' '}
                   <span className='font-semibold text-white/80'>
                     {finalsProgress.completed}/{finalsProgress.total}
                   </span>
                 </div>
                 <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                  <span className='text-white/55'>현재 Swiss:</span>{' '}
+                  <span className='text-white/55'>?꾩옱 Swiss:</span>{' '}
                   <span className='font-semibold text-white/80'>
                     {matchLine(swissProgress.current)}
                   </span>
                 </div>
                 <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                  <span className='text-white/55'>현재 Top8:</span>{' '}
+                  <span className='text-white/55'>?꾩옱 Top8:</span>{' '}
                   <span className='font-semibold text-white/80'>
                     {matchLine(finalsProgress.current)}
                   </span>
                 </div>
                 <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                  <span className='text-white/55'>A그룹:</span>{' '}
+                  <span className='text-white/55'>A洹몃９:</span>{' '}
                   <span className='font-semibold text-white/80'>
                     {regionArchive?.qualifiers.groupA
                       ? `${regionArchive.qualifiers.groupA.nickname} (${regionArchive.qualifiers.groupA.entryId})`
-                      : '미확정'}
+                      : 'TBD'}
                   </span>
                 </div>
                 <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                  <span className='text-white/55'>B그룹:</span>{' '}
+                  <span className='text-white/55'>B洹몃９:</span>{' '}
                   <span className='font-semibold text-white/80'>
                     {regionArchive?.qualifiers.groupB
                       ? `${regionArchive.qualifiers.groupB.nickname} (${regionArchive.qualifiers.groupB.entryId})`
-                      : '미확정'}
+                      : 'TBD'}
                   </span>
                 </div>
               </div>
@@ -1613,13 +1726,13 @@ function ArcadeOpsControlPage() {
           </div>
         </TabsContent>
 
-        {/* ════ 로그 탭 ════ */}
+        {/* ?먥븧?먥븧 濡쒓렇 ???먥븧?먥븧 */}
         <TabsContent value='log'>
           <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
             <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>발행 로그</h2>
+              <h2 className='text-base font-bold text-white'>諛쒗뻾 濡쒓렇</h2>
               <p className='text-xs text-white/60'>
-                송출/롤백/커밋 이력을 확인합니다 (최근 50건).
+                ?≪텧/濡ㅻ갚/而ㅻ컠 ?대젰???뺤씤?⑸땲??(理쒓렐 50嫄?.
               </p>
             </div>
 
@@ -1628,7 +1741,7 @@ function ArcadeOpsControlPage() {
               onClick={loadPublishLog}
               disabled={isLoadingLog}
             >
-              {isLoadingLog ? '조회 중..' : '발행 로그 조회'}
+              {isLoadingLog ? '議고쉶 以?.' : '諛쒗뻾 濡쒓렇 議고쉶'}
             </Button>
 
             {publishLog.length > 0 ? (
@@ -1637,11 +1750,11 @@ function ArcadeOpsControlPage() {
                   <thead className='bg-white/[0.07] text-white/70'>
                     <tr>
                       <th className='px-3 py-2'>ID</th>
-                      <th className='px-3 py-2'>모드</th>
-                      <th className='px-3 py-2'>시각</th>
-                      <th className='px-3 py-2'>시즌</th>
-                      <th className='px-3 py-2'>지역</th>
-                      <th className='px-3 py-2'>행</th>
+                      <th className='px-3 py-2'>紐⑤뱶</th>
+                      <th className='px-3 py-2'>?쒓컖</th>
+                      <th className='px-3 py-2'>?쒖쫵</th>
+                      <th className='px-3 py-2'>吏??</th>
+                      <th className='px-3 py-2'>??</th>
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-white/[0.07]'>

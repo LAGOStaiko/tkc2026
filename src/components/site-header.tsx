@@ -41,6 +41,29 @@ const navItems: NavItem[] = [
 
 const LOGO_SRC = '/branding/v2/logo.png'
 
+function getRuntimeBadge(pathname: string) {
+  if (pathname === '/ops' || pathname.startsWith('/ops/')) {
+    return 'EDIT'
+  }
+
+  const rawStage = String(
+    import.meta.env.VITE_APP_STAGE ??
+      import.meta.env.VITE_DEPLOY_STAGE ??
+      import.meta.env.MODE ??
+      'production'
+  )
+    .trim()
+    .toLowerCase()
+
+  if (!rawStage || ['prod', 'production', 'live'].includes(rawStage)) {
+    return null
+  }
+  if (['staging', 'stage', 'preview', 'test', 'testing', 'qa'].includes(rawStage)) {
+    return 'TEST'
+  }
+  return rawStage.toUpperCase().slice(0, 12)
+}
+
 function isActivePath(pathname: string, item: NavItem) {
   if (item.to === '/') return pathname === '/'
   return pathname === item.to || pathname.startsWith(`${item.to}/`)
@@ -52,6 +75,7 @@ export function SiteHeader() {
     select: (state) => state.location.pathname,
   })
   const siteName = data?.name ?? data?.title ?? t('meta.siteName')
+  const runtimeBadge = getRuntimeBadge(pathname)
 
   const header = useMemo(
     () => (
@@ -70,6 +94,11 @@ export function SiteHeader() {
               loading='eager'
               draggable={false}
             />
+            {runtimeBadge ? (
+              <span className='rounded-full border border-amber-300/50 bg-amber-300/20 px-2 py-0.5 text-[10px] font-semibold tracking-[0.08em] text-amber-100'>
+                {runtimeBadge}
+              </span>
+            ) : null}
             <span className='sr-only'>{siteName}</span>
           </Link>
 
@@ -160,7 +189,7 @@ export function SiteHeader() {
         </SiteContainer>
       </header>
     ),
-    [pathname, siteName]
+    [pathname, runtimeBadge, siteName]
   )
 
   // Rendering via a portal makes the header immune to any parent transforms/filters

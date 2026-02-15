@@ -95,7 +95,7 @@ function SongPoolPage() {
       {
         key: 'consoleFinals',
         label: '콘솔 결선',
-        dotColor: '#e86e3a',
+        dotColor: '#e74c3c',
         pool: consoleFinals,
       },
     ],
@@ -261,7 +261,7 @@ function PoolSection({
                 <span className='font-semibold tracking-widest text-white/25'>
                   ???
                 </span>
-                <span className='rounded bg-[#e86e3a]/[0.08] px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider text-[#e86e3a]'>
+                <span className='rounded bg-[#e74c3c]/[0.08] px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider text-[#e74c3c]'>
                   추후 공지
                 </span>
               </div>
@@ -333,7 +333,7 @@ function PoolSection({
                         <span className='font-semibold tracking-widest text-white/25'>
                           ???
                         </span>
-                        <span className='rounded bg-[#e86e3a]/[0.08] px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider text-[#e86e3a]'>
+                        <span className='rounded bg-[#e74c3c]/[0.08] px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider text-[#e74c3c]'>
                           추후 공지
                         </span>
                       </div>

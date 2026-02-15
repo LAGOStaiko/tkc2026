@@ -91,7 +91,7 @@ function SectionBlock({
   return (
     <section id={id} data-section={id} className='mb-20 scroll-mt-18'>
       <FadeIn>
-        <div className='mb-2 font-mono text-sm font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+        <div className='mb-2 font-mono text-sm font-semibold tracking-[2px] text-[#e74c3c] uppercase'>
           {stageLabel}
         </div>
         <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
@@ -117,7 +117,7 @@ function RecordBadge({ wins, losses }: { wins: number; losses: number }) {
       ? 'text-emerald-400'
       : wins >= 2
         ? 'text-[#f5a623]'
-        : 'text-[#e86e3a]'
+        : 'text-[#e74c3c]'
   return (
     <span className={cn('font-mono text-sm font-semibold', color)}>{text}</span>
   )
@@ -130,7 +130,7 @@ function StatusTag({ label }: { label: string }) {
       className={cn(
         'inline-block rounded-md border px-2.5 py-1 font-mono text-[11px] font-semibold tracking-wide',
         isQualify
-          ? 'border-[#e86e3a]/15 bg-[#e86e3a]/8 text-[#e86e3a]'
+          ? 'border-[#e74c3c]/15 bg-[#e74c3c]/8 text-[#e74c3c]'
           : 'border-[#1e1e1e] bg-white/[0.03] text-white/50'
       )}
     >
@@ -151,8 +151,8 @@ function ResultCallout({
   value: string
 }) {
   return (
-    <div className='flex items-center gap-3 rounded-xl border border-[#e86e3a]/12 bg-[#e86e3a]/4 px-5 py-3.5 text-[15px] text-white/65'>
-      <span className='size-1.5 shrink-0 rounded-full bg-[#e86e3a]' />
+    <div className='flex items-center gap-3 rounded-xl border border-[#e74c3c]/12 bg-[#e74c3c]/4 px-5 py-3.5 text-[15px] text-white/65'>
+      <span className='size-1.5 shrink-0 rounded-full bg-[#e74c3c]' />
       <span className='break-keep'>
         {label} <strong className='font-semibold text-white/90'>{value}</strong>
       </span>
@@ -213,13 +213,13 @@ function PodiumCard({
   return (
     <div className='tkc-arc-glow rounded-2xl'>
       <div className='relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] p-7 md:p-8'>
-        <div className='pointer-events-none absolute -top-8 -right-8 size-36 rounded-full bg-[#e86e3a]/4' />
+        <div className='pointer-events-none absolute -top-8 -right-8 size-36 rounded-full bg-[#e74c3c]/4' />
 
         <div
           className={cn(
             'absolute top-5 right-6 flex size-14 items-center justify-center rounded-full text-3xl font-black',
             isFirst
-              ? 'bg-[#e86e3a]/12 text-[#e86e3a] shadow-[0_0_24px_rgba(232,110,58,0.15)]'
+              ? 'bg-[#e74c3c]/12 text-[#e74c3c] shadow-[0_0_24px_rgba(231,76,60,0.15)]'
               : 'bg-[#f5a623]/10 text-[#f5a623] shadow-[0_0_24px_rgba(245,166,35,0.1)]'
           )}
         >
@@ -227,7 +227,7 @@ function PodiumCard({
         </div>
 
         <div className='relative'>
-          <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-[#e86e3a]'>
+          <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-[#e74c3c]'>
             {groupLabel}
           </div>
           <div className='text-2xl font-extrabold text-white md:text-[28px]'>
@@ -532,7 +532,7 @@ function ArcadeRegionDetailPage() {
           badge={`${roundLabel} · ${regionData.shortLabel}`}
           title={`${regionData.shortLabel} 아카이브`}
           subtitle={`${roundLabel} ${regionData.shortLabel} 지역 예선 결과입니다.`}
-          accentColor='#e86e3a'
+          accentColor='#e74c3c'
           gradientTo='#f5a623'
         />
       </div>
@@ -758,7 +758,7 @@ function ArcadeRegionDetailPage() {
                       <td
                         className={cn(
                           'w-14 px-4 py-3.5 text-center font-mono text-sm font-bold',
-                          idx === 0 ? 'text-[#e86e3a]' : 'text-white/50'
+                          idx === 0 ? 'text-[#e74c3c]' : 'text-white/50'
                         )}
                       >
                         {row.rank}
@@ -788,7 +788,7 @@ function ArcadeRegionDetailPage() {
                   <span
                     className={cn(
                       'w-7 text-center font-mono text-sm font-bold',
-                      idx === 0 ? 'text-[#e86e3a]' : 'text-white/40'
+                      idx === 0 ? 'text-[#e74c3c]' : 'text-white/40'
                     )}
                   >
                     {row.rank}
@@ -868,7 +868,7 @@ function ArcadeRegionDetailPage() {
                       <td
                         className={cn(
                           'w-14 px-4 py-3.5 text-center font-mono text-sm font-bold',
-                          idx === 0 ? 'text-[#e86e3a]' : 'text-white/50'
+                          idx === 0 ? 'text-[#e74c3c]' : 'text-white/50'
                         )}
                       >
                         {row.rank}
@@ -898,7 +898,7 @@ function ArcadeRegionDetailPage() {
                   <span
                     className={cn(
                       'w-7 text-center font-mono text-sm font-bold',
-                      idx === 0 ? 'text-[#e86e3a]' : 'text-white/40'
+                      idx === 0 ? 'text-[#e74c3c]' : 'text-white/40'
                     )}
                   >
                     {row.rank}
@@ -945,7 +945,7 @@ function ArcadeRegionDetailPage() {
       {/* ═══════════ Online Qualifiers ═══════════ */}
       <FadeIn>
         <section className='mb-20'>
-          <div className='mb-2 font-mono text-sm font-semibold tracking-[2px] text-[#e86e3a] uppercase'>
+          <div className='mb-2 font-mono text-sm font-semibold tracking-[2px] text-[#e74c3c] uppercase'>
             Qualifier
           </div>
           <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
@@ -998,7 +998,7 @@ function ArcadeRegionDetailPage() {
                         <td
                           className={cn(
                             'w-14 px-4 py-3.5 text-center font-mono text-sm font-bold',
-                            idx < 16 ? 'text-[#e86e3a]' : 'text-white/50'
+                            idx < 16 ? 'text-[#e74c3c]' : 'text-white/50'
                           )}
                         >
                           {row.rank}

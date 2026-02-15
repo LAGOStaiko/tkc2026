@@ -31,7 +31,7 @@ function MetaChip({
         variant === 'ready'
           ? 'border-emerald-400/15 bg-emerald-500/8 text-emerald-400'
           : variant === 'status'
-            ? 'border-[#e86e3a]/20 text-[#e86e3a]'
+            ? 'border-[#e74c3c]/20 text-[#e74c3c]'
             : 'border-[#1e1e1e] bg-white/[0.03] text-white/50'
       )}
     >
@@ -150,14 +150,14 @@ function ResultsHubPage() {
             className='tkc-arc-glow rounded-2xl'
             style={
               {
-                '--tkc-arc-glow-color': 'rgba(232,110,58,0.35)',
+                '--tkc-arc-glow-color': 'rgba(231,76,60,0.35)',
               } as CSSProperties
             }
           >
             <div className='relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] p-6 sm:p-8'>
-              <div className='pointer-events-none absolute -top-10 -right-10 size-40 rounded-full bg-[#e86e3a]/[0.04]' />
+              <div className='pointer-events-none absolute -top-10 -right-10 size-40 rounded-full bg-[#e74c3c]/[0.04]' />
               <div className='relative'>
-                <div className='font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e86e3a] uppercase'>
+                <div className='font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e74c3c] uppercase'>
                   Console Archive
                 </div>
                 <h2 className='mt-2.5 text-2xl font-extrabold tracking-tight text-white/90 sm:text-[26px]'>
@@ -184,7 +184,7 @@ function ResultsHubPage() {
             </h3>
             <a
               href='/arcade-results/2026/finals'
-              className='shrink-0 font-mono text-[13px] font-semibold text-[#e86e3a] transition-opacity hover:opacity-70'
+              className='shrink-0 font-mono text-[13px] font-semibold text-[#e74c3c] transition-opacity hover:opacity-70'
             >
               Top 8 결선 보기 →
             </a>
@@ -240,7 +240,7 @@ function ResultsHubPage() {
           <h3 className='text-[22px] font-bold tracking-tight text-white'>
             콘솔 결과
           </h3>
-          <div className='rounded-2xl border border-dashed border-[#e86e3a]/15 bg-[#111] px-8 py-10 text-center'>
+          <div className='rounded-2xl border border-dashed border-[#e74c3c]/15 bg-[#111] px-8 py-10 text-center'>
             <h4 className='text-lg font-bold text-white'>
               콘솔 아카이브 준비 중
             </h4>

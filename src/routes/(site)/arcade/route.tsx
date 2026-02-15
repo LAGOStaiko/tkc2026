@@ -39,7 +39,7 @@ const NAV_ITEMS = [
     phase: 'FINALS',
     label: 'PlayX4 결선',
     desc: 'Top 8 최종 결선',
-    color: '#e86e3a',
+    color: '#e74c3c',
   },
 ] as const
 

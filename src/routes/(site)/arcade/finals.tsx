@@ -24,9 +24,9 @@ type RoundOverviewItem = { name: string; info: string; songs: string; highlight?
 type RoundDetailItem = { name: string; songs: string; picks: string; challenge: boolean; highlight?: boolean }
 
 const OVERVIEW_STATS: OverviewStat[] = [
-  { value: '8명', label: '결선 진출자', sub: '예선 4-0 · 3-1 통과', color: '#e86e3a' },
+  { value: '8명', label: '결선 진출자', sub: '예선 4-0 · 3-1 통과', color: '#e74c3c' },
   { value: '단판', label: '대전 방식' },
-  { value: '5곡', label: '사전 준비', color: '#e86e3a' },
+  { value: '5곡', label: '사전 준비', color: '#e74c3c' },
   { value: '밴픽', label: '선곡 방식', color: '#f5a623' },
 ]
 
@@ -140,7 +140,7 @@ function SectionBlock({
   return (
     <section id={id} data-section={id} className='mb-20'>
       <FadeIn>
-        <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e74c3c] uppercase'>
           Section {num}
         </div>
         <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
@@ -241,12 +241,12 @@ function OverviewSection() {
               className={`rounded-xl p-5 text-center ${
                 r.highlight
                   ? 'border border-[#f5a623]/20 bg-[#f5a623]/[0.04]'
-                  : 'border border-[#e86e3a]/10 bg-[#e86e3a]/[0.04]'
+                  : 'border border-[#e74c3c]/10 bg-[#e74c3c]/[0.04]'
               }`}
             >
               <div
                 className='text-[22px] font-extrabold'
-                style={{ color: r.highlight ? '#f5a623' : '#e86e3a' }}
+                style={{ color: r.highlight ? '#f5a623' : '#e74c3c' }}
               >
                 {r.name}
               </div>
@@ -282,7 +282,7 @@ function BracketSection() {
   }, [])
 
   const tbd = 'bg-white/[0.03] text-white/35'
-  const hi = 'bg-[#e86e3a]/10 text-[#e86e3a]'
+  const hi = 'bg-[#e74c3c]/10 text-[#e74c3c]'
   const lo = 'bg-[#f5a623]/[0.08] text-[#f5a623]'
 
   const anim = (name: string, delay: number, extra = '') =>
@@ -328,8 +328,8 @@ function BracketSection() {
           100% { opacity: 0.6; transform: translateY(0); }
         }
         @keyframes bracket-final-glow {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(232,110,58,0); border-radius: 12px; }
-          50% { box-shadow: 0 0 20px 4px rgba(232,110,58,0.12); border-radius: 12px; }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0); border-radius: 12px; }
+          50% { box-shadow: 0 0 20px 4px rgba(231,76,60,0.12); border-radius: 12px; }
         }
         @keyframes bracket-3rd-glow {
           0%, 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0); border-radius: 12px; }
@@ -344,7 +344,7 @@ function BracketSection() {
           <div style={anim('bracket-col-in', 0)}>
             <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
               <div
-                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e86e3a]'
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
                 style={sweep(150)}
               />
               Quarterfinals
@@ -368,7 +368,7 @@ function BracketSection() {
           <div style={anim('bracket-col-in', 550)}>
             <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
               <div
-                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e86e3a]'
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
                 style={sweep(700)}
               />
               Semifinals
@@ -392,7 +392,7 @@ function BracketSection() {
           <div style={anim('bracket-col-in', 950)}>
             <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
               <div
-                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e86e3a]'
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
                 style={sweep(1100)}
               />
               Grand Final
@@ -420,7 +420,7 @@ function BracketSection() {
           <div style={anim('bracket-col-in', 0)}>
             <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
               <div
-                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e86e3a]'
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
                 style={sweep(150)}
               />
               Quarterfinals
@@ -440,7 +440,7 @@ function BracketSection() {
             </div>
           </div>
           <div
-            className='py-1 text-center font-mono text-[11px] font-semibold tracking-[1px] text-[#e86e3a]'
+            className='py-1 text-center font-mono text-[11px] font-semibold tracking-[1px] text-[#e74c3c]'
             style={
               inView
                 ? {
@@ -456,7 +456,7 @@ function BracketSection() {
           <div style={anim('bracket-col-in', 650)}>
             <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
               <div
-                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e86e3a]'
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
                 style={sweep(800)}
               />
               Semifinals
@@ -476,7 +476,7 @@ function BracketSection() {
             </div>
           </div>
           <div
-            className='py-1 text-center font-mono text-[11px] font-semibold tracking-[1px] text-[#e86e3a]'
+            className='py-1 text-center font-mono text-[11px] font-semibold tracking-[1px] text-[#e74c3c]'
             style={
               inView
                 ? {
@@ -492,7 +492,7 @@ function BracketSection() {
           <div style={anim('bracket-col-in', 1100)}>
             <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
               <div
-                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e86e3a]'
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
                 style={sweep(1250)}
               />
               Grand Final
@@ -560,7 +560,7 @@ function PrepSection() {
       {/* Desktop */}
       <div className='hidden items-stretch gap-0 sm:flex'>
         {[
-          { num: '5', label: '사전 준비 곡', desc: '선곡풀에서 선택', color: '#e86e3a' },
+          { num: '5', label: '사전 준비 곡', desc: '선곡풀에서 선택', color: '#e74c3c' },
           { num: '밴', label: '상대가 제거', desc: '해당 라운드 사용 불가', color: undefined },
           { num: '픽', label: '잔여 곡 선택', desc: '경기에 사용할 곡 확정', color: '#f5a623' },
         ].map((step, i) => (
@@ -578,7 +578,7 @@ function PrepSection() {
               <div className='mt-1 text-sm text-white/35'>{step.desc}</div>
             </div>
             {i < 2 && (
-              <span className='shrink-0 px-1 text-lg text-[#e86e3a]'>→</span>
+              <span className='shrink-0 px-1 text-lg text-[#e74c3c]'>→</span>
             )}
           </div>
         ))}
@@ -586,7 +586,7 @@ function PrepSection() {
       {/* Mobile */}
       <div className='flex flex-col gap-0 sm:hidden'>
         {[
-          { num: '5', label: '사전 준비 곡', desc: '선곡풀에서 선택', color: '#e86e3a' },
+          { num: '5', label: '사전 준비 곡', desc: '선곡풀에서 선택', color: '#e74c3c' },
           { num: '밴', label: '상대가 제거', desc: '해당 라운드 사용 불가', color: undefined },
           { num: '픽', label: '잔여 곡 선택', desc: '경기에 사용할 곡 확정', color: '#f5a623' },
         ].map((step, i) => (
@@ -604,7 +604,7 @@ function PrepSection() {
               <div className='mt-1 text-sm text-white/35'>{step.desc}</div>
             </div>
             {i < 2 && (
-              <div className='flex justify-center py-0.5 text-[#e86e3a]'>▼</div>
+              <div className='flex justify-center py-0.5 text-[#e74c3c]'>▼</div>
             )}
           </div>
         ))}
@@ -618,7 +618,7 @@ function PrepSection() {
             key={rule.num}
             className='flex gap-3.5 border-b border-[#1e1e1e] py-3.5 last:border-b-0'
           >
-            <div className='flex size-7 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-[#e86e3a] font-mono text-base font-extrabold text-[#e86e3a]'>
+            <div className='flex size-7 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-[#e74c3c] font-mono text-base font-extrabold text-[#e74c3c]'>
               {rule.num}
             </div>
             <div className='text-[15px] leading-[1.55] break-keep text-white/55'>
@@ -690,7 +690,7 @@ function BanPickSection() {
       ? {
           boxShadow: finals && i >= 2
             ? '0 0 20px 3px rgba(245,166,35,0.15)'
-            : '0 0 20px 3px rgba(232,110,58,0.15)',
+            : '0 0 20px 3px rgba(231,76,60,0.15)',
           zIndex: 10 as const,
         }
       : step >= 0
@@ -710,7 +710,7 @@ function BanPickSection() {
             className='size-1.5 rounded-full transition-all duration-300'
             style={{
               background: step === i
-                ? (finals && i >= 2 ? '#f5a623' : '#e86e3a')
+                ? (finals && i >= 2 ? '#f5a623' : '#e74c3c')
                 : 'rgba(255,255,255,0.12)',
               transform: step === i ? 'scale(1.4)' : 'scale(1)',
             }}
@@ -733,7 +733,7 @@ function BanPickSection() {
         className={`inline-block rounded-[5px] px-3 py-1 font-mono text-xs font-semibold tracking-[1px] ${
           type === 'ban'
             ? 'bg-white/[0.05] text-white/55'
-            : 'bg-[#e86e3a]/10 text-[#e86e3a]'
+            : 'bg-[#e74c3c]/10 text-[#e74c3c]'
         }`}
       >
         {type.toUpperCase()}
@@ -767,7 +767,7 @@ function BanPickSection() {
                 <div
                   className='absolute top-0 right-0 left-0 h-0.5'
                   style={{
-                    background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
+                    background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e74c3c',
                   }}
                 />
                 <div className='mb-2.5 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
@@ -780,7 +780,7 @@ function BanPickSection() {
                   className={`inline-block rounded-[5px] px-3 py-1 font-mono text-xs font-semibold tracking-[1px] ${
                     s.type === 'ban'
                       ? 'bg-white/[0.05] text-white/55'
-                      : 'bg-[#e86e3a]/10 text-[#e86e3a]'
+                      : 'bg-[#e74c3c]/10 text-[#e74c3c]'
                   }`}
                 >
                   {s.type.toUpperCase()}
@@ -802,7 +802,7 @@ function BanPickSection() {
                 <div
                   className='absolute top-0 right-0 left-0 h-0.5'
                   style={{
-                    background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e86e3a',
+                    background: s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e74c3c',
                   }}
                 />
                 <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
@@ -815,7 +815,7 @@ function BanPickSection() {
                   className={`inline-block rounded-[5px] px-3 py-1 font-mono text-xs font-semibold tracking-[1px] ${
                     s.type === 'ban'
                       ? 'bg-white/[0.05] text-white/55'
-                      : 'bg-[#e86e3a]/10 text-[#e86e3a]'
+                      : 'bg-[#e74c3c]/10 text-[#e74c3c]'
                   }`}
                 >
                   {s.type.toUpperCase()}
@@ -913,7 +913,7 @@ function RoundsSection() {
             key={r.name}
             className={`overflow-hidden rounded-2xl border transition-colors ${
               r.highlight
-                ? 'border-[#e86e3a]/35 shadow-[0_0_24px_rgba(232,110,58,0.06),inset_0_0_0_1px_rgba(232,110,58,0.05)]'
+                ? 'border-[#e74c3c]/35 shadow-[0_0_24px_rgba(231,76,60,0.06),inset_0_0_0_1px_rgba(231,76,60,0.05)]'
                 : 'border-[#1e1e1e] hover:border-[#2a2a2a]'
             }`}
           >
@@ -921,16 +921,16 @@ function RoundsSection() {
             <div className='hidden sm:grid sm:grid-cols-[150px_1fr]'>
               <div
                 className={`flex flex-col items-center justify-center border-r border-[#1e1e1e] px-4 py-7 ${
-                  r.highlight ? 'bg-[#e86e3a]/[0.06]' : 'bg-[#111]'
+                  r.highlight ? 'bg-[#e74c3c]/[0.06]' : 'bg-[#111]'
                 }`}
               >
                 <div
                   className='text-[22px] font-extrabold'
-                  style={{ color: r.highlight ? '#e86e3a' : 'rgba(255,255,255,0.9)' }}
+                  style={{ color: r.highlight ? '#e74c3c' : 'rgba(255,255,255,0.9)' }}
                 >
                   {r.name}
                 </div>
-                <div className='mt-0.5 font-mono text-sm font-semibold text-[#e86e3a]'>
+                <div className='mt-0.5 font-mono text-sm font-semibold text-[#e74c3c]'>
                   {r.songs}
                 </div>
               </div>
@@ -944,12 +944,12 @@ function RoundsSection() {
                   </span>
                 </div>
                 {r.challenge && (
-                  <div className='inline-flex items-center gap-2.5 self-start rounded-xl border border-dashed border-[#e86e3a]/15 bg-[#e86e3a]/[0.03] px-4 py-3'>
+                  <div className='inline-flex items-center gap-2.5 self-start rounded-xl border border-dashed border-[#e74c3c]/15 bg-[#e74c3c]/[0.03] px-4 py-3'>
                     <div className='text-xs font-semibold text-white/35'>과제곡</div>
                     <div className='font-mono text-xl font-bold tracking-[3px] text-white/35'>
                       ???
                     </div>
-                    <div className='font-mono text-[11px] font-semibold text-[#e86e3a] opacity-50'>
+                    <div className='font-mono text-[11px] font-semibold text-[#e74c3c] opacity-50'>
                       추후 공개
                     </div>
                   </div>
@@ -961,17 +961,17 @@ function RoundsSection() {
             <div className='sm:hidden'>
               <div
                 className={`relative flex items-center gap-3 border-b border-[#1e1e1e] px-5 py-4 ${
-                  r.highlight ? 'bg-[#e86e3a]/[0.06]' : 'bg-[#111]'
+                  r.highlight ? 'bg-[#e74c3c]/[0.06]' : 'bg-[#111]'
                 }`}
               >
-                <div className='absolute top-0 right-0 left-0 h-[3px] bg-[#e86e3a] opacity-40' />
+                <div className='absolute top-0 right-0 left-0 h-[3px] bg-[#e74c3c] opacity-40' />
                 <div
                   className='text-[22px] font-extrabold'
-                  style={{ color: r.highlight ? '#e86e3a' : 'rgba(255,255,255,0.9)' }}
+                  style={{ color: r.highlight ? '#e74c3c' : 'rgba(255,255,255,0.9)' }}
                 >
                   {r.name}
                 </div>
-                <div className='font-mono text-sm font-semibold text-[#e86e3a]'>
+                <div className='font-mono text-sm font-semibold text-[#e74c3c]'>
                   {r.songs}
                 </div>
               </div>
@@ -985,12 +985,12 @@ function RoundsSection() {
                   </span>
                 </div>
                 {r.challenge && (
-                  <div className='inline-flex items-center gap-2.5 self-start rounded-xl border border-dashed border-[#e86e3a]/15 bg-[#e86e3a]/[0.03] px-4 py-3'>
+                  <div className='inline-flex items-center gap-2.5 self-start rounded-xl border border-dashed border-[#e74c3c]/15 bg-[#e74c3c]/[0.03] px-4 py-3'>
                     <div className='text-xs font-semibold text-white/35'>과제곡</div>
                     <div className='font-mono text-xl font-bold tracking-[3px] text-white/35'>
                       ???
                     </div>
-                    <div className='font-mono text-[11px] font-semibold text-[#e86e3a] opacity-50'>
+                    <div className='font-mono text-[11px] font-semibold text-[#e74c3c] opacity-50'>
                       추후 공개
                     </div>
                   </div>
@@ -1018,7 +1018,7 @@ function PlayRulesSection() {
             key={rule.title}
             className='relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] p-6 transition-colors hover:border-[#2a2a2a]'
           >
-            <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#e86e3a] opacity-40' />
+            <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#e74c3c] opacity-40' />
             <div className='mb-3 flex items-center gap-2.5'>
               <div className='flex size-[30px] shrink-0 items-center justify-center'>
                 {PLAY_RULE_ICON_MAP[rule.icon] ? (
@@ -1054,7 +1054,7 @@ function PlayRulesSection() {
 
       <Callout type='danger' icon={<TkcIcon name='warning' />}>
         선수 과실에 의한 미스는{' '}
-        <strong className='text-[#e86e3a]'>재경기 사유에 해당하지 않습니다.</strong>
+        <strong className='text-[#e74c3c]'>재경기 사유에 해당하지 않습니다.</strong>
       </Callout>
     </SectionBlock>
   )

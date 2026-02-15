@@ -23,7 +23,7 @@ const NAV_ITEMS = [
 ]
 
 const STAT_ITEMS = [
-  { value: '4회', label: '오프라인 예선', color: '#e86e3a' },
+  { value: '4회', label: '오프라인 예선', color: '#e74c3c' },
   { value: '16명', label: '지역별 참가자', color: '#f5a623' },
   { value: '2명', label: '회차별 진출', color: '#f7d154' },
   { value: 'Top 8', label: '결선 진출 인원', color: '#f7d154' },
@@ -130,7 +130,7 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
     },
     {
       record: '0-2',
-      recordCls: 'text-[#e86e3a] bg-[#e86e3a]/[0.08]',
+      recordCls: 'text-[#e74c3c] bg-[#e74c3c]/[0.08]',
       count: 4,
       tag: '탈락',
       tagType: 'eliminated',
@@ -155,7 +155,7 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
     },
     {
       record: '1-2',
-      recordCls: 'text-[#e86e3a] bg-[#e86e3a]/[0.08]',
+      recordCls: 'text-[#e74c3c] bg-[#e74c3c]/[0.08]',
       count: 4,
       tag: '탈락',
       tagType: 'eliminated',
@@ -182,7 +182,7 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
     },
     {
       record: '2-2',
-      recordCls: 'text-[#e86e3a] bg-[#e86e3a]/[0.08]',
+      recordCls: 'text-[#e74c3c] bg-[#e74c3c]/[0.08]',
       count: 3,
       tag: '탈락',
       tagType: 'eliminated',
@@ -261,7 +261,7 @@ function SwissAnimator() {
         }
         @keyframes swiss-eliminate {
           0% { opacity: 0; transform: translateY(14px); border-color: #1e1e1e; }
-          50% { opacity: 1; transform: translateY(0); border-color: rgba(232,110,58,0.4); }
+          50% { opacity: 1; transform: translateY(0); border-color: rgba(231,76,60,0.4); }
           100% { opacity: 1; transform: translateY(0); border-color: #1e1e1e; }
         }
         @keyframes swiss-qualified-glow {
@@ -331,7 +331,7 @@ function SwissAnimator() {
                 <span
                   className={`rounded px-2 py-0.5 text-[11px] font-semibold ${
                     g.tagType === 'eliminated'
-                      ? 'bg-[#e86e3a]/[0.08] text-[#e86e3a]'
+                      ? 'bg-[#e74c3c]/[0.08] text-[#e74c3c]'
                       : g.tagType === 'qualified'
                         ? 'bg-[#f7d154]/[0.08] text-[#f7d154]'
                         : 'bg-[#f5a623]/[0.08] text-[#f5a623]'
@@ -490,7 +490,7 @@ function SwissSection() {
       desc='같은 전적의 참가자끼리 매칭하는 스위스 시스템. 패배가 2회 누적되면 즉시 탈락합니다.'
     >
       <Callout type='danger' icon={<TkcIcon name='warning' />}>
-        <strong className='text-[#e86e3a]'>2패 누적 시 즉시 탈락</strong> — 0-2,
+        <strong className='text-[#e74c3c]'>2패 누적 시 즉시 탈락</strong> — 0-2,
         1-2, 2-2 등 패배가 2회 누적되는 순간 스테이지가 종료되며, 이후 라운드에
         배정되지 않습니다.
       </Callout>
@@ -649,9 +649,9 @@ function SideSection() {
       <Card>
         {/* Mobile */}
         <div className='flex flex-col items-center gap-4 sm:hidden'>
-          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e86e3a] bg-[#e86e3a]/[0.06]'>
+          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e74c3c] bg-[#e74c3c]/[0.06]'>
             <img src='/characters/arcade-side-1p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
-            <div className='text-sm font-bold text-[#e86e3a]'>1P</div>
+            <div className='text-sm font-bold text-[#e74c3c]'>1P</div>
           </div>
           <div className='text-center text-xs leading-[1.55] text-white/35'>
             자기 곡 차례에
@@ -665,9 +665,9 @@ function SideSection() {
         </div>
         {/* Desktop */}
         <div className='hidden items-center justify-center gap-8 py-7 sm:flex'>
-          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e86e3a] bg-[#e86e3a]/[0.06]'>
+          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e74c3c] bg-[#e74c3c]/[0.06]'>
             <img src='/characters/arcade-side-1p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
-            <div className='text-sm font-bold text-[#e86e3a]'>1P</div>
+            <div className='text-sm font-bold text-[#e74c3c]'>1P</div>
           </div>
           <div className='text-center text-[13px] leading-[1.55] text-white/35'>
             자기 곡 차례에
@@ -687,8 +687,8 @@ function SideSection() {
           곡별 사이드 선택
         </div>
         <div className='grid grid-cols-2 gap-2'>
-          <div className='rounded-xl border border-[#e86e3a]/[0.12] bg-[#e86e3a]/[0.04] p-4 text-center'>
-            <div className='mb-1 text-[13px] font-semibold text-[#e86e3a]'>
+          <div className='rounded-xl border border-[#e74c3c]/[0.12] bg-[#e74c3c]/[0.04] p-4 text-center'>
+            <div className='mb-1 text-[13px] font-semibold text-[#e74c3c]'>
               A의 곡 진행 시
             </div>
             <div className='text-[15px] font-bold text-white/90'>

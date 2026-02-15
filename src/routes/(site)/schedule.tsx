@@ -643,7 +643,7 @@ function SectionBlock({
   return (
     <section id={id} data-section={id} className='mb-20'>
       <FadeIn>
-        <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
+        <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e74c3c] uppercase'>
           Section {num}
         </div>
         <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
@@ -695,7 +695,7 @@ function ModeTag({ mode }: { mode: 'online' | 'offline' }) {
       className={`shrink-0 rounded-[5px] px-2.5 py-1 font-mono text-[11px] font-semibold tracking-wide ${
         mode === 'online'
           ? 'bg-[#4a9eff]/[0.08] text-[#4a9eff]'
-          : 'bg-[#e86e3a]/[0.08] text-[#e86e3a]'
+          : 'bg-[#e74c3c]/[0.08] text-[#e74c3c]'
       }`}
     >
       {mode.toUpperCase()}
@@ -768,7 +768,7 @@ function SchedulePanel({
               </div>
               <div
                 className={`mt-1.5 h-2 w-2 shrink-0 rounded-full sm:mt-0 sm:h-2.5 sm:w-2.5 ${
-                  variant === 'console' ? 'bg-[#e86e3a]' : 'bg-[#f5a623]'
+                  variant === 'console' ? 'bg-[#e74c3c]' : 'bg-[#f5a623]'
                 }`}
               />
               <div className='min-w-0 flex-1'>
@@ -848,11 +848,11 @@ function Timeline({ groups }: { groups: TimelineGroupData[] }) {
             <div
               className={`absolute -left-9 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-[#0a0a0a] ${
                 group.entries.some((e) => e.isFinals)
-                  ? 'bg-[#e86e3a] shadow-[0_0_0_3px_rgba(232,110,58,0.15),0_0_8px_rgba(232,110,58,0.3)]'
-                  : 'bg-[#e86e3a] shadow-[0_0_0_2px_rgba(232,110,58,0.2)]'
+                  ? 'bg-[#e74c3c] shadow-[0_0_0_3px_rgba(231,76,60,0.15),0_0_8px_rgba(231,76,60,0.3)]'
+                  : 'bg-[#e74c3c] shadow-[0_0_0_2px_rgba(231,76,60,0.2)]'
               }`}
             />
-            <span className='font-mono text-base font-semibold tracking-wide text-[#e86e3a]'>
+            <span className='font-mono text-base font-semibold tracking-wide text-[#e74c3c]'>
               {group.dateLabel}
             </span>
           </div>
@@ -864,14 +864,14 @@ function Timeline({ groups }: { groups: TimelineGroupData[] }) {
                 key={i}
                 className={`flex items-center gap-3.5 rounded-xl border px-5 py-4 transition-colors hover:border-[#2a2a2a] ${
                   entry.isFinals
-                    ? 'border-[#e86e3a]/25 bg-[#111]'
+                    ? 'border-[#e74c3c]/25 bg-[#111]'
                     : 'border-[#1e1e1e] bg-[#111]'
                 }`}
               >
                 <div
                   className={`h-2.5 w-2.5 shrink-0 rounded-full ${
-                    entry.division === 'arcade' ? 'bg-[#f5a623]' : 'bg-[#e86e3a]'
-                  } ${entry.isFinals ? 'shadow-[0_0_6px_rgba(232,110,58,0.4)]' : ''}`}
+                    entry.division === 'arcade' ? 'bg-[#f5a623]' : 'bg-[#e74c3c]'
+                  } ${entry.isFinals ? 'shadow-[0_0_6px_rgba(231,76,60,0.4)]' : ''}`}
                 />
                 <div className='min-w-0 flex-1'>
                   <div className='text-[15px] font-semibold break-keep text-white/90'>
@@ -916,12 +916,12 @@ function Timeline({ groups }: { groups: TimelineGroupData[] }) {
 
 function FinalsTeaser({ title, meta }: { title: string; meta: string }) {
   return (
-    <div className='relative overflow-hidden rounded-2xl border border-[#e86e3a]/20 bg-[#111] px-8 py-10 text-center'>
-      <div className='absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#e86e3a] to-transparent' />
-      <div className='pointer-events-none absolute -top-16 left-1/2 h-[200px] w-[400px] -translate-x-1/2 bg-[radial-gradient(ellipse,rgba(232,110,58,0.06)_0%,transparent_70%)]' />
+    <div className='relative overflow-hidden rounded-2xl border border-[#e74c3c]/20 bg-[#111] px-8 py-10 text-center'>
+      <div className='absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#e74c3c] to-transparent' />
+      <div className='pointer-events-none absolute -top-16 left-1/2 h-[200px] w-[400px] -translate-x-1/2 bg-[radial-gradient(ellipse,rgba(231,76,60,0.06)_0%,transparent_70%)]' />
 
       <div className='relative'>
-        <div className='mb-3 font-mono text-xs font-semibold tracking-[1px] text-[#e86e3a] uppercase'>
+        <div className='mb-3 font-mono text-xs font-semibold tracking-[1px] text-[#e74c3c] uppercase'>
           PlayX4 2026 · Finals
         </div>
         <div className='mb-2 text-2xl font-extrabold tracking-tight text-white/90 md:text-[30px]'>
@@ -930,7 +930,7 @@ function FinalsTeaser({ title, meta }: { title: string; meta: string }) {
         <p className='text-[15px] leading-[1.55] break-keep text-white/55'>
           콘솔 · 아케이드 결선이 동시 진행됩니다.
         </p>
-        <div className='mt-6 inline-flex items-center gap-2 rounded-[10px] border border-dashed border-[#e86e3a]/20 bg-[#e86e3a]/[0.06] px-6 py-3 font-mono text-[15px] font-semibold tracking-wide text-white/55'>
+        <div className='mt-6 inline-flex items-center gap-2 rounded-[10px] border border-dashed border-[#e74c3c]/20 bg-[#e74c3c]/[0.06] px-6 py-3 font-mono text-[15px] font-semibold tracking-wide text-white/55'>
           {meta}
         </div>
       </div>
@@ -1068,7 +1068,7 @@ function SchedulePage() {
       >
         <div className='mb-7 flex gap-6'>
           <div className='flex items-center gap-2.5 text-[15px] text-white/55'>
-            <div className='h-2.5 w-2.5 rounded-full bg-[#e86e3a]' />
+            <div className='h-2.5 w-2.5 rounded-full bg-[#e74c3c]' />
             콘솔
           </div>
           <div className='flex items-center gap-2.5 text-[15px] text-white/55'>

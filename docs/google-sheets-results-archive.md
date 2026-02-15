@@ -13,6 +13,18 @@ Set these environment variables in Cloudflare Pages:
 
 - `GAS_WEBAPP_URL` = deployed Apps Script Web App URL (e.g. `https://script.google.com/macros/s/.../exec`)
 - `GAS_API_KEY` = shared secret (same value in GAS Script Properties `API_KEY`)
+- `TKC_ENV_TIER` = `production | staging | edit` (optional, default `production`)
+
+Optional tier-specific endpoints (recommended for production/staging split):
+
+- `GAS_WEBAPP_URL_PRODUCTION`
+- `GAS_WEBAPP_URL_STAGING`
+- `GAS_WEBAPP_URL_EDIT`
+
+Optional resiliency tuning:
+
+- `GAS_FETCH_TIMEOUT_MS` (default `12000`)
+- `GAS_FETCH_RETRIES` (default `1`, read actions only)
 
 Optional for local Vite dev:
 

@@ -38,8 +38,8 @@ export function Callout({
 }) {
   const cls = {
     info: 'bg-[#f5a623]/[0.04] border-[#f5a623]/[0.12]',
-    warning: 'bg-[#e86e3a]/[0.04] border-[#e86e3a]/[0.12]',
-    danger: 'bg-[#e86e3a]/[0.04] border-[#e86e3a]/[0.12]',
+    warning: 'bg-[#e74c3c]/[0.04] border-[#e74c3c]/[0.12]',
+    danger: 'bg-[#e74c3c]/[0.04] border-[#e74c3c]/[0.12]',
   }
   return (
     <div
