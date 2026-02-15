@@ -216,30 +216,41 @@ function ConsoleLayout() {
   return (
     <div className='w-full'>
       {/* ── Hero ── */}
-      <section className='relative overflow-hidden pt-12 pb-8 sm:pt-16 sm:pb-10 md:pt-24 md:pb-14'>
-        <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(232,110,58,0.15)_0%,transparent_70%)]' />
-        <div className='relative'>
-          <FadeIn>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e86e3a]/20 bg-[#e86e3a]/[0.08] px-3.5 py-1.5 text-[13px] font-medium tracking-wide text-[#e86e3a]'>
-              <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a]' />
-              CONSOLE DIVISION
-            </div>
-          </FadeIn>
-          <FadeIn delay={120}>
-            <h1 className='text-[clamp(30px,8.5vw,56px)] leading-[1.1] font-extrabold tracking-tight'>
-              <span className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'>
-                콘솔 예선
-              </span>
-              <br />
-              참가 안내
-            </h1>
-          </FadeIn>
-          <FadeIn delay={240}>
-            <p className='mt-4 max-w-[520px] text-[15px] leading-[1.55] font-light break-keep text-white/55'>
-              과제곡 2곡을 플레이하고 영상을 제출하세요. 합산 점수 상위 4명이
-              결선에 진출합니다.
-            </p>
-          </FadeIn>
+      <section className='-mt-20 overflow-hidden md:-mt-24'>
+        <div className='relative h-[320px] sm:h-[380px] md:h-[520px] lg:h-[560px]'>
+          <img
+            src='/branding/hero.jpg'
+            alt=''
+            className='absolute inset-0 h-full w-full object-cover object-[center_top] md:object-center'
+            loading='eager'
+            draggable={false}
+          />
+          <div className='absolute inset-0 bg-black/25' />
+          <div className='absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent' />
+          <div className='absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black via-black/70 to-transparent' />
+          <div className='absolute inset-x-0 bottom-0 px-6 pb-8 sm:px-10 sm:pb-10 md:pb-14'>
+            <FadeIn>
+              <div className='mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e86e3a] backdrop-blur-md'>
+                <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e86e3a] shadow-[0_0_8px_#e86e3a]' />
+                CONSOLE DIVISION
+              </div>
+            </FadeIn>
+            <FadeIn delay={120}>
+              <h1 className='drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] text-[clamp(30px,8.5vw,56px)] leading-[1.1] font-extrabold tracking-tight'>
+                <span className='bg-gradient-to-br from-[#e86e3a] to-[#f5a623] bg-clip-text text-transparent'>
+                  콘솔 예선
+                </span>
+                <br />
+                <span className='text-white'>참가 안내</span>
+              </h1>
+            </FadeIn>
+            <FadeIn delay={240}>
+              <p className='mt-4 max-w-[520px] text-[15px] leading-[1.55] font-light break-keep text-white/70 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]'>
+                과제곡 2곡을 플레이하고 영상을 제출하세요. 합산 점수 상위 4명이
+                결선에 진출합니다.
+              </p>
+            </FadeIn>
+          </div>
         </div>
       </section>
 

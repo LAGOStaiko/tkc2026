@@ -7,7 +7,9 @@ const WORM_SPRITES = Array.from(
   (_, i) => `/loading/worm_${i + 1}.png`,
 )
 
-const MIN_VISIBLE_MS = 900
+const WORM_FRAME_MS = 200
+const WORM_CYCLE_MS = WORM_SPRITES.length * WORM_FRAME_MS
+const MIN_VISIBLE_MS = Math.max(900, WORM_CYCLE_MS)
 const FADE_OUT_MS = 350
 
 type OverlayState = 'hidden' | 'visible' | 'exiting'
@@ -112,7 +114,7 @@ export function GlobalLoadingOverlay() {
     if (overlayState === 'hidden') return
     const id = window.setInterval(() => {
       setSpriteIdx((prev) => (prev + 1) % WORM_SPRITES.length)
-    }, 280)
+    }, WORM_FRAME_MS)
     return () => window.clearInterval(id)
   }, [overlayState])
 
