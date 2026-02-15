@@ -192,7 +192,7 @@ function HomePage() {
             <FadeIn delay={120}>
               <h1 className='text-[28px] leading-[1.15] font-extrabold tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)]'>
                 <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-transparent'>
-                  태고 코리아
+                  태고의 달인 코리아
                 </span>
                 <br />
                 <span className='text-white'>챔피언십 2026</span>

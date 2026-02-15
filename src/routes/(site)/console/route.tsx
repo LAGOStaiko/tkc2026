@@ -267,7 +267,7 @@ function ConsoleLayout() {
         <p className='text-xs leading-[1.55] text-white/35'>
           ※ 세부 사항은 운영진 판단에 따라 변경될 수 있습니다.
           <br />
-          TKC 2026 — 태고 코리아 챔피언십 · 콘솔 부문 규정
+          TKC 2026 — 태고의 달인 코리아 챔피언십 · 콘솔 부문 규정
         </p>
       </footer>
     </div>
