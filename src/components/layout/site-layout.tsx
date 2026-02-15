@@ -1,8 +1,17 @@
-import { Outlet } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { Outlet, useRouterState } from '@tanstack/react-router'
 import { SiteHeader } from '@/components/site-header'
 import { SiteContainer } from '@/components/site/site-container'
 
 export function SiteLayout() {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [pathname])
+
   return (
     <div className='site-scope dark min-h-svh overflow-x-hidden bg-black text-foreground'>
       <div className='relative'>

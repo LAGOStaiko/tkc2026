@@ -70,16 +70,19 @@ const FLOW_STEPS = [
     title: 'A 선수의 곡',
     desc: 'A가 사전 제출한\n해당 라운드 곡',
     icon: 'song-pick',
+    charIcon: '/characters/arcade-flow-a-song.png',
   },
   {
     title: 'B 선수의 곡',
     desc: 'B가 사전 제출한\n해당 라운드 곡',
     icon: 'song-pick',
+    charIcon: '/characters/arcade-flow-b-song.png',
   },
   {
     title: '2곡 합산',
     desc: '두 곡 점수를 합산\n고득점자 승리',
     icon: 'summary',
+    charIcon: '/characters/arcade-flow-summary.png',
   },
 ] as const
 
@@ -565,7 +568,7 @@ function MatchSection() {
               className={`border border-[#1e1e1e] bg-[#111] px-4 py-5 text-center ${i === 0 ? 'rounded-t-2xl' : i === 2 ? 'rounded-b-2xl' : ''}`}
             >
               <div className='mb-2'>
-                <TkcIcon name={step.icon} className='mx-auto size-7' />
+                <img src={step.charIcon} alt='' className='mx-auto size-7 object-contain' loading='lazy' draggable={false} />
               </div>
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
@@ -589,7 +592,7 @@ function MatchSection() {
               className={`flex-1 border border-[#1e1e1e] bg-[#111] px-4 py-5 text-center ${i === 0 ? 'rounded-l-2xl' : i === 2 ? 'rounded-r-2xl' : ''}`}
             >
               <div className='mb-2'>
-                <TkcIcon name={step.icon} className='mx-auto size-7' />
+                <img src={step.charIcon} alt='' className='mx-auto size-7 object-contain' loading='lazy' draggable={false} />
               </div>
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
@@ -647,7 +650,7 @@ function SideSection() {
         {/* Mobile */}
         <div className='flex flex-col items-center gap-4 sm:hidden'>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e86e3a] bg-[#e86e3a]/[0.06]'>
-            <TkcIcon name='match' className='mb-1.5 size-8' />
+            <img src='/characters/arcade-side-1p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
             <div className='text-sm font-bold text-[#e86e3a]'>1P</div>
           </div>
           <div className='text-center text-xs leading-[1.55] text-white/35'>
@@ -656,14 +659,14 @@ function SideSection() {
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#f7d154] bg-[#f7d154]/[0.06]'>
-            <TkcIcon name='match' className='mb-1.5 size-8' />
+            <img src='/characters/arcade-side-2p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
             <div className='text-sm font-bold text-[#f7d154]'>2P</div>
           </div>
         </div>
         {/* Desktop */}
         <div className='hidden items-center justify-center gap-8 py-7 sm:flex'>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e86e3a] bg-[#e86e3a]/[0.06]'>
-            <TkcIcon name='match' className='mb-1.5 size-8' />
+            <img src='/characters/arcade-side-1p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
             <div className='text-sm font-bold text-[#e86e3a]'>1P</div>
           </div>
           <div className='text-center text-[13px] leading-[1.55] text-white/35'>
@@ -672,7 +675,7 @@ function SideSection() {
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#f7d154] bg-[#f7d154]/[0.06]'>
-            <TkcIcon name='match' className='mb-1.5 size-8' />
+            <img src='/characters/arcade-side-2p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
             <div className='text-sm font-bold text-[#f7d154]'>2P</div>
           </div>
         </div>
@@ -788,7 +791,13 @@ function AdvanceSection() {
       <div className='grid gap-4 sm:grid-cols-2'>
         {/* 4-0 Auto */}
         <div className='relative overflow-hidden rounded-2xl border border-[#f7d154]/20 bg-[#f7d154]/[0.04] p-6 text-center'>
-          <TkcIcon name='champion' className='mx-auto mb-2.5 size-10' />
+          <img
+            src='/characters/don_katsu_4_sprite_04.png'
+            alt=''
+            className='mx-auto mb-2.5 size-10 object-contain'
+            loading='lazy'
+            draggable={false}
+          />
           <div className='text-xl font-bold text-[#f7d154]'>자동 진출</div>
           <div className='my-2 font-mono text-[28px] font-extrabold text-[#f7d154]'>
             4-0
@@ -801,7 +810,13 @@ function AdvanceSection() {
         </div>
         {/* 3-1 Playoff */}
         <div className='relative overflow-hidden rounded-2xl border border-[#f5a623]/20 bg-[#f5a623]/[0.04] p-6 text-center'>
-          <TkcIcon name='playoff' className='mx-auto mb-2.5 size-10' />
+          <img
+            src='/characters/don_katsu_4_sprite_05.png'
+            alt=''
+            className='mx-auto mb-2.5 size-10 object-contain'
+            loading='lazy'
+            draggable={false}
+          />
           <div className='text-xl font-bold text-[#f5a623]'>진출자 선발전</div>
           <div className='my-2 font-mono text-[28px] font-extrabold text-[#f5a623]'>
             3-1

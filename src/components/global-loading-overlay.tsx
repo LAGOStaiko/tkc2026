@@ -110,7 +110,6 @@ export function GlobalLoadingOverlay() {
 
   useEffect(() => {
     if (overlayState === 'hidden') return
-    setSpriteIdx(0)
     const id = window.setInterval(() => {
       setSpriteIdx((prev) => (prev + 1) % WORM_SPRITES.length)
     }, 280)

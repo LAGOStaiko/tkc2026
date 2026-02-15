@@ -113,6 +113,13 @@ const PLAY_RULES = [
   },
 ] as const
 
+const PLAY_RULE_ICON_MAP: Record<string, string> = {
+  match: '/characters/arcade-rule-match.png',
+  details: '/characters/arcade-rule-details.png',
+  'song-pick': '/characters/arcade-rule-song-pick.png',
+  tie: '/characters/arcade-rule-tie.png',
+}
+
 /* ════════════════════════════════════════════════════════════════════ */
 /*  Utility Components                                                 */
 /* ════════════════════════════════════════════════════════════════════ */
@@ -1014,7 +1021,17 @@ function PlayRulesSection() {
             <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#e86e3a] opacity-40' />
             <div className='mb-3 flex items-center gap-2.5'>
               <div className='flex size-[30px] shrink-0 items-center justify-center'>
-                <TkcIcon name={rule.icon} className='size-6' />
+                {PLAY_RULE_ICON_MAP[rule.icon] ? (
+                  <img
+                    src={PLAY_RULE_ICON_MAP[rule.icon]}
+                    alt=''
+                    className='size-7 object-contain'
+                    loading='lazy'
+                    draggable={false}
+                  />
+                ) : (
+                  <TkcIcon name={rule.icon} className='size-6' />
+                )}
               </div>
               <div className='text-[17px] font-bold text-white/90'>{rule.title}</div>
             </div>

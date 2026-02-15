@@ -57,7 +57,7 @@ const ROUND_DETAILS: { name: string; songs: string; picks: string; challenge: bo
   { name: '결승', songs: '총 5곡', picks: '각 2곡 선곡', challenge: true, highlight: true },
 ]
 
-const PLAY_RULES: { icon: string; title: string; body: ReactNode; wide?: boolean }[] = [
+const PLAY_RULES: { icon: string; title: string; body: ReactNode }[] = [
   {
     icon: 'match',
     title: '컨트롤러 규정',
@@ -68,7 +68,6 @@ const PLAY_RULES: { icon: string; title: string; body: ReactNode; wide?: boolean
         해당 조건에 사전 동의한 플레이어만 참가 가능합니다.
       </>
     ),
-    wide: true,
   },
   {
     icon: 'summary',
@@ -813,9 +812,7 @@ function PlayRulesSection() {
         {PLAY_RULES.map((rule) => (
           <div
             key={rule.title}
-            className={`relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] p-6 transition-colors hover:border-[#2a2a2a] ${
-              rule.wide ? 'sm:col-span-2' : ''
-            }`}
+            className='relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] p-6 transition-colors hover:border-[#2a2a2a]'
           >
             <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#e86e3a] opacity-40' />
             <div className='mb-3 flex items-center gap-2.5'>
