@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useSite } from '@/lib/api'
 import { sanitizeUrl, sanitizeImgSrc } from '@/lib/sanitize-url'
+import { cn } from '@/lib/utils'
 import { FadeIn } from '@/components/tkc/guide-shared'
 
 export const Route = createFileRoute('/(site)/')({
@@ -145,6 +146,12 @@ type SiteData = {
 
 function HomePage() {
   const { data: site } = useSite<SiteData>()
+  const [heroAnimOn, setHeroAnimOn] = useState(false)
+
+  useEffect(() => {
+    const raf = window.requestAnimationFrame(() => setHeroAnimOn(true))
+    return () => window.cancelAnimationFrame(raf)
+  }, [])
 
   const partners: Partner[] = site?.partners?.length
     ? site.partners
@@ -157,7 +164,12 @@ function HomePage() {
   return (
     <div>
       {/* ── HERO ── */}
-      <section className='hero-anim -mt-20 overflow-hidden md:-mt-24'>
+      <section
+        className={cn(
+          '-mt-20 overflow-hidden md:-mt-24',
+          heroAnimOn && 'hero-anim'
+        )}
+      >
         <div className='relative h-[340px] sm:h-[380px] md:h-[520px] lg:h-[560px]'>
           {/* Layer 1: Background */}
           <div className='hero-layer hero-layer-bg absolute inset-0 z-[1] flex items-center justify-center'>
@@ -245,13 +257,13 @@ function HomePage() {
                     boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
                   }}
                 >
-                  <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
+                  <span className='transition-opacity duration-300 md:group-hover/cta:opacity-0 group-active/cta:opacity-0'>
                     대회 신청하기
                   </span>
                   <img
                     src='/characters/don-wink.png'
                     alt=''
-                    className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta:scale-100 group-hover/cta:opacity-100'
+                    className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 md:group-hover/cta:scale-100 md:group-hover/cta:opacity-100 group-active/cta:scale-100 group-active/cta:opacity-100'
                     draggable={false}
                   />
                 </Link>
@@ -259,13 +271,13 @@ function HomePage() {
                   to='/schedule'
                   className='group/cta2 tkc-motion-lift relative inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] px-6 py-3 text-[15px] font-semibold text-white/80 backdrop-blur-sm hover:border-white/30 hover:bg-white/[0.1] hover:text-white'
                 >
-                  <span className='transition-opacity duration-300 group-hover/cta2:opacity-0'>
+                  <span className='transition-opacity duration-300 md:group-hover/cta2:opacity-0 group-active/cta2:opacity-0'>
                     일정 보기 →
                   </span>
                   <img
                     src='/characters/katsu-wink.png'
                     alt=''
-                    className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta2:scale-100 group-hover/cta2:opacity-100'
+                    className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 md:group-hover/cta2:scale-100 md:group-hover/cta2:opacity-100 group-active/cta2:scale-100 group-active/cta2:opacity-100'
                     draggable={false}
                   />
                 </Link>
@@ -284,13 +296,13 @@ function HomePage() {
               boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
             }}
           >
-            <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
+            <span className='transition-opacity duration-300 group-active/cta:opacity-0'>
               대회 신청하기
             </span>
             <img
               src='/characters/don-wink.png'
               alt=''
-              className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta:scale-100 group-hover/cta:opacity-100'
+              className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-active/cta:scale-100 group-active/cta:opacity-100'
               draggable={false}
             />
           </Link>
@@ -298,13 +310,13 @@ function HomePage() {
             to='/schedule'
             className='group/cta2 tkc-motion-lift relative inline-flex w-full items-center justify-center rounded-lg border border-[#1e1e1e] px-6 py-3 text-[15px] font-semibold text-white/65 hover:border-white/30 hover:bg-white/[0.03] hover:text-white'
           >
-            <span className='transition-opacity duration-300 group-hover/cta2:opacity-0'>
+            <span className='transition-opacity duration-300 group-active/cta2:opacity-0'>
               일정 보기 →
             </span>
             <img
               src='/characters/katsu-wink.png'
               alt=''
-              className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta2:scale-100 group-hover/cta2:opacity-100'
+              className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-active/cta2:scale-100 group-active/cta2:opacity-100'
               draggable={false}
             />
           </Link>
@@ -701,13 +713,13 @@ function DivisionPanel({
               to={detailTo}
               className='group/detail tkc-motion-surface relative inline-flex items-center justify-center rounded-lg border border-[#1e1e1e] px-6 py-2.5 text-sm font-semibold text-white/60 hover:border-white/30 hover:text-white'
             >
-              <span className='transition-opacity duration-300 group-hover/detail:opacity-0'>
+              <span className='transition-opacity duration-300 md:group-hover/detail:opacity-0 group-active/detail:opacity-0'>
                 자세히 보기
               </span>
               <img
                 src='/characters/katsu-wink.png'
                 alt=''
-                className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/detail:scale-100 group-hover/detail:opacity-100'
+                className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 md:group-hover/detail:scale-100 md:group-hover/detail:opacity-100 group-active/detail:scale-100 group-active/detail:opacity-100'
                 draggable={false}
               />
             </Link>
@@ -720,13 +732,13 @@ function DivisionPanel({
                 boxShadow: `0 4px 20px ${accent}33`,
               }}
             >
-              <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
+              <span className='transition-opacity duration-300 md:group-hover/cta:opacity-0 group-active/cta:opacity-0'>
                 대회 신청하기
               </span>
               <img
                 src='/characters/don-wink.png'
                 alt=''
-                className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta:scale-100 group-hover/cta:opacity-100'
+                className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 md:group-hover/cta:scale-100 md:group-hover/cta:opacity-100 group-active/cta:scale-100 group-active/cta:opacity-100'
                 draggable={false}
               />
             </Link>

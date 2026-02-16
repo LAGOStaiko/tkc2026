@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, MapPin } from 'lucide-react'
 import { t } from '@/text'
 import { cn } from '@/lib/utils'
 import { FadeIn } from '@/components/tkc/guide-shared'
@@ -22,6 +22,7 @@ type ScheduleEvent = {
   subtitle?: string
   location?: string
   address?: string
+  region?: string
   mapUrl?: string
   mapQuery?: string
   venueImage?: string
@@ -61,8 +62,9 @@ const SCHEDULE: MonthGroup[] = [
         date: '2026-03-21',
         title: '오프라인 예선 → 서울',
         location: 'TAIKO LABS',
+        region: '서울',
         venueImage: '/branding/venue-seoul.webp',
-        mapQuery: 'TAIKO LABS 서울',
+        mapQuery: '타이코 랩스 서울',
         mode: 'offline',
         division: 'arcade',
         participants: [],
@@ -73,6 +75,7 @@ const SCHEDULE: MonthGroup[] = [
         date: '2026-03-28',
         title: '오프라인 예선 → 대전',
         location: '싸이뮤직 게임월드',
+        region: '대전',
         venueImage: '/branding/venue-daejeon.webp',
         mapQuery: '싸이뮤직 게임월드 대전',
         mode: 'offline',
@@ -92,6 +95,7 @@ const SCHEDULE: MonthGroup[] = [
         date: '2026-04-04',
         title: '오프라인 예선 → 광주',
         location: '게임플라자',
+        region: '광주',
         venueImage: '/branding/venue-gwangju.webp',
         mapQuery: '게임플라자 광주',
         mode: 'offline',
@@ -104,6 +108,7 @@ const SCHEDULE: MonthGroup[] = [
         date: '2026-04-11',
         title: '오프라인 예선 → 부산',
         location: '게임D',
+        region: '부산',
         venueImage: '/branding/venue-busan.webp',
         mapQuery: '게임D 부산',
         mode: 'offline',
@@ -132,6 +137,7 @@ const SCHEDULE: MonthGroup[] = [
         title: '결선 → PlayX4',
         subtitle: '콘솔 + 아케이드 동시 진행',
         location: '킨텍스',
+        region: '고양',
         mapQuery: '킨텍스',
         mode: 'finals',
         division: 'all',
@@ -241,7 +247,7 @@ function loadKakaoSDK(): Promise<void> {
   return kakaoPromise
 }
 
-function VenueMap({ query }: { query: string }) {
+function VenueMap({ query, location }: { query: string; location?: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
@@ -280,25 +286,171 @@ function VenueMap({ query }: { query: string }) {
     }
   }, [query])
 
-  if (status === 'error') return null
+  const kakaoLink = `https://map.kakao.com/link/search/${encodeURIComponent(query)}`
+
+  /* Error fallback */
+  if (status === 'error') {
+    return (
+      <div className='venue-map-area border-t border-[#1a1a1a] sm:border-t-0 sm:border-l'>
+        <div className='flex h-[180px] flex-col items-center justify-center gap-2 sm:h-full sm:min-h-[160px]'>
+          <div className='flex size-7 items-center justify-center rounded-full bg-[#e74c3c]/[0.08]'>
+            <MapPin className='size-3.5 text-[#e74c3c]' />
+          </div>
+          <a
+            href={kakaoLink}
+            target='_blank'
+            rel='noopener noreferrer'
+            onClick={(e) => e.stopPropagation()}
+            className='rounded-[5px] border border-[#4a9eff]/[0.12] bg-[#4a9eff]/[0.04] px-2.5 py-1 text-[11px] font-semibold text-[#4a9eff] transition-colors hover:bg-[#4a9eff]/[0.08]'
+          >
+            카카오맵에서 보기 →
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className='mt-2.5 overflow-hidden rounded-lg border border-[#1e1e1e]'>
+    <div className='venue-map-area relative border-t border-[#1a1a1a] sm:border-t-0 sm:border-l'>
+      {/* Floating badge */}
+      {status === 'ready' && (
+        <div className='pointer-events-none absolute top-2 left-2 z-[2] flex items-center gap-1 rounded-md border border-white/[0.06] bg-black/70 px-2 py-1 text-[10px] font-semibold text-white/55 backdrop-blur-[10px]'>
+          <MapPin className='size-2.5 text-[#e74c3c]' />
+          {location ?? query}
+        </div>
+      )}
+
+      {/* Loading overlay */}
+      {status === 'loading' && (
+        <div className='absolute inset-0 z-[1] flex flex-col items-center justify-center gap-2'>
+          <div className='size-[18px] animate-spin rounded-full border-2 border-white/[0.06] border-t-[#e74c3c]' />
+          <span className='text-[11px] text-white/30'>지도를 불러오는 중</span>
+        </div>
+      )}
+
       <div
         ref={containerRef}
-        className={cn(
-          'h-[160px] w-full bg-[#0d0d0d]',
-          status === 'loading' && 'animate-pulse'
-        )}
+        className='h-[180px] w-full bg-[#0d0d0d] sm:h-full sm:min-h-[160px]'
       />
-      <a
-        href={`https://map.kakao.com/link/search/${encodeURIComponent(query)}`}
-        target='_blank'
-        rel='noopener noreferrer'
-        className='flex items-center justify-center gap-1.5 border-t border-[#1e1e1e] bg-[#0d0d0d] py-2 text-[11px] font-medium text-white/30 transition-colors hover:text-[#4a9eff]'
+    </div>
+  )
+}
+
+/* ── Venue Row (inline) ── */
+
+function VenueRow({ event }: { event: ScheduleEvent }) {
+  const kakaoLink = event.mapQuery
+    ? `https://map.kakao.com/link/search/${encodeURIComponent(event.mapQuery)}`
+    : undefined
+  const naverLink = event.mapQuery
+    ? `https://map.naver.com/v5/search/${encodeURIComponent(event.mapQuery)}`
+    : undefined
+
+  return (
+    <div className='flex items-center gap-2.5'>
+      {event.venueImage && (
+        <img
+          src={event.venueImage}
+          alt={event.location ?? ''}
+          className='size-8 shrink-0 rounded-md border border-white/[0.06] object-cover'
+          loading='lazy'
+          draggable={false}
+        />
+      )}
+      <div className='min-w-0 flex-1'>
+        {event.location && (
+          <div className='text-[12px] font-bold text-white/90'>
+            {event.location}
+          </div>
+        )}
+        {event.address && (
+          <div className='mt-0.5 text-[10px] text-white/25'>
+            {event.address}
+          </div>
+        )}
+      </div>
+      <div className='flex shrink-0 gap-1'>
+        {kakaoLink && (
+          <a
+            href={kakaoLink}
+            target='_blank'
+            rel='noopener noreferrer'
+            onClick={(e) => e.stopPropagation()}
+            className='rounded-[4px] border border-white/[0.05] bg-white/[0.03] px-2 py-1 text-[10px] font-semibold text-white/25 transition-colors hover:border-[#4a9eff]/15 hover:text-[#4a9eff]'
+          >
+            카카오맵
+          </a>
+        )}
+        {naverLink && (
+          <a
+            href={naverLink}
+            target='_blank'
+            rel='noopener noreferrer'
+            onClick={(e) => e.stopPropagation()}
+            className='rounded-[4px] border border-white/[0.05] bg-white/[0.03] px-2 py-1 text-[10px] font-semibold text-white/25 transition-colors hover:border-[#4a9eff]/15 hover:text-[#4a9eff]'
+          >
+            길찾기
+          </a>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ── Players Row (inline) ── */
+
+function PlayersRow({
+  label,
+  count,
+  names,
+  variant = 'default',
+}: {
+  label: string
+  count: number
+  names: string[]
+  variant?: 'default' | 'qualified'
+}) {
+  const isQ = variant === 'qualified'
+
+  return (
+    <div className='flex flex-wrap items-baseline gap-1.5 py-1.5'>
+      <span
+        className={cn(
+          'flex shrink-0 items-center gap-1 text-[11px] font-bold',
+          isQ ? 'text-[#f5a623]' : 'text-white/25'
+        )}
       >
-        카카오맵에서 보기 →
-      </a>
+        {label}
+        <span
+          className={cn(
+            'rounded-[3px] px-1 py-px font-mono text-[10px] font-bold',
+            isQ
+              ? 'bg-[#f5a623]/10 text-[#f5a623]'
+              : 'bg-white/[0.04] text-white/25'
+          )}
+        >
+          {count > 0 ? count : '—'}
+        </span>
+      </span>
+      {names.length > 0 ? (
+        <div className='flex flex-wrap gap-[3px]'>
+          {names.map((name) => (
+            <span
+              key={name}
+              className={cn(
+                'rounded-[4px] border px-[7px] py-[2px] text-[11px] font-semibold',
+                isQ
+                  ? 'border-[#f5a623]/12 bg-[#f5a623]/[0.05] text-[#f5a623]'
+                  : 'border-white/[0.05] bg-white/[0.04] text-white/90'
+              )}
+            >
+              {name}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <span className='text-[11px] italic text-white/25'>추후 공개</span>
+      )}
     </div>
   )
 }
@@ -319,6 +471,7 @@ function EventRow({
     event.venueImage ||
     event.address ||
     event.mapUrl ||
+    event.mapQuery ||
     event.participants ||
     event.qualified
   )
@@ -434,97 +587,59 @@ function EventRow({
 /* ── Event Detail (expanded) ── */
 
 function EventDetail({ event }: { event: ScheduleEvent }) {
+  const hasVenue = !!(event.venueImage || event.address || event.mapQuery)
+  const hasPlayers = !!(event.participants || event.qualified)
+  const hasMap = !!event.mapQuery
+
   return (
-    <div className='space-y-4'>
-      {/* Venue card */}
-      {(event.venueImage || event.address || event.mapQuery) && (
-        <div className='overflow-hidden rounded-lg border border-[#1e1e1e] bg-[#0d0d0d]'>
-          <div className='flex items-start gap-3.5 p-3.5'>
-            {event.venueImage && (
-              <img
-                src={event.venueImage}
-                alt={event.location ?? ''}
-                className='size-16 shrink-0 rounded-lg border border-white/10 object-cover'
-                loading='lazy'
-                draggable={false}
-              />
-            )}
-            <div className='min-w-0 flex-1'>
-              {event.location && (
-                <div className='text-[14px] font-bold text-white/80'>
-                  {event.location}
-                </div>
-              )}
-              {event.address && (
-                <div className='mt-0.5 text-[12px] text-white/35'>
-                  {event.address}
-                </div>
-              )}
-              {event.mapUrl && (
-                <a
-                  href={event.mapUrl}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='mt-1.5 inline-flex items-center gap-1 text-[12px] font-medium text-[#4a9eff] hover:text-[#6ab0ff]'
-                >
-                  지도 보기 →
-                </a>
-              )}
+    <div className='overflow-hidden rounded-xl border border-[#1a1a1a] bg-[#0d0d0d]'>
+      <div
+        className={cn(
+          'flex flex-col',
+          hasMap && 'sm:grid sm:grid-cols-[1fr_180px]'
+        )}
+      >
+        {/* Left: venue + players */}
+        <div className='space-y-0'>
+          {hasVenue && (
+            <div className='px-3.5 py-3'>
+              <VenueRow event={event} />
             </div>
-          </div>
-          {event.mapQuery && <VenueMap query={event.mapQuery} />}
-        </div>
-      )}
+          )}
 
-      {/* Participants */}
-      {event.participants && (
-        <div>
-          <div className='mb-2 text-[11px] font-semibold tracking-wide text-white/30 uppercase'>
-            출전자
-          </div>
-          {event.participants.length > 0 ? (
-            <div className='flex flex-wrap gap-1.5'>
-              {event.participants.map((name) => (
-                <span
-                  key={name}
-                  className='rounded-md border border-[#1e1e1e] bg-[#151515] px-2.5 py-1 text-[12px] font-medium text-white/60'
-                >
-                  {name}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <div className='rounded-lg border border-dashed border-[#1e1e1e] px-3 py-2.5 text-[12px] text-white/20'>
-              추후 공개
+          {hasPlayers && (
+            <div
+              className={cn(
+                'px-3.5 pb-2.5',
+                hasVenue && 'border-t border-white/[0.04] pt-1'
+              )}
+            >
+              {event.participants && (
+                <PlayersRow
+                  label='출전자'
+                  count={event.participants.length}
+                  names={event.participants}
+                />
+              )}
+              {event.qualified && (
+                <div className='border-t border-white/[0.04]'>
+                  <PlayersRow
+                    label='진출자'
+                    count={event.qualified.length}
+                    names={event.qualified}
+                    variant='qualified'
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>
-      )}
 
-      {/* Qualified */}
-      {event.qualified && (
-        <div>
-          <div className='mb-2 text-[11px] font-semibold tracking-wide text-white/30 uppercase'>
-            진출자
-          </div>
-          {event.qualified.length > 0 ? (
-            <div className='flex flex-wrap gap-1.5'>
-              {event.qualified.map((name) => (
-                <span
-                  key={name}
-                  className='rounded-md border border-[#f5a623]/20 bg-[#f5a623]/[0.06] px-2.5 py-1 text-[12px] font-semibold text-[#f5a623]'
-                >
-                  {name}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <div className='rounded-lg border border-dashed border-[#1e1e1e] px-3 py-2.5 text-[12px] text-white/20'>
-              추후 공개
-            </div>
-          )}
-        </div>
-      )}
+        {/* Right: map */}
+        {hasMap && (
+          <VenueMap query={event.mapQuery!} location={event.location} />
+        )}
+      </div>
     </div>
   )
 }
