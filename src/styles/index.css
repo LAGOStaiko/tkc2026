@@ -895,6 +895,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Transition utilities: only shorten duration, preserve opacity/transform */
+  .site-scope .transition-all,
+  .site-scope .transition-colors,
+  .site-scope .transition-transform,
+  .site-scope .transition-opacity {
+    transition-duration: 1ms !important;
+  }
+
   .tkc-motion-reveal,
   .tkc-motion-surface,
   .tkc-motion-lift,
@@ -902,10 +910,6 @@
   .tkc-motion-glow,
   .tkc-motion-spin-slow,
   .tkc-hero-year,
-  .site-scope .transition-all,
-  .site-scope .transition-colors,
-  .site-scope .transition-transform,
-  .site-scope .transition-opacity,
   .rewards-enter,
   .rewards-flow-shell,
   .rewards-flow-label,
