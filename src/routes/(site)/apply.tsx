@@ -1224,7 +1224,7 @@ function ApplyPage() {
       {/* ── Footer ── */}
       <footer className='border-t border-[#1e1e1e] py-10 text-center'>
         <p className='text-[14px] leading-[1.8] text-white/35'>
-          TKC 2026 — 태고 코리아 챔피언십
+          TKC 2026 — 태고의 달인 코리아 챔피언십
           <br />
           주최: 타이코랩스 · 협력: BNEK
         </p>

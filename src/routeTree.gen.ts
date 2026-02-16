@@ -16,6 +16,7 @@ import { Route as siteIndexRouteImport } from './routes/(site)/index'
 import { Route as siteSongsRouteImport } from './routes/(site)/songs'
 import { Route as siteSongPoolRouteImport } from './routes/(site)/song-pool'
 import { Route as siteScheduleRouteImport } from './routes/(site)/schedule'
+import { Route as siteRewardsRouteImport } from './routes/(site)/rewards'
 import { Route as siteResultsRouteImport } from './routes/(site)/results'
 import { Route as siteContactRouteImport } from './routes/(site)/contact'
 import { Route as siteArchiveRouteImport } from './routes/(site)/archive'
@@ -83,6 +84,11 @@ const siteSongPoolRoute = siteSongPoolRouteImport.update({
 const siteScheduleRoute = siteScheduleRouteImport.update({
   id: '/schedule',
   path: '/schedule',
+  getParentRoute: () => siteRouteRoute,
+} as any)
+const siteRewardsRoute = siteRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
   getParentRoute: () => siteRouteRoute,
 } as any)
 const siteResultsRoute = siteResultsRouteImport.update({
@@ -275,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/archive': typeof siteArchiveRoute
   '/contact': typeof siteContactRoute
   '/results': typeof siteResultsRoute
+  '/rewards': typeof siteRewardsRoute
   '/schedule': typeof siteScheduleRoute
   '/song-pool': typeof siteSongPoolRoute
   '/songs': typeof siteSongsRoute
@@ -313,6 +320,7 @@ export interface FileRoutesByTo {
   '/archive': typeof siteArchiveRoute
   '/contact': typeof siteContactRoute
   '/results': typeof siteResultsRoute
+  '/rewards': typeof siteRewardsRoute
   '/schedule': typeof siteScheduleRoute
   '/song-pool': typeof siteSongPoolRoute
   '/songs': typeof siteSongsRoute
@@ -357,6 +365,7 @@ export interface FileRoutesById {
   '/(site)/archive': typeof siteArchiveRoute
   '/(site)/contact': typeof siteContactRoute
   '/(site)/results': typeof siteResultsRoute
+  '/(site)/rewards': typeof siteRewardsRoute
   '/(site)/schedule': typeof siteScheduleRoute
   '/(site)/song-pool': typeof siteSongPoolRoute
   '/(site)/songs': typeof siteSongsRoute
@@ -401,6 +410,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/contact'
     | '/results'
+    | '/rewards'
     | '/schedule'
     | '/song-pool'
     | '/songs'
@@ -439,6 +449,7 @@ export interface FileRouteTypes {
     | '/archive'
     | '/contact'
     | '/results'
+    | '/rewards'
     | '/schedule'
     | '/song-pool'
     | '/songs'
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/(site)/archive'
     | '/(site)/contact'
     | '/(site)/results'
+    | '/(site)/rewards'
     | '/(site)/schedule'
     | '/(site)/song-pool'
     | '/(site)/songs'
@@ -570,6 +582,13 @@ declare module '@tanstack/react-router' {
       path: '/schedule'
       fullPath: '/schedule'
       preLoaderRoute: typeof siteScheduleRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
+    '/(site)/rewards': {
+      id: '/(site)/rewards'
+      path: '/rewards'
+      fullPath: '/rewards'
+      preLoaderRoute: typeof siteRewardsRouteImport
       parentRoute: typeof siteRouteRoute
     }
     '/(site)/results': {
@@ -849,6 +868,7 @@ interface siteRouteRouteChildren {
   siteArchiveRoute: typeof siteArchiveRoute
   siteContactRoute: typeof siteContactRoute
   siteResultsRoute: typeof siteResultsRoute
+  siteRewardsRoute: typeof siteRewardsRoute
   siteScheduleRoute: typeof siteScheduleRoute
   siteSongPoolRoute: typeof siteSongPoolRoute
   siteSongsRoute: typeof siteSongsRoute
@@ -867,6 +887,7 @@ const siteRouteRouteChildren: siteRouteRouteChildren = {
   siteArchiveRoute: siteArchiveRoute,
   siteContactRoute: siteContactRoute,
   siteResultsRoute: siteResultsRoute,
+  siteRewardsRoute: siteRewardsRoute,
   siteScheduleRoute: siteScheduleRoute,
   siteSongPoolRoute: siteSongPoolRoute,
   siteSongsRoute: siteSongsRoute,

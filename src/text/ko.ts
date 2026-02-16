@@ -142,6 +142,7 @@ export const ko = {
   'nav.menuTitle': '\uBA54\uB274',
   'nav.openMenu': '\uBA54\uB274 \uC5F4\uAE30',
   'nav.results': '\uC21C\uC704 \uBC0F \uACB0\uACFC',
+  'nav.rewards': '보상',
   'nav.schedule': '\uC77C\uC815',
   'nav.songPool': '선곡풀',
   'nav.songs': '\uACFC\uC81C\uACE1',

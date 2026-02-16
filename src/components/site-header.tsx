@@ -35,6 +35,7 @@ const navItems: NavItem[] = [
   { label: t('nav.songs'), to: '/songs' },
   { label: t('nav.songPool'), to: '/song-pool' },
   { label: t('nav.results'), to: '/results' },
+  { label: t('nav.rewards'), to: '/rewards' },
   { label: t('nav.apply'), to: '/apply', emphasis: true },
   { label: t('nav.contact'), to: '/contact' },
 ]
@@ -58,7 +59,9 @@ function getRuntimeBadge(pathname: string) {
   if (!rawStage || ['prod', 'production', 'live'].includes(rawStage)) {
     return null
   }
-  if (['staging', 'stage', 'preview', 'test', 'testing', 'qa'].includes(rawStage)) {
+  if (
+    ['staging', 'stage', 'preview', 'test', 'testing', 'qa'].includes(rawStage)
+  ) {
     return 'TEST'
   }
   return rawStage.toUpperCase().slice(0, 12)

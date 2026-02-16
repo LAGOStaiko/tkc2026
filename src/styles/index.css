@@ -218,8 +218,8 @@
   }
 
   .tkc-motion-lift {
-    transition-property: transform, border-color, background-color, box-shadow,
-      color, opacity;
+    transition-property:
+      transform, border-color, background-color, box-shadow, color, opacity;
     transition-duration: var(--tkc-motion-duration-base);
     transition-timing-function: var(--tkc-motion-ease);
     will-change: transform;
@@ -273,7 +273,7 @@
 /* ── Animated border for archive cards ── */
 
 @property --border-angle {
-  syntax: "<angle>";
+  syntax: '<angle>';
   inherits: false;
   initial-value: 0deg;
 }
@@ -300,13 +300,477 @@
     var(--tkc-arc-glow-color, rgba(231, 76, 60, 0.35)),
     transparent 60%
   );
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask-composite: xor;
   animation: tkc-border-spin 4s linear infinite;
   pointer-events: none;
   z-index: 1;
+}
+
+/* Rewards page motion */
+
+@keyframes rewards-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rewards-fade-up-scale {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes rewards-badge-bounce {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes rewards-highlight-in {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: 0 0 22px rgba(245, 166, 35, 0.35);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: 0 0 12px rgba(245, 166, 35, 0.18);
+  }
+}
+
+@keyframes rewards-connector-draw-x {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes rewards-connector-draw-y {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes rewards-typing {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes rewards-curtain-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes rewards-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.78;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+@keyframes rewards-shimmer {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(140%);
+    opacity: 0;
+  }
+}
+
+@keyframes rewards-chip-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes rewards-icon-float-glow {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow:
+      0 0 30px rgba(231, 76, 60, 0.1),
+      0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    transform: translateY(-4px);
+    box-shadow:
+      0 0 50px rgba(231, 76, 60, 0.35),
+      0 0 80px rgba(231, 76, 60, 0.15),
+      0 8px 25px rgba(0, 0, 0, 0.35);
+  }
+}
+
+@keyframes rewards-title-shine-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes rewards-tag-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rewards-border-flash {
+  0% {
+    box-shadow: 0 0 0 rgba(231, 76, 60, 0);
+  }
+  35% {
+    box-shadow:
+      0 0 50px rgba(231, 76, 60, 0.18),
+      inset 0 0 40px rgba(231, 76, 60, 0.05);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(231, 76, 60, 0);
+  }
+}
+
+@layer utilities {
+  .rewards-enter {
+    opacity: 0;
+    transform: translateY(16px);
+    will-change: opacity, transform;
+  }
+
+  .rewards-enter.is-on {
+    opacity: 1;
+    transform: translateY(0);
+    animation: rewards-fade-in-up 600ms var(--tkc-motion-ease) both;
+  }
+
+  .rewards-flow-shell {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 220ms var(--tkc-motion-ease),
+      transform 220ms var(--tkc-motion-ease);
+    will-change: opacity, transform;
+  }
+
+  .rewards-flow-shell.is-on {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .rewards-flow-label {
+    display: inline-block;
+    white-space: nowrap;
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    will-change: clip-path, opacity;
+  }
+
+  .rewards-flow-label.is-on {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    animation: rewards-typing 860ms steps(16) both;
+  }
+
+  .rewards-step {
+    opacity: 0;
+    transform: translateY(14px) scale(0.95);
+    will-change: opacity, transform;
+  }
+
+  .rewards-step.is-on {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    animation: rewards-fade-up-scale 520ms var(--tkc-motion-ease) both;
+  }
+
+  .rewards-step-badge {
+    transform: scale(0);
+    transform-origin: center;
+    will-change: transform, opacity;
+    opacity: 0;
+  }
+
+  .rewards-step.is-on .rewards-step-badge {
+    transform: scale(1);
+    opacity: 1;
+    animation: rewards-badge-bounce 420ms var(--tkc-motion-ease) both;
+  }
+
+  .rewards-step-highlight {
+    opacity: 0;
+    transform: translateY(6px);
+    will-change: opacity, transform, box-shadow;
+  }
+
+  .rewards-step-highlight.is-on {
+    opacity: 1;
+    transform: translateY(0);
+    animation: rewards-highlight-in 420ms var(--tkc-motion-ease) both;
+  }
+
+  .rewards-connector {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left center;
+    will-change: opacity, transform;
+  }
+
+  .rewards-connector::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 10px;
+    top: 50%;
+    height: 2px;
+    transform: translateY(-50%);
+    border-radius: 9999px;
+    background: var(--rewards-accent, rgba(245, 166, 35, 0.55));
+    opacity: 0.35;
+  }
+
+  .rewards-connector::after {
+    content: '';
+    position: absolute;
+    right: 1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 7px solid var(--rewards-accent, rgba(245, 166, 35, 0.55));
+    opacity: 0.45;
+  }
+
+  .rewards-connector.is-on {
+    opacity: 1;
+    transform: scaleX(1);
+    animation: rewards-connector-draw-x 260ms var(--tkc-motion-ease) both;
+  }
+
+  @media (max-width: 767px) {
+    .rewards-connector {
+      width: 26px;
+      height: 32px;
+      transform: scaleY(0);
+      transform-origin: top center;
+    }
+
+    .rewards-connector::before {
+      left: 50%;
+      right: auto;
+      top: 0;
+      bottom: 10px;
+      width: 2px;
+      height: auto;
+      transform: translateX(-50%);
+    }
+
+    .rewards-connector::after {
+      left: 50%;
+      right: auto;
+      top: auto;
+      bottom: 1px;
+      transform: translateX(-50%);
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 7px solid var(--rewards-accent, rgba(245, 166, 35, 0.55));
+      border-bottom: 0;
+      opacity: 0.45;
+    }
+
+    .rewards-connector.is-on {
+      transform: scaleY(1);
+      animation-name: rewards-connector-draw-y;
+    }
+  }
+
+  .rewards-preview-curtain {
+    opacity: 0;
+    transform: translateY(10px);
+    clip-path: inset(100% 0 0 0);
+    will-change: clip-path, opacity, transform;
+  }
+
+  .rewards-preview-curtain.is-on {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+    animation: rewards-curtain-up 680ms var(--tkc-motion-ease) both;
+  }
+
+  .rewards-coming-pulse {
+    animation: rewards-pulse 1200ms var(--tkc-motion-ease) infinite;
+    animation-delay: 680ms;
+  }
+
+  .rewards-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rewards-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--rewards-accent, rgba(245, 166, 35, 0.55)) 50%,
+      transparent 100%
+    );
+    opacity: 0;
+    transform: translateX(-120%);
+    animation: rewards-shimmer 950ms var(--tkc-motion-ease) both;
+    pointer-events: none;
+  }
+
+  .rewards-callout {
+    opacity: 0;
+    transform: translateY(12px);
+    will-change: opacity, transform;
+  }
+
+  .rewards-callout.is-on {
+    animation: rewards-fade-in-up 520ms var(--tkc-motion-ease) both;
+  }
+
+  .rewards-chip {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+    will-change: opacity, transform;
+  }
+
+  .rewards-chip.is-on {
+    animation: rewards-chip-drop 520ms var(--tkc-motion-ease) both;
+  }
+
+  .rewards-icon-float-glow {
+    animation: rewards-icon-float-glow 3s ease-in-out infinite;
+  }
+
+  .rewards-title-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rewards-title-shine::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      transparent 30%,
+      rgba(231, 76, 60, 0.2) 42%,
+      rgba(245, 166, 35, 0.3) 50%,
+      rgba(231, 76, 60, 0.2) 58%,
+      transparent 70%,
+      transparent 100%
+    );
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+
+  .rewards-title-shine.is-on::after {
+    animation: rewards-title-shine-sweep 1.2s ease-in-out forwards;
+  }
+
+  .rewards-tag-pop {
+    opacity: 0;
+    transform: scale(0);
+    will-change: opacity, transform;
+  }
+
+  .rewards-tag-pop.is-on {
+    opacity: 1;
+    transform: scale(1);
+    animation: rewards-tag-pop 400ms var(--tkc-motion-ease) both;
+  }
+
+  .rewards-border-flash {
+    animation: rewards-border-flash 1.5s ease-out;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -320,9 +784,30 @@
   .site-scope .transition-all,
   .site-scope .transition-colors,
   .site-scope .transition-transform,
-  .site-scope .transition-opacity {
+  .site-scope .transition-opacity,
+  .rewards-enter,
+  .rewards-flow-shell,
+  .rewards-flow-label,
+  .rewards-step,
+  .rewards-step-badge,
+  .rewards-step-highlight,
+  .rewards-connector,
+  .rewards-preview-curtain,
+  .rewards-coming-pulse,
+  .rewards-callout,
+  .rewards-chip,
+  .rewards-icon-float-glow,
+  .rewards-title-shine,
+  .rewards-title-shine::after,
+  .rewards-tag-pop,
+  .rewards-border-flash {
     transition-duration: 1ms !important;
     animation: none !important;
+  }
+
+  .rewards-tag-pop {
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   .tkc-motion-lift:hover {
@@ -331,5 +816,15 @@
 
   .tkc-arc-glow::before {
     animation: none !important;
+  }
+
+  .rewards-flow-label {
+    clip-path: none !important;
+  }
+
+  .rewards-callout.is-on,
+  .rewards-chip.is-on {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
