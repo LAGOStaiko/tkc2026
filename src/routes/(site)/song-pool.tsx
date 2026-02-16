@@ -138,7 +138,7 @@ function SongPoolPage() {
       ) : (
         <div className='space-y-8'>
           {/* Tab bar */}
-          <div className='flex gap-1.5'>
+          <div className='flex gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             {tabs.map((tab) => (
               <button
                 key={tab.key}

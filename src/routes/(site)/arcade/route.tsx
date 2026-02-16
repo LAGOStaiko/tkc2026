@@ -161,7 +161,7 @@ function SubNav() {
             )
           })}
         </div>
-        <div className='grid grid-cols-2 gap-2'>
+        <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
           {prevItem ? (
             <Link
               to={prevItem.to}
@@ -171,7 +171,7 @@ function SubNav() {
               <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
                 PREV PHASE
               </div>
-              <div className='truncate text-[12px] font-bold text-white/85'>
+              <div className='text-[12px] font-bold break-keep text-white/85 sm:truncate'>
                 {prevItem.phase}
               </div>
             </Link>
@@ -192,7 +192,7 @@ function SubNav() {
               <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
                 NEXT PHASE
               </div>
-              <div className='truncate text-[12px] font-bold text-white/85'>
+              <div className='text-[12px] font-bold break-keep text-white/85 sm:truncate'>
                 {nextItem.phase}
               </div>
             </Link>

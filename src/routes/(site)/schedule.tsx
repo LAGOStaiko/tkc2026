@@ -314,7 +314,7 @@ function VenueMap({ query, location }: { query: string; location?: string }) {
     <div className='venue-map-area relative border-t border-[#1a1a1a] sm:border-t-0 sm:border-l'>
       {/* Floating badge */}
       {status === 'ready' && (
-        <div className='pointer-events-none absolute top-2 left-2 z-[2] flex items-center gap-1 rounded-md border border-white/[0.06] bg-black/70 px-2 py-1 text-[10px] font-semibold text-white/55 backdrop-blur-[10px]'>
+        <div className='pointer-events-none absolute top-2 left-2 z-[2] flex items-center gap-1 rounded-md border border-white/[0.06] bg-black/70 px-2 py-1 text-[11px] font-semibold text-white/55 backdrop-blur-[10px]'>
           <MapPin className='size-2.5 text-[#e74c3c]' />
           {location ?? query}
         </div>
@@ -364,7 +364,7 @@ function VenueRow({ event }: { event: ScheduleEvent }) {
           </div>
         )}
         {event.address && (
-          <div className='mt-0.5 text-[10px] text-white/25'>
+          <div className='mt-0.5 text-[11px] text-white/25'>
             {event.address}
           </div>
         )}
@@ -376,7 +376,7 @@ function VenueRow({ event }: { event: ScheduleEvent }) {
             target='_blank'
             rel='noopener noreferrer'
             onClick={(e) => e.stopPropagation()}
-            className='rounded-[4px] border border-white/[0.05] bg-white/[0.03] px-2 py-1 text-[10px] font-semibold text-white/25 transition-colors hover:border-[#4a9eff]/15 hover:text-[#4a9eff]'
+            className='rounded-[4px] border border-white/[0.05] bg-white/[0.03] px-2 py-1 text-[11px] font-semibold text-white/25 transition-colors hover:border-[#4a9eff]/15 hover:text-[#4a9eff]'
           >
             카카오맵
           </a>
@@ -387,7 +387,7 @@ function VenueRow({ event }: { event: ScheduleEvent }) {
             target='_blank'
             rel='noopener noreferrer'
             onClick={(e) => e.stopPropagation()}
-            className='rounded-[4px] border border-white/[0.05] bg-white/[0.03] px-2 py-1 text-[10px] font-semibold text-white/25 transition-colors hover:border-[#4a9eff]/15 hover:text-[#4a9eff]'
+            className='rounded-[4px] border border-white/[0.05] bg-white/[0.03] px-2 py-1 text-[11px] font-semibold text-white/25 transition-colors hover:border-[#4a9eff]/15 hover:text-[#4a9eff]'
           >
             길찾기
           </a>
@@ -423,7 +423,7 @@ function PlayersRow({
         {label}
         <span
           className={cn(
-            'rounded-[3px] px-1 py-px font-mono text-[10px] font-bold',
+            'rounded-[3px] px-1 py-px font-mono text-[11px] font-bold',
             isQ
               ? 'bg-[#f5a623]/10 text-[#f5a623]'
               : 'bg-white/[0.04] text-white/25'

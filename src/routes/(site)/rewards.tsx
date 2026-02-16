@@ -173,7 +173,7 @@ function PreviewSlot({
         </div>
         <div
           className={cn(
-            'rounded-md border px-3 py-1 font-mono text-[10px] font-bold tracking-[1.5px]',
+            'rounded-md border px-3 py-1 font-mono text-[11px] font-bold tracking-[1.5px]',
             pulse && 'rewards-coming-pulse'
           )}
           style={{
@@ -401,7 +401,7 @@ function NameplateBanner() {
                   LIMITED NAMEPLATE
                 </span>
                 <span
-                  className='rounded px-2 py-0.5 text-[10px] font-bold tracking-wide'
+                  className='rounded px-2 py-0.5 text-[11px] font-bold tracking-wide'
                   style={{
                     background: gold,
                     color: '#0a0a0a',
@@ -622,7 +622,7 @@ function TitleBanner() {
                   </span>
                   <span
                     className={cn(
-                      'rewards-tag-pop rounded px-2 py-0.5 text-[10px] font-bold tracking-wide text-white',
+                      'rewards-tag-pop rounded px-2 py-0.5 text-[11px] font-bold tracking-wide text-white',
                       tagsIn && 'is-on'
                     )}
                     style={{ background: red }}
@@ -631,7 +631,7 @@ function TitleBanner() {
                   </span>
                   <span
                     className={cn(
-                      'rewards-tag-pop rounded border px-2 py-0.5 text-[10px] font-bold',
+                      'rewards-tag-pop rounded border px-2 py-0.5 text-[11px] font-bold',
                       tagsIn && 'is-on'
                     )}
                     style={{
@@ -942,7 +942,7 @@ function PrizeCard({
 
         <div className='min-w-0 flex-1'>
           <span
-            className='inline-flex rounded border px-2 py-0.5 font-mono text-[10px] font-bold tracking-[1.2px]'
+            className='inline-flex rounded border px-2 py-0.5 font-mono text-[11px] font-bold tracking-[1.2px]'
             style={{
               color: divisionTag.color,
               background: divisionTag.bg,

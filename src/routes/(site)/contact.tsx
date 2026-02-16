@@ -791,23 +791,23 @@ function ContactPage() {
               key={i}
               className='tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3 hover:border-[#2a2a2a]'
             >
-              <p className='mb-2 font-mono text-[11px] font-semibold tracking-wide text-white/35 uppercase'>
+              <p className='mb-2 font-mono text-[12px] font-semibold tracking-wide text-white/35 uppercase'>
                 {row.label}
               </p>
-              <div className='grid grid-cols-2 gap-3'>
+              <div className='grid grid-cols-1 gap-3 min-[380px]:grid-cols-2'>
                 <div>
-                  <p className='mb-0.5 font-mono text-[11px] font-bold tracking-wide text-[#f5a623]'>
+                  <p className='mb-0.5 font-mono text-[12px] font-bold tracking-wide text-[#f5a623]'>
                     콘솔
                   </p>
-                  <p className='text-[12px] font-semibold text-white/90 break-keep'>
+                  <p className='text-[13px] leading-[1.45] font-semibold break-keep text-white/90'>
                     {row.console}
                   </p>
                 </div>
                 <div>
-                  <p className='mb-0.5 font-mono text-[11px] font-bold tracking-wide text-[#f5a623]'>
+                  <p className='mb-0.5 font-mono text-[12px] font-bold tracking-wide text-[#f5a623]'>
                     아케이드
                   </p>
-                  <p className='text-[12px] font-semibold text-white/90 break-keep'>
+                  <p className='text-[13px] leading-[1.45] font-semibold break-keep text-white/90'>
                     {row.arcade}
                   </p>
                 </div>

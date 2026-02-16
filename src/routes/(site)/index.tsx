@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useSite } from '@/lib/api'
 import { sanitizeUrl, sanitizeImgSrc } from '@/lib/sanitize-url'
@@ -147,10 +147,33 @@ type SiteData = {
 function HomePage() {
   const { data: site } = useSite<SiteData>()
   const [heroAnimOn, setHeroAnimOn] = useState(false)
+  const [mobilePressedButton, setMobilePressedButton] = useState<
+    'apply' | 'schedule' | null
+  >(null)
+  const mobilePressedTimerRef = useRef<number | null>(null)
+
+  const triggerMobileButtonFx = (button: 'apply' | 'schedule') => {
+    setMobilePressedButton(button)
+    if (mobilePressedTimerRef.current != null) {
+      window.clearTimeout(mobilePressedTimerRef.current)
+    }
+    mobilePressedTimerRef.current = window.setTimeout(() => {
+      setMobilePressedButton(null)
+      mobilePressedTimerRef.current = null
+    }, 220)
+  }
 
   useEffect(() => {
     const raf = window.requestAnimationFrame(() => setHeroAnimOn(true))
     return () => window.cancelAnimationFrame(raf)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (mobilePressedTimerRef.current != null) {
+        window.clearTimeout(mobilePressedTimerRef.current)
+      }
+    }
   }, [])
 
   const partners: Partner[] = site?.partners?.length
@@ -291,32 +314,56 @@ function HomePage() {
           <Link
             to='/apply'
             className='group/cta tkc-motion-lift relative inline-flex w-full items-center justify-center rounded-lg px-7 py-3 text-[15px] font-semibold text-white'
+            onTouchStart={() => triggerMobileButtonFx('apply')}
+            onMouseDown={() => triggerMobileButtonFx('apply')}
             style={{
               background: '#e74c3c',
               boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
             }}
           >
-            <span className='transition-opacity duration-300 group-active/cta:opacity-0'>
+            <span
+              className={cn(
+                'transition-opacity duration-200',
+                mobilePressedButton === 'apply' && 'opacity-0'
+              )}
+            >
               대회 신청하기
             </span>
             <img
               src='/characters/don-wink.png'
               alt=''
-              className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-active/cta:scale-100 group-active/cta:opacity-100'
+              className={cn(
+                'pointer-events-none absolute inset-0 m-auto h-8 w-8 object-contain transition-all duration-200',
+                mobilePressedButton === 'apply'
+                  ? 'scale-100 opacity-100'
+                  : 'scale-75 opacity-0'
+              )}
               draggable={false}
             />
           </Link>
           <Link
             to='/schedule'
             className='group/cta2 tkc-motion-lift relative inline-flex w-full items-center justify-center rounded-lg border border-[#1e1e1e] px-6 py-3 text-[15px] font-semibold text-white/65 hover:border-white/30 hover:bg-white/[0.03] hover:text-white'
+            onTouchStart={() => triggerMobileButtonFx('schedule')}
+            onMouseDown={() => triggerMobileButtonFx('schedule')}
           >
-            <span className='transition-opacity duration-300 group-active/cta2:opacity-0'>
+            <span
+              className={cn(
+                'transition-opacity duration-200',
+                mobilePressedButton === 'schedule' && 'opacity-0'
+              )}
+            >
               일정 보기 →
             </span>
             <img
               src='/characters/katsu-wink.png'
               alt=''
-              className='pointer-events-none absolute inset-0 m-auto h-8 w-8 scale-75 object-contain opacity-0 transition-all duration-300 group-active/cta2:scale-100 group-active/cta2:opacity-100'
+              className={cn(
+                'pointer-events-none absolute inset-0 m-auto h-8 w-8 object-contain transition-all duration-200',
+                mobilePressedButton === 'schedule'
+                  ? 'scale-100 opacity-100'
+                  : 'scale-75 opacity-0'
+              )}
               draggable={false}
             />
           </Link>
@@ -378,10 +425,10 @@ function HomePage() {
                   </div>
                   <div>
                     <div className='mb-1 flex flex-wrap items-center gap-1.5'>
-                      <span className='font-mono text-[10px] font-bold tracking-[1.5px] text-[#f5a623]'>
+                      <span className='font-mono text-[11px] font-bold tracking-[1.5px] text-[#f5a623]'>
                         LIMITED NAMEPLATE
                       </span>
-                      <span className='rounded bg-[#f5a623] px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#0a0a0a]'>
+                      <span className='rounded bg-[#f5a623] px-1.5 py-0.5 text-[11px] font-bold leading-none text-[#0a0a0a]'>
                         한정
                       </span>
                     </div>
@@ -401,29 +448,29 @@ function HomePage() {
                     <span className='text-[12px] font-semibold text-white/30'>
                       명찰 디자인 미리보기
                     </span>
-                    <span className='rounded-md bg-[#f5a623]/[0.06] px-2.5 py-1 font-mono text-[9px] font-bold tracking-[1.5px] text-[#f5a623]/40'>
+                    <span className='rounded-md bg-[#f5a623]/[0.06] px-2.5 py-1 font-mono text-[11px] font-bold tracking-[1.5px] text-[#f5a623]/40'>
                       COMING SOON
                     </span>
                   </div>
                 </div>
 
-                <div className='flex flex-wrap items-center gap-2'>
+                <div className='flex flex-wrap items-center gap-2.5'>
                   {[
                     { num: '1', label: '엔트리 등록' },
                     { num: '2', label: '참가 확인' },
                     { num: '3', label: '현장 수령' },
                   ].map((step, i) => (
-                    <div key={step.num} className='flex items-center'>
+                    <div key={step.num} className='flex items-center gap-1'>
                       {i > 0 && (
-                        <span className='text-[11px] text-[#f5a623]/30'>
+                        <span className='mx-1 shrink-0 text-[11px] text-[#f5a623]/30'>
                           →
                         </span>
                       )}
                       <div className='flex items-center gap-1.5'>
-                        <span className='flex size-[18px] items-center justify-center rounded-[5px] bg-[#f5a623]/10 text-[10px] font-extrabold text-[#f5a623]'>
+                        <span className='flex size-[19px] items-center justify-center rounded-[5px] bg-[#f5a623]/10 text-[11px] font-extrabold text-[#f5a623]'>
                           {step.num}
                         </span>
-                        <span className='text-[12px] font-medium text-white/55'>
+                        <span className='text-[12px] font-medium text-white/55 sm:text-[13px]'>
                           {step.label}
                         </span>
                       </div>
@@ -447,13 +494,13 @@ function HomePage() {
                   </div>
                   <div>
                     <div className='mb-1 flex flex-wrap items-center gap-1.5'>
-                      <span className='font-mono text-[10px] font-bold tracking-[1.5px] text-[#e74c3c]'>
+                      <span className='font-mono text-[11px] font-bold tracking-[1.5px] text-[#e74c3c]'>
                         IN-GAME TITLE
                       </span>
-                      <span className='rounded bg-[#e74c3c] px-1.5 py-0.5 text-[9px] font-bold leading-none text-white'>
+                      <span className='rounded bg-[#e74c3c] px-1.5 py-0.5 text-[11px] font-bold leading-none text-white'>
                         한정
                       </span>
-                      <span className='rounded border border-[#e74c3c]/20 bg-[#e74c3c]/10 px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#e74c3c]'>
+                      <span className='rounded border border-[#e74c3c]/20 bg-[#e74c3c]/10 px-1.5 py-0.5 text-[11px] font-bold leading-none text-[#e74c3c]'>
                         🇰🇷 KR ONLY
                       </span>
                     </div>
@@ -473,7 +520,7 @@ function HomePage() {
                     <span className='text-[12px] font-semibold text-white/30'>
                       칭호 디자인 미리보기
                     </span>
-                    <span className='rounded-md bg-[#e74c3c]/[0.06] px-2.5 py-1 font-mono text-[9px] font-bold tracking-[1.5px] text-[#e74c3c]/40'>
+                    <span className='rounded-md bg-[#e74c3c]/[0.06] px-2.5 py-1 font-mono text-[11px] font-bold tracking-[1.5px] text-[#e74c3c]/40'>
                       COMING SOON
                     </span>
                   </div>
@@ -760,7 +807,7 @@ function VenueThumb({ src }: { src?: string }) {
 
   if (!src || failed) {
     return (
-      <span className='flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e74c3c]/20 bg-[#e74c3c]/12 text-[10px] leading-none text-[#e74c3c]/80'>
+      <span className='flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e74c3c]/20 bg-[#e74c3c]/12 text-[11px] leading-none text-[#e74c3c]/80'>
         •
       </span>
     )
@@ -840,7 +887,7 @@ function ScheduleStrip() {
                     </span>
                   </div>
                   <span
-                    className={`rounded-[4px] border px-2 py-[3px] font-mono text-[9px] font-bold tracking-[1.5px] ${tag.cls}`}
+                    className={`rounded-[4px] border px-2 py-[3px] font-mono text-[11px] font-bold tracking-[1.5px] ${tag.cls}`}
                   >
                     {tag.label}
                   </span>
@@ -852,22 +899,22 @@ function ScheduleStrip() {
                       return (
                         <div
                           key={`${ev.name}-${ev.fullDate}`}
-                          className='flex items-center gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
+                          className='flex items-start gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
                         >
                           <span className='w-[44px] shrink-0 text-[14px] font-extrabold tracking-tight tabular-nums text-white/75'>
                             {fmtDate(ev.fullDate)}
                           </span>
                           <span className='size-1.5 shrink-0 rounded-full bg-[#4a9eff] shadow-[0_0_6px_rgba(74,158,255,0.3)]' />
                           <div className='min-w-0 flex-1'>
-                            <div className='truncate text-[13px] font-semibold text-white/80'>
+                            <div className='text-[13px] leading-[1.35] font-semibold break-keep text-white/80 sm:truncate'>
                               {ev.name}
                             </div>
-                            <div className='truncate text-[11px] text-white/35'>
+                            <div className='text-[11px] leading-[1.35] break-keep text-white/35 sm:truncate'>
                               {ev.detail}
                             </div>
                           </div>
                           {ev.badge && (
-                            <span className='shrink-0 rounded-[4px] bg-[#4a9eff]/8 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-[#4a9eff]'>
+                            <span className='shrink-0 rounded-[4px] bg-[#4a9eff]/8 px-1.5 py-0.5 text-[11px] font-bold tracking-wide text-[#4a9eff]'>
                               {ev.badge}
                             </span>
                           )}
@@ -879,17 +926,17 @@ function ScheduleStrip() {
                       return (
                         <div
                           key={`${ev.name}-${ev.fullDate}`}
-                          className='flex items-center gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
+                          className='flex items-start gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
                         >
                           <span className='w-[44px] shrink-0 text-[14px] font-extrabold tracking-tight tabular-nums text-white/75'>
                             {fmtDate(ev.fullDate)}
                           </span>
                           <VenueThumb src={ev.venueImage} />
                           <div className='min-w-0 flex-1'>
-                            <div className='truncate text-[13px] font-semibold text-white/80'>
+                            <div className='text-[13px] leading-[1.35] font-semibold break-keep text-white/80 sm:truncate'>
                               {ev.name}
                             </div>
-                            <div className='truncate text-[11px] text-white/35'>
+                            <div className='text-[11px] leading-[1.35] break-keep text-white/35 sm:truncate'>
                               {ev.venueName}
                             </div>
                           </div>
@@ -901,17 +948,17 @@ function ScheduleStrip() {
                       return (
                         <div
                           key={`${ev.name}-${ev.fullDate}`}
-                          className='flex items-center gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
+                          className='flex items-start gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
                         >
                           <span className='w-[44px] shrink-0 text-[14px] font-extrabold tracking-tight tabular-nums text-white/55'>
                             {fmtDate(ev.fullDate)}
                           </span>
                           <span className='size-1.5 shrink-0 rounded-full bg-white/25' />
                           <div className='min-w-0 flex-1'>
-                            <div className='truncate text-[13px] font-semibold text-white/55'>
+                            <div className='text-[13px] leading-[1.35] font-semibold break-keep text-white/55 sm:truncate'>
                               {ev.name}
                             </div>
-                            <div className='truncate text-[11px] text-white/30'>
+                            <div className='text-[11px] leading-[1.35] break-keep text-white/30 sm:truncate'>
                               {ev.detail}
                             </div>
                           </div>
@@ -924,16 +971,16 @@ function ScheduleStrip() {
                         key={`${ev.name}-${ev.fullDate}`}
                         className='rounded-lg border border-[#e74c3c]/12 bg-gradient-to-br from-[#e74c3c]/[0.04] to-[#f5a623]/[0.02] px-3 py-3.5'
                       >
-                        <div className='flex items-center gap-2.5'>
+                        <div className='flex items-start gap-2.5'>
                           <span className='w-[44px] shrink-0 bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-[14px] font-extrabold tracking-tight tabular-nums text-transparent'>
                             {fmtDate(ev.fullDate)}
                           </span>
                           <span className='size-1.5 shrink-0 rounded-full bg-[#f5a623] shadow-[0_0_6px_rgba(245,166,35,0.35)]' />
                           <div className='min-w-0 flex-1'>
-                            <div className='truncate text-[14px] font-bold text-white/90'>
+                            <div className='text-[14px] leading-[1.35] font-bold break-keep text-white/90 sm:truncate'>
                               {ev.name}
                             </div>
-                            <div className='truncate text-[11px] text-white/40'>
+                            <div className='text-[11px] leading-[1.35] break-keep text-white/40 sm:truncate'>
                               {ev.venueName} · {ev.detail}
                             </div>
                           </div>
@@ -955,7 +1002,7 @@ function ScheduleStrip() {
                       />
                     )}
                     <div className='flex flex-col gap-0.5'>
-                      <span className='text-[10px] text-white/35'>
+                      <span className='text-[11px] text-white/35'>
                         {finalsEvent.footerLabel}
                       </span>
                       <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-[13px] font-extrabold tracking-[-0.3px] text-transparent'>
