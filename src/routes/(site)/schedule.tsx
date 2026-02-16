@@ -93,6 +93,7 @@ const SCHEDULE: MonthGroup[] = [
         title: '오프라인 예선 → 광주',
         location: '게임플라자',
         venueImage: '/branding/venue-gwangju.webp',
+        mapQuery: '게임플라자 광주',
         mode: 'offline',
         division: 'arcade',
         participants: [],
@@ -104,6 +105,7 @@ const SCHEDULE: MonthGroup[] = [
         title: '오프라인 예선 → 부산',
         location: '게임D',
         venueImage: '/branding/venue-busan.webp',
+        mapQuery: '게임D 부산',
         mode: 'offline',
         division: 'arcade',
         participants: [],
@@ -130,6 +132,7 @@ const SCHEDULE: MonthGroup[] = [
         title: '결선 → PlayX4',
         subtitle: '콘솔 + 아케이드 동시 진행',
         location: '킨텍스',
+        mapQuery: '킨텍스',
         mode: 'finals',
         division: 'all',
         participants: [],
@@ -205,6 +208,94 @@ function VenueThumb({ src }: { src?: string }) {
       draggable={false}
       onError={() => setFailed(true)}
     />
+  )
+}
+
+/* ── Kakao Maps ── */
+
+let kakaoPromise: Promise<void> | null = null
+
+function loadKakaoSDK(): Promise<void> {
+  if (kakaoPromise) return kakaoPromise
+  const key = import.meta.env.VITE_KAKAO_MAP_KEY
+  if (!key) return Promise.reject(new Error('Missing VITE_KAKAO_MAP_KEY'))
+
+  kakaoPromise = new Promise<void>((resolve, reject) => {
+    if (window.kakao?.maps) {
+      window.kakao.maps.load(() => resolve())
+      return
+    }
+    const script = document.createElement('script')
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`
+    script.onload = () => window.kakao!.maps.load(() => resolve())
+    script.onerror = () => {
+      kakaoPromise = null
+      reject(new Error('Kakao Maps SDK load failed'))
+    }
+    document.head.appendChild(script)
+  })
+  return kakaoPromise
+}
+
+function VenueMap({ query }: { query: string }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+
+  useEffect(() => {
+    let cancelled = false
+
+    loadKakaoSDK()
+      .then(() => {
+        if (cancelled || !containerRef.current) return
+        const k = window.kakao!.maps
+
+        const map = new k.Map(containerRef.current, {
+          center: new k.LatLng(37.5665, 126.978),
+          level: 3,
+        })
+
+        const ps = new k.services.Places()
+        ps.keywordSearch(query, (data, searchStatus) => {
+          if (cancelled) return
+          if (searchStatus === k.services.Status.OK && data[0]) {
+            const pos = new k.LatLng(Number(data[0].y), Number(data[0].x))
+            map.setCenter(pos)
+            new k.Marker({ map, position: pos })
+            setStatus('ready')
+          } else {
+            setStatus('error')
+          }
+        })
+      })
+      .catch(() => {
+        if (!cancelled) setStatus('error')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [query])
+
+  if (status === 'error') return null
+
+  return (
+    <div className='mt-2.5 overflow-hidden rounded-lg border border-[#1e1e1e]'>
+      <div
+        ref={containerRef}
+        className={cn(
+          'h-[160px] w-full bg-[#0d0d0d]',
+          status === 'loading' && 'animate-pulse'
+        )}
+      />
+      <a
+        href={`https://map.kakao.com/link/search/${encodeURIComponent(query)}`}
+        target='_blank'
+        rel='noopener noreferrer'
+        className='flex items-center justify-center gap-1.5 border-t border-[#1e1e1e] bg-[#0d0d0d] py-2 text-[11px] font-medium text-white/30 transition-colors hover:text-[#4a9eff]'
+      >
+        카카오맵에서 보기 →
+      </a>
+    </div>
   )
 }
 
@@ -342,39 +433,42 @@ function EventDetail({ event }: { event: ScheduleEvent }) {
   return (
     <div className='space-y-4'>
       {/* Venue card */}
-      {(event.venueImage || event.address || event.mapUrl) && (
-        <div className='flex items-start gap-3.5 rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] p-3.5'>
-          {event.venueImage && (
-            <img
-              src={event.venueImage}
-              alt={event.location ?? ''}
-              className='size-16 shrink-0 rounded-lg border border-white/10 object-cover'
-              loading='lazy'
-              draggable={false}
-            />
-          )}
-          <div className='min-w-0 flex-1'>
-            {event.location && (
-              <div className='text-[14px] font-bold text-white/80'>
-                {event.location}
-              </div>
+      {(event.venueImage || event.address || event.mapQuery) && (
+        <div className='overflow-hidden rounded-lg border border-[#1e1e1e] bg-[#0d0d0d]'>
+          <div className='flex items-start gap-3.5 p-3.5'>
+            {event.venueImage && (
+              <img
+                src={event.venueImage}
+                alt={event.location ?? ''}
+                className='size-16 shrink-0 rounded-lg border border-white/10 object-cover'
+                loading='lazy'
+                draggable={false}
+              />
             )}
-            {event.address && (
-              <div className='mt-0.5 text-[12px] text-white/35'>
-                {event.address}
-              </div>
-            )}
-            {event.mapUrl && (
-              <a
-                href={event.mapUrl}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='mt-1.5 inline-flex items-center gap-1 text-[12px] font-medium text-[#4a9eff] hover:text-[#6ab0ff]'
-              >
-                지도 보기 →
-              </a>
-            )}
+            <div className='min-w-0 flex-1'>
+              {event.location && (
+                <div className='text-[14px] font-bold text-white/80'>
+                  {event.location}
+                </div>
+              )}
+              {event.address && (
+                <div className='mt-0.5 text-[12px] text-white/35'>
+                  {event.address}
+                </div>
+              )}
+              {event.mapUrl && (
+                <a
+                  href={event.mapUrl}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='mt-1.5 inline-flex items-center gap-1 text-[12px] font-medium text-[#4a9eff] hover:text-[#6ab0ff]'
+                >
+                  지도 보기 →
+                </a>
+              )}
+            </div>
           </div>
+          {event.mapQuery && <VenueMap query={event.mapQuery} />}
         </div>
       )}
 
