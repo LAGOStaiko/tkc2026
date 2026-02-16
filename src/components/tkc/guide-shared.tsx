@@ -98,21 +98,36 @@ export function TkcIcon({
     info: '/characters/callout-info.png',
     warning: '/characters/callout-warning.png',
   }
-  const resolveSrc = (iconName: string) =>
-    iconOverrides[iconName] ?? `/branding/v2/emojis/png/${iconName}.png`
   const fallbackSrc = iconOverrides.info
+  const overrideSrc = iconOverrides[name]
+  const primarySrc = overrideSrc ?? `/branding/v2/emojis/webp/${name}.webp`
+  const pngFallbackSrc = overrideSrc ?? `/branding/v2/emojis/png/${name}.png`
 
   return (
     <img
-      src={resolveSrc(name)}
+      src={primarySrc}
       alt=''
       className={`${className} object-contain`}
       draggable={false}
       loading='lazy'
+      data-fallback-stage='primary'
       onError={(event) => {
         const image = event.currentTarget
-        if (image.dataset.fallbackApplied === 'true') return
-        image.dataset.fallbackApplied = 'true'
+        if (overrideSrc) {
+          if (image.dataset.fallbackStage === 'final') return
+          image.dataset.fallbackStage = 'final'
+          image.src = fallbackSrc
+          return
+        }
+
+        if (image.dataset.fallbackStage === 'primary') {
+          image.dataset.fallbackStage = 'png'
+          image.src = pngFallbackSrc
+          return
+        }
+
+        if (image.dataset.fallbackStage === 'final') return
+        image.dataset.fallbackStage = 'final'
         image.src = fallbackSrc
       }}
     />

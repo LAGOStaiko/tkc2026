@@ -9,7 +9,7 @@ export const Route = createFileRoute('/(site)/')({
 })
 
 const ASSETS = {
-  hero: '/branding/v2/home-hero.jpg',
+  hero: '/branding/v2/home-hero.webp',
   logo: '/branding/v2/logo.png',
 }
 const HOME_YOUTUBE_ID = 'DQKIfLMIgXY'
@@ -32,7 +32,7 @@ const DIVISIONS = [
     periodStart: '03.02',
     periodEnd: '04.30',
     detailTo: '/console' as const,
-    logoSrc: '/branding/taiko-console-logo.png',
+    logoSrc: '/branding/taiko-console-logo.webp',
   },
   {
     num: '02',
@@ -43,7 +43,7 @@ const DIVISIONS = [
     periodStart: '03.02',
     periodEnd: '04.11',
     detailTo: '/arcade' as const,
-    logoSrc: '/branding/taiko-arcade-logo.png',
+    logoSrc: '/branding/taiko-arcade-logo.webp',
   },
 ]
 
@@ -91,16 +91,16 @@ const SCHEDULE_MONTHS: {
     events: [
       { type: 'range', name: '콘솔 예선', detail: '온라인 · 약 2개월간 진행', startDate: '2026-03-02', endDate: '2026-04-30', division: 'console' },
       { type: 'range', name: '아케이드 온라인 예선', detail: '2주간 진행', startDate: '2026-03-02', endDate: '2026-03-16', division: 'arcade' },
-      { type: 'single', name: '오프라인 예선 → 서울', fullDate: '2026-03-21', venueName: 'TAIKO LABS · 서울', venueImage: '/branding/venue-seoul.png' },
-      { type: 'single', name: '오프라인 예선 → 대전', fullDate: '2026-03-28', venueName: '싸이뮤직 게임월드 · 대전', venueImage: '/branding/venue-daejeon.png' },
+      { type: 'single', name: '오프라인 예선 → 서울', fullDate: '2026-03-21', venueName: 'TAIKO LABS · 서울', venueImage: '/branding/venue-seoul.webp' },
+      { type: 'single', name: '오프라인 예선 → 대전', fullDate: '2026-03-28', venueName: '싸이뮤직 게임월드 · 대전', venueImage: '/branding/venue-daejeon.webp' },
     ],
   },
   {
     label: '4월',
     labelEn: 'APRIL',
     events: [
-      { type: 'single', name: '오프라인 예선 → 광주', fullDate: '2026-04-04', venueName: '게임플라자 · 광주', venueImage: '/branding/venue-gwangju.png' },
-      { type: 'single', name: '오프라인 예선 → 부산', fullDate: '2026-04-11', venueName: '게임D · 부산', venueImage: '/branding/venue-busan.png' },
+      { type: 'single', name: '오프라인 예선 → 광주', fullDate: '2026-04-04', venueName: '게임플라자 · 광주', venueImage: '/branding/venue-gwangju.webp' },
+      { type: 'single', name: '오프라인 예선 → 부산', fullDate: '2026-04-11', venueName: '게임D · 부산', venueImage: '/branding/venue-busan.webp' },
       { type: 'deadline', name: '콘솔 예선 마감', detail: '온라인 예선 제출 종료', fullDate: '2026-04-30' },
     ],
   },
@@ -910,3 +910,4 @@ function YouTubeEmbed() {
     </div>
   )
 }
+

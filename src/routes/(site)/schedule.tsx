@@ -110,22 +110,22 @@ type VenueAsset = {
 
 const VENUE_ASSETS: VenueAsset[] = [
   {
-    image: '/branding/venue-seoul.png',
+    image: '/branding/venue-seoul.webp',
     dates: ['2026-03-21', '03.21', '3.21', '03-21'],
     keywords: ['taiko labs', 'taikolabs', '서울', 'seoul'],
   },
   {
-    image: '/branding/venue-daejeon.png',
+    image: '/branding/venue-daejeon.webp',
     dates: ['2026-03-28', '03.28', '3.28', '03-28'],
     keywords: ['싸이뮤직', 'cygameworld', '대전', 'daejeon'],
   },
   {
-    image: '/branding/venue-gwangju.png',
+    image: '/branding/venue-gwangju.webp',
     dates: ['2026-04-04', '04.04', '4.04', '04-04'],
     keywords: ['게임플라자', 'gameplaza', '광주', 'gwangju'],
   },
   {
-    image: '/branding/venue-busan.png',
+    image: '/branding/venue-busan.webp',
     dates: ['2026-04-11', '04.11', '4.11', '04-11'],
     keywords: ['게임d', '게임디', 'game d', 'gamed', '부산', 'busan'],
   },
@@ -1098,3 +1098,4 @@ function SchedulePage() {
     </>
   )
 }
+

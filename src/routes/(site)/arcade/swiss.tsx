@@ -30,10 +30,10 @@ const STAT_ITEMS = [
 ] as const
 
 const REGIONS = [
-  { num: 1, name: '서울', detail: '1차 예선', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.png' },
-  { num: 2, name: '대전', detail: '2차 예선', arcade: '대전 싸이뮤직 게임월드', image: '/branding/venue-daejeon.png' },
-  { num: 3, name: '광주', detail: '3차 예선', arcade: '광주 게임플라자', image: '/branding/venue-gwangju.png' },
-  { num: 4, name: '부산', detail: '4차 예선', arcade: '게임D', image: '/branding/venue-busan.png' },
+  { num: 1, name: '서울', detail: '1차 예선', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.webp' },
+  { num: 2, name: '대전', detail: '2차 예선', arcade: '대전 싸이뮤직 게임월드', image: '/branding/venue-daejeon.webp' },
+  { num: 3, name: '광주', detail: '3차 예선', arcade: '광주 게임플라자', image: '/branding/venue-gwangju.webp' },
+  { num: 4, name: '부산', detail: '4차 예선', arcade: '게임D', image: '/branding/venue-busan.webp' },
 ] as const
 
 const SEED_MATCHES = [
@@ -963,3 +963,4 @@ function ArcadeSwissPage() {
     </>
   )
 }
+

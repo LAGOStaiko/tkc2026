@@ -69,7 +69,7 @@ export function PageHero({
     <section className='-mt-20 overflow-hidden md:-mt-24'>
       <div className='relative h-[320px] sm:h-[380px] md:h-[520px] lg:h-[560px]'>
         <img
-          src='/branding/hero.jpg'
+          src='/branding/hero.webp'
           alt=''
           className='absolute inset-0 h-full w-full object-cover object-[center_top] md:object-center'
           loading='eager'
@@ -118,3 +118,4 @@ export function PageHero({
     </section>
   )
 }
+

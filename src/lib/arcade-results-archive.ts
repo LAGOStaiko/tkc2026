@@ -1,10 +1,10 @@
-﻿import { formatSongLabel } from '@/content/arcade-songs'
+import { formatSongLabel } from '@/content/arcade-songs'
 
 const REGION_DEFINITIONS = [
-  { key: 'seoul', label: '1차 서울', shortLabel: '서울', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.png' },
-  { key: 'daejeon', label: '2차 대전', shortLabel: '대전', arcade: '대전 싸이뮤직 게임월드', image: '/branding/venue-daejeon.png' },
-  { key: 'gwangju', label: '3차 광주', shortLabel: '광주', arcade: '광주 게임플라자', image: '/branding/venue-gwangju.png' },
-  { key: 'busan', label: '4차 부산', shortLabel: '부산', arcade: '게임D', image: '/branding/venue-busan.png' },
+  { key: 'seoul', label: '1차 서울', shortLabel: '서울', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.webp' },
+  { key: 'daejeon', label: '2차 대전', shortLabel: '대전', arcade: '대전 싸이뮤직 게임월드', image: '/branding/venue-daejeon.webp' },
+  { key: 'gwangju', label: '3차 광주', shortLabel: '광주', arcade: '광주 게임플라자', image: '/branding/venue-gwangju.webp' },
+  { key: 'busan', label: '4차 부산', shortLabel: '부산', arcade: '게임D', image: '/branding/venue-busan.webp' },
 ] as const
 
 export type ArcadeRegionKey = (typeof REGION_DEFINITIONS)[number]['key']
@@ -681,3 +681,4 @@ export function isArcadeRegionKey(value: string): value is ArcadeRegionKey {
 export function getRegionDefinitions() {
   return REGION_DEFINITIONS
 }
+
