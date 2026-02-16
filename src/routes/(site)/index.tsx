@@ -10,17 +10,14 @@ export const Route = createFileRoute('/(site)/')({
 
 const ASSETS = {
   hero: '/branding/v2/home-hero.webp',
+  heroBg: '/branding/v2/hero-bg.webp',
+  heroMain: '/branding/v2/hero-title.webp',
+  heroSide: '/branding/v2/hero-side.webp',
+  heroTitle: '/branding/v2/hero-main.webp',
   logo: '/branding/v2/logo.png',
 }
 const HOME_YOUTUBE_ID = 'DQKIfLMIgXY'
 const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
-
-/* ── Character Assets ── */
-const CHARS = {
-  finalsDuo: '/characters/don_katsu_2_sprite_03.png',
-  // Schedule decoration
-  katsuRun: '/characters/don_katsu_normal_5_sprite_02.png', // 달리는 캇짱
-}
 
 const DIVISIONS = [
   {
@@ -52,10 +49,9 @@ const DIVISIONS = [
 type RangeEvent = {
   type: 'range'
   name: string
+  fullDate: string
   detail: string
-  startDate: string
-  endDate: string
-  division: 'console' | 'arcade'
+  badge?: 'ONLINE'
 }
 type SingleEvent = {
   type: 'single'
@@ -76,6 +72,9 @@ type FinalsEvent = {
   detail: string
   fullDate: string
   venueName: string
+  footerLabel: string
+  footerDate: string
+  footerLogoSrc?: string
 }
 type ScheduleEvent = RangeEvent | SingleEvent | DeadlineEvent | FinalsEvent
 
@@ -89,18 +88,23 @@ const SCHEDULE_MONTHS: {
     label: '3월',
     labelEn: 'MARCH',
     events: [
-      { type: 'range', name: '콘솔 예선', detail: '온라인 · 약 2개월간 진행', startDate: '2026-03-02', endDate: '2026-04-30', division: 'console' },
-      { type: 'range', name: '아케이드 온라인 예선', detail: '2주간 진행', startDate: '2026-03-02', endDate: '2026-03-16', division: 'arcade' },
-      { type: 'single', name: '오프라인 예선 → 서울', fullDate: '2026-03-21', venueName: 'TAIKO LABS · 서울', venueImage: '/branding/venue-seoul.webp' },
-      { type: 'single', name: '오프라인 예선 → 대전', fullDate: '2026-03-28', venueName: '싸이뮤직 게임월드 · 대전', venueImage: '/branding/venue-daejeon.webp' },
+      {
+        type: 'range',
+        name: '콘솔 · 아케이드 예선 시작',
+        fullDate: '2026-03-02',
+        detail: '온라인 접수 개시',
+        badge: 'ONLINE',
+      },
+      { type: 'single', name: '오프라인 예선 → 서울', fullDate: '2026-03-21', venueName: 'TAIKO LABS', venueImage: '/branding/venue-seoul.webp' },
+      { type: 'single', name: '오프라인 예선 → 대전', fullDate: '2026-03-28', venueName: '싸이뮤직 게임월드', venueImage: '/branding/venue-daejeon.webp' },
     ],
   },
   {
     label: '4월',
     labelEn: 'APRIL',
     events: [
-      { type: 'single', name: '오프라인 예선 → 광주', fullDate: '2026-04-04', venueName: '게임플라자 · 광주', venueImage: '/branding/venue-gwangju.webp' },
-      { type: 'single', name: '오프라인 예선 → 부산', fullDate: '2026-04-11', venueName: '게임D · 부산', venueImage: '/branding/venue-busan.webp' },
+      { type: 'single', name: '오프라인 예선 → 광주', fullDate: '2026-04-04', venueName: '게임플라자', venueImage: '/branding/venue-gwangju.webp' },
+      { type: 'single', name: '오프라인 예선 → 부산', fullDate: '2026-04-11', venueName: '게임D', venueImage: '/branding/venue-busan.webp' },
       { type: 'deadline', name: '콘솔 예선 마감', detail: '온라인 예선 제출 종료', fullDate: '2026-04-30' },
     ],
   },
@@ -109,37 +113,23 @@ const SCHEDULE_MONTHS: {
     labelEn: 'MAY',
     isFinals: true,
     events: [
-      { type: 'finals', name: '결선 → PlayX4', detail: '콘솔 · 아케이드 동시 진행', fullDate: '2026-05-23', venueName: '킨텍스 · PlayX4 2026' },
+      {
+        type: 'finals',
+        name: '결선 → PlayX4',
+        detail: '콘솔 + 아케이드 동시 진행',
+        fullDate: '2026-05-23',
+        venueName: '킨텍스',
+        footerLabel: '플레이 엑스포 현장 결선',
+        footerDate: '26. 5. 23 (토)',
+        footerLogoSrc: '/branding/playx4-bi-white.png',
+      },
     ],
   },
 ]
 
-function getDateProgress(startDate: string, endDate: string) {
-  const start = new Date(startDate + 'T00:00:00')
-  const end = new Date(endDate + 'T23:59:59')
-  const today = new Date()
-  if (today < start) return 0
-  if (today > end) return 100
-  return Math.round(((today.getTime() - start.getTime()) / (end.getTime() - start.getTime())) * 100)
-}
-
-function getEventStatus(fullDate: string, endDate?: string) {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const start = new Date(fullDate + 'T00:00:00')
-  const end = endDate ? new Date(endDate + 'T23:59:59') : new Date(fullDate + 'T23:59:59')
-  if (today < start) return '예정'
-  if (today <= end) return '진행중'
-  return '종료'
-}
-
 function fmtDate(d: string) {
   const date = new Date(d + 'T00:00:00')
   return `${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
-}
-
-function fmtDay(d: string) {
-  return ['일', '월', '화', '수', '목', '금', '토'][new Date(d + 'T00:00:00').getDay()]
 }
 
 type Partner = {
@@ -167,89 +157,119 @@ function HomePage() {
   return (
     <div>
       {/* ── HERO ── */}
-      <section className='-mt-20 overflow-hidden md:-mt-24'>
-        {/* Image + desktop overlay */}
+      <section className='hero-anim -mt-20 overflow-hidden md:-mt-24'>
         <div className='relative h-[340px] sm:h-[380px] md:h-[520px] lg:h-[560px]'>
-          <img
-            src={ASSETS.hero}
-            alt='TKC2026 Hero'
-            className='absolute inset-0 h-full w-full object-cover object-[center_top] md:object-center'
-            loading='eager'
-          />
+          {/* Layer 1: Background */}
+          <div className='hero-layer hero-layer-bg absolute inset-0 z-[1] flex items-center justify-center'>
+            <img
+              src={ASSETS.heroBg}
+              alt=''
+              className='h-full w-full object-cover object-[center_top] md:object-center'
+              loading='eager'
+              draggable={false}
+            />
+          </div>
+
+          {/* Layer 2: Side characters */}
+          <div className='hero-layer hero-layer-side absolute inset-0 z-[2] flex items-center justify-center'>
+            <img
+              src={ASSETS.heroSide}
+              alt=''
+              className='h-full w-full object-cover object-[center_top] md:object-center'
+              loading='eager'
+              draggable={false}
+            />
+          </div>
+
+          {/* Layer 3: Main character */}
+          <div className='hero-layer hero-layer-main absolute inset-0 z-[3] flex items-center justify-center'>
+            <img
+              src={ASSETS.heroMain}
+              alt=''
+              className='h-full w-full object-cover object-[center_top] md:object-center'
+              loading='eager'
+              draggable={false}
+            />
+          </div>
+
+          {/* Layer 4: Title logo */}
+          <div className='hero-layer hero-layer-title absolute inset-0 z-[4] flex items-center justify-center'>
+            <img
+              src={ASSETS.heroTitle}
+              alt=''
+              className='h-full w-full object-cover object-[center_top] md:object-center'
+              loading='eager'
+              draggable={false}
+            />
+          </div>
+
+          {/* Flash effect (synced with title) */}
+          <div className='hero-flash pointer-events-none absolute inset-0 z-10' />
+
           {/* Top darkening for header readability */}
-          <div className='absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent' />
+          <div className='hero-grad-top absolute inset-x-0 top-0 z-[5] h-32 bg-gradient-to-b from-black/60 to-transparent' />
           {/* Bottom gradient overlay */}
-          <div className='absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black via-black/70 to-transparent' />
+          <div className='hero-grad-bottom absolute inset-x-0 bottom-0 z-[5] h-3/4 bg-gradient-to-t from-black via-black/70 to-transparent' />
 
           {/* Mobile: overlay text on hero */}
-          <div className='absolute inset-x-0 bottom-0 px-6 pb-6 md:hidden'>
-            <FadeIn>
-              <div className='mb-3 inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e74c3c] backdrop-blur-md'>
-                <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e74c3c] shadow-[0_0_8px_#e74c3c]' />
-                TAIKO KOREA CHAMPIONSHIP
-              </div>
-            </FadeIn>
-            <FadeIn delay={120}>
-              <h1 className='text-[28px] leading-[1.15] font-extrabold tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)]'>
-                <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-transparent'>
-                  태고의 달인
-                </span>
-                <br />
-                <span className='text-white'>코리아 챔피언십 2026</span>
-              </h1>
-            </FadeIn>
-            <FadeIn delay={200}>
-              <p className='mt-2 text-[13px] leading-[1.55] font-light text-white/60 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]'>
-                PlayX4 2026에서 만나는 태고의 달인 공식 대회
-              </p>
-            </FadeIn>
+          <div className='hero-cta absolute inset-x-0 bottom-0 z-[6] px-6 pb-6 md:hidden'>
+            <div className='mb-3 inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e74c3c] backdrop-blur-md'>
+              <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e74c3c] shadow-[0_0_8px_#e74c3c]' />
+              TAIKO KOREA CHAMPIONSHIP
+            </div>
+            <h1 className='text-[28px] leading-[1.15] font-extrabold tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)]'>
+              <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-transparent'>
+                태고의 달인
+              </span>
+              <br />
+              <span className='text-white'>코리아 챔피언십 2026</span>
+            </h1>
+            <p className='mt-2 text-[13px] leading-[1.55] font-light text-white/60 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]'>
+              PlayX4 2026에서 만나는 태고의 달인 공식 대회
+            </p>
           </div>
 
           {/* Desktop: overlay buttons */}
-          <div className='absolute inset-x-0 bottom-0 hidden px-8 pb-10 md:block'>
+          <div className='hero-cta absolute inset-x-0 bottom-0 z-[6] hidden px-8 pb-10 md:block'>
             <div className='mx-auto max-w-[1200px]'>
-              <FadeIn delay={200}>
-                <div className='mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-[#e74c3c]/20 bg-[#e74c3c]/[0.08] px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e74c3c]'>
-                  <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e74c3c] shadow-[0_0_8px_#e74c3c]' />
-                  TAIKO KOREA CHAMPIONSHIP
-                </div>
-              </FadeIn>
-              <FadeIn delay={300}>
-                <div className='flex flex-row items-center gap-3'>
-                  <Link
-                    to='/apply'
-                    className='group/cta tkc-motion-lift relative inline-flex items-center justify-center rounded-lg px-7 py-3 text-[15px] font-semibold text-white'
-                    style={{
-                      background: '#e74c3c',
-                      boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
-                    }}
-                  >
-                    <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
-                      대회 신청하기
-                    </span>
-                    <img
-                      src='/characters/don-wink.png'
-                      alt=''
-                      className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta:scale-100 group-hover/cta:opacity-100'
-                      draggable={false}
-                    />
-                  </Link>
-                  <Link
-                    to='/schedule'
-                    className='group/cta2 tkc-motion-lift relative inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] px-6 py-3 text-[15px] font-semibold text-white/80 backdrop-blur-sm hover:border-white/30 hover:bg-white/[0.1] hover:text-white'
-                  >
-                    <span className='transition-opacity duration-300 group-hover/cta2:opacity-0'>
-                      일정 보기 →
-                    </span>
-                    <img
-                      src='/characters/katsu-wink.png'
-                      alt=''
-                      className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta2:scale-100 group-hover/cta2:opacity-100'
-                      draggable={false}
-                    />
-                  </Link>
-                </div>
-              </FadeIn>
+              <div className='mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-[#e74c3c]/20 bg-[#e74c3c]/[0.08] px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#e74c3c]'>
+                <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e74c3c] shadow-[0_0_8px_#e74c3c]' />
+                TAIKO KOREA CHAMPIONSHIP
+              </div>
+              <div className='flex flex-row items-center gap-3'>
+                <Link
+                  to='/apply'
+                  className='group/cta tkc-motion-lift relative inline-flex items-center justify-center rounded-lg px-7 py-3 text-[15px] font-semibold text-white'
+                  style={{
+                    background: '#e74c3c',
+                    boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
+                  }}
+                >
+                  <span className='transition-opacity duration-300 group-hover/cta:opacity-0'>
+                    대회 신청하기
+                  </span>
+                  <img
+                    src='/characters/don-wink.png'
+                    alt=''
+                    className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta:scale-100 group-hover/cta:opacity-100'
+                    draggable={false}
+                  />
+                </Link>
+                <Link
+                  to='/schedule'
+                  className='group/cta2 tkc-motion-lift relative inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] px-6 py-3 text-[15px] font-semibold text-white/80 backdrop-blur-sm hover:border-white/30 hover:bg-white/[0.1] hover:text-white'
+                >
+                  <span className='transition-opacity duration-300 group-hover/cta2:opacity-0'>
+                    일정 보기 →
+                  </span>
+                  <img
+                    src='/characters/katsu-wink.png'
+                    alt=''
+                    className='pointer-events-none absolute inset-0 m-auto h-9 w-9 scale-75 object-contain opacity-0 transition-all duration-300 group-hover/cta2:scale-100 group-hover/cta2:opacity-100'
+                    draggable={false}
+                  />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -316,6 +336,175 @@ function HomePage() {
         </FadeIn>
         <FadeIn delay={100}>
           <ScheduleStrip />
+        </FadeIn>
+      </section>
+
+      {/* ── REWARDS ── */}
+      <section className='mt-8 sm:mt-8 md:mt-10'>
+        <FadeIn>
+          <SectionHead label='Rewards' title='보상'>
+            <Link
+              to='/rewards'
+              className='text-sm text-white/55 transition-colors hover:text-[#f5a623]'
+            >
+              자세히 보기 →
+            </Link>
+          </SectionHead>
+        </FadeIn>
+
+        <div className='grid gap-3 md:grid-cols-2'>
+          {/* ── 한정 명찰 ── */}
+          <FadeIn delay={100}>
+            <div className='group relative overflow-hidden rounded-xl border border-[#f5a623]/15 bg-[#111] transition-all hover:border-[#f5a623]/30'>
+              <div className='absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-[#f5a623] via-[#f5a623]/40 to-transparent' />
+              <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-[#f5a623]/[0.03] to-transparent' />
+
+              <div className='relative p-6'>
+                <div className='mb-4 flex items-start gap-3.5'>
+                  <div className='flex size-12 shrink-0 items-center justify-center rounded-[12px] border border-[#f5a623]/20 bg-gradient-to-br from-[#f5a623]/15 to-[#f5a623]/[0.05] text-xl shadow-[0_0_16px_rgba(245,166,35,0.08)]'>
+                    🏷
+                  </div>
+                  <div>
+                    <div className='mb-1 flex items-center gap-2'>
+                      <span className='font-mono text-[10px] font-bold tracking-[1.5px] text-[#f5a623]'>
+                        LIMITED NAMEPLATE
+                      </span>
+                      <span className='rounded bg-[#f5a623] px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#0a0a0a]'>
+                        한정
+                      </span>
+                    </div>
+                    <h3 className='text-[17px] font-extrabold tracking-tight'>
+                      TKC 2026 한정 명찰
+                    </h3>
+                  </div>
+                </div>
+
+                <p className='mb-4 text-[13px] leading-relaxed text-white/50'>
+                  대회 참가 + 결선 직관을 모두 완료한 참가자 한정
+                </p>
+
+                <div className='mb-5 overflow-hidden rounded-lg border border-dashed border-[#f5a623]/20 bg-gradient-to-br from-[#f5a623]/[0.02] to-transparent'>
+                  <div className='flex flex-col items-center justify-center gap-2 py-8 text-center'>
+                    <span className='text-2xl opacity-40'>🏷</span>
+                    <span className='text-[12px] font-semibold text-white/30'>
+                      명찰 디자인 미리보기
+                    </span>
+                    <span className='rounded-md bg-[#f5a623]/[0.06] px-2.5 py-1 font-mono text-[9px] font-bold tracking-[1.5px] text-[#f5a623]/40'>
+                      COMING SOON
+                    </span>
+                  </div>
+                </div>
+
+                <div className='flex items-center gap-0'>
+                  {[
+                    { num: '1', label: '엔트리 등록' },
+                    { num: '2', label: '참가 확인' },
+                    { num: '3', label: '현장 수령' },
+                  ].map((step, i) => (
+                    <div key={step.num} className='flex items-center'>
+                      {i > 0 && (
+                        <span className='mx-2 text-[11px] text-[#f5a623]/30'>
+                          →
+                        </span>
+                      )}
+                      <div className='flex items-center gap-1.5'>
+                        <span className='flex size-[18px] items-center justify-center rounded-[5px] bg-[#f5a623]/10 text-[10px] font-extrabold text-[#f5a623]'>
+                          {step.num}
+                        </span>
+                        <span className='text-[12px] font-medium text-white/55'>
+                          {step.label}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* ── 인게임 칭호 ── */}
+          <FadeIn delay={200}>
+            <div className='group relative overflow-hidden rounded-xl border border-[#e74c3c]/15 bg-[#111] transition-all hover:border-[#e74c3c]/30'>
+              <div className='absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-[#e74c3c] via-[#e74c3c]/40 to-transparent' />
+              <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-[#e74c3c]/[0.03] to-transparent' />
+
+              <div className='relative p-6'>
+                <div className='mb-4 flex items-start gap-3.5'>
+                  <div className='flex size-12 shrink-0 items-center justify-center rounded-[12px] border border-[#e74c3c]/20 bg-gradient-to-br from-[#e74c3c]/15 to-[#e74c3c]/[0.05] text-xl shadow-[0_0_16px_rgba(231,76,60,0.08)]'>
+                    🏅
+                  </div>
+                  <div>
+                    <div className='mb-1 flex items-center gap-2'>
+                      <span className='font-mono text-[10px] font-bold tracking-[1.5px] text-[#e74c3c]'>
+                        IN-GAME TITLE
+                      </span>
+                      <span className='rounded bg-[#e74c3c] px-1.5 py-0.5 text-[9px] font-bold leading-none text-white'>
+                        한정
+                      </span>
+                      <span className='rounded border border-[#e74c3c]/20 bg-[#e74c3c]/10 px-1.5 py-0.5 text-[9px] font-bold leading-none text-[#e74c3c]'>
+                        🇰🇷 KR ONLY
+                      </span>
+                    </div>
+                    <h3 className='text-[17px] font-extrabold tracking-tight'>
+                      아케이드 인게임 칭호
+                    </h3>
+                  </div>
+                </div>
+
+                <p className='mb-4 text-[13px] leading-relaxed text-white/50'>
+                  대한민국 TKC 2026에서만 획득 가능 · 결선 TOP 8 전원 지급
+                </p>
+
+                <div className='mb-5 overflow-hidden rounded-lg border border-dashed border-[#e74c3c]/20 bg-gradient-to-br from-[#e74c3c]/[0.02] to-transparent'>
+                  <div className='flex flex-col items-center justify-center gap-2 py-8 text-center'>
+                    <span className='text-2xl opacity-40'>🏅</span>
+                    <span className='text-[12px] font-semibold text-white/30'>
+                      칭호 디자인 미리보기
+                    </span>
+                    <span className='rounded-md bg-[#e74c3c]/[0.06] px-2.5 py-1 font-mono text-[9px] font-bold tracking-[1.5px] text-[#e74c3c]/40'>
+                      COMING SOON
+                    </span>
+                  </div>
+                </div>
+
+                <div className='flex flex-wrap gap-1.5'>
+                  <span className='inline-flex items-center gap-1 rounded-md border border-[#f5a623]/15 bg-[#f5a623]/10 px-2 py-1 text-[11px] font-semibold text-[#f5a623]'>
+                    🏆 우승
+                  </span>
+                  <span className='inline-flex rounded-md border border-[#a8b4c0]/12 bg-[#a8b4c0]/10 px-2 py-1 text-[11px] font-semibold text-[#a8b4c0]'>
+                    준우승
+                  </span>
+                  <span className='inline-flex rounded-md border border-[#cd7f32]/12 bg-[#cd7f32]/10 px-2 py-1 text-[11px] font-semibold text-[#cd7f32]'>
+                    3위
+                  </span>
+                  <span className='inline-flex rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-1 text-[11px] font-semibold text-white/50'>
+                    4위
+                  </span>
+                  <span className='inline-flex rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-1 text-[11px] font-semibold text-white/50'>
+                    5~8위
+                  </span>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+
+        <FadeIn delay={300}>
+          <div className='relative mt-3 overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] px-6 py-4'>
+            <div className='absolute bottom-0 left-0 top-0 w-[3px] bg-gradient-to-b from-[#e74c3c] to-[#f5a623]' />
+            <div className='flex flex-wrap items-center justify-between gap-3'>
+              <p className='text-[13px] text-white/50'>
+                <span className='font-semibold text-white/70'>결선 수상자</span>{' '}
+                상장 및 트로피 지급 · 콘솔 부문은 개발진 사인 공식 상패 지급
+              </p>
+              <Link
+                to='/rewards'
+                className='shrink-0 rounded-lg border border-[#1e1e1e] px-4 py-2 text-[12px] font-semibold text-white/50 transition-all hover:border-white/20 hover:text-white'
+              >
+                전체 보상 보기 →
+              </Link>
+            </div>
+          </div>
         </FadeIn>
       </section>
 
@@ -552,300 +741,241 @@ function DivisionPanel({
 /*  Schedule Strip                                                    */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function StatusTag({ status }: { status: string }) {
-  const cls =
-    status === '진행중'
-      ? 'bg-emerald-500/15 text-emerald-400'
-      : status === '종료'
-        ? 'bg-white/[0.03] text-white/35'
-        : 'border border-[#1e1e1e] bg-white/[0.03] text-white/45'
+function VenueThumb({ src }: { src?: string }) {
+  const [failed, setFailed] = useState(!src)
+
+  if (!src || failed) {
+    return (
+      <span className='flex size-7 shrink-0 items-center justify-center rounded-md border border-[#e74c3c]/20 bg-[#e74c3c]/12 text-[10px] leading-none text-[#e74c3c]/80'>
+        •
+      </span>
+    )
+  }
+
   return (
-    <span
-      className={`rounded-[5px] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide whitespace-nowrap ${cls}`}
-    >
-      {status}
-    </span>
+    <img
+      src={src}
+      alt=''
+      className='size-7 shrink-0 rounded-md border border-white/10 object-cover'
+      loading='lazy'
+      draggable={false}
+      onError={() => setFailed(true)}
+    />
   )
 }
 
 function ScheduleStrip() {
-  const overall = getDateProgress('2026-03-02', '2026-05-23')
-  const monthMarkers = [
-    { label: '3월', pct: 0 },
-    { label: '4월', pct: 37 },
-    { label: '5월', pct: 74 },
-  ]
-
   return (
-    <div className='space-y-12'>
-      {/* ── Progress Bar ── */}
-      <div className='relative mt-2 mb-4 h-1 rounded-full bg-[#1e1e1e]'>
-        <div
-          className='absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-[#e74c3c] to-[#f5a623] transition-all duration-1000'
-          style={{ width: `${overall}%` }}
-        />
-        {/* Progress bar runner — 달리는 캇짱 */}
-        {overall > 0 && overall < 100 && (
-          <div
-            className='pointer-events-none absolute -top-5 z-10 transition-all duration-1000'
-            style={{ left: `${Math.min(overall, 95)}%`, transform: 'translateX(-50%)' }}
-          >
-            <img
-              src={CHARS.katsuRun}
-              alt=''
-              className='h-auto w-6 opacity-50'
-              loading='lazy'
-              draggable={false}
-            />
-          </div>
-        )}
-        <div className='absolute -top-2 inset-x-0 flex justify-between'>
-          {monthMarkers.map((m) => {
-            const active = overall >= m.pct
-            return (
-              <div key={m.label} className='flex flex-col items-center'>
-                <div
-                  className={`size-2 rounded-full border-2 border-[#0a0a0a] ${
-                    active
-                      ? 'bg-[#e74c3c] shadow-[0_0_8px_rgba(231,76,60,0.3)]'
-                      : 'bg-[#2a2a2a]'
-                  }`}
-                />
-                <span
-                  className={`mt-2.5 text-[11px] leading-none font-semibold tracking-[0.02em] ${
-                    active ? 'text-[#e74c3c]' : 'text-white/35'
-                  }`}
-                >
-                  {m.label}
-                </span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+    <div>
+      <div className='grid grid-cols-1 gap-0 md:grid-cols-3 md:gap-3'>
+        {SCHEDULE_MONTHS.map((group, idx) => {
+          const monthNum = group.label.replace('월', '')
+          const finalsEvent = group.events.find(
+            (event): event is FinalsEvent => event.type === 'finals'
+          )
+          const tag = group.isFinals
+            ? {
+                label: 'FINALS',
+                cls: 'border-[#e74c3c]/20 bg-[#e74c3c]/10 text-[#e74c3c]',
+              }
+            : idx === 0
+              ? {
+                  label: '예선 시작',
+                  cls: 'border-[#4a9eff]/15 bg-[#4a9eff]/8 text-[#4a9eff]',
+                }
+              : {
+                  label: '예선 마감',
+                  cls: 'border-[#4a9eff]/15 bg-[#4a9eff]/8 text-[#4a9eff]',
+                }
 
-      {/* ── Month Groups ── */}
-      {SCHEDULE_MONTHS.map((group) => (
-        <div key={group.label}>
-          {/* Month label */}
-          <div className='mb-3.5 flex items-center gap-2.5'>
-            <span
-              className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1 text-[11px] leading-none font-semibold tracking-[0.08em] ${
+          return (
+            <div
+              key={group.label}
+              className={`overflow-hidden border bg-[#111] transition-all duration-300 ${
                 group.isFinals
-                  ? 'border-[#e74c3c]/20 bg-[#e74c3c]/[0.04] text-[#e74c3c]'
-                  : 'border-[#1e1e1e] bg-white/[0.02] text-white/40'
+                  ? 'border-[#e74c3c]/20 md:hover:border-[#e74c3c]/35'
+                  : 'border-[#1e1e1e] md:hover:border-[#2a2a2a]'
+              } md:hover:-translate-y-0.5 ${
+                idx === 0
+                  ? 'rounded-t-[14px] border-b-0 md:rounded-[14px] md:border'
+                  : idx === SCHEDULE_MONTHS.length - 1
+                    ? 'rounded-b-[14px] md:rounded-[14px]'
+                    : 'border-b-0 md:rounded-[14px] md:border'
               }`}
             >
-              {group.label} {group.labelEn}
-              {group.isFinals && ' → FINALS'}
-            </span>
-            <div className='h-px flex-1 bg-[#1e1e1e]' />
-          </div>
+              <div
+                className={`h-[3px] ${
+                  group.isFinals
+                    ? 'bg-gradient-to-r from-[#e74c3c] to-[#f5a623]'
+                    : 'bg-gradient-to-r from-[#1e1e1e] to-transparent'
+                }`}
+              />
 
-          {/* Events */}
-          <div className='space-y-3 sm:space-y-2.5'>
-            {group.events.map((ev) => {
-              if (ev.type === 'range') {
-                const progress = getDateProgress(ev.startDate, ev.endDate)
-                const status = getEventStatus(ev.startDate, ev.endDate)
-                return (
-                  <div
-                    key={ev.name}
-                    className='rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
-                  >
-                    <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5'>
-                      <div className='flex w-[52px] shrink-0 flex-col items-start justify-center text-left sm:w-[72px] sm:items-center sm:text-center'>
-                        <div className='w-[5ch] text-left text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-center sm:text-lg'>
-                          {fmtDate(ev.startDate)}
-                        </div>
-                        <div className='my-1 w-[5ch] text-left text-[11px] leading-none text-white/20 sm:text-center'>
-                          →
-                        </div>
-                        <div className='w-[5ch] text-left text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-center sm:text-lg'>
-                          {fmtDate(ev.endDate)}
-                        </div>
-                      </div>
-                      <div className='min-w-0 flex-1'>
-                        <div className='flex items-center justify-between gap-3'>
-                          <div className='min-w-0'>
-                            <div className='text-[14px] leading-[1.4] font-semibold break-keep text-white/90 sm:text-[15px] sm:leading-[1.3]'>
-                              {ev.name}
-                            </div>
-                            <div className='mt-0.5 text-[13px] leading-[1.4] break-keep text-white/40'>
-                              {ev.detail}
-                            </div>
-                          </div>
-                          <div className='hidden shrink-0 gap-1.5 sm:flex'>
-                            <span className='rounded-[5px] bg-[#4a9eff]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#4a9eff]'>
-                              ONLINE
-                            </span>
-                            <StatusTag status={status} />
-                          </div>
-                        </div>
-                        <div className='mt-2 flex gap-1.5 sm:hidden'>
-                          <span className='rounded-[5px] bg-[#4a9eff]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#4a9eff]'>
-                            ONLINE
-                          </span>
-                          <StatusTag status={status} />
-                        </div>
-                        <div className='mt-3 flex items-center gap-2'>
-                          <div className='h-[3px] flex-1 overflow-hidden rounded-full bg-[#1e1e1e]'>
-                            <div
-                              className={`h-full rounded-full transition-all duration-1000 ${
-                                ev.division === 'console'
-                                  ? 'bg-[#e74c3c]'
-                                  : 'bg-[#f5a623]'
-                              }`}
-                              style={{ width: `${progress}%` }}
-                            />
-                          </div>
-                          <span className='text-[11px] leading-none tabular-nums text-white/40'>
-                            {progress}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              }
-
-              if (ev.type === 'single') {
-                const status = getEventStatus(ev.fullDate)
-                return (
-                  <div
-                    key={ev.fullDate}
-                    className='rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'
-                  >
-                    <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5'>
-                      <div className='flex w-[52px] shrink-0 flex-col items-start justify-center text-left sm:w-[72px] sm:items-center sm:text-center'>
-                        <div className='w-[5ch] text-left text-[15px] leading-none font-bold tracking-tight tabular-nums text-white/90 sm:text-center sm:text-xl'>
-                          {fmtDate(ev.fullDate)}
-                        </div>
-                        <div className='mt-1 w-[5ch] text-left text-[11px] leading-none text-white/35 sm:text-center'>
-                          {fmtDay(ev.fullDate)}
-                        </div>
-                      </div>
-                      <div className='min-w-0 flex-1'>
-                        <div className='flex items-center justify-between gap-3'>
-                          <div className='min-w-0'>
-                            <div className='text-[14px] leading-[1.35] font-semibold break-keep text-white/90 sm:text-[15px] sm:leading-[1.3]'>
-                              {ev.name}
-                            </div>
-                            <div className='mt-1 flex items-center gap-1.5 text-[13px] text-white/40'>
-                              {ev.venueImage ? (
-                                <img
-                                  src={ev.venueImage}
-                                  alt=''
-                                  className='size-5 rounded object-cover'
-                                  loading='lazy'
-                                  draggable={false}
-                                />
-                              ) : (
-                                <span className='size-1 rounded-full bg-white/20' />
-                              )}
-                              <span className='break-keep'>{ev.venueName}</span>
-                            </div>
-                          </div>
-                          <div className='hidden shrink-0 gap-1.5 sm:flex'>
-                            <span className='rounded-[5px] bg-[#e74c3c]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e74c3c]'>
-                              OFFLINE
-                            </span>
-                            <StatusTag status={status} />
-                          </div>
-                        </div>
-                        <div className='mt-2 flex gap-1.5 sm:hidden'>
-                          <span className='rounded-[5px] bg-[#e74c3c]/[0.08] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e74c3c]'>
-                            OFFLINE
-                          </span>
-                          <StatusTag status={status} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              }
-
-              if (ev.type === 'deadline') {
-                return (
-                  <div
-                    key={ev.fullDate}
-                    className='flex items-center gap-3 rounded-xl border border-dashed border-[#1e1e1e] bg-[#111]/60 px-5 py-4 sm:gap-4 sm:px-5'
-                  >
-                    <div className='flex w-[52px] shrink-0 flex-col items-start justify-center text-left sm:w-[72px] sm:items-center sm:text-center'>
-                      <div className='w-[5ch] text-left text-[14px] leading-none font-semibold tracking-tight tabular-nums text-white/35 sm:text-center sm:text-[17px]'>
-                        {fmtDate(ev.fullDate)}
-                      </div>
-                    </div>
-                    <div className='min-w-0 flex-1'>
-                      <div className='text-[15px] leading-[1.3] font-medium break-keep text-white/50'>
-                        {ev.name}
-                      </div>
-                      <div className='mt-0.5 text-[13px] leading-[1.4] break-keep text-white/30'>
-                        {ev.detail}
-                      </div>
-                    </div>
-                    <span className='shrink-0 rounded-[5px] border border-[#1e1e1e] bg-white/[0.02] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-white/35'>
-                      마감
+              <div className='p-5'>
+                <div className='mb-4 flex items-center justify-between gap-2'>
+                  <div className='flex items-baseline gap-1.5'>
+                    <span
+                      className={`text-[28px] leading-none font-black tracking-[-1px] ${
+                        group.isFinals
+                          ? 'bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-transparent opacity-60'
+                          : 'text-white/[0.12]'
+                      }`}
+                    >
+                      {monthNum}
+                    </span>
+                    <span
+                      className={`text-[15px] font-bold ${
+                        group.isFinals ? 'text-white/80' : 'text-white/60'
+                      }`}
+                    >
+                      {group.labelEn}
                     </span>
                   </div>
-                )
-              }
-
-              if (ev.type === 'finals') {
-                const status = getEventStatus(ev.fullDate)
-                return (
-                  <div
-                    key={ev.fullDate}
-                    className='relative overflow-hidden rounded-xl border border-[#e74c3c]/20 bg-[#111] transition-colors hover:border-[#e74c3c]/30'
+                  <span
+                    className={`rounded-[4px] border px-2 py-[3px] font-mono text-[9px] font-bold tracking-[1.5px] ${tag.cls}`}
                   >
-                    <div className='absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-[#e74c3c] to-[#f5a623]' />
-                    <div className='flex items-center gap-3 p-5 sm:gap-4 sm:p-5 sm:py-5'>
-                      <div className='flex w-[52px] shrink-0 flex-col items-start justify-center text-left sm:w-[72px] sm:items-center sm:text-center'>
-                        <div className='w-[5ch] bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-left text-lg leading-none font-extrabold tracking-tight tabular-nums text-transparent sm:text-center sm:text-2xl'>
-                          {fmtDate(ev.fullDate)}
-                        </div>
-                        <div className='mt-1 w-[5ch] text-left text-[11px] leading-none text-[#e74c3c]/60 sm:text-center'>
-                          {fmtDay(ev.fullDate)}
-                        </div>
-                      </div>
-                      <div className='min-w-0 flex-1'>
-                        <div className='flex items-start justify-between gap-3'>
-                          <div className='min-w-0'>
-                            <div className='text-[16px] leading-[1.3] font-bold break-keep text-white/90'>
+                    {tag.label}
+                  </span>
+                </div>
+
+                <div className='space-y-2'>
+                  {group.events.map((ev) => {
+                    if (ev.type === 'range') {
+                      return (
+                        <div
+                          key={`${ev.name}-${ev.fullDate}`}
+                          className='flex items-center gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
+                        >
+                          <span className='w-[44px] shrink-0 text-[14px] font-extrabold tracking-tight tabular-nums text-white/75'>
+                            {fmtDate(ev.fullDate)}
+                          </span>
+                          <span className='size-1.5 shrink-0 rounded-full bg-[#4a9eff] shadow-[0_0_6px_rgba(74,158,255,0.3)]' />
+                          <div className='min-w-0 flex-1'>
+                            <div className='truncate text-[13px] font-semibold text-white/80'>
                               {ev.name}
                             </div>
-                            <div className='mt-0.5 text-[13px] leading-[1.4] break-keep text-white/40'>
+                            <div className='truncate text-[11px] text-white/35'>
                               {ev.detail}
                             </div>
-                            <div className='mt-1 flex items-center gap-1.5 text-[13px] text-white/40'>
-                              <span className='size-1 rounded-full bg-[#e74c3c]/50' />
-                              <span className='break-keep'>{ev.venueName}</span>
+                          </div>
+                          {ev.badge && (
+                            <span className='shrink-0 rounded-[4px] bg-[#4a9eff]/8 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-[#4a9eff]'>
+                              {ev.badge}
+                            </span>
+                          )}
+                        </div>
+                      )
+                    }
+
+                    if (ev.type === 'single') {
+                      return (
+                        <div
+                          key={`${ev.name}-${ev.fullDate}`}
+                          className='flex items-center gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
+                        >
+                          <span className='w-[44px] shrink-0 text-[14px] font-extrabold tracking-tight tabular-nums text-white/75'>
+                            {fmtDate(ev.fullDate)}
+                          </span>
+                          <VenueThumb src={ev.venueImage} />
+                          <div className='min-w-0 flex-1'>
+                            <div className='truncate text-[13px] font-semibold text-white/80'>
+                              {ev.name}
+                            </div>
+                            <div className='truncate text-[11px] text-white/35'>
+                              {ev.venueName}
                             </div>
                           </div>
-                          <div className='hidden shrink-0 gap-1.5 sm:flex'>
-                            <span className='rounded-[5px] border border-[#e74c3c]/20 bg-[#e74c3c]/[0.12] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e74c3c]'>
-                              FINALS
-                            </span>
-                            <StatusTag status={status} />
+                        </div>
+                      )
+                    }
+
+                    if (ev.type === 'deadline') {
+                      return (
+                        <div
+                          key={`${ev.name}-${ev.fullDate}`}
+                          className='flex items-center gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
+                        >
+                          <span className='w-[44px] shrink-0 text-[14px] font-extrabold tracking-tight tabular-nums text-white/55'>
+                            {fmtDate(ev.fullDate)}
+                          </span>
+                          <span className='size-1.5 shrink-0 rounded-full bg-white/25' />
+                          <div className='min-w-0 flex-1'>
+                            <div className='truncate text-[13px] font-semibold text-white/55'>
+                              {ev.name}
+                            </div>
+                            <div className='truncate text-[11px] text-white/30'>
+                              {ev.detail}
+                            </div>
                           </div>
                         </div>
-                        <div className='mt-2 flex gap-1.5 sm:hidden'>
-                          <span className='rounded-[5px] border border-[#e74c3c]/20 bg-[#e74c3c]/[0.12] px-2.5 py-1 text-[11px] leading-none font-semibold tracking-wide text-[#e74c3c]'>
-                            FINALS
+                      )
+                    }
+
+                    return (
+                      <div
+                        key={`${ev.name}-${ev.fullDate}`}
+                        className='rounded-lg border border-[#e74c3c]/12 bg-gradient-to-br from-[#e74c3c]/[0.04] to-[#f5a623]/[0.02] px-3 py-3.5'
+                      >
+                        <div className='flex items-center gap-2.5'>
+                          <span className='w-[44px] shrink-0 bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-[14px] font-extrabold tracking-tight tabular-nums text-transparent'>
+                            {fmtDate(ev.fullDate)}
                           </span>
-                          <StatusTag status={status} />
+                          <span className='size-1.5 shrink-0 rounded-full bg-[#f5a623] shadow-[0_0_6px_rgba(245,166,35,0.35)]' />
+                          <div className='min-w-0 flex-1'>
+                            <div className='truncate text-[14px] font-bold text-white/90'>
+                              {ev.name}
+                            </div>
+                            <div className='truncate text-[11px] text-white/40'>
+                              {ev.venueName} · {ev.detail}
+                            </div>
+                          </div>
                         </div>
                       </div>
+                    )
+                  })}
+                </div>
+
+                {group.isFinals && finalsEvent && (
+                  <div className='mt-3.5 flex items-center gap-3 border-t border-[#e74c3c]/10 pt-3.5'>
+                    {finalsEvent.footerLogoSrc && (
+                      <img
+                        src={finalsEvent.footerLogoSrc}
+                        alt='PlayX4'
+                        className='h-4 w-auto shrink-0 object-contain opacity-50'
+                        loading='lazy'
+                        draggable={false}
+                      />
+                    )}
+                    <div className='flex flex-col gap-0.5'>
+                      <span className='text-[10px] text-white/35'>
+                        {finalsEvent.footerLabel}
+                      </span>
+                      <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-[13px] font-extrabold tracking-[-0.3px] text-transparent'>
+                        {finalsEvent.footerDate}
+                      </span>
                     </div>
                   </div>
-                )
-              }
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
 
-              return null
-            })}
-          </div>
-        </div>
-      ))}
+      <div className='mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#1e1e1e] pt-3.5'>
+        <span className='inline-flex items-center gap-1.5 text-[11px] text-white/35'>
+          <span className='size-1.5 rounded-full bg-[#4a9eff]' />
+          온라인
+        </span>
+        <span className='inline-flex items-center gap-1.5 text-[11px] text-white/35'>
+          <span className='size-1.5 rounded-full bg-[#e74c3c]' />
+          오프라인
+        </span>
+        <span className='inline-flex items-center gap-1.5 text-[11px] text-white/35'>
+          <span className='size-1.5 rounded-full bg-[#f5a623]' />
+          결선
+        </span>
+      </div>
     </div>
   )
 }
@@ -910,4 +1040,3 @@ function YouTubeEmbed() {
     </div>
   )
 }
-
