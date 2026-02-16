@@ -512,7 +512,6 @@ function TitleBanner() {
   const [stage, setStage] = useState(0)
   const [iconGlow, setIconGlow] = useState(false)
   const [tagsIn, setTagsIn] = useState(false)
-  const [titleShine, setTitleShine] = useState(false)
   const [borderFlash, setBorderFlash] = useState(false)
 
   useEffect(() => {
@@ -535,7 +534,6 @@ function TitleBanner() {
         setStage(4)
         setIconGlow(true)
         setTagsIn(true)
-        setTitleShine(true)
         return
       }
 
@@ -553,7 +551,6 @@ function TitleBanner() {
       setStage(1)
       schedule(() => setIconGlow(true), enhanceDelay)
       schedule(() => setTagsIn(true), enhanceDelay + 250)
-      schedule(() => setTitleShine(true), enhanceDelay + 450)
       schedule(() => setStage(2), previewDelay)
       schedule(() => setStage(3), previewDelay + calloutsDelay)
       schedule(() => {
