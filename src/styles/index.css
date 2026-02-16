@@ -883,7 +883,7 @@
   opacity: 0;
 }
 .hero-anim .hero-grad-bottom {
-  animation: hero-grad-in 1s ease 1.8s both;
+  animation: hero-grad-in 1s ease 2.5s both;
 }
 
 .hero-cta {

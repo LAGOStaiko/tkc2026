@@ -4,6 +4,8 @@ interface ImportMetaEnv {
   readonly VITE_KAKAO_MAP_KEY: string
 }
 
+type _UseImportMetaEnv = ImportMetaEnv
+
 /* Kakao Maps SDK – minimal type stubs */
 declare global {
   interface Window {

@@ -218,7 +218,9 @@ let kakaoPromise: Promise<void> | null = null
 function loadKakaoSDK(): Promise<void> {
   if (kakaoPromise) return kakaoPromise
   const key = import.meta.env.VITE_KAKAO_MAP_KEY
-  if (!key) return Promise.reject(new Error('Missing VITE_KAKAO_MAP_KEY'))
+  if (!key) {
+    return Promise.reject(new Error('Missing VITE_KAKAO_MAP_KEY'))
+  }
 
   kakaoPromise = new Promise<void>((resolve, reject) => {
     if (window.kakao?.maps) {
@@ -226,8 +228,10 @@ function loadKakaoSDK(): Promise<void> {
       return
     }
     const script = document.createElement('script')
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`
-    script.onload = () => window.kakao!.maps.load(() => resolve())
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services&autoload=false`
+    script.onload = () => {
+      window.kakao!.maps.load(() => resolve())
+    }
     script.onerror = () => {
       kakaoPromise = null
       reject(new Error('Kakao Maps SDK load failed'))
