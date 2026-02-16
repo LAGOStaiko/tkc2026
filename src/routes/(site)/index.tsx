@@ -166,7 +166,7 @@ function HomePage() {
       {/* ── HERO ── */}
       <section
         className={cn(
-          '-mt-20 overflow-hidden md:-mt-24',
+          '-mx-4 -mt-20 overflow-hidden md:mx-0 md:-mt-24',
           heroAnimOn && 'hero-anim'
         )}
       >
@@ -377,7 +377,7 @@ function HomePage() {
                     🏷
                   </div>
                   <div>
-                    <div className='mb-1 flex items-center gap-2'>
+                    <div className='mb-1 flex flex-wrap items-center gap-1.5'>
                       <span className='font-mono text-[10px] font-bold tracking-[1.5px] text-[#f5a623]'>
                         LIMITED NAMEPLATE
                       </span>
@@ -407,7 +407,7 @@ function HomePage() {
                   </div>
                 </div>
 
-                <div className='flex items-center gap-0'>
+                <div className='flex flex-wrap items-center gap-2'>
                   {[
                     { num: '1', label: '엔트리 등록' },
                     { num: '2', label: '참가 확인' },
@@ -415,7 +415,7 @@ function HomePage() {
                   ].map((step, i) => (
                     <div key={step.num} className='flex items-center'>
                       {i > 0 && (
-                        <span className='mx-2 text-[11px] text-[#f5a623]/30'>
+                        <span className='text-[11px] text-[#f5a623]/30'>
                           →
                         </span>
                       )}
@@ -446,7 +446,7 @@ function HomePage() {
                     🏅
                   </div>
                   <div>
-                    <div className='mb-1 flex items-center gap-2'>
+                    <div className='mb-1 flex flex-wrap items-center gap-1.5'>
                       <span className='font-mono text-[10px] font-bold tracking-[1.5px] text-[#e74c3c]'>
                         IN-GAME TITLE
                       </span>
@@ -559,11 +559,11 @@ function HomePage() {
                   <img
                     src={safeLogoUrl}
                     alt={p.name}
-                    className='h-6 w-auto opacity-90'
+                    className='inline-block h-6 w-auto opacity-90'
                     loading='lazy'
                   />
                 ) : (
-                  <span>{p.name}</span>
+                  <span className='leading-none'>{p.name}</span>
                 )
 
                 return hasHref ? (
@@ -572,12 +572,14 @@ function HomePage() {
                     href={safeHref}
                     target='_blank'
                     rel='noreferrer'
-                    className='hover:text-white'
+                    className='inline-flex h-6 items-center hover:text-white'
                   >
                     {node}
                   </a>
                 ) : (
-                  <span key={key}>{node}</span>
+                  <span key={key} className='inline-flex h-6 items-center'>
+                    {node}
+                  </span>
                 )
               })}
           </div>
@@ -708,7 +710,7 @@ function DivisionPanel({
           </div>
 
           {/* Actions */}
-          <div className='grid grid-cols-2 gap-2.5'>
+          <div className='grid grid-cols-1 gap-2.5 sm:grid-cols-2'>
             <Link
               to={detailTo}
               className='group/detail tkc-motion-surface relative inline-flex items-center justify-center rounded-lg border border-[#1e1e1e] px-6 py-2.5 text-sm font-semibold text-white/60 hover:border-white/30 hover:text-white'
@@ -779,7 +781,7 @@ function VenueThumb({ src }: { src?: string }) {
 function ScheduleStrip() {
   return (
     <div>
-      <div className='grid grid-cols-1 gap-0 md:grid-cols-3 md:gap-3'>
+      <div className='grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-3'>
         {SCHEDULE_MONTHS.map((group, idx) => {
           const monthNum = group.label.replace('월', '')
           const finalsEvent = group.events.find(
@@ -807,13 +809,7 @@ function ScheduleStrip() {
                 group.isFinals
                   ? 'border-[#e74c3c]/20 md:hover:border-[#e74c3c]/35'
                   : 'border-[#1e1e1e] md:hover:border-[#2a2a2a]'
-              } md:hover:-translate-y-0.5 ${
-                idx === 0
-                  ? 'rounded-t-[14px] border-b-0 md:rounded-[14px] md:border'
-                  : idx === SCHEDULE_MONTHS.length - 1
-                    ? 'rounded-b-[14px] md:rounded-[14px]'
-                    : 'border-b-0 md:rounded-[14px] md:border'
-              }`}
+              } rounded-[14px] md:hover:-translate-y-0.5`}
             >
               <div
                 className={`h-[3px] ${
