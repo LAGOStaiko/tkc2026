@@ -40,15 +40,15 @@ function ArcadeOnlinePage() {
           <h2 className='mb-4 text-[17px] font-bold text-white/90 sm:text-[18px]'>
             예선 한눈에 보기
           </h2>
-          <div className='grid grid-cols-2 gap-2.5 sm:grid-cols-4'>
+          <div className='grid grid-cols-1 gap-2.5 min-[420px]:grid-cols-2 sm:grid-cols-4'>
             {OVERVIEW.map((item) => (
               <div
                 key={item.label}
                 className='rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] px-3 py-3'
               >
-                <div className='text-[11px] text-white/35'>{item.label}</div>
+                <div className='text-[12px] text-white/35'>{item.label}</div>
                 <div
-                  className='mt-1 text-[14px] font-extrabold tracking-tight'
+                  className='mt-1 text-[13px] leading-tight font-extrabold tracking-tight sm:text-[14px]'
                   style={{ color: item.color ?? 'rgba(255,255,255,0.9)' }}
                 >
                   {item.value}
@@ -68,7 +68,7 @@ function ArcadeOnlinePage() {
             {REGIONS.map((item) => (
               <div
                 key={item.round}
-                className='flex items-center justify-between rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] px-3.5 py-3'
+                className='flex items-start justify-between gap-2 rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] px-3.5 py-3'
               >
                 <div>
                   <div className='text-[11px] text-white/35'>
@@ -78,7 +78,7 @@ function ArcadeOnlinePage() {
                     {item.city}
                   </div>
                 </div>
-                <div className='text-right text-[12px] text-white/45'>
+                <div className='text-right text-[12px] leading-[1.35] break-keep text-white/45'>
                   {item.venue}
                 </div>
               </div>

@@ -76,12 +76,12 @@ function ConsoleFinalsPage() {
             {BRACKET.map((item) => (
               <div
                 key={item.match}
-                className='flex items-center justify-between rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] px-3.5 py-3'
+                className='flex items-start justify-between gap-2 rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] px-3.5 py-3'
               >
                 <span className='font-mono text-[12px] font-bold text-[#e74c3c]'>
                   {item.match}
                 </span>
-                <span className='text-[13px] font-medium text-white/75'>
+                <span className='text-right text-[13px] leading-[1.35] font-medium break-keep text-white/75'>
                   {item.players}
                 </span>
               </div>
