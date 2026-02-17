@@ -1,6 +1,6 @@
-import { useAuth } from '@clerk/clerk-react'
-import { useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect } from 'react'
+import { useNavigate, useRouterState } from '@tanstack/react-router'
+import { useAuth } from '@clerk/clerk-react'
 import { Loader2 } from 'lucide-react'
 import { AuthenticatedLayout } from './authenticated-layout'
 

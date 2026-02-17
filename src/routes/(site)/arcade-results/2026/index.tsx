@@ -4,8 +4,8 @@ import { t } from '@/text'
 import { useResults } from '@/lib/api'
 import { resolveArcadeSeasonArchive } from '@/lib/arcade-results-archive'
 import { cn } from '@/lib/utils'
-import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { FadeIn } from '@/components/tkc/guide-shared'
+import { PageHero, TkcSection } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/arcade-results/2026/')({
   component: ArcadeResults2026Page,

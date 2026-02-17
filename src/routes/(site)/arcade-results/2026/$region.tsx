@@ -12,8 +12,8 @@ import {
 } from '@/lib/arcade-results-archive'
 import { buildRegionFinalRanking } from '@/lib/arcade-results-ranking'
 import { cn } from '@/lib/utils'
-import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { FadeIn } from '@/components/tkc/guide-shared'
+import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { LevelBadge } from '@/components/tkc/level-badge'
 import { parseLevelNumber } from '@/components/tkc/parse-level-number'
 
@@ -143,13 +143,7 @@ function StatusTag({ label }: { label: string }) {
 /*  Result Callout                                                     */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function ResultCallout({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
+function ResultCallout({ label, value }: { label: string; value: string }) {
   return (
     <div className='flex items-center gap-3 rounded-xl border border-[#e74c3c]/12 bg-[#e74c3c]/4 px-5 py-3.5 text-[15px] text-white/65'>
       <span className='size-1.5 shrink-0 rounded-full bg-[#e74c3c]' />
@@ -239,12 +233,16 @@ function PodiumCard({
           <div className='mt-4 flex gap-5 text-sm text-white/50'>
             {typeof seed === 'number' && (
               <span>
-                시드 <strong className='font-semibold text-white/90'>{seed}</strong>
+                시드{' '}
+                <strong className='font-semibold text-white/90'>{seed}</strong>
               </span>
             )}
             {record && (
               <span>
-                전적 <strong className='font-semibold text-white/90'>{record}</strong>
+                전적{' '}
+                <strong className='font-semibold text-white/90'>
+                  {record}
+                </strong>
               </span>
             )}
           </div>
@@ -402,9 +400,7 @@ function renderParticipant(
   const fromOnline = region.onlineRows.find((row) => row.entryId === entryId)
   if (fromOnline) return `${fromOnline.nickname} (${entryId})`
 
-  const fromSwiss = region.swissStandings.find(
-    (row) => row.entryId === entryId
-  )
+  const fromSwiss = region.swissStandings.find((row) => row.entryId === entryId)
   if (fromSwiss) return `${fromSwiss.nickname} (${entryId})`
 
   if (region.qualifiers.groupA?.entryId === entryId) {
@@ -561,7 +557,8 @@ function ArcadeRegionDetailPage() {
                   entryId={row.entryId}
                   seed={row.seed}
                   record={
-                    typeof row.wins === 'number' && typeof row.losses === 'number'
+                    typeof row.wins === 'number' &&
+                    typeof row.losses === 'number'
                       ? `${row.wins}-${row.losses}`
                       : undefined
                   }
@@ -666,15 +663,11 @@ function ArcadeRegionDetailPage() {
                       </div>
                       <div className='mt-1 flex items-center gap-3 text-xs text-white/45'>
                         <span>
-                          시드{' '}
-                          {typeof row.seed === 'number' ? row.seed : '-'}
+                          시드 {typeof row.seed === 'number' ? row.seed : '-'}
                         </span>
                         {typeof row.wins === 'number' &&
                           typeof row.losses === 'number' && (
-                            <RecordBadge
-                              wins={row.wins}
-                              losses={row.losses}
-                            />
+                            <RecordBadge wins={row.wins} losses={row.losses} />
                           )}
                       </div>
                     </div>
@@ -695,8 +688,12 @@ function ArcadeRegionDetailPage() {
         {swissByRound.length > 0 && (
           <details className='group mt-6'>
             <summary className='cursor-pointer text-sm font-medium text-white/40 transition-colors hover:text-white/60'>
-              <span className='group-open:hidden'>▸ 스위스 라운드별 상세 매치 기록 보기</span>
-              <span className='hidden group-open:inline'>▾ 스위스 라운드별 상세 매치 기록 접기</span>
+              <span className='group-open:hidden'>
+                ▸ 스위스 라운드별 상세 매치 기록 보기
+              </span>
+              <span className='hidden group-open:inline'>
+                ▾ 스위스 라운드별 상세 매치 기록 접기
+              </span>
             </summary>
             <div className='mt-5 space-y-6'>
               {swissByRound.map((block) => (

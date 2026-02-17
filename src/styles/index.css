@@ -776,50 +776,114 @@
 /* ── Hero Layered Animation ── */
 
 @keyframes hero-bg-reveal {
-  0% { opacity: 0; transform: scale(1.12); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes hero-main-pop {
-  0% { opacity: 0; transform: scale(0.7) translateY(30px); }
-  60% { opacity: 1; transform: scale(1.04) translateY(-5px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(30px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes hero-float-idle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 @keyframes hero-side-pop {
-  0% { opacity: 0; transform: scale(0.8); }
-  60% { opacity: 1; transform: scale(1.03); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes hero-title-slam {
-  0%   { opacity: 0; transform: scale(1.8) translateY(-50px); filter: brightness(3) blur(3px); }
-  25%  { opacity: 1; filter: brightness(2) blur(0); }
-  50%  { transform: scale(0.96) translateY(5px); filter: brightness(1.1); }
-  70%  { transform: scale(1.03) translateY(-2px); filter: brightness(1); }
-  85%  { transform: scale(0.99) translateY(1px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); filter: brightness(1); }
+  0% {
+    opacity: 0;
+    transform: scale(1.8) translateY(-50px);
+    filter: brightness(3) blur(3px);
+  }
+  25% {
+    opacity: 1;
+    filter: brightness(2) blur(0);
+  }
+  50% {
+    transform: scale(0.96) translateY(5px);
+    filter: brightness(1.1);
+  }
+  70% {
+    transform: scale(1.03) translateY(-2px);
+    filter: brightness(1);
+  }
+  85% {
+    transform: scale(0.99) translateY(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: brightness(1);
+  }
 }
 
 @keyframes hero-flash {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes hero-grad-in {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes hero-cta-in {
-  0% { opacity: 0; transform: translateY(12px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero-layer {

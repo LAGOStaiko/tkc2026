@@ -5,7 +5,9 @@ import { toast } from 'sonner'
 export function handleServerError(error: unknown) {
   let errMsg = t('toast.generalError')
 
-  if (
+  if (error instanceof AxiosError && error.response?.status === 429) {
+    errMsg = t('toast.rateLimited')
+  } else if (
     error &&
     typeof error === 'object' &&
     'status' in error &&

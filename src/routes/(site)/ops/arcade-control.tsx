@@ -87,7 +87,8 @@ async function requestOpsApi(
 ) {
   const basePath = path.split('?')[0] || path
   const isReadOnly =
-    method === 'GET' || (method === 'POST' && READ_ONLY_POST_PATHS.has(basePath))
+    method === 'GET' ||
+    (method === 'POST' && READ_ONLY_POST_PATHS.has(basePath))
 
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -434,9 +435,7 @@ function ArcadeOpsControlPage() {
         if (feedRequestIdRef.current !== requestId) return null
 
         setFeedRaw(data ?? null)
-        setLastFeedAt(
-          new Date().toLocaleTimeString('ko-KR', { hour12: false })
-        )
+        setLastFeedAt(new Date().toLocaleTimeString('ko-KR', { hour12: false }))
         const feedData = data as Record<string, unknown> | null
         if (feedData?.publishMeta) {
           setPublishMeta(

@@ -166,8 +166,13 @@ export function Accordion({
         onClick={() => setOpen((v) => !v)}
         className='flex w-full items-center justify-between px-4 py-3.5 text-left text-white/35 transition-colors hover:text-white/55 sm:px-6 sm:py-4'
       >
-        <span className='text-[13px] font-bold text-white/90 sm:text-sm'>{title}</span>
-        <DropdownToggleIcon open={open} className='size-8 shrink-0 object-contain' />
+        <span className='text-[13px] font-bold text-white/90 sm:text-sm'>
+          {title}
+        </span>
+        <DropdownToggleIcon
+          open={open}
+          className='size-8 shrink-0 object-contain'
+        />
       </button>
       <div
         className={`grid transition-[grid-template-rows] duration-400 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
@@ -224,10 +229,13 @@ export function StepCard({
         <button
           type='button'
           onClick={() => setOpen((v) => !v)}
-          className='flex w-full items-center justify-center gap-1.5 border-t border-[#1e1e1e] py-3 text-[11px] text-white/35 transition-colors hover:text-white/55 sm:py-2.5 sm:text-xs'
+          className='flex w-full items-center justify-center gap-1.5 border-t border-[#1e1e1e] py-3 text-[12px] text-white/35 transition-colors hover:text-white/55 sm:py-2.5'
         >
           {toggleLabel}
-          <DropdownToggleIcon open={open} className='size-6 shrink-0 object-contain' />
+          <DropdownToggleIcon
+            open={open}
+            className='size-6 shrink-0 object-contain'
+          />
         </button>
 
         {/* Detail */}
@@ -235,7 +243,7 @@ export function StepCard({
           className={`grid transition-[grid-template-rows] duration-400 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
         >
           <div className='overflow-hidden'>
-            <div className='border-t border-[#1e1e1e] px-4 py-4 [&>*+*]:mt-4 sm:px-6 sm:py-5 sm:[&>*+*]:mt-5'>
+            <div className='border-t border-[#1e1e1e] px-4 py-4 sm:px-6 sm:py-5 [&>*+*]:mt-4 sm:[&>*+*]:mt-5'>
               {children}
             </div>
           </div>
@@ -267,7 +275,7 @@ export function DetailRow({
       <span className='min-w-0 text-white/55'>{label}</span>
       {isBadge ? (
         <span
-          className='shrink-0 rounded px-2.5 py-0.5 font-mono text-[11px] font-bold tracking-wider'
+          className='shrink-0 rounded px-2.5 py-0.5 font-mono text-[12px] font-bold tracking-wider'
           style={{
             backgroundColor: `color-mix(in srgb, ${accentColor} 8%, transparent)`,
             color: accentColor,

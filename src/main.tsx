@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { AxiosError } from 'axios'
-import { ClerkProvider } from '@clerk/clerk-react'
 import {
   QueryCache,
   QueryClient,
@@ -9,6 +8,7 @@ import {
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { t } from '@/text'
+import { ClerkProvider } from '@clerk/clerk-react'
 import { toast } from 'sonner'
 import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
@@ -31,7 +31,7 @@ const queryClient = new QueryClient({
 
         return !(
           error instanceof AxiosError &&
-          [401, 403].includes(error.response?.status ?? 0)
+          [401, 403, 429].includes(error.response?.status ?? 0)
         )
       },
       refetchOnWindowFocus: import.meta.env.PROD,
@@ -63,6 +63,9 @@ const queryClient = new QueryClient({
           if (import.meta.env.PROD) {
             router.navigate({ to: '/500' })
           }
+        }
+        if (error.response?.status === 429) {
+          toast.error(t('toast.rateLimited'))
         }
         if (error.response?.status === 403) {
           // router.navigate("/forbidden", { replace: true });

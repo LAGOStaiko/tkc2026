@@ -1,154 +1,20 @@
 import { z } from "zod";
 import { badRequest, ok, serverError, tooManyRequests } from "../_lib/response";
-import { callGasJson, type _Env } from "../_lib/gas";
+import { callGasJson } from "../_lib/gas";
 import { escapeFormulaField } from "../_lib/sanitize";
+import { hitRateLimit, buildRateLimitConfig, getClientIp, type RateLimitEnv } from "../_lib/rate-limit";
 import { REGISTER_LIMITS as L } from "../../shared/register-limits";
 
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX = 10;
-const CLEANUP_INTERVAL = 100;
-const RATE_LIMIT_KV_PREFIX = "register:rate-limit";
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-let requestCounter = 0;
-
-type KvNamespaceLike = {
-  get: (key: string) => Promise<string | null>;
-  put: (
-    key: string,
-    value: string,
-    options?: { expirationTtl?: number }
-  ) => Promise<void>;
-};
-
-type RegisterEnv = _Env & {
+type RegisterEnv = RateLimitEnv & {
   TURNSTILE_SECRET_KEY?: string;
-  RATE_LIMIT_KV?: KvNamespaceLike;
-  RATE_LIMIT_WINDOW_MS?: string | number;
-  RATE_LIMIT_MAX?: string | number;
-  RATE_LIMIT_KV_PREFIX?: string;
 };
 
-type RateLimitConfig = {
-  windowMs: number;
-  max: number;
-  kvPrefix: string;
-};
-
-const parseBoundedInt = (
-  value: unknown,
-  fallback: number,
-  min: number,
-  max: number
-) => {
-  const raw = typeof value === "number" ? value : Number(String(value ?? "").trim());
-  if (!Number.isFinite(raw)) return fallback;
-  const rounded = Math.floor(raw);
-  if (rounded < min) return min;
-  if (rounded > max) return max;
-  return rounded;
-};
-
-const readRateLimitConfig = (env: RegisterEnv): RateLimitConfig => {
-  const windowMs = parseBoundedInt(
-    env.RATE_LIMIT_WINDOW_MS,
-    RATE_LIMIT_WINDOW_MS,
-    60_000,
-    3_600_000
-  );
-  const max = parseBoundedInt(env.RATE_LIMIT_MAX, RATE_LIMIT_MAX, 1, 100);
-  const tier = String(env.TKC_ENV_TIER ?? "production")
-    .trim()
-    .toLowerCase();
-  const defaultPrefix = tier
-    ? `${RATE_LIMIT_KV_PREFIX}:${tier}`
-    : RATE_LIMIT_KV_PREFIX;
-  const kvPrefix = env.RATE_LIMIT_KV_PREFIX?.trim() || defaultPrefix;
-
-  return { windowMs, max, kvPrefix };
-};
-
-const cleanupExpiredEntries = () => {
-  const now = Date.now();
-  for (const [ip, entry] of rateLimitStore) {
-    if (entry.resetAt <= now) {
-      rateLimitStore.delete(ip);
-    }
-  }
-};
-
-const hitRateLimitInMemory = (ip: string, config: RateLimitConfig) => {
-  requestCounter += 1;
-  if (requestCounter >= CLEANUP_INTERVAL) {
-    requestCounter = 0;
-    cleanupExpiredEntries();
-  }
-
-  const now = Date.now();
-  const entry = rateLimitStore.get(ip);
-  if (!entry || entry.resetAt <= now) {
-    rateLimitStore.set(ip, { count: 1, resetAt: now + config.windowMs });
-    return { limited: false, retryAfter: Math.ceil(config.windowMs / 1000) };
-  }
-
-  entry.count += 1;
-  if (entry.count > config.max) {
-    return {
-      limited: true,
-      retryAfter: Math.ceil((entry.resetAt - now) / 1000),
-    };
-  }
-
-  return { limited: false, retryAfter: Math.ceil((entry.resetAt - now) / 1000) };
-};
-
-const hitRateLimitWithKv = async (
-  ip: string,
-  kv: KvNamespaceLike,
-  config: RateLimitConfig
-) => {
-  const now = Date.now();
-  const windowNo = Math.floor(now / config.windowMs);
-  const resetAt = (windowNo + 1) * config.windowMs;
-  const retryAfter = Math.max(1, Math.ceil((resetAt - now) / 1000));
-  const key = `${config.kvPrefix}:${ip}:${windowNo}`;
-
-  const raw = await kv.get(key);
-  const current = Number(raw ?? "0");
-  const safeCurrent = Number.isFinite(current) && current > 0 ? current : 0;
-  const next = safeCurrent + 1;
-
-  await kv.put(key, String(next), {
-    expirationTtl: retryAfter + 60,
+const registerRateConfig = (env: RegisterEnv) =>
+  buildRateLimitConfig(env, {
+    prefix: "register:rate-limit",
+    defaultWindowMs: 10 * 60 * 1000, // 10 minutes
+    defaultMax: 10,                   // 10 requests per window
   });
-
-  return {
-    limited: next > config.max,
-    retryAfter,
-  };
-};
-
-const hitRateLimit = async (ip: string, env: RegisterEnv) => {
-  const config = readRateLimitConfig(env);
-  const kv = env.RATE_LIMIT_KV;
-  if (kv) {
-    try {
-      return await hitRateLimitWithKv(ip, kv, config);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("rate_limit_kv_error", error);
-    }
-  }
-
-  return hitRateLimitInMemory(ip, config);
-};
-
-const getClientIp = (request: Request) => {
-  const cfIp = request.headers.get("CF-Connecting-IP");
-  if (cfIp) return cfIp.trim();
-  const forwarded = request.headers.get("X-Forwarded-For");
-  if (forwarded) return forwarded.split(",")[0]?.trim() ?? "unknown";
-  return "unknown";
-};
 
 const trimString = (value: unknown) => {
   if (typeof value === "string") return value.trim();
@@ -328,7 +194,7 @@ export const onRequestPost = async ({ env, request }) => {
   try {
     const clientIp = getClientIp(request);
     const runtimeEnv = env as RegisterEnv;
-    const rate = await hitRateLimit(clientIp, runtimeEnv);
+    const rate = await hitRateLimit(clientIp, runtimeEnv, registerRateConfig(runtimeEnv));
     if (rate.limited) {
       return tooManyRequests("Too many requests", rate.retryAfter);
     }

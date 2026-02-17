@@ -5,16 +5,11 @@ import {
   Outlet,
   useRouterState,
 } from '@tanstack/react-router'
-import { t } from '@/text'
 import { FadeIn } from '@/components/tkc/guide-shared'
 
 export const Route = createFileRoute('/(site)/arcade')({
   component: ArcadeLayout,
 })
-
-/* ════════════════════════════════════════════════════════════════════ */
-/*  Sub-navigation                                                     */
-/* ════════════════════════════════════════════════════════════════════ */
 
 const NAV_ITEMS = [
   {
@@ -22,15 +17,15 @@ const NAV_ITEMS = [
     exact: true,
     phase: 'PHASE 1',
     label: '온라인 예선',
-    desc: '스코어 어택',
+    desc: '2곡 합산 점수 선발',
     color: '#f5a623',
   },
   {
     to: '/arcade/swiss',
     exact: false,
     phase: 'PHASE 2',
-    label: '스위스 스테이지',
-    desc: '차수별 Top 16',
+    label: '오프라인 스위스',
+    desc: '회차별 Top 16',
     color: '#f7d154',
   },
   {
@@ -38,7 +33,7 @@ const NAV_ITEMS = [
     exact: false,
     phase: 'FINALS',
     label: 'PlayX4 결선',
-    desc: 'Top 8 최종 결선',
+    desc: 'Top 8 토너먼트',
     color: '#e74c3c',
   },
 ] as const
@@ -62,7 +57,6 @@ function SubNav() {
 
   return (
     <nav className='mb-8 overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] sm:mb-10'>
-      {/* Desktop */}
       <div className='hidden sm:flex'>
         {NAV_ITEMS.map((item, i) => {
           const active = isActive(item)
@@ -77,208 +71,92 @@ function SubNav() {
             >
               <div
                 className='absolute top-0 right-0 left-0 h-0.5 transition-opacity'
-                style={{
-                  background: item.color,
-                  opacity: active ? 1 : 0.3,
-                }}
+                style={{ background: item.color, opacity: active ? 1 : 0.3 }}
               />
               <div
-                className='mb-1 font-mono text-[11px] font-extrabold transition-opacity'
-                style={{
-                  color: item.color,
-                  opacity: active ? 1 : 0.5,
-                }}
+                className='mb-1 font-mono text-[11px] font-extrabold'
+                style={{ color: item.color, opacity: active ? 1 : 0.65 }}
               >
                 {item.phase}
               </div>
-              <div
-                className={`text-[13px] font-bold transition-colors ${active ? 'text-white/90' : 'text-white/45'}`}
-              >
+              <div className='text-[15px] font-bold text-white/90'>
                 {item.label}
               </div>
-              <div
-                className={`text-[11px] transition-colors ${active ? 'text-white/35' : 'text-white/20'}`}
-              >
+              <div className='mt-0.5 text-[12px] text-white/35'>
                 {item.desc}
               </div>
-              {i < NAV_ITEMS.length - 1 && (
-                <span className='absolute top-1/2 -right-[7px] z-10 -translate-y-1/2 bg-[#111] px-0.5 text-xs text-white/35'>
-                  →
-                </span>
-              )}
             </Link>
           )
         })}
       </div>
-      {/* Mobile */}
-      <div className='space-y-2 p-2 sm:hidden'>
-        <div
-          className='grid gap-2'
-          style={{
-            gridTemplateColumns: `repeat(${NAV_ITEMS.length}, minmax(0, 1fr))`,
-          }}
-        >
-          {NAV_ITEMS.map((item) => {
+
+      <div className='sm:hidden'>
+        <div className='flex items-center justify-between gap-2 border-b border-[#1e1e1e] px-3 py-2.5 text-[11px] font-medium text-white/35'>
+          <span>{prevItem ? `← ${prevItem.label}` : '\u00A0'}</span>
+          <span className='text-[10px] font-bold tracking-[0.8px] text-white/25'>
+            탭 이동
+          </span>
+          <span>{nextItem ? `${nextItem.label} →` : '\u00A0'}</span>
+        </div>
+        <div className='flex'>
+          {NAV_ITEMS.map((item, i) => {
             const active = isActive(item)
             return (
               <Link
                 key={item.to}
                 to={item.to}
                 preload='render'
-                className={`relative rounded-lg border px-3 py-3 text-left transition-colors ${
-                  active
-                    ? 'border-white/20 bg-white/[0.05]'
-                    : 'border-[#1e1e1e] bg-[#0f0f0f] hover:border-[#2a2a2a]'
-                }`}
+                className={`relative flex-1 border-[#1e1e1e] px-3 py-3 text-center transition-colors ${
+                  i < NAV_ITEMS.length - 1 ? 'border-r' : ''
+                } ${active ? 'bg-white/[0.03]' : 'hover:bg-white/[0.01]'}`}
               >
                 <div
-                  className='absolute top-0 right-0 left-0 h-0.5 transition-opacity'
-                  style={{
-                    background: item.color,
-                    opacity: active ? 1 : 0.3,
-                  }}
+                  className='absolute top-0 right-0 left-0 h-0.5'
+                  style={{ background: item.color, opacity: active ? 1 : 0.25 }}
                 />
-                <div
-                  className='mb-0.5 font-mono text-[11px] font-extrabold transition-opacity'
-                  style={{
-                    color: item.color,
-                    opacity: active ? 1 : 0.5,
-                  }}
-                >
-                  {item.phase}
-                </div>
-                <div
-                  className={`text-[12px] font-bold transition-colors ${active ? 'text-white/90' : 'text-white/55'}`}
-                >
+                <div className='text-[13px] font-bold text-white/90'>
                   {item.label}
-                </div>
-                <div
-                  className={`mt-0.5 text-[11px] transition-colors ${active ? 'text-white/35' : 'text-white/30'}`}
-                >
-                  {item.desc}
                 </div>
               </Link>
             )
           })}
-        </div>
-        <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
-          {prevItem ? (
-            <Link
-              to={prevItem.to}
-              preload='render'
-              className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 text-left transition-colors hover:border-[#2a2a2a]'
-            >
-              <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
-                PREV PHASE
-              </div>
-              <div className='text-[12px] font-bold break-keep text-white/85 sm:truncate'>
-                {prevItem.phase}
-              </div>
-            </Link>
-          ) : (
-            <div className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 opacity-40'>
-              <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
-                PREV PHASE
-              </div>
-              <div className='text-[12px] font-bold text-white/55'>-</div>
-            </div>
-          )}
-          {nextItem ? (
-            <Link
-              to={nextItem.to}
-              preload='render'
-              className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 text-right transition-colors hover:border-[#2a2a2a]'
-            >
-              <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
-                NEXT PHASE
-              </div>
-              <div className='text-[12px] font-bold break-keep text-white/85 sm:truncate'>
-                {nextItem.phase}
-              </div>
-            </Link>
-          ) : (
-            <div className='rounded-lg border border-[#1e1e1e] bg-[#0f0f0f] px-3 py-2.5 text-right opacity-40'>
-              <div className='text-[11px] font-mono font-semibold tracking-wide text-white/35'>
-                NEXT PHASE
-              </div>
-              <div className='text-[12px] font-bold text-white/55'>-</div>
-            </div>
-          )}
         </div>
       </div>
     </nav>
   )
 }
 
-/* ════════════════════════════════════════════════════════════════════ */
-/*  Layout                                                             */
-/* ════════════════════════════════════════════════════════════════════ */
-
 function ArcadeLayout() {
-  const title = t('nav.arcade')
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
 
   useEffect(() => {
-    document.title = `${t('meta.siteName')} | ${title}`
-  }, [title])
+    let suffix = '예선 안내'
+    if (pathname.includes('/swiss')) suffix = '스위스 안내'
+    if (pathname.includes('/finals')) suffix = '결선 안내'
+    document.title = `TKC 2026 | 아케이드 부문 ${suffix}`
+  }, [pathname])
 
   return (
-    <div className='w-full'>
-      {/* ── Hero ── */}
-      <section className='-mt-20 overflow-hidden md:-mt-24'>
-        <div className='relative h-[320px] sm:h-[380px] md:h-[520px] lg:h-[560px]'>
-          <img
-            src='/branding/hero.webp'
-            alt=''
-            className='absolute inset-0 h-full w-full object-cover object-[center_top] md:object-center'
-            loading='eager'
-            draggable={false}
-          />
-          <div className='absolute inset-0 bg-black/25' />
-          <div className='absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent' />
-          <div className='absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black via-black/70 to-transparent' />
-          <div className='absolute inset-x-0 bottom-0 px-6 pb-8 sm:px-10 sm:pb-10 md:pb-14'>
-            <FadeIn>
-              <div className='mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-[7px] font-mono text-[11px] font-semibold tracking-[1.5px] text-[#f5a623] backdrop-blur-md'>
-                <span className='tkc-motion-dot size-1.5 rounded-full bg-[#f5a623] shadow-[0_0_8px_#f5a623]' />
-                ARCADE DIVISION
-              </div>
-            </FadeIn>
-            <FadeIn delay={120}>
-              <h1 className='drop-shadow-[0_2px_16px_rgba(0,0,0,0.9)] text-[clamp(30px,8.5vw,56px)] leading-[1.1] font-extrabold tracking-tight'>
-                <span className='bg-gradient-to-br from-[#f5a623] to-[#f7d154] bg-clip-text text-transparent'>
-                  아케이드 예선
-                </span>
-                <br />
-                <span className='text-white'>참가 안내</span>
-              </h1>
-            </FadeIn>
-            <FadeIn delay={240}>
-              <p className='mt-4 max-w-[520px] text-[15px] leading-[1.55] font-light break-keep text-white/70 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]'>
-                동더 광장 연동으로 점수를 제출하고, 차수별 상위 16명이 오프라인
-                스위스 스테이지에 진출합니다.
-              </p>
-            </FadeIn>
-          </div>
+    <section className='space-y-5'>
+      <FadeIn>
+        <div className='space-y-2'>
+          <h1 className='text-[26px] leading-tight font-extrabold tracking-tight text-white sm:text-[30px]'>
+            아케이드 부문
+          </h1>
+          <p className='text-[13px] leading-relaxed break-keep text-white/55 sm:text-[14px]'>
+            온라인 예선, 오프라인 스위스, PlayX4 결선까지 아케이드 부문 전체
+            흐름을 단계별로 확인할 수 있습니다.
+          </p>
         </div>
-      </section>
+      </FadeIn>
 
-      {/* ── Sub-Navigation ── */}
-      <FadeIn delay={300}>
+      <FadeIn delay={80}>
         <SubNav />
       </FadeIn>
 
-      {/* ── Page Content ── */}
       <Outlet />
-
-      {/* ── Footer ── */}
-      <footer className='mt-14 border-t border-[#1e1e1e] py-10 text-center'>
-        <p className='text-xs leading-[1.55] text-white/35'>
-          ※ 세부 사항은 운영진 판단에 따라 변경될 수 있습니다.
-          <br />
-          TKC 2026 — 태고의 달인 코리아 챔피언십 · 아케이드 부문 규정
-        </p>
-      </footer>
-    </div>
+    </section>
   )
 }
-

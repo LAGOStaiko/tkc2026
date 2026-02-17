@@ -29,3 +29,6 @@ dist-ssr
 nul
 # Generated during favicon experimentation
 /tmp/favicon-*.png
+
+# TanStack Router temp cache
+.tanstack/tmp/
