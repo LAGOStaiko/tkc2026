@@ -128,7 +128,7 @@ function StatusTag({ label }: { label: string }) {
   return (
     <span
       className={cn(
-        'inline-block rounded-md border px-2.5 py-1 font-mono text-[11px] font-semibold tracking-wide',
+        'inline-block shrink-0 rounded-md border px-2.5 py-1 font-mono text-[11px] font-semibold tracking-wide',
         isQualify
           ? 'border-[#e74c3c]/15 bg-[#e74c3c]/8 text-[#e74c3c]'
           : 'border-[#1e1e1e] bg-white/[0.03] text-white/50'
@@ -297,12 +297,12 @@ function SwissRoundCard({
               <div className='mt-3 space-y-1.5'>
                 <div
                   className={cn(
-                    'flex items-baseline gap-2 text-sm',
+                    'flex flex-wrap items-start gap-x-2 gap-y-0.5 text-sm',
                     isP1Winner ? 'text-[#f5a623]' : 'text-white'
                   )}
                 >
-                  <span className='font-bold'>{p1Name}</span>
-                  <span className='font-mono text-xs text-white/35'>
+                  <span className='font-bold break-keep'>{p1Name}</span>
+                  <span className='font-mono text-[11px] text-white/35'>
                     {p1Id}
                   </span>
                   {isP1Winner && (
@@ -316,13 +316,13 @@ function SwissRoundCard({
                 </div>
                 <div
                   className={cn(
-                    'flex items-baseline gap-2 text-sm',
+                    'flex flex-wrap items-start gap-x-2 gap-y-0.5 text-sm',
                     isP2Winner ? 'text-[#f5a623]' : 'text-white'
                   )}
                 >
-                  <span className='font-bold'>{p2Name}</span>
+                  <span className='font-bold break-keep'>{p2Name}</span>
                   {p2Id && (
-                    <span className='font-mono text-xs text-white/35'>
+                    <span className='font-mono text-[11px] text-white/35'>
                       {p2Id}
                     </span>
                   )}
@@ -647,21 +647,21 @@ function ArcadeRegionDetailPage() {
                 .map((row) => (
                   <div
                     key={`m-fr-${row.entryId}-${row.rank}`}
-                    className='flex items-center gap-3 rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3'
+                    className='flex items-start gap-3 rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3'
                   >
                     <span className='w-7 text-center text-sm font-bold text-white/40'>
                       {row.rank}
                     </span>
                     <div className='min-w-0 flex-1'>
-                      <div className='flex items-baseline gap-1.5'>
-                        <span className='font-semibold text-white'>
+                      <div className='flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5'>
+                        <span className='font-semibold break-keep text-white'>
                           {row.nickname}
                         </span>
-                        <span className='font-mono text-xs text-white/40'>
+                        <span className='font-mono text-[11px] text-white/40'>
                           {row.entryId}
                         </span>
                       </div>
-                      <div className='mt-1 flex items-center gap-3 text-xs text-white/45'>
+                      <div className='mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/45'>
                         <span>
                           시드 {typeof row.seed === 'number' ? row.seed : '-'}
                         </span>
@@ -780,7 +780,7 @@ function ArcadeRegionDetailPage() {
               {sortedDeciderRows.map((row, idx) => (
                 <div
                   key={`dec-m-${row.entryId}`}
-                  className='flex items-center gap-3 rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3'
+                  className='flex items-start gap-3 rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3'
                 >
                   <span
                     className={cn(
@@ -791,14 +791,14 @@ function ArcadeRegionDetailPage() {
                     {row.rank}
                   </span>
                   <div className='min-w-0 flex-1'>
-                    <div className='font-semibold text-white'>
+                    <div className='font-semibold break-keep text-white'>
                       {row.nickname}
                     </div>
-                    <div className='mt-0.5 font-mono text-xs text-white/40'>
+                    <div className='mt-0.5 font-mono text-[11px] text-white/40'>
                       {row.entryId}
                     </div>
                   </div>
-                  <span className='font-mono text-sm font-semibold text-white tabular-nums'>
+                  <span className='shrink-0 font-mono text-sm font-semibold text-white tabular-nums'>
                     {formatScore(row.score)}
                   </span>
                 </div>
@@ -890,7 +890,7 @@ function ArcadeRegionDetailPage() {
               {sortedSeedingRows.map((row, idx) => (
                 <div
                   key={`seed-m-${row.entryId}`}
-                  className='flex items-center gap-3 rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3'
+                  className='flex items-start gap-3 rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-3'
                 >
                   <span
                     className={cn(
@@ -901,14 +901,14 @@ function ArcadeRegionDetailPage() {
                     {row.rank}
                   </span>
                   <div className='min-w-0 flex-1'>
-                    <div className='font-semibold text-white'>
+                    <div className='font-semibold break-keep text-white'>
                       {row.nickname}
                     </div>
-                    <div className='mt-0.5 font-mono text-xs text-white/40'>
+                    <div className='mt-0.5 font-mono text-[11px] text-white/40'>
                       {row.entryId}
                     </div>
                   </div>
-                  <span className='font-mono text-sm font-semibold text-white tabular-nums'>
+                  <span className='shrink-0 font-mono text-sm font-semibold text-white tabular-nums'>
                     {formatScore(row.score)}
                   </span>
                 </div>
@@ -1035,10 +1035,10 @@ function ArcadeRegionDetailPage() {
                   >
                     <div className='flex items-start justify-between gap-3'>
                       <div className='min-w-0'>
-                        <div className='text-base font-bold text-white'>
+                        <div className='text-[15px] font-bold break-keep text-white'>
                           {row.nickname}
                         </div>
-                        <div className='mt-0.5 font-mono text-xs text-white/40'>
+                        <div className='mt-0.5 font-mono text-[11px] text-white/40'>
                           {row.entryId}
                         </div>
                       </div>
@@ -1046,7 +1046,7 @@ function ArcadeRegionDetailPage() {
                         {row.rank}
                       </div>
                     </div>
-                    <div className='mt-3 grid grid-cols-3 gap-2 text-xs'>
+                    <div className='mt-3 grid grid-cols-3 gap-2 text-[11px] sm:text-xs'>
                       <div className='rounded-lg bg-white/[0.04] px-2.5 py-2 text-center'>
                         <div className='text-white/35'>과제곡 1</div>
                         <div className='mt-0.5 font-bold text-white/75 tabular-nums'>
