@@ -48,6 +48,7 @@ import { Route as siteOpsArcadeBroadcastRouteImport } from './routes/(site)/ops/
 import { Route as siteConsoleFinalsRouteImport } from './routes/(site)/console/finals'
 import { Route as siteArcadeSwissRouteImport } from './routes/(site)/arcade/swiss'
 import { Route as siteArcadeFinalsRouteImport } from './routes/(site)/arcade/finals'
+import { Route as siteConsoleResults2026IndexRouteImport } from './routes/(site)/console-results/2026/index'
 import { Route as siteArcadeResults2026IndexRouteImport } from './routes/(site)/arcade-results/2026/index'
 import { Route as siteArcadeResults2026FinalsRouteImport } from './routes/(site)/arcade-results/2026/finals'
 import { Route as siteArcadeResults2026RegionRouteImport } from './routes/(site)/arcade-results/2026/$region'
@@ -247,6 +248,12 @@ const siteArcadeFinalsRoute = siteArcadeFinalsRouteImport.update({
   path: '/finals',
   getParentRoute: () => siteArcadeRouteRoute,
 } as any)
+const siteConsoleResults2026IndexRoute =
+  siteConsoleResults2026IndexRouteImport.update({
+    id: '/console-results/2026/',
+    path: '/console-results/2026/',
+    getParentRoute: () => siteRouteRoute,
+  } as any)
 const siteArcadeResults2026IndexRoute =
   siteArcadeResults2026IndexRouteImport.update({
     id: '/arcade-results/2026/',
@@ -308,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/arcade-results/2026/$region': typeof siteArcadeResults2026RegionRoute
   '/arcade-results/2026/finals': typeof siteArcadeResults2026FinalsRoute
   '/arcade-results/2026': typeof siteArcadeResults2026IndexRoute
+  '/console-results/2026': typeof siteConsoleResults2026IndexRoute
 }
 export interface FileRoutesByTo {
   '/sign-in': typeof authSignInRoute
@@ -347,6 +355,7 @@ export interface FileRoutesByTo {
   '/arcade-results/2026/$region': typeof siteArcadeResults2026RegionRoute
   '/arcade-results/2026/finals': typeof siteArcadeResults2026FinalsRoute
   '/arcade-results/2026': typeof siteArcadeResults2026IndexRoute
+  '/console-results/2026': typeof siteConsoleResults2026IndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -392,6 +401,7 @@ export interface FileRoutesById {
   '/(site)/arcade-results/2026/$region': typeof siteArcadeResults2026RegionRoute
   '/(site)/arcade-results/2026/finals': typeof siteArcadeResults2026FinalsRoute
   '/(site)/arcade-results/2026/': typeof siteArcadeResults2026IndexRoute
+  '/(site)/console-results/2026/': typeof siteConsoleResults2026IndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -437,6 +447,7 @@ export interface FileRouteTypes {
     | '/arcade-results/2026/$region'
     | '/arcade-results/2026/finals'
     | '/arcade-results/2026'
+    | '/console-results/2026'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/sign-in'
@@ -476,6 +487,7 @@ export interface FileRouteTypes {
     | '/arcade-results/2026/$region'
     | '/arcade-results/2026/finals'
     | '/arcade-results/2026'
+    | '/console-results/2026'
   id:
     | '__root__'
     | '/(site)'
@@ -520,6 +532,7 @@ export interface FileRouteTypes {
     | '/(site)/arcade-results/2026/$region'
     | '/(site)/arcade-results/2026/finals'
     | '/(site)/arcade-results/2026/'
+    | '/(site)/console-results/2026/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -808,6 +821,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof siteArcadeFinalsRouteImport
       parentRoute: typeof siteArcadeRouteRoute
     }
+    '/(site)/console-results/2026/': {
+      id: '/(site)/console-results/2026/'
+      path: '/console-results/2026'
+      fullPath: '/console-results/2026'
+      preLoaderRoute: typeof siteConsoleResults2026IndexRouteImport
+      parentRoute: typeof siteRouteRoute
+    }
     '/(site)/arcade-results/2026/': {
       id: '/(site)/arcade-results/2026/'
       path: '/arcade-results/2026'
@@ -878,6 +898,7 @@ interface siteRouteRouteChildren {
   siteArcadeResults2026RegionRoute: typeof siteArcadeResults2026RegionRoute
   siteArcadeResults2026FinalsRoute: typeof siteArcadeResults2026FinalsRoute
   siteArcadeResults2026IndexRoute: typeof siteArcadeResults2026IndexRoute
+  siteConsoleResults2026IndexRoute: typeof siteConsoleResults2026IndexRoute
 }
 
 const siteRouteRouteChildren: siteRouteRouteChildren = {
@@ -897,6 +918,7 @@ const siteRouteRouteChildren: siteRouteRouteChildren = {
   siteArcadeResults2026RegionRoute: siteArcadeResults2026RegionRoute,
   siteArcadeResults2026FinalsRoute: siteArcadeResults2026FinalsRoute,
   siteArcadeResults2026IndexRoute: siteArcadeResults2026IndexRoute,
+  siteConsoleResults2026IndexRoute: siteConsoleResults2026IndexRoute,
 }
 
 const siteRouteRouteWithChildren = siteRouteRoute._addFileChildren(

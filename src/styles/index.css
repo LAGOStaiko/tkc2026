@@ -1013,6 +1013,50 @@
     opacity: 1 !important;
     transform: none !important;
   }
+
+  .tkc-champion-card {
+    animation: none !important;
+  }
+
+  .tkc-champion-shimmer {
+    animation: none !important;
+  }
+
+  .tkc-crown-float {
+    animation: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Finals – Champion card animations
+   ═══════════════════════════════════════════════════════════════════ */
+
+@keyframes tkc-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes tkc-crown-float {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-4px) rotate(3deg); }
+}
+
+@keyframes tkc-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(255,215,0,0.08), 0 0 60px rgba(231,76,60,0.04), inset 0 1px 0 rgba(255,215,0,0.06);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255,215,0,0.15), 0 0 80px rgba(231,76,60,0.08), inset 0 1px 0 rgba(255,215,0,0.1);
+  }
+}
+
+@keyframes tkc-glow-pulse-console {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(255,215,0,0.08), 0 0 60px rgba(74,158,255,0.03), inset 0 1px 0 rgba(255,215,0,0.06);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255,215,0,0.15), 0 0 80px rgba(74,158,255,0.06), inset 0 1px 0 rgba(255,215,0,0.1);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
