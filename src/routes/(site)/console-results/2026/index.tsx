@@ -1,6 +1,18 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
+import { useResults } from '@/lib/api'
+import {
+  resolveConsoleSeasonArchive,
+  buildStandings,
+  buildQualifierRows,
+  getSF1,
+  getSF2,
+  getThirdPlace,
+  getFinal,
+  type ConsoleStage,
+  type ConsoleQualifierRow,
+} from '@/lib/console-results-archive'
 import { cn } from '@/lib/utils'
 import { FadeIn } from '@/components/tkc/guide-shared'
 import { TkcSection } from '@/components/tkc/layout'
@@ -344,15 +356,22 @@ function MatchBox({
 /*  Qualifier Table                                                    */
 /* ════════════════════════════════════════════════════════════════════ */
 
-const QUALIFIER_ROWS = Array.from({ length: 8 }, (_, i) => ({
-  rank: i + 1,
-  name: '—',
-  score: '—',
-  passed: i < 4,
-  seed: i < 4 ? `#${i + 1}` : undefined,
-}))
+const DEFAULT_QUALIFIER_ROWS: ConsoleQualifierRow[] = Array.from(
+  { length: 8 },
+  (_, i) => ({
+    rank: i + 1,
+    nickname: '—',
+    score: null,
+    detail: '',
+    passed: i < 4,
+    seed: i < 4 ? `#${i + 1}` : undefined,
+  })
+)
 
-function QualifierTable() {
+function QualifierTable({ rows }: { rows: ConsoleQualifierRow[] }) {
+  const displayRows = rows.length > 0 ? rows : DEFAULT_QUALIFIER_ROWS
+  const cutoffIndex = displayRows.findIndex((r) => !r.passed)
+
   return (
     <div className='overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111]'>
       <table className='w-full border-collapse'>
@@ -373,9 +392,9 @@ function QualifierTable() {
           </tr>
         </thead>
         <tbody>
-          {QUALIFIER_ROWS.map((row, i) => (
+          {displayRows.map((row, i) => (
             <Fragment key={row.rank}>
-              {i === 4 && (
+              {cutoffIndex > 0 && i === cutoffIndex && (
                 <tr aria-hidden>
                   <td
                     colSpan={4}
@@ -392,7 +411,8 @@ function QualifierTable() {
                   className={cn(
                     'px-2.5 py-2 text-center font-mono text-[12px] font-extrabold sm:px-3.5 sm:py-2.5',
                     row.passed ? 'text-[#4a9eff]' : 'text-white/20',
-                    i < 7 && 'border-b border-white/[0.03]'
+                    i < displayRows.length - 1 &&
+                      'border-b border-white/[0.03]'
                   )}
                 >
                   {row.rank}
@@ -403,24 +423,27 @@ function QualifierTable() {
                     row.passed
                       ? 'font-bold text-white/60'
                       : 'font-medium text-white/25',
-                    i < 7 && 'border-b border-white/[0.03]'
+                    i < displayRows.length - 1 &&
+                      'border-b border-white/[0.03]'
                   )}
                 >
-                  {row.name}
+                  {row.nickname}
                 </td>
                 <td
                   className={cn(
                     'px-2.5 py-2 font-mono text-[11px] font-bold sm:px-3.5 sm:py-2.5 sm:text-[12px]',
                     row.passed ? 'text-white/40' : 'text-white/25',
-                    i < 7 && 'border-b border-white/[0.03]'
+                    i < displayRows.length - 1 &&
+                      'border-b border-white/[0.03]'
                   )}
                 >
-                  {row.score}
+                  {row.score !== null ? row.score.toLocaleString() : '—'}
                 </td>
                 <td
                   className={cn(
                     'px-2.5 py-2 sm:px-3.5 sm:py-2.5',
-                    i < 7 && 'border-b border-white/[0.03]'
+                    i < displayRows.length - 1 &&
+                      'border-b border-white/[0.03]'
                   )}
                 >
                   {row.seed && (
@@ -439,8 +462,42 @@ function QualifierTable() {
 }
 
 /* ════════════════════════════════════════════════════════════════════ */
-/*  Ban/Pick helpers                                                   */
+/*  Stage → MatchPlayer helpers                                       */
 /* ════════════════════════════════════════════════════════════════════ */
+
+function stageToPlayers(
+  stage: ConsoleStage | undefined,
+  seed1?: string,
+  seed2?: string,
+  tbd1 = 'TBD',
+  tbd2 = 'TBD'
+): MatchPlayer[] {
+  if (!stage || stage.rows.length < 2) {
+    return [
+      { seed: seed1, name: tbd1, score: '—', isTbd: true },
+      { seed: seed2, name: tbd2, score: '—', isTbd: true },
+    ]
+  }
+
+  const sorted = [...stage.rows].sort((a, b) => a.rank - b.rank)
+  const winner = sorted[0]
+  const loser = sorted[1]
+
+  return [
+    {
+      seed: seed1,
+      name: winner.nickname,
+      score: winner.score !== null ? winner.score.toLocaleString() : '—',
+      isWinner: true,
+    },
+    {
+      seed: seed2,
+      name: loser.nickname,
+      score: loser.score !== null ? loser.score.toLocaleString() : '—',
+      isWinner: false,
+    },
+  ]
+}
 
 function buildBanPicks(who1: string, who2: string): BanPickRow[] {
   return [
@@ -467,6 +524,21 @@ function buildFinalBanPicks(): BanPickRow[] {
 /* ════════════════════════════════════════════════════════════════════ */
 
 function ConsoleResults2026Page() {
+  const { data, isLoading, isError } = useResults<unknown>()
+  const archive = useMemo(() => resolveConsoleSeasonArchive(data), [data])
+  const standings = useMemo(() => buildStandings(archive), [archive])
+  const qualifierRows = useMemo(() => buildQualifierRows(archive), [archive])
+
+  const sf1 = useMemo(() => getSF1(archive), [archive])
+  const sf2 = useMemo(() => getSF2(archive), [archive])
+  const thirdPlace = useMemo(() => getThirdPlace(archive), [archive])
+  const final = useMemo(() => getFinal(archive), [archive])
+
+  const champion = standings.find((s) => s.rank === 1)?.nickname ?? '—'
+  const runner2 = standings.find((s) => s.rank === 2)?.nickname ?? '—'
+  const runner3 = standings.find((s) => s.rank === 3)?.nickname ?? '—'
+  const runner4 = standings.find((s) => s.rank === 4)?.nickname ?? '—'
+
   useEffect(() => {
     document.title = `${t('meta.siteName')} | 콘솔 시즌 2026`
   }, [])
@@ -521,17 +593,31 @@ function ConsoleResults2026Page() {
             <span className='sm:hidden'>3라운드</span>
           </strong>
         </div>
+        {isLoading && (
+          <div className='inline-flex items-center gap-1.5 rounded-lg border border-[#4a9eff]/15 bg-[#4a9eff]/[0.04] px-2.5 py-2 text-[11px] font-semibold text-[#4a9eff] sm:px-3.5 sm:text-[12px]'>
+            동기화 중
+          </div>
+        )}
       </div>
+
+      {isError && (
+        <div className='flex items-center gap-3 rounded-xl border border-[#4a9eff]/[0.12] bg-[#4a9eff]/[0.04] p-3.5 text-[12px] leading-relaxed text-white/55 sm:p-4 sm:text-[13px]'>
+          <span className='shrink-0'>⚠</span>
+          <span className='break-keep'>
+            결과 데이터를 불러오지 못했습니다. 기본 구조만 표시합니다.
+          </span>
+        </div>
+      )}
 
       {/* ── Podium (STANDINGS) ── */}
       <FadeIn>
         <section>
           <SectionHead badge='STANDINGS' title='최종 순위' />
-          <ChampionCard name='—' />
+          <ChampionCard name={champion} />
           <div className='grid gap-1.5 sm:grid-cols-3 sm:gap-2'>
-            <RunnerUpCard rank={2} name='—' />
-            <RunnerUpCard rank={3} name='—' />
-            <RunnerUpCard rank={4} name='—' />
+            <RunnerUpCard rank={2} name={runner2} />
+            <RunnerUpCard rank={3} name={runner3} />
+            <RunnerUpCard rank={4} name={runner4} />
           </div>
         </section>
       </FadeIn>
@@ -563,19 +649,13 @@ function ConsoleResults2026Page() {
               <div className='grid gap-2 sm:grid-cols-2'>
                 <MatchBox
                   label='SF-1'
-                  players={[
-                    { seed: '#1', name: 'TBD', score: '—', isTbd: true },
-                    { seed: '#4', name: 'TBD', score: '—', isTbd: true },
-                  ]}
+                  players={stageToPlayers(sf1, '#1', '#4')}
                   banPicks={buildBanPicks('#1', '#4')}
                   hideBanPickMobile
                 />
                 <MatchBox
                   label='SF-2'
-                  players={[
-                    { seed: '#2', name: 'TBD', score: '—', isTbd: true },
-                    { seed: '#3', name: 'TBD', score: '—', isTbd: true },
-                  ]}
+                  players={stageToPlayers(sf2, '#2', '#3')}
                   banPicks={buildBanPicks('#2', '#3')}
                   hideBanPickMobile
                 />
@@ -600,10 +680,13 @@ function ConsoleResults2026Page() {
               </div>
               <MatchBox
                 label='3RD'
-                players={[
-                  { seed: '—', name: 'SF-1 패자', score: '—', isTbd: true },
-                  { seed: '—', name: 'SF-2 패자', score: '—', isTbd: true },
-                ]}
+                players={stageToPlayers(
+                  thirdPlace,
+                  '—',
+                  '—',
+                  'SF-1 패자',
+                  'SF-2 패자'
+                )}
                 banPicks={buildBanPicks('A', 'B')}
                 hideLabelMobile
                 hideBanPickMobile
@@ -639,10 +722,13 @@ function ConsoleResults2026Page() {
               <MatchBox
                 label='FINAL'
                 isFinal
-                players={[
-                  { seed: '—', name: 'SF-1 승자', score: '—', isTbd: true },
-                  { seed: '—', name: 'SF-2 승자', score: '—', isTbd: true },
-                ]}
+                players={stageToPlayers(
+                  final,
+                  '—',
+                  '—',
+                  'SF-1 승자',
+                  'SF-2 승자'
+                )}
                 banPicks={buildFinalBanPicks()}
                 hideSeedsMobile
               />
@@ -691,7 +777,7 @@ function ConsoleResults2026Page() {
       <FadeIn>
         <section>
           <SectionHead badge='QUALIFIER' title='온라인 예선 순위' />
-          <QualifierTable />
+          <QualifierTable rows={qualifierRows} />
         </section>
       </FadeIn>
     </TkcSection>

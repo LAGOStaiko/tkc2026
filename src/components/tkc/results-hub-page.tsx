@@ -7,6 +7,16 @@ import {
   type ArcadeFinalSeedRow,
   type ArcadeRegionArchive,
 } from '@/lib/arcade-results-archive'
+import {
+  resolveConsoleSeasonArchive,
+  buildStandings as buildConsoleStandings,
+  buildQualifierRows as buildConsoleQualifierRows,
+  getSF1 as getConsoleSF1,
+  getSF2 as getConsoleSF2,
+  getFinal as getConsoleFinal,
+  type ConsoleQualifierRow,
+  type ConsoleStage,
+} from '@/lib/console-results-archive'
 import { cn } from '@/lib/utils'
 import { FadeIn } from '@/components/tkc/guide-shared'
 import { TkcSection } from '@/components/tkc/layout'
@@ -197,24 +207,29 @@ function ArchiveDescriptionCard({
           CONSOLE ARCHIVE
         </div>
         <h2 className='mt-2 text-[20px] font-extrabold tracking-tight text-white sm:text-[24px]'>
-          콘솔 시즌 결과 아카이브
+          {season} 시즌 콘솔 결과
         </h2>
         <p className='mt-2.5 max-w-[760px] text-[13px] leading-relaxed break-keep text-white/55 sm:text-[14px]'>
-          콘솔 결과 아카이브는 별도 구조로 확장 예정입니다.
+          온라인 예선을 거쳐 선발된 Top 4의 결선 토너먼트 결과를 조회할 수
+          있습니다.
         </p>
-        <div className='mt-4 border-t border-[#1e1e1e] pt-4 text-[13px] italic text-white/40'>
-          현재는 기존 콘솔 결과 페이지 운영 데이터를 유지합니다.
-        </div>
-        <div className='mt-4 flex flex-wrap gap-1.5'>
+        <div className='mt-5 flex flex-wrap gap-1.5'>
           <span className='rounded-md border border-[#1e1e1e] bg-white/[0.03] px-2.5 py-1 font-mono text-[11px] font-bold text-white/55 sm:text-[12px]'>
             온라인 예선 <strong className='text-white/85'>Top 4</strong>
           </span>
           <span className='rounded-md border border-[#1e1e1e] bg-white/[0.03] px-2.5 py-1 font-mono text-[11px] font-bold text-white/55 sm:text-[12px]'>
-            결선 구조{' '}
-            <strong className='text-white/85'>SF-1 / SF-2 / FINAL</strong>
+            결선 스테이지{' '}
+            <strong className='text-white/85'>
+              {finalsMatchCount > 0 ? `${finalsMatchCount}개` : 'SF / 3RD / FINAL'}
+            </strong>
           </span>
-          <span className='rounded-md border border-[#4a9eff]/15 bg-[#4a9eff]/[0.08] px-2.5 py-1 font-mono text-[11px] font-bold text-[#4a9eff] sm:text-[12px]'>
-            운영 데이터 반영 예정
+          <span className={cn(
+            'rounded-md px-2.5 py-1 font-mono text-[11px] font-bold sm:text-[12px]',
+            finalsMatchCount > 0
+              ? 'border border-emerald-400/15 bg-emerald-500/[0.08] text-emerald-400'
+              : 'border border-[#4a9eff]/15 bg-[#4a9eff]/[0.08] text-[#4a9eff]'
+          )}>
+            {isLoading ? '동기화 중' : finalsMatchCount > 0 ? '데이터 연동 완료' : '데이터 대기'}
           </span>
         </div>
       </div>
@@ -226,10 +241,12 @@ function PodiumPreview({
   badgeVariant,
   linkHref,
   subLabel,
+  names,
 }: {
   badgeVariant: 'arcade' | 'console'
   linkHref?: string
   subLabel: string
+  names?: Record<number, string>
 }) {
   return (
     <div>
@@ -267,7 +284,9 @@ function PodiumPreview({
             <span className={cn('font-mono text-[9px] font-extrabold tracking-[1px]', pod.labelCn)}>
               {pod.label}
             </span>
-            <span className={cn('font-extrabold', pod.nameCn)}>—</span>
+            <span className={cn('font-extrabold', pod.nameCn)}>
+              {names?.[pod.rank] ?? '—'}
+            </span>
             <span className='text-[11px] text-white/30'>{subLabel}</span>
           </div>
         ))}
@@ -292,7 +311,9 @@ function PodiumPreview({
               <div className={cn('font-mono text-[9px] font-extrabold tracking-[1px]', pod.labelCn)}>
                 {pod.label}
               </div>
-              <div className={cn('font-extrabold', pod.mobileNameCn)}>—</div>
+              <div className={cn('font-extrabold', pod.mobileNameCn)}>
+                {names?.[pod.rank] ?? '—'}
+              </div>
             </div>
             <span
               className={cn(
@@ -428,8 +449,22 @@ function ArcadeFinalsPreview({ matches }: { matches: ArcadeFinalCrossMatch[] }) 
   )
 }
 
-function ConsoleQualifierTable() {
-  const rows = [1, 2, 3, 4]
+function ConsoleQualifierTable({
+  qualifierRows,
+}: {
+  qualifierRows: ConsoleQualifierRow[]
+}) {
+  const rows =
+    qualifierRows.length > 0
+      ? qualifierRows.filter((r) => r.passed).slice(0, 4)
+      : [1, 2, 3, 4].map((rank) => ({
+          rank,
+          nickname: '—',
+          score: null as number | null,
+          detail: '',
+          passed: true,
+          seed: `#${rank}`,
+        }))
 
   return (
     <div>
@@ -450,18 +485,20 @@ function ConsoleQualifierTable() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((rank, i) => (
-              <tr key={rank}>
+            {rows.map((row, i) => (
+              <tr key={row.rank}>
                 <td className={cn('px-3.5 py-[7px] text-center font-mono text-[11px] font-extrabold text-[#4a9eff] sm:text-[12px]', i < rows.length - 1 && 'border-b border-white/[0.03]')}>
-                  {rank}
+                  {row.rank}
                 </td>
                 <td className={cn('px-3.5 py-[7px] text-[12px] font-bold text-white/75 sm:text-[13px]', i < rows.length - 1 && 'border-b border-white/[0.03]')}>
-                  —
+                  {row.nickname}
                 </td>
                 <td className={cn('px-3.5 py-[7px]', i < rows.length - 1 && 'border-b border-white/[0.03]')}>
-                  <span className='rounded-[3px] bg-[#4a9eff]/[0.08] px-[5px] py-[2px] font-mono text-[8px] font-extrabold text-[#4a9eff] sm:text-[9px]'>
-                    #{rank}
-                  </span>
+                  {row.seed && (
+                    <span className='rounded-[3px] bg-[#4a9eff]/[0.08] px-[5px] py-[2px] font-mono text-[8px] font-extrabold text-[#4a9eff] sm:text-[9px]'>
+                      {row.seed}
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
@@ -472,12 +509,40 @@ function ConsoleQualifierTable() {
   )
 }
 
-function ConsoleFinalsPreview() {
+function consoleStagePreviewRows(
+  stage: ConsoleStage | undefined,
+  seed1: string,
+  seed2: string,
+  tbd1: string,
+  tbd2: string
+): { seed?: string; name: string; hasData: boolean }[] {
+  if (stage && stage.rows.length >= 2) {
+    const sorted = [...stage.rows].sort((a, b) => a.rank - b.rank)
+    return [
+      { seed: seed1, name: sorted[0].nickname, hasData: true },
+      { seed: seed2, name: sorted[1].nickname, hasData: true },
+    ]
+  }
+  return [
+    { seed: seed1, name: tbd1, hasData: false },
+    { seed: seed2, name: tbd2, hasData: false },
+  ]
+}
+
+function ConsoleFinalsPreview({
+  sf1,
+  sf2,
+  final,
+}: {
+  sf1?: ConsoleStage
+  sf2?: ConsoleStage
+  final?: ConsoleStage
+}) {
   const matches = [
-    { label: 'SF-1', rows: [{ seed: '#1', name: 'TBD' }, { seed: '#4', name: 'TBD' }] },
-    { label: 'SF-2', rows: [{ seed: '#2', name: 'TBD' }, { seed: '#3', name: 'TBD' }] },
-    { label: 'FINAL', rows: [{ name: 'SF-1 승자' }, { name: 'SF-2 승자' }] },
-  ] as const
+    { label: 'SF-1', rows: consoleStagePreviewRows(sf1, '#1', '#4', 'TBD', 'TBD') },
+    { label: 'SF-2', rows: consoleStagePreviewRows(sf2, '#2', '#3', 'TBD', 'TBD') },
+    { label: 'FINAL', rows: consoleStagePreviewRows(final, undefined as unknown as string, undefined as unknown as string, 'SF-1 승자', 'SF-2 승자') },
+  ]
 
   return (
     <a
@@ -501,10 +566,12 @@ function ConsoleFinalsPreview() {
             <div className='border-b border-[#1e1e1e] bg-white/[0.015] px-2 py-1 font-mono text-[9px] font-extrabold tracking-[0.5px] text-white/20'>
               {m.label}
             </div>
-            {m.rows.map((row) => (
-              <div key={row.name} className='flex items-center gap-1.5 border-b border-white/[0.02] px-2 py-[5px] text-[11px] italic last:border-b-0'>
-                {'seed' in row && <span className='min-w-4 font-mono text-[9px] font-extrabold text-white/20'>{row.seed}</span>}
-                <span className='truncate font-semibold text-white/15'>{row.name}</span>
+            {m.rows.map((row, i) => (
+              <div key={i} className='flex items-center gap-1.5 border-b border-white/[0.02] px-2 py-[5px] text-[11px] last:border-b-0'>
+                {row.seed && <span className='min-w-4 font-mono text-[9px] font-extrabold text-white/20'>{row.seed}</span>}
+                <span className={cn('truncate font-semibold', row.hasData ? 'text-white/50' : 'text-white/15 italic')}>
+                  {row.name}
+                </span>
               </div>
             ))}
           </div>
@@ -518,6 +585,10 @@ export function ResultsHubPage() {
   const [division, setDivision] = useState<Division>('arcade')
   const { data, isLoading, isError } = useResults<unknown>()
   const archive = useMemo(() => resolveArcadeSeasonArchive(data), [data])
+  const consoleArchive = useMemo(
+    () => resolveConsoleSeasonArchive(data),
+    [data]
+  )
 
   const crossMatches = useMemo(() => {
     if (archive.finals.crossMatches.length > 0) {
@@ -538,6 +609,37 @@ export function ResultsHubPage() {
       return qualifierCount >= 2
     }).length
   }, [archive.regions])
+
+  const consoleStandings = useMemo(
+    () => buildConsoleStandings(consoleArchive),
+    [consoleArchive]
+  )
+  const consoleQualifierRows = useMemo(
+    () => buildConsoleQualifierRows(consoleArchive),
+    [consoleArchive]
+  )
+  const consoleSF1 = useMemo(
+    () => getConsoleSF1(consoleArchive),
+    [consoleArchive]
+  )
+  const consoleSF2 = useMemo(
+    () => getConsoleSF2(consoleArchive),
+    [consoleArchive]
+  )
+  const consoleFinal = useMemo(
+    () => getConsoleFinal(consoleArchive),
+    [consoleArchive]
+  )
+
+  const consoleStandingNames = useMemo(() => {
+    const map: Record<number, string> = {}
+    for (const s of consoleStandings) {
+      map[s.rank] = s.nickname
+    }
+    return map
+  }, [consoleStandings])
+
+  const consoleStageCount = consoleArchive.stages.length
 
   useEffect(() => {
     document.title = `${t('meta.siteName')} | 아카이브`
@@ -664,20 +766,29 @@ export function ResultsHubPage() {
               season={archive.season}
               isLoading={isLoading}
               finalizedRegionCount={finalizedRegionCount}
-              finalsMatchCount={crossMatches.length}
+              finalsMatchCount={consoleStageCount}
             />
           </FadeIn>
 
           <FadeIn>
-            <PodiumPreview badgeVariant='console' subLabel='온라인 예선' />
+            <PodiumPreview
+              badgeVariant='console'
+              linkHref='/console-results/2026'
+              subLabel='온라인 예선'
+              names={consoleStandingNames}
+            />
           </FadeIn>
 
           <FadeIn delay={80}>
-            <ConsoleQualifierTable />
+            <ConsoleQualifierTable qualifierRows={consoleQualifierRows} />
           </FadeIn>
 
           <FadeIn delay={140}>
-            <ConsoleFinalsPreview />
+            <ConsoleFinalsPreview
+              sf1={consoleSF1}
+              sf2={consoleSF2}
+              final={consoleFinal}
+            />
           </FadeIn>
         </div>
       )}

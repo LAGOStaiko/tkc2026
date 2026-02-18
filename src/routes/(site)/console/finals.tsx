@@ -257,9 +257,45 @@ function OverviewSection() {
 }
 
 function BracketSection() {
+  const [inView, setInView] = useState(false)
+  const bracketRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = bracketRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setInView(true)
+          obs.disconnect()
+        }
+      },
+      { threshold: 0.1 },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  const tbd = 'bg-white/[0.03] text-white/35'
   const hi = 'bg-[#e74c3c]/10 text-[#e74c3c]'
   const lo = 'bg-[#f5a623]/[0.08] text-[#f5a623]'
-  const tbd = 'bg-white/[0.03] text-white/35'
+
+  const anim = (name: string, delay: number, extra = '') =>
+    inView
+      ? {
+          opacity: 0 as const,
+          animation: `${name} 0.45s ease-out ${delay}ms forwards${extra ? `, ${extra}` : ''}`,
+        }
+      : { opacity: 0 as const }
+
+  const sweep = (delay: number) =>
+    inView
+      ? {
+          transformOrigin: 'left' as const,
+          transform: 'scaleX(0)',
+          animation: `bracket-sweep 0.5s ease-out ${delay}ms forwards`,
+        }
+      : { transform: 'scaleX(0)' }
 
   return (
     <SectionBlock
@@ -268,90 +304,181 @@ function BracketSection() {
       title='4강 대진표'
       desc='예선 결과에 따라 시드를 배치합니다. 1위 vs 4위, 2위 vs 3위.'
     >
-      {/* Desktop Bracket */}
-      <div className='hidden gap-4 sm:grid sm:grid-cols-2'>
-        <div>
-          <div className='mb-2.5 border-b-2 border-[#e74c3c] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
-            Semifinals
+      <style>{`
+        @keyframes bracket-col-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bracket-card-in {
+          from { opacity: 0; transform: scale(0.96) translateY(10px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes bracket-sweep {
+          from { transform: scaleX(0); }
+          to { transform: scaleX(1); }
+        }
+        @keyframes bracket-arrow-bounce {
+          0% { opacity: 0; transform: translateY(-8px); }
+          70% { opacity: 0.6; transform: translateY(2px); }
+          100% { opacity: 0.6; transform: translateY(0); }
+        }
+        @keyframes bracket-final-glow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0); border-radius: 12px; }
+          50% { box-shadow: 0 0 20px 4px rgba(231,76,60,0.12); border-radius: 12px; }
+        }
+        @keyframes bracket-3rd-glow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0); border-radius: 12px; }
+          50% { box-shadow: 0 0 20px 4px rgba(245,166,35,0.12); border-radius: 12px; }
+        }
+      `}</style>
+
+      <div ref={bracketRef}>
+        {/* Desktop Bracket */}
+        <div className='hidden gap-4 sm:grid sm:grid-cols-2'>
+          {/* Semifinals */}
+          <div style={anim('bracket-col-in', 0)}>
+            <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
+              <div
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
+                style={sweep(150)}
+              />
+              Semifinals
+            </div>
+            <div className='space-y-2'>
+              {SF_MATCHES.map((m, i) => (
+                <div key={m.label} style={anim('bracket-card-in', 250 + i * 80)}>
+                  <MatchCard
+                    label={m.label}
+                    rows={[
+                      { seed: m.seeds[0], name: m.names[0], seedCls: hi },
+                      { seed: m.seeds[1], name: m.names[1], seedCls: lo },
+                    ]}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-          <div className='space-y-2'>
-            {SF_MATCHES.map((m) => (
+
+          {/* Grand Final */}
+          <div style={anim('bracket-col-in', 550)}>
+            <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
+              <div
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
+                style={sweep(700)}
+              />
+              Grand Final
+            </div>
+            <div
+              style={anim(
+                'bracket-card-in',
+                800,
+                'bracket-final-glow 2s ease-in-out 1250ms',
+              )}
+            >
               <MatchCard
-                key={m.label}
-                label={m.label}
+                label='Final'
                 rows={[
-                  { seed: m.seeds[0], name: m.names[0], seedCls: hi },
-                  { seed: m.seeds[1], name: m.names[1], seedCls: lo },
+                  { seed: '?', name: 'SF1 승자', seedCls: tbd },
+                  { seed: '?', name: 'SF2 승자', seedCls: tbd },
                 ]}
               />
-            ))}
+            </div>
           </div>
         </div>
-        <div>
-          <div className='mb-2.5 border-b-2 border-[#e74c3c] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
-            Grand Final
-          </div>
-          <MatchCard
-            label='Final'
-            rows={[
-              { seed: '?', name: 'SF1 승자', seedCls: tbd },
-              { seed: '?', name: 'SF2 승자', seedCls: tbd },
-            ]}
-          />
-        </div>
-      </div>
 
-      {/* Mobile Bracket */}
-      <div className='space-y-4 sm:hidden'>
-        <div>
-          <div className='mb-2.5 border-b-2 border-[#e74c3c] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
-            Semifinals
+        {/* Mobile Bracket */}
+        <div className='space-y-4 sm:hidden'>
+          <div style={anim('bracket-col-in', 0)}>
+            <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
+              <div
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
+                style={sweep(150)}
+              />
+              Semifinals
+            </div>
+            <div className='space-y-2'>
+              {SF_MATCHES.map((m, i) => (
+                <div key={m.label} style={anim('bracket-card-in', 250 + i * 80)}>
+                  <MatchCard
+                    label={m.label}
+                    rows={[
+                      { seed: m.seeds[0], name: m.names[0], seedCls: hi },
+                      { seed: m.seeds[1], name: m.names[1], seedCls: lo },
+                    ]}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-          <div className='space-y-2'>
-            {SF_MATCHES.map((m) => (
+          <div
+            className='py-1 text-center font-mono text-[11px] font-semibold tracking-[1px] text-[#e74c3c]'
+            style={
+              inView
+                ? {
+                    opacity: 0 as const,
+                    animation:
+                      'bracket-arrow-bounce 0.5s ease-out 480ms forwards',
+                  }
+                : { opacity: 0 as const }
+            }
+          >
+            ▼ 승자 진출
+          </div>
+          <div style={anim('bracket-col-in', 550)}>
+            <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
+              <div
+                className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#e74c3c]'
+                style={sweep(700)}
+              />
+              Grand Final
+            </div>
+            <div
+              style={anim(
+                'bracket-card-in',
+                800,
+                'bracket-final-glow 2s ease-in-out 1250ms',
+              )}
+            >
               <MatchCard
-                key={m.label}
-                label={m.label}
+                label='Final'
                 rows={[
-                  { seed: m.seeds[0], name: m.names[0], seedCls: hi },
-                  { seed: m.seeds[1], name: m.names[1], seedCls: lo },
+                  { seed: '?', name: 'SF1 승자', seedCls: tbd },
+                  { seed: '?', name: 'SF2 승자', seedCls: tbd },
                 ]}
               />
-            ))}
+            </div>
           </div>
         </div>
-        <div className='py-1 text-center font-mono text-[11px] font-semibold tracking-[1px] text-[#e74c3c] opacity-60'>
-          ▼ 승자 진출
-        </div>
-        <div>
-          <div className='mb-2.5 border-b-2 border-[#e74c3c] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
-            Grand Final
-          </div>
-          <MatchCard
-            label='Final'
-            rows={[
-              { seed: '?', name: 'SF1 승자', seedCls: tbd },
-              { seed: '?', name: 'SF2 승자', seedCls: tbd },
-            ]}
-          />
-        </div>
-      </div>
 
-      {/* 3rd Place */}
-      <FadeIn delay={100}>
-        <div className='mx-auto max-w-[300px]'>
-          <div className='mb-2.5 border-b-2 border-[#f5a623] pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
+        {/* 3rd Place Match */}
+        <div
+          className='mx-auto mt-5 max-w-[300px]'
+          style={anim('bracket-col-in', 950)}
+        >
+          <div className='relative mb-2.5 pb-2 text-center font-mono text-xs font-semibold tracking-[1px] text-white/35 uppercase'>
+            <div
+              className='absolute bottom-0 right-0 left-0 h-0.5 bg-[#f5a623]'
+              style={sweep(1050)}
+            />
             3·4위전
           </div>
-          <MatchCard
-            label='3rd Place'
-            rows={[
-              { seed: '?', name: 'SF1 패자', seedCls: tbd },
-              { seed: '?', name: 'SF2 패자', seedCls: tbd },
-            ]}
-          />
+          <div
+            style={anim(
+              'bracket-card-in',
+              1150,
+              'bracket-3rd-glow 2s ease-in-out 1600ms',
+            )}
+          >
+            <MatchCard
+              label='3rd Place'
+              rows={[
+                { seed: '?', name: 'SF1 패자', seedCls: tbd },
+                { seed: '?', name: 'SF2 패자', seedCls: tbd },
+              ]}
+            />
+          </div>
         </div>
-      </FadeIn>
+      </div>
 
       <Callout type='warning' icon={<TkcIcon name='warning' />}>
         4강 <strong className='text-white/80'>패자</strong>는 3·4위전, 4강{' '}
