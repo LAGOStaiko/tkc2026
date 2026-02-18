@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useResults } from '@/lib/api'
 import {
@@ -28,19 +28,19 @@ export const Route = createFileRoute('/(site)/console-results/2026/')({
 function Breadcrumb() {
   return (
     <nav className='mb-5 flex items-center gap-1.5 text-[12px] text-white/30'>
-      <a
-        href='/results'
+      <Link
+        to='/results'
         className='transition-colors hover:text-[#4a9eff]'
       >
         아카이브
-      </a>
+      </Link>
       <span className='text-white/15'>›</span>
-      <a
-        href='/results'
+      <Link
+        to='/results'
         className='hidden transition-colors hover:text-[#4a9eff] sm:inline'
       >
         콘솔 시즌
-      </a>
+      </Link>
       <span className='hidden text-white/15 sm:inline'>›</span>
       <span className='font-semibold text-white/60'>
         <span className='hidden sm:inline'>2026</span>

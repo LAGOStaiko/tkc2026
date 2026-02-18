@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { ARCADE_SONGS } from '@/content/arcade-songs'
 import { t } from '@/text'
 import { useResults } from '@/lib/api'
@@ -47,16 +47,16 @@ const REGION_HERO_LABELS: Record<string, string> = {
 function Breadcrumb({ regionLabel }: { regionLabel: string }) {
   return (
     <nav className='mb-5 flex items-center gap-1.5 text-[12px] text-white/30'>
-      <a href='/results' className='transition-colors hover:text-[#f5a623]'>
+      <Link to='/results' className='transition-colors hover:text-[#f5a623]'>
         아카이브
-      </a>
+      </Link>
       <span className='text-white/15'>›</span>
-      <a
-        href='/arcade-results/2026'
+      <Link
+        to='/arcade-results/2026'
         className='hidden transition-colors hover:text-[#f5a623] sm:inline'
       >
         아케이드 시즌
-      </a>
+      </Link>
       <span className='hidden text-white/15 sm:inline'>›</span>
       <span className='font-semibold text-white/60'>{regionLabel}</span>
     </nav>
@@ -76,9 +76,10 @@ function RegionStepper({ activeKey }: { activeKey: string }) {
         const isActive = r.key === activeKey
         const roundLabel = REGION_ROUND_LABELS[r.key] ?? ''
         return (
-          <a
+          <Link
             key={r.key}
-            href={`/arcade-results/2026/${r.key}`}
+            to='/arcade-results/2026/$region'
+            params={{ region: r.key }}
             className={cn(
               'flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-[12px] font-semibold no-underline transition-all sm:gap-2 sm:px-3 sm:text-[13px]',
               isActive
@@ -90,7 +91,7 @@ function RegionStepper({ activeKey }: { activeKey: string }) {
               {roundLabel}
             </span>
             {r.shortLabel}
-          </a>
+          </Link>
         )
       })}
     </div>

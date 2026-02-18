@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useResults } from '@/lib/api'
 import {
@@ -47,19 +47,19 @@ function getRegionLabel(key: string): string {
 function Breadcrumb() {
   return (
     <nav className='mb-5 flex items-center gap-1.5 text-[12px] text-white/30'>
-      <a
-        href='/results'
+      <Link
+        to='/results'
         className='transition-colors hover:text-[#f5a623]'
       >
         아카이브
-      </a>
+      </Link>
       <span className='text-white/15'>›</span>
-      <a
-        href='/arcade-results/2026'
+      <Link
+        to='/arcade-results/2026'
         className='hidden transition-colors hover:text-[#f5a623] sm:inline'
       >
         아케이드 시즌
-      </a>
+      </Link>
       <span className='hidden text-white/15 sm:inline'>›</span>
       <span className='font-semibold text-white/60'>결선</span>
     </nav>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useResults } from '@/lib/api'
 import {
@@ -226,8 +226,9 @@ function RegionCard({ region }: { region: ArcadeRegionArchive }) {
   ]
 
   return (
-    <a
-      href={`/arcade-results/2026/${region.key}`}
+    <Link
+      to='/arcade-results/2026/$region'
+      params={{ region: region.key }}
       className='group relative block overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] text-inherit no-underline transition-colors hover:border-[#2a2a2a]'
     >
       <div className='absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#f5a623] via-[#f5a623]/40 to-transparent opacity-40 transition-opacity group-hover:opacity-100' />
@@ -322,7 +323,7 @@ function RegionCard({ region }: { region: ArcadeRegionArchive }) {
           )}
         </div>
       </div>
-    </a>
+    </Link>
   )
 }
 
@@ -339,8 +340,8 @@ function FinalsCard({ archive }: { archive: ArcadeSeasonArchive }) {
     return null
 
   return (
-    <a
-      href='/arcade-results/2026/finals'
+    <Link
+      to='/arcade-results/2026/finals'
       className='group relative block overflow-hidden rounded-xl border border-[#e74c3c]/15 bg-[#111] text-inherit no-underline transition-colors hover:border-[#e74c3c]/30'
     >
       <div className='absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#e74c3c] to-[#f5a623] opacity-50' />
@@ -463,7 +464,7 @@ function FinalsCard({ archive }: { archive: ArcadeSeasonArchive }) {
           </div>
         )}
       </div>
-    </a>
+    </Link>
   )
 }
 
@@ -488,13 +489,13 @@ function ArcadeResults2026Page() {
     <TkcSection className='space-y-8 md:space-y-10'>
       {/* Back nav + Hero */}
       <div className='space-y-4'>
-        <a
-          href='/results'
+        <Link
+          to='/results'
           className='inline-flex items-center gap-1 text-[13px] text-white/40 transition-colors hover:text-[#f5a623]'
         >
           ← <span className='hidden sm:inline'>결과 아카이브로 돌아가기</span>
           <span className='sm:hidden'>아카이브</span>
-        </a>
+        </Link>
 
         <div>
           <div className='mb-3 inline-flex items-center gap-1.5 font-mono text-xs font-bold tracking-[1.5px] text-[#f5a623]'>
@@ -573,12 +574,12 @@ function ArcadeResults2026Page() {
                 지역 상세
               </h2>
             </div>
-            <a
-              href='/arcade-results/2026/finals'
+            <Link
+              to='/arcade-results/2026/finals'
               className='text-[13px] text-white/55 transition-colors hover:text-[#f5a623] sm:text-sm'
             >
               Top 8 결선 상세 →
-            </a>
+            </Link>
           </div>
 
           <div className='flex flex-col gap-2'>
@@ -608,13 +609,13 @@ function ArcadeResults2026Page() {
               </span>
               <span className='sm:hidden'> · 전체 기록 확인</span>
             </p>
-            <a
-              href='/arcade-results/2026/finals'
+            <Link
+              to='/arcade-results/2026/finals'
               className='shrink-0 rounded-lg border border-[#1e1e1e] px-4 py-2 text-xs font-semibold text-white/50 transition-all hover:border-white/20 hover:text-white'
             >
               <span className='hidden sm:inline'>전체 기록 보기 →</span>
               <span className='sm:hidden'>기록 보기 →</span>
-            </a>
+            </Link>
           </div>
         </div>
       </FadeIn>

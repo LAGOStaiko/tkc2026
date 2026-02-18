@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useResults } from '@/lib/api'
 import {
@@ -138,12 +139,12 @@ function SectionHead({
         {title}
       </h3>
       {linkLabel && linkHref && (
-        <a
-          href={linkHref}
+        <Link
+          to={linkHref}
           className='text-[12px] text-white/30 transition-colors hover:text-[#f5a623]'
         >
           {linkLabel}
-        </a>
+        </Link>
       )}
     </div>
   )
@@ -342,9 +343,10 @@ function RegionCards({ regions }: { regions: ArcadeRegionArchive[] }) {
           const qualB = region.qualifiers.groupB
 
           return (
-            <a
+            <Link
               key={region.key}
-              href={`/arcade-results/2026/${region.key}`}
+              to='/arcade-results/2026/$region'
+              params={{ region: region.key }}
               className='group relative flex flex-col items-center gap-2 overflow-hidden rounded-[10px] border border-[#1e1e1e] bg-[#111] p-4 text-inherit no-underline transition-all hover:border-[#2a2a2a] hover:-translate-y-0.5'
             >
               <span className='rounded bg-[#f5a623]/[0.06] px-1.5 py-0.5 font-mono text-[10px] font-extrabold tracking-[0.5px] text-[#f5a623]'>
@@ -381,7 +383,7 @@ function RegionCards({ regions }: { regions: ArcadeRegionArchive[] }) {
                   <div className='text-center text-[11px] text-white/70'>—</div>
                 )}
               </div>
-            </a>
+            </Link>
           )
         })}
       </div>
@@ -401,8 +403,8 @@ function ArcadeFinalsPreview({ matches }: { matches: ArcadeFinalCrossMatch[] }) 
         ]
 
   return (
-    <a
-      href='/arcade-results/2026/finals'
+    <Link
+      to='/arcade-results/2026/finals'
       className='group relative block overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] p-5 no-underline transition-colors hover:border-[#2a2a2a]'
     >
       <div className='mb-3.5 flex items-center justify-between'>
@@ -445,7 +447,7 @@ function ArcadeFinalsPreview({ matches }: { matches: ArcadeFinalCrossMatch[] }) 
           )
         })}
       </div>
-    </a>
+    </Link>
   )
 }
 
@@ -545,8 +547,8 @@ function ConsoleFinalsPreview({
   ]
 
   return (
-    <a
-      href='/console-results/2026'
+    <Link
+      to='/console-results/2026'
       className='group relative block overflow-hidden rounded-xl border border-[#4a9eff]/[0.08] bg-[#111] p-5 no-underline transition-colors hover:border-[#2a2a2a]'
     >
       <div className='mb-3.5 flex items-center justify-between'>
@@ -577,7 +579,7 @@ function ConsoleFinalsPreview({
           </div>
         ))}
       </div>
-    </a>
+    </Link>
   )
 }
 
