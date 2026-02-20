@@ -47,10 +47,7 @@ function getRegionLabel(key: string): string {
 function Breadcrumb() {
   return (
     <nav className='mb-5 flex items-center gap-1.5 text-[12px] text-white/30'>
-      <Link
-        to='/results'
-        className='transition-colors hover:text-[#f5a623]'
-      >
+      <Link to='/results' className='transition-colors hover:text-[#f5a623]'>
         아카이브
       </Link>
       <span className='text-white/15'>›</span>
@@ -70,19 +67,12 @@ function Breadcrumb() {
 /*  Champion Card                                                      */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function ChampionCard({
-  name,
-  region,
-}: {
-  name: string
-  region: string
-}) {
+function ChampionCard({ name, region }: { name: string; region: string }) {
   return (
     <div
       className='tkc-champion-card relative mb-2.5 overflow-hidden rounded-[16px] border border-[#ffd700]/15 p-6 sm:p-8'
       style={{
-        background:
-          'linear-gradient(135deg, #111 0%, #141210 50%, #111 100%)',
+        background: 'linear-gradient(135deg, #111 0%, #141210 50%, #111 100%)',
         animation: 'tkc-glow-pulse 4s ease-in-out infinite',
       }}
     >
@@ -154,8 +144,7 @@ const RUNNERUP_CONFIG = {
   4: {
     label: '4TH PLACE',
     color: 'rgba(255,255,255,0.3)',
-    barGradient:
-      'linear-gradient(90deg, rgba(255,255,255,0.15), transparent)',
+    barGradient: 'linear-gradient(90deg, rgba(255,255,255,0.15), transparent)',
   },
 } as const
 
@@ -197,9 +186,7 @@ function RunnerUpCard({
           <div className='mt-0.5 text-sm font-extrabold text-white/85 sm:text-base'>
             {name}
           </div>
-          <div className='mt-0.5 text-[11px] text-white/30'>
-            {region} 예선
-          </div>
+          <div className='mt-0.5 text-[11px] text-white/30'>{region} 예선</div>
         </div>
       </div>
     </div>
@@ -412,13 +399,7 @@ function MatchBox({
 /*  Section Header                                                     */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function SectionHead({
-  badge,
-  title,
-}: {
-  badge: string
-  title: string
-}) {
+function SectionHead({ badge, title }: { badge: string; title: string }) {
   return (
     <div className='mb-4 flex items-center gap-2.5'>
       <span className='rounded-[5px] border border-[#e74c3c]/15 bg-[#e74c3c]/[0.08] px-2 py-[3px] font-mono text-[10px] font-extrabold tracking-[1px] text-[#e74c3c]'>
@@ -651,12 +632,14 @@ function ArcadeFinals2026Page() {
                 </div>
               ) : (
                 <div className='grid gap-2 sm:grid-cols-2'>
-                  {([
-                    ['A1', 'B4'],
-                    ['A2', 'B3'],
-                    ['A3', 'B2'],
-                    ['A4', 'B1'],
-                  ] as const).map(([left, right], i) => (
+                  {(
+                    [
+                      ['A1', 'B4'],
+                      ['A2', 'B3'],
+                      ['A3', 'B2'],
+                      ['A4', 'B1'],
+                    ] as const
+                  ).map(([left, right], i) => (
                     <MatchBox
                       key={i}
                       label={`MATCH ${i + 1}`}

@@ -50,8 +50,7 @@ const PODIUM_CONFIG = [
   {
     rank: 2,
     label: 'RUNNER-UP',
-    rankCn:
-      'text-[#c0c0c0] bg-[#c0c0c0]/[0.06] border border-[#c0c0c0]/[0.1]',
+    rankCn: 'text-[#c0c0c0] bg-[#c0c0c0]/[0.06] border border-[#c0c0c0]/[0.1]',
     labelCn: 'text-[#c0c0c0]',
     cardCn: 'border-[#1e1e1e] bg-[#111]',
     nameCn: 'text-[15px] text-white/85',
@@ -62,8 +61,7 @@ const PODIUM_CONFIG = [
   {
     rank: 3,
     label: '3RD',
-    rankCn:
-      'text-[#cd7f32] bg-[#cd7f32]/[0.06] border border-[#cd7f32]/[0.1]',
+    rankCn: 'text-[#cd7f32] bg-[#cd7f32]/[0.06] border border-[#cd7f32]/[0.1]',
     labelCn: 'text-[#cd7f32]',
     cardCn: 'border-[#1e1e1e] bg-[#111]',
     nameCn: 'text-[15px] text-white/85',
@@ -182,7 +180,9 @@ function ArchiveDescriptionCard({
           <div className='mt-5 flex flex-wrap gap-1.5'>
             <span className='rounded-md border border-[#1e1e1e] bg-white/[0.03] px-2.5 py-1 font-mono text-[11px] font-bold text-white/55 sm:text-[12px]'>
               지역 확정{' '}
-              <strong className='text-white/85'>{finalizedRegionCount}/4</strong>
+              <strong className='text-white/85'>
+                {finalizedRegionCount}/4
+              </strong>
             </span>
             <span className='rounded-md border border-[#1e1e1e] bg-white/[0.03] px-2.5 py-1 font-mono text-[11px] font-bold text-white/55 sm:text-[12px]'>
               결선 매치{' '}
@@ -221,16 +221,24 @@ function ArchiveDescriptionCard({
           <span className='rounded-md border border-[#1e1e1e] bg-white/[0.03] px-2.5 py-1 font-mono text-[11px] font-bold text-white/55 sm:text-[12px]'>
             결선 스테이지{' '}
             <strong className='text-white/85'>
-              {finalsMatchCount > 0 ? `${finalsMatchCount}개` : 'SF / 3RD / FINAL'}
+              {finalsMatchCount > 0
+                ? `${finalsMatchCount}개`
+                : 'SF / 3RD / FINAL'}
             </strong>
           </span>
-          <span className={cn(
-            'rounded-md px-2.5 py-1 font-mono text-[11px] font-bold sm:text-[12px]',
-            finalsMatchCount > 0
-              ? 'border border-emerald-400/15 bg-emerald-500/[0.08] text-emerald-400'
-              : 'border border-[#4a9eff]/15 bg-[#4a9eff]/[0.08] text-[#4a9eff]'
-          )}>
-            {isLoading ? '동기화 중' : finalsMatchCount > 0 ? '데이터 연동 완료' : '데이터 대기'}
+          <span
+            className={cn(
+              'rounded-md px-2.5 py-1 font-mono text-[11px] font-bold sm:text-[12px]',
+              finalsMatchCount > 0
+                ? 'border border-emerald-400/15 bg-emerald-500/[0.08] text-emerald-400'
+                : 'border border-[#4a9eff]/15 bg-[#4a9eff]/[0.08] text-[#4a9eff]'
+            )}
+          >
+            {isLoading
+              ? '동기화 중'
+              : finalsMatchCount > 0
+                ? '데이터 연동 완료'
+                : '데이터 대기'}
           </span>
         </div>
       </div>
@@ -267,11 +275,11 @@ function PodiumPreview({
               'relative flex flex-col items-center gap-1.5 overflow-hidden rounded-[10px] border p-4 text-center',
               pod.cardCn,
               pod.rank === 1 &&
-                'p-5 [animation:tkc-glow-pulse_4s_ease-in-out_infinite]'
+                '[animation:tkc-glow-pulse_4s_ease-in-out_infinite] p-5'
             )}
           >
             {pod.showShimmer && (
-              <div className='tkc-champion-shimmer absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,transparent,#ffd700,#f5a623,#ffd700,transparent)] bg-[length:200%_100%] [animation:tkc-shimmer_4s_linear_infinite]' />
+              <div className='tkc-champion-shimmer absolute inset-x-0 top-0 h-[3px] [animation:tkc-shimmer_4s_linear_infinite] bg-[linear-gradient(90deg,transparent,#ffd700,#f5a623,#ffd700,transparent)] bg-[length:200%_100%]' />
             )}
             {pod.showCrown && <span className='text-[20px]'>👑</span>}
             <span
@@ -282,7 +290,12 @@ function PodiumPreview({
             >
               {pod.rank}
             </span>
-            <span className={cn('font-mono text-[9px] font-extrabold tracking-[1px]', pod.labelCn)}>
+            <span
+              className={cn(
+                'font-mono text-[9px] font-extrabold tracking-[1px]',
+                pod.labelCn
+              )}
+            >
               {pod.label}
             </span>
             <span className={cn('font-extrabold', pod.nameCn)}>
@@ -301,15 +314,20 @@ function PodiumPreview({
               'relative flex items-center gap-3 overflow-hidden rounded-[10px] border px-3.5 py-3',
               pod.cardCn,
               pod.rank === 1 &&
-                'px-4 py-3.5 [animation:tkc-glow-pulse_4s_ease-in-out_infinite]'
+                '[animation:tkc-glow-pulse_4s_ease-in-out_infinite] px-4 py-3.5'
             )}
           >
             {pod.showShimmer && (
-              <div className='tkc-champion-shimmer absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,transparent,#ffd700,#f5a623,#ffd700,transparent)] bg-[length:200%_100%] [animation:tkc-shimmer_4s_linear_infinite]' />
+              <div className='tkc-champion-shimmer absolute inset-x-0 top-0 h-[3px] [animation:tkc-shimmer_4s_linear_infinite] bg-[linear-gradient(90deg,transparent,#ffd700,#f5a623,#ffd700,transparent)] bg-[length:200%_100%]' />
             )}
             {pod.showCrown && <span className='text-[16px]'>👑</span>}
             <div className='flex-1'>
-              <div className={cn('font-mono text-[9px] font-extrabold tracking-[1px]', pod.labelCn)}>
+              <div
+                className={cn(
+                  'font-mono text-[9px] font-extrabold tracking-[1px]',
+                  pod.labelCn
+                )}
+              >
                 {pod.label}
               </div>
               <div className={cn('font-extrabold', pod.mobileNameCn)}>
@@ -347,7 +365,7 @@ function RegionCards({ regions }: { regions: ArcadeRegionArchive[] }) {
               key={region.key}
               to='/arcade-results/2026/$region'
               params={{ region: region.key }}
-              className='group relative flex flex-col items-center gap-2 overflow-hidden rounded-[10px] border border-[#1e1e1e] bg-[#111] p-4 text-inherit no-underline transition-all hover:border-[#2a2a2a] hover:-translate-y-0.5'
+              className='group relative flex flex-col items-center gap-2 overflow-hidden rounded-[10px] border border-[#1e1e1e] bg-[#111] p-4 text-inherit no-underline transition-all hover:-translate-y-0.5 hover:border-[#2a2a2a]'
             >
               <span className='rounded bg-[#f5a623]/[0.06] px-1.5 py-0.5 font-mono text-[10px] font-extrabold tracking-[0.5px] text-[#f5a623]'>
                 {ROUND_LABELS[region.key] ?? ''}
@@ -355,10 +373,20 @@ function RegionCards({ regions }: { regions: ArcadeRegionArchive[] }) {
               <span className='text-[14px] font-extrabold text-white/85 sm:text-[16px]'>
                 {region.shortLabel}
               </span>
-              <span className={cn('text-[11px] font-semibold', isDone ? 'text-emerald-400' : 'text-white/20')}>
+              <span
+                className={cn(
+                  'text-[11px] font-semibold',
+                  isDone ? 'text-emerald-400' : 'text-white/20'
+                )}
+              >
                 {isDone ? '완료' : '예정'}
               </span>
-              <div className={cn('mt-1 flex w-full flex-col gap-1 border-t border-white/[0.04] pt-2', !isDone && 'opacity-25')}>
+              <div
+                className={cn(
+                  'mt-1 flex w-full flex-col gap-1 border-t border-white/[0.04] pt-2',
+                  !isDone && 'opacity-25'
+                )}
+              >
                 {isDone ? (
                   <>
                     {qualA && (
@@ -366,7 +394,9 @@ function RegionCards({ regions }: { regions: ArcadeRegionArchive[] }) {
                         <span className='rounded-[3px] bg-[#e74c3c]/[0.08] px-1 py-px font-mono text-[9px] font-extrabold text-[#e74c3c]'>
                           A
                         </span>
-                        <span className='truncate font-bold text-white/70'>{qualA.nickname}</span>
+                        <span className='truncate font-bold text-white/70'>
+                          {qualA.nickname}
+                        </span>
                       </div>
                     )}
                     {qualB && (
@@ -374,10 +404,16 @@ function RegionCards({ regions }: { regions: ArcadeRegionArchive[] }) {
                         <span className='rounded-[3px] bg-[#f5a623]/[0.08] px-1 py-px font-mono text-[9px] font-extrabold text-[#f5a623]'>
                           B
                         </span>
-                        <span className='truncate font-bold text-white/70'>{qualB.nickname}</span>
+                        <span className='truncate font-bold text-white/70'>
+                          {qualB.nickname}
+                        </span>
                       </div>
                     )}
-                    {!qualA && !qualB && <div className='text-center text-[11px] text-white/15'>—</div>}
+                    {!qualA && !qualB && (
+                      <div className='text-center text-[11px] text-white/15'>
+                        —
+                      </div>
+                    )}
                   </>
                 ) : (
                   <div className='text-center text-[11px] text-white/70'>—</div>
@@ -391,7 +427,11 @@ function RegionCards({ regions }: { regions: ArcadeRegionArchive[] }) {
   )
 }
 
-function ArcadeFinalsPreview({ matches }: { matches: ArcadeFinalCrossMatch[] }) {
+function ArcadeFinalsPreview({
+  matches,
+}: {
+  matches: ArcadeFinalCrossMatch[]
+}) {
   const displayMatches =
     matches.length >= 4
       ? matches.slice(0, 4)
@@ -421,25 +461,50 @@ function ArcadeFinalsPreview({ matches }: { matches: ArcadeFinalCrossMatch[] }) 
       <div className='grid grid-cols-2 gap-1 sm:grid-cols-4 sm:gap-1.5'>
         {displayMatches.map((m) => {
           const hasData = 'left' in m
-          const seedL = hasData ? `A${(m as ArcadeFinalCrossMatch).left.seed}` : (m as { seedL: string }).seedL
-          const seedR = hasData ? `B${(m as ArcadeFinalCrossMatch).right.seed}` : (m as { seedR: string }).seedR
-          const nameL = hasData ? (m as ArcadeFinalCrossMatch).left.nickname : (m as { nameL: string }).nameL
-          const nameR = hasData ? (m as ArcadeFinalCrossMatch).right.nickname : (m as { nameR: string }).nameR
+          const seedL = hasData
+            ? `A${(m as ArcadeFinalCrossMatch).left.seed}`
+            : (m as { seedL: string }).seedL
+          const seedR = hasData
+            ? `B${(m as ArcadeFinalCrossMatch).right.seed}`
+            : (m as { seedR: string }).seedR
+          const nameL = hasData
+            ? (m as ArcadeFinalCrossMatch).left.nickname
+            : (m as { nameL: string }).nameL
+          const nameR = hasData
+            ? (m as ArcadeFinalCrossMatch).right.nickname
+            : (m as { nameR: string }).nameR
 
           return (
-            <div key={m.matchNo} className='overflow-hidden rounded-lg border border-[#1e1e1e] bg-white/[0.015]'>
+            <div
+              key={m.matchNo}
+              className='overflow-hidden rounded-lg border border-[#1e1e1e] bg-white/[0.015]'
+            >
               <div className='border-b border-[#1e1e1e] bg-white/[0.015] px-2 py-1 font-mono text-[9px] font-extrabold tracking-[0.5px] text-white/20'>
                 QF-{m.matchNo}
               </div>
               <div className='flex items-center gap-1.5 border-b border-white/[0.02] px-2 py-[5px] text-[11px]'>
-                <span className='min-w-4 font-mono text-[9px] font-extrabold text-white/20'>{seedL}</span>
-                <span className={cn('truncate font-semibold', nameL === 'TBD' ? 'text-white/15 italic' : 'text-white/50')}>
+                <span className='min-w-4 font-mono text-[9px] font-extrabold text-white/20'>
+                  {seedL}
+                </span>
+                <span
+                  className={cn(
+                    'truncate font-semibold',
+                    nameL === 'TBD' ? 'text-white/15 italic' : 'text-white/50'
+                  )}
+                >
                   {nameL}
                 </span>
               </div>
               <div className='flex items-center gap-1.5 px-2 py-[5px] text-[11px]'>
-                <span className='min-w-4 font-mono text-[9px] font-extrabold text-white/20'>{seedR}</span>
-                <span className={cn('truncate font-semibold', nameR === 'TBD' ? 'text-white/15 italic' : 'text-white/50')}>
+                <span className='min-w-4 font-mono text-[9px] font-extrabold text-white/20'>
+                  {seedR}
+                </span>
+                <span
+                  className={cn(
+                    'truncate font-semibold',
+                    nameR === 'TBD' ? 'text-white/15 italic' : 'text-white/50'
+                  )}
+                >
                   {nameR}
                 </span>
               </div>
@@ -470,7 +535,11 @@ function ConsoleQualifierTable({
 
   return (
     <div>
-      <SectionHead badge='QUALIFIER' badgeVariant='console' title='온라인 예선' />
+      <SectionHead
+        badge='QUALIFIER'
+        badgeVariant='console'
+        title='온라인 예선'
+      />
       <div className='overflow-hidden rounded-[10px] border border-[#1e1e1e] bg-[#111]'>
         <table className='w-full border-collapse'>
           <thead>
@@ -489,13 +558,28 @@ function ConsoleQualifierTable({
           <tbody>
             {rows.map((row, i) => (
               <tr key={row.rank}>
-                <td className={cn('px-3.5 py-[7px] text-center font-mono text-[11px] font-extrabold text-[#4a9eff] sm:text-[12px]', i < rows.length - 1 && 'border-b border-white/[0.03]')}>
+                <td
+                  className={cn(
+                    'px-3.5 py-[7px] text-center font-mono text-[11px] font-extrabold text-[#4a9eff] sm:text-[12px]',
+                    i < rows.length - 1 && 'border-b border-white/[0.03]'
+                  )}
+                >
                   {row.rank}
                 </td>
-                <td className={cn('px-3.5 py-[7px] text-[12px] font-bold text-white/75 sm:text-[13px]', i < rows.length - 1 && 'border-b border-white/[0.03]')}>
+                <td
+                  className={cn(
+                    'px-3.5 py-[7px] text-[12px] font-bold text-white/75 sm:text-[13px]',
+                    i < rows.length - 1 && 'border-b border-white/[0.03]'
+                  )}
+                >
                   {row.nickname}
                 </td>
-                <td className={cn('px-3.5 py-[7px]', i < rows.length - 1 && 'border-b border-white/[0.03]')}>
+                <td
+                  className={cn(
+                    'px-3.5 py-[7px]',
+                    i < rows.length - 1 && 'border-b border-white/[0.03]'
+                  )}
+                >
                   {row.seed && (
                     <span className='rounded-[3px] bg-[#4a9eff]/[0.08] px-[5px] py-[2px] font-mono text-[8px] font-extrabold text-[#4a9eff] sm:text-[9px]'>
                       {row.seed}
@@ -541,9 +625,24 @@ function ConsoleFinalsPreview({
   final?: ConsoleStage
 }) {
   const matches = [
-    { label: 'SF-1', rows: consoleStagePreviewRows(sf1, '#1', '#4', 'TBD', 'TBD') },
-    { label: 'SF-2', rows: consoleStagePreviewRows(sf2, '#2', '#3', 'TBD', 'TBD') },
-    { label: 'FINAL', rows: consoleStagePreviewRows(final, undefined as unknown as string, undefined as unknown as string, 'SF-1 승자', 'SF-2 승자') },
+    {
+      label: 'SF-1',
+      rows: consoleStagePreviewRows(sf1, '#1', '#4', 'TBD', 'TBD'),
+    },
+    {
+      label: 'SF-2',
+      rows: consoleStagePreviewRows(sf2, '#2', '#3', 'TBD', 'TBD'),
+    },
+    {
+      label: 'FINAL',
+      rows: consoleStagePreviewRows(
+        final,
+        undefined as unknown as string,
+        undefined as unknown as string,
+        'SF-1 승자',
+        'SF-2 승자'
+      ),
+    },
   ]
 
   return (
@@ -564,14 +663,29 @@ function ConsoleFinalsPreview({
 
       <div className='grid grid-cols-2 gap-1 sm:grid-cols-3 sm:gap-1.5'>
         {matches.map((m) => (
-          <div key={m.label} className='overflow-hidden rounded-lg border border-[#1e1e1e] bg-white/[0.015]'>
+          <div
+            key={m.label}
+            className='overflow-hidden rounded-lg border border-[#1e1e1e] bg-white/[0.015]'
+          >
             <div className='border-b border-[#1e1e1e] bg-white/[0.015] px-2 py-1 font-mono text-[9px] font-extrabold tracking-[0.5px] text-white/20'>
               {m.label}
             </div>
             {m.rows.map((row, i) => (
-              <div key={i} className='flex items-center gap-1.5 border-b border-white/[0.02] px-2 py-[5px] text-[11px] last:border-b-0'>
-                {row.seed && <span className='min-w-4 font-mono text-[9px] font-extrabold text-white/20'>{row.seed}</span>}
-                <span className={cn('truncate font-semibold', row.hasData ? 'text-white/50' : 'text-white/15 italic')}>
+              <div
+                key={i}
+                className='flex items-center gap-1.5 border-b border-white/[0.02] px-2 py-[5px] text-[11px] last:border-b-0'
+              >
+                {row.seed && (
+                  <span className='min-w-4 font-mono text-[9px] font-extrabold text-white/20'>
+                    {row.seed}
+                  </span>
+                )}
+                <span
+                  className={cn(
+                    'truncate font-semibold',
+                    row.hasData ? 'text-white/50' : 'text-white/15 italic'
+                  )}
+                >
                   {row.name}
                 </span>
               </div>
@@ -668,10 +782,12 @@ export function ResultsHubPage() {
           </h1>
           <p className='mt-2.5 max-w-[600px] text-[13px] leading-[1.7] break-keep text-white/50 sm:text-sm'>
             <span className='hidden sm:inline'>
-              태고의 달인 한국 챔피언십 2026의 전체 기록입니다. 시즌별 결과와 상세
-              기록을 확인하세요.
+              태고의 달인 한국 챔피언십 2026의 전체 기록입니다. 시즌별 결과와
+              상세 기록을 확인하세요.
             </span>
-            <span className='sm:hidden'>태고의 달인 한국 챔피언십 2026 전체 기록</span>
+            <span className='sm:hidden'>
+              태고의 달인 한국 챔피언십 2026 전체 기록
+            </span>
           </p>
         </div>
       </FadeIn>
@@ -702,7 +818,12 @@ export function ResultsHubPage() {
               : 'border-[#1e1e1e] bg-[#111] text-white/35 hover:border-[#2a2a2a] hover:text-white/50'
           )}
         >
-          <span className={cn('size-1.5 rounded-full bg-[#e74c3c] transition-opacity', division === 'arcade' ? 'opacity-100' : 'opacity-40')} />
+          <span
+            className={cn(
+              'size-1.5 rounded-full bg-[#e74c3c] transition-opacity',
+              division === 'arcade' ? 'opacity-100' : 'opacity-40'
+            )}
+          />
           <span className='hidden sm:inline'>아케이드 시즌</span>
           <span className='sm:hidden'>아케이드</span>
           <span className='rounded-[3px] bg-emerald-400/[0.08] px-[5px] py-[2px] font-mono text-[9px] font-extrabold tracking-[0.5px] text-emerald-400'>
@@ -720,7 +841,12 @@ export function ResultsHubPage() {
               : 'border-[#1e1e1e] bg-[#111] text-white/35 hover:border-[#2a2a2a] hover:text-white/50'
           )}
         >
-          <span className={cn('size-1.5 rounded-full bg-[#4a9eff] transition-opacity', division === 'console' ? 'opacity-100' : 'opacity-40')} />
+          <span
+            className={cn(
+              'size-1.5 rounded-full bg-[#4a9eff] transition-opacity',
+              division === 'console' ? 'opacity-100' : 'opacity-40'
+            )}
+          />
           <span className='hidden sm:inline'>콘솔 시즌</span>
           <span className='sm:hidden'>콘솔</span>
           <span className='rounded-[3px] bg-white/[0.03] px-[5px] py-[2px] font-mono text-[9px] font-extrabold tracking-[0.5px] text-white/25'>

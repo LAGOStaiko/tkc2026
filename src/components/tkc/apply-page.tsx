@@ -1,6 +1,6 @@
 ﻿import * as React from 'react'
 import { z } from 'zod'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { parseSongOption, parseSongTitle } from '@/content/swiss-song-pool'
 import { t } from '@/text'
@@ -418,11 +418,52 @@ export function ApplyPage() {
     document.title = `${t('meta.siteName')} | ${t('apply.title')}`
   }, [])
 
+  const scrollToField = (fieldName: string) => {
+    if (typeof document === 'undefined') return false
+    const target = document.querySelector(
+      `[name="${fieldName}"]`
+    ) as HTMLElement | null
+    if (!target) return false
+    target.focus({ preventScroll: true })
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    return true
+  }
+
+  const scrollToTurnstile = () => {
+    if (typeof document === 'undefined') return
+    const target = document.getElementById('turnstile-anchor')
+    if (!target) return
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  const onInvalidSubmit = (errors: FieldErrors<ApplyFormValues>) => {
+    const first = Object.entries(errors)[0]
+    if (!first) return
+
+    const [fieldName, issue] = first
+    const message =
+      typeof issue?.message === 'string'
+        ? issue.message
+        : '입력 항목을 확인해주세요.'
+
+    if (fieldName === 'turnstileToken') {
+      scrollToTurnstile()
+    } else {
+      scrollToField(fieldName)
+    }
+
+    toast.error('입력 내용을 확인해주세요.', { description: message })
+  }
+
   const onSubmit = async (values: ApplyFormValues) => {
     if (turnstileSiteKey && !values.turnstileToken?.trim()) {
       window.turnstile?.reset?.()
       form.setError('turnstileToken', {
         message: '보안 인증을 완료해주세요.',
+      })
+      scrollToTurnstile()
+      toast.error('보안 인증이 필요합니다.', {
+        description: '보안 인증을 완료한 뒤 다시 시도해주세요.',
       })
       return
     }
@@ -466,7 +507,9 @@ export function ApplyPage() {
           ? '보안 인증이 필요합니다. 인증을 완료한 뒤 다시 시도해주세요.'
           : rawMessage === 'Turnstile verification failed'
             ? '보안 인증 검증에 실패했습니다. 인증을 다시 진행해주세요.'
-            : rawMessage
+            : rawMessage === 'Request timed out'
+              ? '요청이 지연되고 있습니다. 잠시 후 다시 시도해주세요.'
+              : rawMessage
       toast.error('신청 실패', { description: message })
     }
   }
@@ -528,7 +571,7 @@ export function ApplyPage() {
 
           {/* Form body */}
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)}>
               <div className='p-7 sm:p-9'>
                 {/* Honeypot */}
                 <input
@@ -544,7 +587,7 @@ export function ApplyPage() {
                 {/* Turnstile */}
                 {turnstileSiteKey ? (
                   <div className='mb-6 space-y-2'>
-                    <div ref={turnstileRef} />
+                    <div id='turnstile-anchor' ref={turnstileRef} />
                     {turnstileError ? (
                       <p className='text-xs text-[#e74c3c]'>{turnstileError}</p>
                     ) : null}

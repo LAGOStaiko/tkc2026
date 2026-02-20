@@ -28,10 +28,7 @@ export const Route = createFileRoute('/(site)/console-results/2026/')({
 function Breadcrumb() {
   return (
     <nav className='mb-5 flex items-center gap-1.5 text-[12px] text-white/30'>
-      <Link
-        to='/results'
-        className='transition-colors hover:text-[#4a9eff]'
-      >
+      <Link to='/results' className='transition-colors hover:text-[#4a9eff]'>
         아카이브
       </Link>
       <span className='text-white/15'>›</span>
@@ -76,8 +73,7 @@ function ChampionCard({ name }: { name: string }) {
     <div
       className='tkc-champion-card relative mb-2.5 overflow-hidden rounded-[16px] border border-[#ffd700]/15 p-6 sm:p-8'
       style={{
-        background:
-          'linear-gradient(135deg, #111 0%, #10111a 50%, #111 100%)',
+        background: 'linear-gradient(135deg, #111 0%, #10111a 50%, #111 100%)',
         animation: 'tkc-glow-pulse-console 4s ease-in-out infinite',
       }}
     >
@@ -116,9 +112,7 @@ function ChampionCard({ name }: { name: string }) {
           <div className='text-[22px] font-black text-[#f0f0f0] [text-shadow:0_0_30px_rgba(255,215,0,0.15)] sm:text-[28px]'>
             {name}
           </div>
-          <div className='mt-1.5 text-[13px] text-white/40'>
-            콘솔 시즌 우승
-          </div>
+          <div className='mt-1.5 text-[13px] text-white/40'>콘솔 시즌 우승</div>
         </div>
         <div className='flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#ffd700]/12 bg-[#ffd700]/[0.06] font-mono text-base font-black text-[#ffd700] [text-shadow:0_0_12px_rgba(255,215,0,0.3)] sm:size-12 sm:text-xl'>
           1
@@ -149,18 +143,11 @@ const RUNNERUP_CONFIG = {
     label: '4TH PLACE',
     mobileLabel: '4TH',
     color: 'rgba(255,255,255,0.3)',
-    barGradient:
-      'linear-gradient(90deg, rgba(255,255,255,0.15), transparent)',
+    barGradient: 'linear-gradient(90deg, rgba(255,255,255,0.15), transparent)',
   },
 } as const
 
-function RunnerUpCard({
-  rank,
-  name,
-}: {
-  rank: 2 | 3 | 4
-  name: string
-}) {
+function RunnerUpCard({ rank, name }: { rank: 2 | 3 | 4; name: string }) {
   const cfg = RUNNERUP_CONFIG[rank]
   return (
     <div className='relative overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] transition-colors hover:border-[#2a2a2a]'>
@@ -411,8 +398,7 @@ function QualifierTable({ rows }: { rows: ConsoleQualifierRow[] }) {
                   className={cn(
                     'px-2.5 py-2 text-center font-mono text-[12px] font-extrabold sm:px-3.5 sm:py-2.5',
                     row.passed ? 'text-[#4a9eff]' : 'text-white/20',
-                    i < displayRows.length - 1 &&
-                      'border-b border-white/[0.03]'
+                    i < displayRows.length - 1 && 'border-b border-white/[0.03]'
                   )}
                 >
                   {row.rank}
@@ -423,8 +409,7 @@ function QualifierTable({ rows }: { rows: ConsoleQualifierRow[] }) {
                     row.passed
                       ? 'font-bold text-white/60'
                       : 'font-medium text-white/25',
-                    i < displayRows.length - 1 &&
-                      'border-b border-white/[0.03]'
+                    i < displayRows.length - 1 && 'border-b border-white/[0.03]'
                   )}
                 >
                   {row.nickname}
@@ -433,8 +418,7 @@ function QualifierTable({ rows }: { rows: ConsoleQualifierRow[] }) {
                   className={cn(
                     'px-2.5 py-2 font-mono text-[11px] font-bold sm:px-3.5 sm:py-2.5 sm:text-[12px]',
                     row.passed ? 'text-white/40' : 'text-white/25',
-                    i < displayRows.length - 1 &&
-                      'border-b border-white/[0.03]'
+                    i < displayRows.length - 1 && 'border-b border-white/[0.03]'
                   )}
                 >
                   {row.score !== null ? row.score.toLocaleString() : '—'}
@@ -442,8 +426,7 @@ function QualifierTable({ rows }: { rows: ConsoleQualifierRow[] }) {
                 <td
                   className={cn(
                     'px-2.5 py-2 sm:px-3.5 sm:py-2.5',
-                    i < displayRows.length - 1 &&
-                      'border-b border-white/[0.03]'
+                    i < displayRows.length - 1 && 'border-b border-white/[0.03]'
                   )}
                 >
                   {row.seed && (
@@ -561,9 +544,7 @@ function ConsoleResults2026Page() {
             Nintendo Switch 온라인 예선을 거쳐 선발된 Top 4의 결선 토너먼트.
             밴픽과 과제곡으로 승부합니다.
           </span>
-          <span className='sm:hidden'>
-            온라인 예선 Top 4 결선 토너먼트
-          </span>
+          <span className='sm:hidden'>온라인 예선 Top 4 결선 토너먼트</span>
         </p>
       </div>
 
@@ -583,7 +564,8 @@ function ConsoleResults2026Page() {
           <strong className='font-bold text-white/85'>4명</strong>
         </div>
         <div className='hidden items-center gap-1.5 rounded-lg border border-[#1e1e1e] bg-[#111] px-3.5 py-2 text-[12px] text-white/50 sm:inline-flex'>
-          ⚔ 방식 <strong className='font-bold text-white/85'>단판 토너먼트</strong>
+          ⚔ 방식{' '}
+          <strong className='font-bold text-white/85'>단판 토너먼트</strong>
         </div>
         <div className='inline-flex items-center gap-1.5 rounded-lg border border-[#1e1e1e] bg-[#111] px-2.5 py-2 text-[11px] text-white/50 sm:px-3.5 sm:text-[12px]'>
           <span className='hidden sm:inline'>🏆 라운드</span>

@@ -102,7 +102,12 @@ function RegionStepper({ activeKey }: { activeKey: string }) {
 /*  Sticky Section Nav                                                 */
 /* ════════════════════════════════════════════════════════════════════ */
 
-type NavItem = { id: string; label: string; mobileLabel: string; hasData: boolean }
+type NavItem = {
+  id: string
+  label: string
+  mobileLabel: string
+  hasData: boolean
+}
 
 function SectionNav({
   activeId,
@@ -173,7 +178,11 @@ function QualifiedPodium({
   const rest = rankingRows.filter((r) => r.rank > 2)
 
   return (
-    <section id='standings' data-section='standings' className='mb-10 scroll-mt-18'>
+    <section
+      id='standings'
+      data-section='standings'
+      className='mb-10 scroll-mt-18'
+    >
       <FadeIn>
         <SectionHead badge='STANDINGS' title='최종 순위' />
 
@@ -197,12 +206,12 @@ function QualifiedPodium({
                   className={cn(
                     'relative flex items-center gap-3 overflow-hidden rounded-xl border p-4 sm:gap-3.5 sm:p-5',
                     isFirst
-                      ? 'border-[#ffd700]/15 bg-[linear-gradient(135deg,#111,#141210,#111)] [animation:tkc-glow-pulse_4s_ease-in-out_infinite]'
+                      ? '[animation:tkc-glow-pulse_4s_ease-in-out_infinite] border-[#ffd700]/15 bg-[linear-gradient(135deg,#111,#141210,#111)]'
                       : 'border-[#1e1e1e] bg-[#111]'
                   )}
                 >
                   {isFirst && (
-                    <div className='tkc-champion-shimmer absolute inset-x-0 top-0 h-[3px] bg-[linear-gradient(90deg,transparent,#ffd700,#f5a623,#ffd700,transparent)] bg-[length:200%_100%] [animation:tkc-shimmer_4s_linear_infinite]' />
+                    <div className='tkc-champion-shimmer absolute inset-x-0 top-0 h-[3px] [animation:tkc-shimmer_4s_linear_infinite] bg-[linear-gradient(90deg,transparent,#ffd700,#f5a623,#ffd700,transparent)] bg-[length:200%_100%]' />
                   )}
                   {!isFirst && (
                     <div className='absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#c0c0c0] to-[#c0c0c0]/20 opacity-30' />
@@ -276,7 +285,8 @@ function QualifiedPodium({
               <tbody>
                 {rest.map((row, i) => {
                   const record =
-                    typeof row.wins === 'number' && typeof row.losses === 'number'
+                    typeof row.wins === 'number' &&
+                    typeof row.losses === 'number'
                       ? `${row.wins}-${row.losses}`
                       : '—'
                   return (
@@ -311,7 +321,8 @@ function QualifiedPodium({
                           i < rest.length - 1 && 'border-b border-white/[0.03]'
                         )}
                       >
-                        {row.statusLabel !== '탈락' && row.statusLabel !== '진행중'
+                        {row.statusLabel !== '탈락' &&
+                        row.statusLabel !== '진행중'
                           ? row.statusLabel
                           : ''}
                       </td>
@@ -381,8 +392,12 @@ function SwissRoundBlock({
               >
                 <div className='flex items-center justify-between border-b border-[#1e1e1e] bg-white/[0.015] px-2.5 py-1'>
                   <span className='font-mono text-[9px] font-extrabold tracking-[0.5px] text-white/20'>
-                    <span className='hidden sm:inline'>MATCH {match.table ?? index + 1}</span>
-                    <span className='sm:hidden'>M{match.table ?? index + 1}</span>
+                    <span className='hidden sm:inline'>
+                      MATCH {match.table ?? index + 1}
+                    </span>
+                    <span className='sm:hidden'>
+                      M{match.table ?? index + 1}
+                    </span>
                   </span>
                   {match.bye && (
                     <span className='font-mono text-[8px] font-extrabold text-white/15'>
@@ -466,7 +481,7 @@ function SwissRoundBlock({
                     )}
                   </div>
                 ) : (
-                  <div className='px-2.5 py-2 text-[11px] italic text-white/20'>
+                  <div className='px-2.5 py-2 text-[11px] text-white/20 italic'>
                     부전승
                   </div>
                 )}
@@ -548,9 +563,13 @@ function StageCard({
         </thead>
         <tbody>
           {rows.map((row, i) => {
-            const isPass = cutlineAfter != null ? row.rank <= cutlineAfter : true
+            const isPass =
+              cutlineAfter != null ? row.rank <= cutlineAfter : true
             const showCutBefore =
-              cutlineAfter != null && i > 0 && rows[i - 1].rank <= cutlineAfter && row.rank > cutlineAfter
+              cutlineAfter != null &&
+              i > 0 &&
+              rows[i - 1].rank <= cutlineAfter &&
+              row.rank > cutlineAfter
 
             return (
               <tr key={row.rank}>
@@ -560,8 +579,7 @@ function StageCard({
                     'px-3.5 py-2 text-center font-mono text-[12px] font-extrabold',
                     isPass ? 'text-emerald-400' : 'text-white/15',
                     i < rows.length - 1 && 'border-b border-white/[0.03]',
-                    showCutBefore &&
-                      `border-t-2`
+                    showCutBefore && `border-t-2`
                   )}
                   style={
                     showCutBefore
@@ -641,7 +659,7 @@ function StageCard({
       {/* Callout */}
       {callout && (
         <div
-          className='mx-4 mb-4 mt-3 flex flex-wrap items-center gap-2 rounded-lg border px-3.5 py-3 text-[13px] font-semibold text-white/70 sm:mx-4'
+          className='mx-4 mt-3 mb-4 flex flex-wrap items-center gap-2 rounded-lg border px-3.5 py-3 text-[13px] font-semibold text-white/70 sm:mx-4'
           style={{
             background: `${accentColor}0a`,
             borderColor: `${accentColor}1a`,
@@ -658,11 +676,7 @@ function StageCard({
 /*  Online Qualifier Table                                             */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function OnlineQualifierSection({
-  region,
-}: {
-  region: ArcadeRegionArchive
-}) {
+function OnlineQualifierSection({ region }: { region: ArcadeRegionArchive }) {
   const sorted = useMemo(
     () => [...region.onlineRows].sort((a, b) => a.rank - b.rank),
     [region.onlineRows]
@@ -864,13 +878,44 @@ function ArcadeRegionDetailPage() {
 
   const navItems: NavItem[] = useMemo(
     () => [
-      { id: 'standings', label: '최종 순위', mobileLabel: '순위', hasData: finalRankingRows.length > 0 },
-      { id: 'swiss', label: '스위스', mobileLabel: '스위스', hasData: swissByRound.length > 0 },
-      { id: 'selection', label: '선발전', mobileLabel: '선발전', hasData: sortedDeciderRows.length > 0 },
-      { id: 'seed', label: '시드전', mobileLabel: '시드전', hasData: sortedSeedingRows.length > 0 },
-      { id: 'online', label: '온라인 예선', mobileLabel: '온라인', hasData: regionData ? regionData.onlineRows.length > 0 : false },
+      {
+        id: 'standings',
+        label: '최종 순위',
+        mobileLabel: '순위',
+        hasData: finalRankingRows.length > 0,
+      },
+      {
+        id: 'swiss',
+        label: '스위스',
+        mobileLabel: '스위스',
+        hasData: swissByRound.length > 0,
+      },
+      {
+        id: 'selection',
+        label: '선발전',
+        mobileLabel: '선발전',
+        hasData: sortedDeciderRows.length > 0,
+      },
+      {
+        id: 'seed',
+        label: '시드전',
+        mobileLabel: '시드전',
+        hasData: sortedSeedingRows.length > 0,
+      },
+      {
+        id: 'online',
+        label: '온라인 예선',
+        mobileLabel: '온라인',
+        hasData: regionData ? regionData.onlineRows.length > 0 : false,
+      },
     ],
-    [finalRankingRows, swissByRound, sortedDeciderRows, sortedSeedingRows, regionData]
+    [
+      finalRankingRows,
+      swissByRound,
+      sortedDeciderRows,
+      sortedSeedingRows,
+      regionData,
+    ]
   )
 
   // IntersectionObserver for sticky nav
@@ -895,9 +940,7 @@ function ArcadeRegionDetailPage() {
   }, [regionData])
 
   useEffect(() => {
-    const title = regionData
-      ? `${regionData.label} 아카이브`
-      : '지역 아카이브'
+    const title = regionData ? `${regionData.label} 아카이브` : '지역 아카이브'
     document.title = `${t('meta.siteName')} | ${title}`
   }, [regionData])
 
@@ -949,8 +992,8 @@ function ArcadeRegionDetailPage() {
           </h1>
           <p className='mt-2.5 text-[13px] leading-[1.7] break-keep text-white/50 sm:text-[14px]'>
             <span className='hidden sm:inline'>
-              {regionData.arcade}에서 진행된 아케이드 {roundLabel} 지역 예선 전체
-              기록
+              {regionData.arcade}에서 진행된 아케이드 {roundLabel} 지역 예선
+              전체 기록
             </span>
             <span className='sm:hidden'>
               {roundLabel} 지역 예선 · {regionData.arcade}
@@ -960,16 +1003,25 @@ function ArcadeRegionDetailPage() {
           {/* Meta chips */}
           <div className='mt-2 flex flex-wrap gap-1.5'>
             <span className='hidden rounded-md border border-[#1e1e1e] bg-white/[0.025] px-2.5 py-1 text-[11px] text-white/40 sm:inline-flex'>
-              📍 <strong className='ml-1 font-bold text-white/70'>{regionData.arcade}</strong>
+              📍{' '}
+              <strong className='ml-1 font-bold text-white/70'>
+                {regionData.arcade}
+              </strong>
             </span>
             {regionData.updatedAt && (
               <span className='inline-flex rounded-md border border-[#1e1e1e] bg-white/[0.025] px-2.5 py-1 text-[11px] text-white/40'>
-                📅 <strong className='ml-1 font-bold text-white/70'>{regionData.updatedAt}</strong>
+                📅{' '}
+                <strong className='ml-1 font-bold text-white/70'>
+                  {regionData.updatedAt}
+                </strong>
               </span>
             )}
             {participantCount > 0 && (
               <span className='inline-flex rounded-md border border-[#1e1e1e] bg-white/[0.025] px-2.5 py-1 text-[11px] text-white/40'>
-                👤 <span className='hidden sm:inline'>참가자</span> <strong className='ml-1 font-bold text-white/70'>{participantCount}명</strong>
+                👤 <span className='hidden sm:inline'>참가자</span>{' '}
+                <strong className='ml-1 font-bold text-white/70'>
+                  {participantCount}명
+                </strong>
               </span>
             )}
           </div>
@@ -1010,7 +1062,11 @@ function ArcadeRegionDetailPage() {
       </section>
 
       {/* ═══ 3. 선발전 ═══ */}
-      <section id='selection' data-section='selection' className='mb-10 scroll-mt-18'>
+      <section
+        id='selection'
+        data-section='selection'
+        className='mb-10 scroll-mt-18'
+      >
         <FadeIn>
           <SectionHead badge='SELECTION' title='선발전' />
           {sortedDeciderRows.length === 0 ? (

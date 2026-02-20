@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { ARCADE_SONGS } from '@/content/arcade-songs'
 import {
   Callout,
   FadeIn,
@@ -10,7 +11,6 @@ import {
   DetailRow,
 } from '@/components/tkc/guide-shared'
 import { LevelBadge } from '@/components/tkc/level-badge'
-import { ARCADE_SONGS } from '@/content/arcade-songs'
 
 export const Route = createFileRoute('/(site)/arcade/')({
   component: ArcadeOnlinePage,
@@ -37,10 +37,34 @@ const GLANCE_ITEMS: GlanceItem[] = [
 ]
 
 const REGIONS = [
-  { num: 1, label: '1차수', venue: '서울', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.webp' },
-  { num: 2, label: '2차수', venue: '대전', arcade: '대전 싸이뮤직 게임월드', image: '/branding/venue-daejeon.webp' },
-  { num: 3, label: '3차수', venue: '광주', arcade: '광주 게임플라자', image: '/branding/venue-gwangju.webp' },
-  { num: 4, label: '4차수', venue: '부산', arcade: '게임D', image: '/branding/venue-busan.webp' },
+  {
+    num: 1,
+    label: '1차수',
+    venue: '서울',
+    arcade: 'TAIKO LABS',
+    image: '/branding/venue-seoul.webp',
+  },
+  {
+    num: 2,
+    label: '2차수',
+    venue: '대전',
+    arcade: '대전 싸이뮤직 게임월드',
+    image: '/branding/venue-daejeon.webp',
+  },
+  {
+    num: 3,
+    label: '3차수',
+    venue: '광주',
+    arcade: '광주 게임플라자',
+    image: '/branding/venue-gwangju.webp',
+  },
+  {
+    num: 4,
+    label: '4차수',
+    venue: '부산',
+    arcade: '게임D',
+    image: '/branding/venue-busan.webp',
+  },
 ] as const
 
 const LINK_FLOW = [
@@ -281,7 +305,7 @@ function ArcadeOnlinePage() {
                   {item.label}
                 </div>
                 <div
-                  className='whitespace-pre-line text-[24px] font-extrabold tracking-tight sm:whitespace-normal sm:text-[28px]'
+                  className='text-[24px] font-extrabold tracking-tight whitespace-pre-line sm:text-[28px] sm:whitespace-normal'
                   style={{ color: item.color ?? 'rgba(255,255,255,0.9)' }}
                 >
                   {item.value}
@@ -318,8 +342,8 @@ function ArcadeOnlinePage() {
           heading='신청 & 차수 선택'
           summary={
             <>
-              홈페이지에서 <strong className='text-white/90'>참가 차수</strong>를
-              선택하여 신청합니다. 거주지와 무관하게 자유롭게 선택 가능하며,
+              홈페이지에서 <strong className='text-white/90'>참가 차수</strong>
+              를 선택하여 신청합니다. 거주지와 무관하게 자유롭게 선택 가능하며,
               오프라인 예선곡 4곡도 함께 선택합니다.
             </>
           }
@@ -330,13 +354,11 @@ function ArcadeOnlinePage() {
             tag='중요'
             tagCls='bg-[#f5a623]/[0.08] text-[#f5a623]'
           >
-            차수는 <strong>스위스 스테이지가 열리는 장소</strong>를
-            의미합니다.
+            차수는 <strong>스위스 스테이지가 열리는 장소</strong>를 의미합니다.
             <br />
-            예를 들어, 1차수(서울 · TAIKO LABS)에 신청하면 <strong>
-              거주지에 상관없이
-            </strong>{' '}
-            1차수에 신청한 참가자들끼리 온라인 점수를 겨루고, 상위 16명이{' '}
+            예를 들어, 1차수(서울 · TAIKO LABS)에 신청하면{' '}
+            <strong>거주지에 상관없이</strong> 1차수에 신청한 참가자들끼리
+            온라인 점수를 겨루고, 상위 16명이{' '}
             <strong>서울 TAIKO LABS에서 열리는 오프라인 대회</strong>에 진출하는
             구조입니다.
           </HighlightCard>
@@ -379,9 +401,9 @@ function ArcadeOnlinePage() {
             tag='필수'
             tagCls='bg-[#f5a623]/[0.08] text-[#f5a623]'
           >
-            신청 시 <strong>스위스 스테이지에서 사용할 곡 4곡</strong>
-            을 미리 선택해야 합니다. 이 곡은 오프라인 대회에서 사이드 선택 시
-            활용되며, 신청 이후에는 변경할 수 없습니다.
+            신청 시 <strong>스위스 스테이지에서 사용할 곡 4곡</strong>을 미리
+            선택해야 합니다. 이 곡은 오프라인 대회에서 사이드 선택 시 활용되며,
+            신청 이후에는 변경할 수 없습니다.
           </HighlightCard>
         </StepCard>
 
@@ -477,9 +499,10 @@ function ArcadeOnlinePage() {
           heading='스위스 스테이지 진출'
           summary={
             <>
-              2곡 합산 점수 <strong className='text-white/90'>차수별 상위 16명</strong>이
-              스위스 스테이지에 진출합니다.
-              스위스 스테이지를 거쳐 최종 결선 진출자가 결정됩니다.
+              2곡 합산 점수{' '}
+              <strong className='text-white/90'>차수별 상위 16명</strong>이
+              스위스 스테이지에 진출합니다. 스위스 스테이지를 거쳐 최종 결선
+              진출자가 결정됩니다.
             </>
           }
           toggleLabel='점수 산정 · 진출 구조 상세 보기'
@@ -573,7 +596,10 @@ function ArcadeOnlinePage() {
               ))}
               <div className='mt-4'>
                 <DetailSubtitle>대리 참가 · 부정행위</DetailSubtitle>
-                <Callout type='danger' icon={<CalloutCharIcon type='warning' />}>
+                <Callout
+                  type='danger'
+                  icon={<CalloutCharIcon type='warning' />}
+                >
                   중복 참가 및 대리 참가는{' '}
                   <strong className='text-[#e74c3c]'>엄격히 금지</strong>
                   됩니다. 위반 시 실격 처리되며, 향후 대회 참가에 불이익이 있을
@@ -638,4 +664,3 @@ function ArcadeOnlinePage() {
     </>
   )
 }
-

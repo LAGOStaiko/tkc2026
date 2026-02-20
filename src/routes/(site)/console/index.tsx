@@ -228,7 +228,7 @@ function ConsoleQualifierPage() {
                   {item.label}
                 </div>
                 <div
-                  className='whitespace-pre-line text-[24px] font-extrabold tracking-tight sm:whitespace-normal sm:text-[28px]'
+                  className='text-[24px] font-extrabold tracking-tight whitespace-pre-line sm:text-[28px] sm:whitespace-normal'
                   style={{ color: item.color ?? 'rgba(255,255,255,0.9)' }}
                 >
                   {item.value}
@@ -344,8 +344,8 @@ function ConsoleQualifierPage() {
             <>
               직접 앵글로 촬영하여{' '}
               <strong className='text-white/90'>유튜브 일부공개</strong>로
-              업로드 후 링크를 제출합니다.
-              플레이 화면과 조작이 모두 보여야 합니다.
+              업로드 후 링크를 제출합니다. 플레이 화면과 조작이 모두 보여야
+              합니다.
             </>
           }
           toggleLabel='제출 절차 · 필수 요소 상세 보기'
@@ -407,9 +407,8 @@ function ConsoleQualifierPage() {
           accentColor='#e74c3c'
           summary={
             <>
-              2곡 합산 점수 <strong className='text-white/90'>상위 4명</strong>이
-              PlayX4 결선에 진출합니다.
-              기권 시 예비 순번으로 대체됩니다.
+              2곡 합산 점수 <strong className='text-white/90'>상위 4명</strong>
+              이 PlayX4 결선에 진출합니다. 기권 시 예비 순번으로 대체됩니다.
             </>
           }
           toggleLabel='점수 산정 · 순위 상세 보기'
@@ -498,7 +497,10 @@ function ConsoleQualifierPage() {
                   isBadge={false}
                   accentColor='#e74c3c'
                 />
-                <Callout type='warning' icon={<CalloutCharIcon type='warning' />}>
+                <Callout
+                  type='warning'
+                  icon={<CalloutCharIcon type='warning' />}
+                >
                   예선 중복 참가 가능하지만,{' '}
                   <strong className='text-white/80'>결선 진출은 택 1</strong>{' '}
                   구조입니다.
@@ -507,7 +509,10 @@ function ConsoleQualifierPage() {
 
               <div className='mt-4'>
                 <DetailSubtitle>대리 참가 · 부정행위</DetailSubtitle>
-                <Callout type='danger' icon={<CalloutCharIcon type='warning' />}>
+                <Callout
+                  type='danger'
+                  icon={<CalloutCharIcon type='warning' />}
+                >
                   중복 참가 및 대리 참가는{' '}
                   <strong className='text-[#e74c3c]'>엄격히 금지</strong>
                   됩니다. 위반 시 실격 처리되며, 향후 대회 참가에 불이익이 있을

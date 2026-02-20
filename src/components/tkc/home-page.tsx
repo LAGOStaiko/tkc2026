@@ -1,4 +1,5 @@
 ﻿import { useSite } from '@/lib/api'
+import { sanitizeImgSrc } from '@/lib/sanitize-url'
 import { HomeDivisionsSection } from '@/components/tkc/home/home-divisions-section'
 import {
   HomeFooterStrip,
@@ -8,17 +9,13 @@ import { HomeHeroSection } from '@/components/tkc/home/home-hero-section'
 import { HomeRewardsSection } from '@/components/tkc/home/home-rewards-section'
 import { HomeScheduleSection } from '@/components/tkc/home/home-schedule-section'
 import { HomeVideoSection } from '@/components/tkc/home/home-video-section'
-import { sanitizeImgSrc } from '@/lib/sanitize-url'
 
 type SiteData = {
   partners?: HomePartner[]
 }
 
 const toPartnerKey = (name: string) =>
-  name
-    .trim()
-    .replace(/\s+/g, '')
-    .toLowerCase()
+  name.trim().replace(/\s+/g, '').toLowerCase()
 
 const pickNonEmpty = (...values: Array<string | undefined>) => {
   for (const value of values) {
@@ -38,12 +35,15 @@ const pickLogoUrl = (...values: Array<string | undefined>) => {
 }
 
 const PARTNER_NAME_ALIASES: Record<string, string> = {
-  [toPartnerKey('\ubc18\ub2e4\uc774\ub0a8\ucf54\uc775\uc2a4\ud53c\ub9ac\uc5b8\uc2a4')]:
-    'BANDAI NAMCO',
-  [toPartnerKey('\ubc18\ub2e4\uc774\ub0a8\ucf54\uc5d4\ud130\ud14c\uc774\uba3c\ud2b8\ucf54\ub9ac\uc544')]:
-    'BANDAI NAMCO',
-  [toPartnerKey('\ubc18\ub2e4\uc774\ub0a8\ucf54\uc5d4\ud130\ud14c\uc778\uba3c\ud2b8\ucf54\ub9ac\uc544')]:
-    'BANDAI NAMCO',
+  [toPartnerKey(
+    '\ubc18\ub2e4\uc774\ub0a8\ucf54\uc775\uc2a4\ud53c\ub9ac\uc5b8\uc2a4'
+  )]: 'BANDAI NAMCO',
+  [toPartnerKey(
+    '\ubc18\ub2e4\uc774\ub0a8\ucf54\uc5d4\ud130\ud14c\uc774\uba3c\ud2b8\ucf54\ub9ac\uc544'
+  )]: 'BANDAI NAMCO',
+  [toPartnerKey(
+    '\ubc18\ub2e4\uc774\ub0a8\ucf54\uc5d4\ud130\ud14c\uc778\uba3c\ud2b8\ucf54\ub9ac\uc544'
+  )]: 'BANDAI NAMCO',
   [toPartnerKey('Bandai Namco Experience')]: 'BANDAI NAMCO',
   [toPartnerKey('Bandai Namco Entertainment Korea')]: 'BANDAI NAMCO',
   [toPartnerKey('\uc548\ub2e4\ubbf8\ub85c')]: 'ANDAMIRO',

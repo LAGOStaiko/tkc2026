@@ -138,7 +138,13 @@ export function getThirdPlace(archive: ConsoleSeasonArchive) {
 }
 
 export function getFinal(archive: ConsoleSeasonArchive) {
-  return findStage(archive, 'final', 'grand_final', 'grandfinal', 'championship')
+  return findStage(
+    archive,
+    'final',
+    'grand_final',
+    'grandfinal',
+    'championship'
+  )
 }
 
 /* ═══════════════════════════════════════════════════════════════════ */

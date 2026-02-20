@@ -95,10 +95,7 @@ export type ArcadeScoreAttackRow = {
   note?: string
 }
 
-export type ArcadeRegistrationMap = Record<
-  string,
-  { offlineSongs?: string[] }
->
+export type ArcadeRegistrationMap = Record<string, { offlineSongs?: string[] }>
 
 export type ArcadeRegionArchive = {
   key: ArcadeRegionKey
@@ -400,9 +397,9 @@ function normalizeRegistrations(
         .filter((s: string) => s.length > 0)
     } else if (typeof entry.offlineSongs === 'string') {
       const songsRaw = entry.offlineSongs
-      songs = (songsRaw.includes(' || ')
-        ? songsRaw.split(' || ')
-        : songsRaw.split(','))
+      songs = (
+        songsRaw.includes(' || ') ? songsRaw.split(' || ') : songsRaw.split(',')
+      )
         .map((s: string) => s.trim())
         .filter((s: string) => s.length > 0)
     } else {

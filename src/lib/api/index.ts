@@ -18,6 +18,10 @@ type PersistedCache<T> = {
   updatedAt: number
 }
 
+type ApiRequestOptions = {
+  timeoutMs?: number
+}
+
 function canUseStorage() {
   return (
     typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
@@ -78,13 +82,36 @@ async function parseResponse<T>(
   }
 }
 
-async function apiRequest<T>(path: string, init: RequestInit): Promise<T> {
+async function apiRequest<T>(
+  path: string,
+  init: RequestInit,
+  options: ApiRequestOptions = {}
+): Promise<T> {
   const headers = new Headers(init.headers)
   if (!headers.has('Accept')) {
     headers.set('Accept', 'application/json')
   }
 
-  const response = await fetch(path, { ...init, headers })
+  const timeoutMs = options.timeoutMs ?? 20_000
+  const controller = new AbortController()
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs)
+
+  let response: Response
+  try {
+    response = await fetch(path, {
+      ...init,
+      headers,
+      signal: controller.signal,
+    })
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error('Request timed out')
+    }
+    throw error
+  } finally {
+    window.clearTimeout(timeoutId)
+  }
+
   const payload = await parseResponse<T>(response)
 
   if (!response.ok) {

@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import {
+  SWISS_SONG_POOL,
+  buildSongOptions,
+  parseSongOption,
+  parseSongTitle,
+} from '@/content/swiss-song-pool'
+import {
   buildCurrentFinalMatchDraft,
   buildCurrentSwissMatchDraft,
   buildFinalsProgress,
@@ -22,20 +28,6 @@ import {
   resolveArcadeSeasonArchive,
 } from '@/lib/arcade-results-archive'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
 import {
   Command,
   CommandEmpty,
@@ -44,12 +36,20 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
+import { Input } from '@/components/ui/input'
 import {
-  SWISS_SONG_POOL,
-  buildSongOptions,
-  parseSongOption,
-  parseSongTitle,
-} from '@/content/swiss-song-pool'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 
 export const Route = createFileRoute('/(site)/ops/arcade-control')({
   component: ArcadeOpsControlPage,
@@ -258,9 +258,7 @@ function OpsCombobox({
             displayValue ? 'text-white' : 'text-white/30'
           }`}
         >
-          <span className='truncate'>
-            {displayValue || placeholder}
-          </span>
+          <span className='truncate'>{displayValue || placeholder}</span>
           <span className='ml-2 shrink-0 text-xs text-white/20'>▾</span>
         </button>
       </PopoverTrigger>
@@ -269,10 +267,7 @@ function OpsCombobox({
         align='start'
       >
         <Command>
-          <CommandInput
-            placeholder={searchPlaceholder}
-            className='text-base'
-          />
+          <CommandInput placeholder={searchPlaceholder} className='text-base' />
           <CommandList>
             <CommandEmpty>{emptyLabel}</CommandEmpty>
             {hasPriority ? (
@@ -682,8 +677,7 @@ function ArcadeOpsControlPage() {
         const other = participantByEntryId.get(otherEntryId)
         const thisSeed = p.seed ?? Number.MAX_SAFE_INTEGER
         const otherSeed = other?.seed ?? Number.MAX_SAFE_INTEGER
-        next.highSeedEntryId =
-          thisSeed <= otherSeed ? p.entryId : otherEntryId
+        next.highSeedEntryId = thisSeed <= otherSeed ? p.entryId : otherEntryId
       } else {
         next.highSeedEntryId = p.entryId
       }
@@ -1352,7 +1346,7 @@ function ArcadeOpsControlPage() {
      ────────────────────────────────────────────── */
 
   return (
-    <div className='mx-auto max-w-lg px-4 pb-28 pt-4'>
+    <div className='mx-auto max-w-lg px-4 pt-4 pb-28'>
       {/* ════ HEADER ════ */}
       <header className='mb-4 flex items-center justify-between'>
         <h1 className='text-lg font-extrabold tracking-tight'>
@@ -1451,7 +1445,7 @@ function ArcadeOpsControlPage() {
       </div>
 
       {/* ════ REGION PILLS ════ */}
-      <div className='-mx-4 mb-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden'>
+      <div className='-mx-4 mb-5 flex gap-2 overflow-x-auto px-4 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
         {weekStatuses.map((week) => (
           <button
             key={week.key}
@@ -1484,13 +1478,13 @@ function ArcadeOpsControlPage() {
       <div className='mb-6 space-y-3'>
         {/* Current match */}
         <div className='rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/[0.08] p-4'>
-          <div className='text-[10px] font-bold uppercase tracking-widest text-[#ff2a00]'>
+          <div className='text-[10px] font-bold tracking-widest text-[#ff2a00] uppercase'>
             현재 경기 ·{' '}
             {stage === 'finalMatch'
               ? 'Top8'
               : `Swiss${currentSwissRound ? ` R${currentSwissRound}` : ''}`}
           </div>
-          <div className='mt-1.5 text-xl font-extrabold leading-tight text-white'>
+          <div className='mt-1.5 text-xl leading-tight font-extrabold text-white'>
             {stageCurrent
               ? `${stageCurrent.leftName} vs ${stageCurrent.rightName}`
               : '대기중'}
@@ -1605,7 +1599,7 @@ function ArcadeOpsControlPage() {
       <div className='mb-6 h-px bg-white/[0.08]' />
 
       {/* ════ INPUT SECTION ════ */}
-      <div className='mb-3 text-[11px] font-bold uppercase tracking-widest text-white/30'>
+      <div className='mb-3 text-[11px] font-bold tracking-widest text-white/30 uppercase'>
         경기 입력
       </div>
 
@@ -1634,7 +1628,7 @@ function ArcadeOpsControlPage() {
       {/* Sequential guide */}
       {isSequentialStage ? (
         <>
-          <div className='-mx-4 mb-2.5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden'>
+          <div className='-mx-4 mb-2.5 flex gap-2 overflow-x-auto px-4 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             {[
               { label: '현재 경기', value: matchShort(stageCurrent) },
               { label: '다음 경기', value: matchShort(stageNext) },
@@ -1675,7 +1669,7 @@ function ArcadeOpsControlPage() {
         <>
           {/* 매치 정보 */}
           <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
-            <div className='flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30'>
+            <div className='flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-white/30 uppercase'>
               <span className='inline-block h-2 w-2 rounded-sm bg-[#ff2a00]' />
               매치 정보
             </div>
@@ -1727,9 +1721,7 @@ function ArcadeOpsControlPage() {
                 ) : (
                   <Input
                     value={draft.p1EntryId ?? ''}
-                    onChange={(e) =>
-                      setDraftField('p1EntryId', e.target.value)
-                    }
+                    onChange={(e) => setDraftField('p1EntryId', e.target.value)}
                     placeholder='SEO-01'
                     className='min-h-[48px] text-base'
                   />
@@ -1765,9 +1757,7 @@ function ArcadeOpsControlPage() {
                 ) : (
                   <Input
                     value={draft.p2EntryId ?? ''}
-                    onChange={(e) =>
-                      setDraftField('p2EntryId', e.target.value)
-                    }
+                    onChange={(e) => setDraftField('p2EntryId', e.target.value)}
                     placeholder='SEO-16'
                     className='min-h-[48px] text-base'
                   />
@@ -1789,7 +1779,7 @@ function ArcadeOpsControlPage() {
 
           {/* 곡별 점수 */}
           <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
-            <div className='flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30'>
+            <div className='flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-white/30 uppercase'>
               <span className='inline-block h-2 w-2 rounded-sm bg-[#ff2a00]' />
               곡별 점수
             </div>
@@ -1841,7 +1831,7 @@ function ArcadeOpsControlPage() {
           {/* 승자 선택 */}
           {winnerOptions.length > 0 ? (
             <div className='mb-3 rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/[0.08] p-4'>
-              <div className='mb-3 text-[10px] font-bold uppercase tracking-widest text-[#ff2a00]'>
+              <div className='mb-3 text-[10px] font-bold tracking-widest text-[#ff2a00] uppercase'>
                 승자 선택
               </div>
               <div className='grid grid-cols-2 gap-2.5'>
@@ -1886,7 +1876,7 @@ function ArcadeOpsControlPage() {
         /* ════ GENERIC FORM (non-Swiss stages) ════ */
         <>
           <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
-            <div className='flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30'>
+            <div className='flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-white/30 uppercase'>
               <span className='inline-block h-2 w-2 rounded-sm bg-[#ff2a00]' />
               필수 입력
             </div>
@@ -1897,7 +1887,7 @@ function ArcadeOpsControlPage() {
 
           {winnerOptions.length > 0 ? (
             <div className='mb-3 rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/[0.08] p-4'>
-              <div className='mb-3 text-[10px] font-bold uppercase tracking-widest text-[#ff2a00]'>
+              <div className='mb-3 text-[10px] font-bold tracking-widest text-[#ff2a00] uppercase'>
                 승자 선택
               </div>
               <div className='grid grid-cols-2 gap-2.5'>
@@ -2021,9 +2011,7 @@ function ArcadeOpsControlPage() {
               <Textarea
                 value={bulkLines}
                 onChange={(event) => setBulkLines(event.target.value)}
-                placeholder={
-                  '1,SEO-01,SEO-16\n2,SEO-02,SEO-15\n3,SEO-03,BYE'
-                }
+                placeholder={'1,SEO-01,SEO-16\n2,SEO-02,SEO-15\n3,SEO-03,BYE'}
                 className='min-h-32 font-mono text-sm'
               />
             </div>
@@ -2060,8 +2048,8 @@ function ArcadeOpsControlPage() {
       ) : null}
 
       {/* ════ OPS SECTION ════ */}
-      <div className='mb-5 mt-6 h-px bg-white/[0.08]' />
-      <div className='mb-3 text-[11px] font-bold uppercase tracking-widest text-white/30'>
+      <div className='mt-6 mb-5 h-px bg-white/[0.08]' />
+      <div className='mb-3 text-[11px] font-bold tracking-widest text-white/30 uppercase'>
         운영 도구
       </div>
 

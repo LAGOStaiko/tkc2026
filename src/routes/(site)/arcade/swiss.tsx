@@ -30,10 +30,34 @@ const STAT_ITEMS = [
 ] as const
 
 const REGIONS = [
-  { num: 1, name: '서울', detail: '1차 예선', arcade: 'TAIKO LABS', image: '/branding/venue-seoul.png' },
-  { num: 2, name: '대전', detail: '2차 예선', arcade: '대전 싸이뮤직 게임월드', image: '/branding/venue-daejeon.png' },
-  { num: 3, name: '광주', detail: '3차 예선', arcade: '광주 게임플라자', image: '/branding/venue-gwangju.png' },
-  { num: 4, name: '부산', detail: '4차 예선', arcade: '게임D', image: '/branding/venue-busan.png' },
+  {
+    num: 1,
+    name: '서울',
+    detail: '1차 예선',
+    arcade: 'TAIKO LABS',
+    image: '/branding/venue-seoul.png',
+  },
+  {
+    num: 2,
+    name: '대전',
+    detail: '2차 예선',
+    arcade: '대전 싸이뮤직 게임월드',
+    image: '/branding/venue-daejeon.png',
+  },
+  {
+    num: 3,
+    name: '광주',
+    detail: '3차 예선',
+    arcade: '광주 게임플라자',
+    image: '/branding/venue-gwangju.png',
+  },
+  {
+    num: 4,
+    name: '부산',
+    detail: '4차 예선',
+    arcade: '게임D',
+    image: '/branding/venue-busan.png',
+  },
 ] as const
 
 const SEED_MATCHES = [
@@ -290,7 +314,7 @@ function SwissAnimator() {
             }}
             className={`relative flex-1 overflow-hidden rounded-xl border py-2.5 text-[13px] font-semibold transition-all duration-300 ${
               activeRound === r
-                ? 'border-[#f5a623] bg-[#f5a623]/[0.05] text-white/90 scale-[1.02]'
+                ? 'scale-[1.02] border-[#f5a623] bg-[#f5a623]/[0.05] text-white/90'
                 : 'border-[#1e1e1e] text-white/35 hover:border-[#2a2a2a] hover:text-white/55'
             }`}
           >
@@ -299,9 +323,13 @@ function SwissAnimator() {
               <span
                 key={`bar-${activeRound}`}
                 className='absolute right-0 bottom-0 left-0 h-0.5 origin-left bg-[#f5a623]'
-                style={autoPlay ? {
-                  animation: 'swiss-progress 3.5s linear forwards',
-                } : undefined}
+                style={
+                  autoPlay
+                    ? {
+                        animation: 'swiss-progress 3.5s linear forwards',
+                      }
+                    : undefined
+                }
               />
             )}
           </button>
@@ -462,9 +490,7 @@ function OverviewSection() {
               <div className='mt-1 text-[13px] font-bold text-[#f5a623]'>
                 {r.arcade}
               </div>
-              <div className='mt-0.5 text-[11px] text-white/35'>
-                {r.detail}
-              </div>
+              <div className='mt-0.5 text-[11px] text-white/35'>{r.detail}</div>
               {i < REGIONS.length - 1 && (
                 <div className='absolute top-[20px] left-1/2 h-px w-full bg-[#2a2a2a]' />
               )}
@@ -568,7 +594,13 @@ function MatchSection() {
               className={`border border-[#1e1e1e] bg-[#111] px-4 py-5 text-center ${i === 0 ? 'rounded-t-2xl' : i === 2 ? 'rounded-b-2xl' : ''}`}
             >
               <div className='mb-2'>
-                <img src={step.charIcon} alt='' className='mx-auto size-7 object-contain' loading='lazy' draggable={false} />
+                <img
+                  src={step.charIcon}
+                  alt=''
+                  className='mx-auto size-7 object-contain'
+                  loading='lazy'
+                  draggable={false}
+                />
               </div>
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
@@ -592,7 +624,13 @@ function MatchSection() {
               className={`flex-1 border border-[#1e1e1e] bg-[#111] px-4 py-5 text-center ${i === 0 ? 'rounded-l-2xl' : i === 2 ? 'rounded-r-2xl' : ''}`}
             >
               <div className='mb-2'>
-                <img src={step.charIcon} alt='' className='mx-auto size-7 object-contain' loading='lazy' draggable={false} />
+                <img
+                  src={step.charIcon}
+                  alt=''
+                  className='mx-auto size-7 object-contain'
+                  loading='lazy'
+                  draggable={false}
+                />
               </div>
               <div className='text-[13px] font-bold text-white/90'>
                 {step.title}
@@ -650,7 +688,13 @@ function SideSection() {
         {/* Mobile */}
         <div className='flex flex-col items-center gap-4 sm:hidden'>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e74c3c] bg-[#e74c3c]/[0.06]'>
-            <img src='/characters/arcade-side-1p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
+            <img
+              src='/characters/arcade-side-1p.png'
+              alt=''
+              className='mb-1.5 size-14 object-contain'
+              loading='lazy'
+              draggable={false}
+            />
             <div className='text-sm font-bold text-[#e74c3c]'>1P</div>
           </div>
           <div className='text-center text-xs leading-[1.55] text-white/35'>
@@ -659,14 +703,26 @@ function SideSection() {
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#f7d154] bg-[#f7d154]/[0.06]'>
-            <img src='/characters/arcade-side-2p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
+            <img
+              src='/characters/arcade-side-2p.png'
+              alt=''
+              className='mb-1.5 size-14 object-contain'
+              loading='lazy'
+              draggable={false}
+            />
             <div className='text-sm font-bold text-[#f7d154]'>2P</div>
           </div>
         </div>
         {/* Desktop */}
         <div className='hidden items-center justify-center gap-8 py-7 sm:flex'>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e74c3c] bg-[#e74c3c]/[0.06]'>
-            <img src='/characters/arcade-side-1p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
+            <img
+              src='/characters/arcade-side-1p.png'
+              alt=''
+              className='mb-1.5 size-14 object-contain'
+              loading='lazy'
+              draggable={false}
+            />
             <div className='text-sm font-bold text-[#e74c3c]'>1P</div>
           </div>
           <div className='text-center text-[13px] leading-[1.55] text-white/35'>
@@ -675,7 +731,13 @@ function SideSection() {
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
           </div>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#f7d154] bg-[#f7d154]/[0.06]'>
-            <img src='/characters/arcade-side-2p.png' alt='' className='mb-1.5 size-14 object-contain' loading='lazy' draggable={false} />
+            <img
+              src='/characters/arcade-side-2p.png'
+              alt=''
+              className='mb-1.5 size-14 object-contain'
+              loading='lazy'
+              draggable={false}
+            />
             <div className='text-sm font-bold text-[#f7d154]'>2P</div>
           </div>
         </div>
