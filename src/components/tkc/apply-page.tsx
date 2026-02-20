@@ -420,7 +420,7 @@ export function ApplyPage() {
 
   const onSubmit = async (values: ApplyFormValues) => {
     if (turnstileSiteKey && !values.turnstileToken?.trim()) {
-      window.turnstile?.reset?.(turnstileWidgetId.current ?? undefined)
+      window.turnstile?.reset?.()
       form.setError('turnstileToken', {
         message: '보안 인증을 완료해주세요.',
       })

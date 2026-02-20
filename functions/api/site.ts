@@ -8,7 +8,7 @@ const CACHE_HEADERS = {
 
 const rateConfig = (env: RateLimitEnv) =>
   buildRateLimitConfig(env, {
-    prefix: "api-read:rate-limit",
+    prefix: "api-site:rate-limit",
     defaultWindowMs: 60_000, // 1 minute
     defaultMax: 180,         // 180 requests per minute
   });
