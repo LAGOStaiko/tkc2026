@@ -10,7 +10,7 @@ const rateConfig = (env: RateLimitEnv) =>
   buildRateLimitConfig(env, {
     prefix: "api-read:rate-limit",
     defaultWindowMs: 60_000, // 1 minute
-    defaultMax: 60,          // 60 requests per minute
+    defaultMax: 180,         // 180 requests per minute
   });
 
 export const onRequestGet = async ({ env, request }) => {

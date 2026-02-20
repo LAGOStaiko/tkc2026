@@ -275,9 +275,12 @@ const inputClass =
 /* ════════════════════════════════════════════════════════════════════ */
 
 export function ApplyPage() {
-  const { data, isError } = useSite<SiteData>()
+  const { data, isError, error } = useSite<SiteData>()
   const { data: poolsData } = useSongPools<SongPoolsData>()
   const applyOpen = data?.applyOpen
+  const siteErrorMessage =
+    error instanceof Error ? error.message.trim() : String(error ?? '').trim()
+  const isSiteRateLimited = /too many requests/i.test(siteErrorMessage)
 
   const songPool = React.useMemo(() => {
     const entries = poolsData?.arcadeSwiss ?? []
@@ -494,7 +497,11 @@ export function ApplyPage() {
       />
 
       {isError && (
-        <p className='mb-4 text-sm text-[#e74c3c]'>{t('apply.failedStatus')}</p>
+        <p className='mb-4 text-sm text-[#e74c3c]'>
+          {isSiteRateLimited
+            ? '요청이 몰려 신청 상태 확인이 잠시 지연되고 있습니다. 잠시 후 다시 시도해주세요.'
+            : t('apply.failedStatus')}
+        </p>
       )}
 
       {/* ── Form Card ── */}
