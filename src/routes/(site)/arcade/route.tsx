@@ -6,6 +6,7 @@ import {
   useRouterState,
 } from '@tanstack/react-router'
 import { FadeIn } from '@/components/tkc/guide-shared'
+import { PageHero } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/arcade')({
   component: ArcadeLayout,
@@ -140,6 +141,14 @@ function ArcadeLayout() {
 
   return (
     <section className='space-y-5'>
+      <PageHero
+        badge='ARCADE'
+        title='아케이드'
+        subtitle='아케이드 부문 예선, 스위스, 결선 안내'
+        accentColor='#f5a623'
+        gradientTo='#e74c3c'
+      />
+
       <FadeIn>
         <div className='space-y-2'>
           <h1 className='text-[26px] leading-tight font-extrabold tracking-tight text-white sm:text-[30px]'>

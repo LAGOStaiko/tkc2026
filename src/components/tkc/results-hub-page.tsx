@@ -20,7 +20,7 @@ import {
 } from '@/lib/console-results-archive'
 import { cn } from '@/lib/utils'
 import { FadeIn } from '@/components/tkc/guide-shared'
-import { TkcSection } from '@/components/tkc/layout'
+import { PageHero, TkcSection } from '@/components/tkc/layout'
 
 type Division = 'arcade' | 'console'
 
@@ -649,6 +649,14 @@ export function ResultsHubPage() {
 
   return (
     <TkcSection className='space-y-8 md:space-y-10'>
+      <PageHero
+        badge='RESULTS'
+        title='순위 및 결과'
+        subtitle='TKC 2026 콘솔 · 아케이드 시즌 결과 아카이브'
+        accentColor='#e74c3c'
+        gradientTo='#f5a623'
+      />
+
       <FadeIn>
         <div>
           <div className='mb-3 inline-flex items-center gap-1.5 font-mono text-xs font-bold tracking-[1.5px] text-[#e74c3c]'>

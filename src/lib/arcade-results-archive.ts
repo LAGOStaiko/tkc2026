@@ -95,6 +95,11 @@ export type ArcadeScoreAttackRow = {
   note?: string
 }
 
+export type ArcadeRegistrationMap = Record<
+  string,
+  { offlineSongs?: string[] }
+>
+
 export type ArcadeRegionArchive = {
   key: ArcadeRegionKey
   label: string
@@ -112,6 +117,7 @@ export type ArcadeRegionArchive = {
     groupA?: ArcadeParticipant
     groupB?: ArcadeParticipant
   }
+  registrations?: ArcadeRegistrationMap
 }
 
 export type ArcadeFinalSeedRow = {
@@ -376,6 +382,40 @@ function normalizeScoreAttackRow(
   }
 }
 
+function normalizeRegistrations(
+  value: unknown
+): ArcadeRegistrationMap | undefined {
+  const record = toRecord(value)
+  if (!record) return undefined
+
+  const result: ArcadeRegistrationMap = {}
+  for (const [key, raw] of Object.entries(record)) {
+    const entry = toRecord(raw)
+    if (!entry) continue
+    // Handle both array and comma-separated string from GAS
+    let songs: string[]
+    if (Array.isArray(entry.offlineSongs)) {
+      songs = entry.offlineSongs
+        .map((s: unknown) => (typeof s === 'string' ? s.trim() : ''))
+        .filter((s: string) => s.length > 0)
+    } else if (typeof entry.offlineSongs === 'string') {
+      const songsRaw = entry.offlineSongs
+      songs = (songsRaw.includes(' || ')
+        ? songsRaw.split(' || ')
+        : songsRaw.split(','))
+        .map((s: string) => s.trim())
+        .filter((s: string) => s.length > 0)
+    } else {
+      continue
+    }
+    if (songs.length > 0) {
+      result[key] = { offlineSongs: songs }
+    }
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined
+}
+
 function normalizeRegionArchive(
   key: ArcadeRegionKey,
   value: unknown
@@ -441,6 +481,7 @@ function normalizeRegionArchive(
       groupA: normalizeParticipant(qualifiersRecord.groupA, 0),
       groupB: normalizeParticipant(qualifiersRecord.groupB, 1),
     },
+    registrations: normalizeRegistrations(record.registrations),
   }
 }
 

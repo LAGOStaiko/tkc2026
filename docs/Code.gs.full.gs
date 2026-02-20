@@ -1970,12 +1970,61 @@ function handleRegister_(payload) {
   try {
     var sh = getSheet_('ops_registrations');
 
+    // Duplicate nickname guard within same division + qualifierRegion
+    var division = String(payload.division || '').trim();
+    var divisionLower = division.toLowerCase();
+    var newNick = String(payload.nickname || '').trim();
+    var newNickLower = newNick.toLowerCase();
+    var newRegion = normalizeRegionKey_(String(payload.qualifierRegion || '').trim()) || '';
+    var needsRegion = divisionLower === 'arcade';
+
+    if (sh.getLastRow() > 1 && newNick) {
+      var allData = sh.getRange(1, 1, sh.getLastRow(), sh.getLastColumn()).getValues();
+      var hdr = allData[0].map(function(h){ return String(h).trim(); });
+      var iDiv = hdr.indexOf('division');
+      var iNick = hdr.indexOf('nickname');
+      var iRegion = hdr.indexOf('qualifierRegion');
+      var iStatus = hdr.indexOf('status');
+
+      if (iDiv >= 0 && iNick >= 0) {
+        for (var i = 1; i < allData.length; i++) {
+          var rowDiv = String(allData[i][iDiv] || '').trim().toLowerCase();
+          var rowNick = String(allData[i][iNick] || '').trim();
+          var rowNickLower = rowNick.toLowerCase();
+          var rowRegion = iRegion >= 0
+            ? (normalizeRegionKey_(String(allData[i][iRegion] || '').trim()) || '')
+            : '';
+          var rowStatus = iStatus >= 0 ? String(allData[i][iStatus] || '').trim().toLowerCase() : '';
+          if (rowStatus === 'cancelled') continue;
+
+          var sameDivision = rowDiv === divisionLower;
+          var sameNickname = rowNickLower === newNickLower;
+          var sameRegion = !needsRegion || rowRegion === newRegion;
+
+          if (sameDivision && sameNickname && sameRegion) {
+            return { ok: false, error: '이미 같은 부문/예선지역에 동일한 닉네임이 등록되어 있습니다: ' + newNick };
+          }
+        }
+      }
+    }
+
     // Ensure header exists
     if (sh.getLastRow() < 1) {
       throw new Error('registrations sheet is missing header row');
     }
 
     var headers = sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0].map(function(h){ return String(h).trim(); });
+    // Auto-heal missing registration columns
+    var EXPECTED = ['createdAt','receiptId','division','name','phone','email','nickname','namcoId','cardNo','videoLink','dohirobaNo','qualifierRegion','offlineSongs','spectator','isMinor','consentLink','privacyAgree','status','memo'];
+    var missing = EXPECTED.filter(function(h){ return headers.indexOf(h) === -1; });
+    if (missing.length > 0) {
+      var lastCol = sh.getLastColumn();
+      missing.forEach(function(col, i) {
+        sh.getRange(1, lastCol + 1 + i).setValue(col);
+      });
+      // Reload headers after patching missing columns
+      headers = sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0].map(function(h){ return String(h).trim(); });
+    }
     var now = new Date();
     var receiptId = makeReceiptId_();
 
@@ -1995,7 +2044,7 @@ function handleRegister_(payload) {
       videoLink: escapeFormula_(String(payload.videoLink||'').trim()),
       dohirobaNo: escapeFormula_(String(payload.dohirobaNo||'').trim()),
       qualifierRegion: escapeFormula_(String(payload.qualifierRegion||'').trim()),
-      offlineSongs: escapeFormula_((payload.offlineSongs||[]).join(', ')),
+      offlineSongs: escapeFormula_((payload.offlineSongs||[]).join(' || ')),
       spectator: toBool_(payload.spectator),
       isMinor: toBool_(payload.isMinor),
       consentLink: escapeFormula_(String(payload.consentLink||'').trim()),
@@ -2234,7 +2283,7 @@ function getOpsSheetSchemas_() {
     },
     {
       name: 'ops_registrations',
-      headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'cardNo', 'dohirobaNo', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo']
+      headers: ['createdAt', 'receiptId', 'division', 'name', 'phone', 'email', 'nickname', 'namcoId', 'cardNo', 'videoLink', 'dohirobaNo', 'qualifierRegion', 'offlineSongs', 'spectator', 'isMinor', 'consentLink', 'privacyAgree', 'status', 'memo']
     },
     {
       name: 'ops_backup_snapshots',
@@ -3996,6 +4045,35 @@ function buildArcadeArchiveFromOps_(params) {
     if (group === 'B') regionMap[key].qualifiers.groupB = participant;
   });
 
+  // Read registrations for offline song selections (keyed by nickname)
+  var regRows = readOptionalTable_('ops_registrations').rows;
+  regRows.forEach(function(r) {
+    var div = trim_(r.division).toLowerCase();
+    if (div !== 'arcade' && div !== '아케이드') return;
+
+    var regKey = normalizeRegionKey_(r.qualifierRegion);
+    if (!regKey || !regionMap[regKey]) return;
+    if (!allowRegion_(regKey)) return;
+
+    var nickname = trim_(r.nickname);
+    if (!nickname) return;
+
+    var songsRaw = trim_(r.offlineSongs);
+    if (!songsRaw) return;
+
+    var songs = songsRaw.indexOf(' || ') >= 0
+      ? songsRaw.split(' || ').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; })
+      : songsRaw.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+    if (songs.length === 0) return;
+
+    if (!regionMap[regKey].registrations) {
+      regionMap[regKey].registrations = {};
+    }
+    if (!regionMap[regKey].registrations[nickname]) {
+      regionMap[regKey].registrations[nickname] = { offlineSongs: songs };
+    }
+  });
+
   var finalsA = readOptionalTable_('ops_db_finals_a').rows
     .filter(function(r){ return !trim_(r.season) || trim_(r.season) === season; })
     .map(function(r){
@@ -4691,4 +4769,3 @@ function handleOpsPublishLog_() {
  * if (action === 'verifyMigration') return json_(handleVerifyMigration_());
  * if (action === 'pubCommit') { ... }
  */
-

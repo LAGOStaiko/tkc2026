@@ -6,6 +6,7 @@ import {
   useRouterState,
 } from '@tanstack/react-router'
 import { FadeIn } from '@/components/tkc/guide-shared'
+import { PageHero } from '@/components/tkc/layout'
 
 export const Route = createFileRoute('/(site)/console')({
   component: ConsoleLayout,
@@ -130,6 +131,14 @@ function ConsoleLayout() {
 
   return (
     <section className='space-y-5'>
+      <PageHero
+        badge='CONSOLE'
+        title='콘솔'
+        subtitle='콘솔 부문 온라인 예선부터 결선까지 전체 안내'
+        accentColor='#e74c3c'
+        gradientTo='#f5a623'
+      />
+
       <FadeIn>
         <div className='space-y-2'>
           <h1 className='text-[26px] leading-tight font-extrabold tracking-tight text-white sm:text-[30px]'>

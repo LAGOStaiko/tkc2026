@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { FadeIn } from '@/components/tkc/guide-shared'
+import { PageHero } from '@/components/tkc/layout'
 import { REGISTER_LIMITS as L } from '../../../shared/register-limits'
 
 declare global {
@@ -458,30 +459,13 @@ export function ApplyPage() {
 
   return (
     <div className='w-full'>
-      {/* ── Hero ── */}
-      <section className='relative overflow-hidden pt-12 pb-8 sm:pt-16 sm:pb-10 md:pt-24 md:pb-14'>
-        <div className='pointer-events-none absolute -top-24 -right-48 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(231,76,60,0.15)_0%,transparent_70%)]' />
-        <div className='relative'>
-          <FadeIn>
-            <div className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#e74c3c]/20 bg-[#e74c3c]/[0.08] px-3.5 py-1.5 font-mono text-[12px] font-semibold tracking-[1.5px] text-[#e74c3c]'>
-              <span className='tkc-motion-dot size-1.5 rounded-full bg-[#e74c3c]' />
-              REGISTRATION
-            </div>
-          </FadeIn>
-          <FadeIn delay={100}>
-            <h1 className='text-[clamp(36px,6vw,52px)] leading-[1.1] font-extrabold tracking-tight'>
-              <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-transparent'>
-                {t('apply.title')}
-              </span>
-            </h1>
-          </FadeIn>
-          <FadeIn delay={200}>
-            <p className='mt-3 text-[16px] font-light break-keep text-white/55 sm:text-[18px]'>
-              TKC 2026 참가 신청
-            </p>
-          </FadeIn>
-        </div>
-      </section>
+      <PageHero
+        badge='REGISTRATION'
+        title={t('apply.title')}
+        subtitle='TKC 2026 참가 신청'
+        accentColor='#e74c3c'
+        gradientTo='#f5a623'
+      />
 
       {isError && (
         <p className='mb-4 text-sm text-[#e74c3c]'>{t('apply.failedStatus')}</p>

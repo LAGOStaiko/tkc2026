@@ -12,7 +12,6 @@ import {
   buildRegionFinalRanking,
   buildRegionWeekStatuses,
   buildSwissProgress,
-  OPS_REGION_OPTIONS,
   OPS_STAGE_DEFINITIONS,
   type OpsProgressMatch,
   type OpsRegionKey,
@@ -31,13 +30,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { TkcPageHeader, TkcSection } from '@/components/tkc/layout'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
+import {
+  SWISS_SONG_POOL,
+  buildSongOptions,
+  parseSongOption,
+  parseSongTitle,
+} from '@/content/swiss-song-pool'
 
 export const Route = createFileRoute('/(site)/ops/arcade-control')({
   component: ArcadeOpsControlPage,
 })
+
+/* ──────────────────────────────────────────────
+   Constants
+   ────────────────────────────────────────────── */
 
 const DEFAULT_SEASON = '2026'
 const DEFAULT_REGION: OpsRegionKey = 'seoul'
@@ -71,6 +91,12 @@ type ApiEnvelope = {
   data?: unknown
   error?: string
 }
+
+type OpsPanel = 'validate' | 'rollback' | 'log' | 'utility' | null
+
+/* ──────────────────────────────────────────────
+   Helpers
+   ────────────────────────────────────────────── */
 
 function isAbortError(err: unknown) {
   if (!err || typeof err !== 'object') return false
@@ -138,9 +164,9 @@ async function requestOpsApi(
   throw new Error('Request failed')
 }
 
-function matchLine(match?: OpsProgressMatch) {
-  if (!match) return '매치 없음'
-  return `${match.label} - ${match.leftName} vs ${match.rightName}`
+function matchShort(match?: OpsProgressMatch) {
+  if (!match) return '없음'
+  return match.label
 }
 
 type BulkSwissSeedRow = {
@@ -196,7 +222,242 @@ function parseBulkSwissLines(source: string): BulkSwissSeedRow[] {
   return rows.sort((a, b) => a.table - b.table)
 }
 
+/* ──────────────────────────────────────────────
+   Ops Combobox (searchable dropdown)
+   ────────────────────────────────────────────── */
+
+function OpsCombobox({
+  displayValue,
+  options,
+  onSelect,
+  placeholder = '선택',
+  searchPlaceholder = '검색...',
+  emptyLabel = '결과 없음',
+  priorityOptions,
+  priorityLabel,
+}: {
+  displayValue: string
+  options: { value: string; label: string }[]
+  onSelect: (value: string) => void
+  placeholder?: string
+  searchPlaceholder?: string
+  emptyLabel?: string
+  priorityOptions?: { value: string; label: string }[]
+  priorityLabel?: string
+}) {
+  const [open, setOpen] = useState(false)
+
+  const hasPriority = priorityOptions && priorityOptions.length > 0
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type='button'
+          className={`flex min-h-[44px] w-full items-center justify-between rounded-md border border-white/[0.12] bg-transparent px-3 text-left text-base transition-colors hover:bg-white/[0.04] ${
+            displayValue ? 'text-white' : 'text-white/30'
+          }`}
+        >
+          <span className='truncate'>
+            {displayValue || placeholder}
+          </span>
+          <span className='ml-2 shrink-0 text-xs text-white/20'>▾</span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className='w-[var(--radix-popover-trigger-width)] p-0'
+        align='start'
+      >
+        <Command>
+          <CommandInput
+            placeholder={searchPlaceholder}
+            className='text-base'
+          />
+          <CommandList>
+            <CommandEmpty>{emptyLabel}</CommandEmpty>
+            {hasPriority ? (
+              <>
+                <CommandGroup heading={priorityLabel || '선수 선곡'}>
+                  {priorityOptions.map((opt) => (
+                    <CommandItem
+                      key={`pri-${opt.value}`}
+                      value={opt.label}
+                      onSelect={() => {
+                        onSelect(opt.value)
+                        setOpen(false)
+                      }}
+                      className='min-h-[40px]'
+                    >
+                      <span className='mr-1.5 text-[#ff2a00]'>★</span>
+                      {opt.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                <CommandGroup heading='전체 곡 풀'>
+                  {options.map((opt) => (
+                    <CommandItem
+                      key={opt.value}
+                      value={opt.label}
+                      onSelect={() => {
+                        onSelect(opt.value)
+                        setOpen(false)
+                      }}
+                      className='min-h-[40px]'
+                    >
+                      {opt.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            ) : (
+              <CommandGroup>
+                {options.map((opt) => (
+                  <CommandItem
+                    key={opt.value}
+                    value={opt.label}
+                    onSelect={() => {
+                      onSelect(opt.value)
+                      setOpen(false)
+                    }}
+                    className='min-h-[40px]'
+                  >
+                    {opt.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+/* ──────────────────────────────────────────────
+   Swiss Song Card
+   ────────────────────────────────────────────── */
+
+function SwissSongCard({
+  badge,
+  songField,
+  levelField,
+  p1ScoreField,
+  p2ScoreField,
+  p1Label,
+  p2Label,
+  draft,
+  setDraftField,
+  dim,
+  songOptions,
+  prioritySongs,
+  priorityLabel,
+}: {
+  badge: string
+  songField: string
+  levelField: string
+  p1ScoreField: string
+  p2ScoreField: string
+  p1Label: string
+  p2Label: string
+  draft: Record<string, string>
+  setDraftField: (name: string, value: string) => void
+  dim?: boolean
+  songOptions?: { value: string; label: string }[]
+  prioritySongs?: { value: string; label: string }[]
+  priorityLabel?: string
+}) {
+  const hasContent =
+    draft[songField]?.trim() ||
+    draft[p1ScoreField]?.trim() ||
+    draft[p2ScoreField]?.trim()
+  const isDim = dim && !hasContent
+
+  return (
+    <div
+      className={`rounded-xl border border-white/[0.08] bg-black/25 p-4 transition-opacity ${isDim ? 'opacity-30 focus-within:opacity-100' : ''}`}
+    >
+      <div className='mb-3.5 space-y-2'>
+        <div className='flex items-center gap-2.5'>
+          <span className='flex-shrink-0 rounded-md border border-[#ff2a00]/15 bg-[#ff2a00]/10 px-2.5 py-1.5 text-xs font-bold text-[#ff2a00]'>
+            {badge}
+          </span>
+          {draft[levelField] ? (
+            <span className='font-mono text-xs text-white/30'>
+              ★{draft[levelField]}
+            </span>
+          ) : null}
+        </div>
+        {songOptions && songOptions.length > 0 ? (
+          <OpsCombobox
+            displayValue={draft[songField] ?? ''}
+            options={songOptions}
+            onSelect={(val) => {
+              const opt = parseSongOption(val)
+              if (opt) {
+                setDraftField(songField, opt.title)
+                setDraftField(levelField, String(opt.level))
+              }
+            }}
+            placeholder='곡 검색...'
+            searchPlaceholder='곡명으로 검색'
+            priorityOptions={prioritySongs}
+            priorityLabel={priorityLabel}
+          />
+        ) : (
+          <div className='flex items-center gap-2.5'>
+            <Input
+              value={draft[songField] ?? ''}
+              onChange={(e) => setDraftField(songField, e.target.value)}
+              placeholder='곡명'
+              className='min-h-[44px] flex-1 text-base'
+            />
+            <Input
+              value={draft[levelField] ?? ''}
+              onChange={(e) => setDraftField(levelField, e.target.value)}
+              placeholder='Lv'
+              className='min-h-[44px] w-16 text-center text-base'
+            />
+          </div>
+        )}
+      </div>
+      <div className='grid grid-cols-2 gap-3'>
+        <div className='space-y-1.5'>
+          <span className='text-[11px] font-semibold text-white/25'>
+            {p1Label}
+          </span>
+          <Input
+            type='number'
+            inputMode='numeric'
+            value={draft[p1ScoreField] ?? ''}
+            onChange={(e) => setDraftField(p1ScoreField, e.target.value)}
+            placeholder='—'
+            className='min-h-[48px] text-right font-mono text-lg font-medium'
+          />
+        </div>
+        <div className='space-y-1.5'>
+          <span className='text-[11px] font-semibold text-white/25'>
+            {p2Label}
+          </span>
+          <Input
+            type='number'
+            inputMode='numeric'
+            value={draft[p2ScoreField] ?? ''}
+            onChange={(e) => setDraftField(p2ScoreField, e.target.value)}
+            placeholder='—'
+            className='min-h-[48px] text-right font-mono text-lg font-medium'
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ──────────────────────────────────────────────
+   Component
+   ────────────────────────────────────────────── */
+
 function ArcadeOpsControlPage() {
+  /* ── core state ── */
   const [operatorKey, setOperatorKey] = useState('')
   const [season, setSeason] = useState(DEFAULT_SEASON)
   const [region, setRegion] = useState<OpsRegionKey>(DEFAULT_REGION)
@@ -205,6 +466,11 @@ function ArcadeOpsControlPage() {
     buildInitialDraft('swissMatch')
   )
 
+  /* ── UI state ── */
+  const [showSettings, setShowSettings] = useState(false)
+  const [opsPanel, setOpsPanel] = useState<OpsPanel>(null)
+
+  /* ── action flags ── */
   const [isSaving, setIsSaving] = useState(false)
   const [isInitRunning, setIsInitRunning] = useState(false)
   const [isGuideRunning, setIsGuideRunning] = useState(false)
@@ -254,7 +520,6 @@ function ArcadeOpsControlPage() {
   const feedErrorStreakRef = useRef(0)
   const nextFeedRetryAtRef = useRef(0)
 
-  const [activeTab, setActiveTab] = useState('input')
   const [publishMeta, setPublishMeta] = useState<{
     lastPublishId: string
     lastPublishedAt: string
@@ -264,6 +529,7 @@ function ArcadeOpsControlPage() {
   const [publishLog, setPublishLog] = useState<Record<string, unknown>[]>([])
   const [isLoadingLog, setIsLoadingLog] = useState(false)
 
+  /* ── derived ── */
   const stageDef = OPS_STAGE_DEFINITIONS[stage]
 
   const archive = useMemo(() => resolveArcadeSeasonArchive(feedRaw), [feedRaw])
@@ -297,6 +563,41 @@ function ArcadeOpsControlPage() {
     )
   }, [regionParticipants])
 
+  const songOptions = useMemo(() => buildSongOptions(SWISS_SONG_POOL), [])
+
+  const playerOptions = useMemo(
+    () =>
+      regionParticipants.map((p) => ({
+        value: p.entryId,
+        label: `${p.nickname} (${p.entryId})${p.seed != null ? ` #${p.seed}` : ''}`,
+      })),
+    [regionParticipants]
+  )
+
+  const buildPlayerSongPriority = useCallback(
+    (entryId?: string) => {
+      if (!entryId) return []
+      const p = participantByEntryId.get(entryId.trim())
+      if (!p?.offlineSongs || p.offlineSongs.length === 0) return []
+      // Try exact match first (title|difficulty|level), then fallback to title-only match
+      const songSet = new Set(p.offlineSongs)
+      const titleSet = new Set(p.offlineSongs.map(parseSongTitle))
+      return songOptions.filter(
+        (opt) => songSet.has(opt.value) || titleSet.has(opt.title)
+      )
+    },
+    [participantByEntryId, songOptions]
+  )
+
+  const p1SongPriority = useMemo(
+    () => buildPlayerSongPriority(draft.p1EntryId),
+    [buildPlayerSongPriority, draft.p1EntryId]
+  )
+  const p2SongPriority = useMemo(
+    () => buildPlayerSongPriority(draft.p2EntryId),
+    [buildPlayerSongPriority, draft.p2EntryId]
+  )
+
   const isSequentialStage = stage === 'swissMatch' || stage === 'finalMatch'
   const stageCurrent =
     stage === 'swissMatch'
@@ -322,7 +623,6 @@ function ArcadeOpsControlPage() {
       (match) => !match.winnerEntryId
     )
     if (unresolved) return unresolved.round
-
     const rounds = regionArchive.swissMatches.map((match) => match.round)
     return rounds.length > 0 ? Math.max(...rounds) : null
   }, [regionArchive])
@@ -363,8 +663,32 @@ function ArcadeOpsControlPage() {
     [season, region]
   )
 
+  /* ── draft helpers ── */
   const setDraftField = (name: string, value: string) => {
     setDraft((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handlePlayerSelect = (prefix: 'p1' | 'p2', entryId: string) => {
+    const p = participantByEntryId.get(entryId)
+    if (!p) return
+    setDraft((prev) => {
+      const next = { ...prev }
+      next[`${prefix}EntryId`] = p.entryId
+      next[`${prefix}Nickname`] = p.nickname
+      if (p.seed != null) next[`${prefix}Seed`] = String(p.seed)
+      const otherPrefix = prefix === 'p1' ? 'p2' : 'p1'
+      const otherEntryId = next[`${otherPrefix}EntryId`]?.trim()
+      if (otherEntryId) {
+        const other = participantByEntryId.get(otherEntryId)
+        const thisSeed = p.seed ?? Number.MAX_SAFE_INTEGER
+        const otherSeed = other?.seed ?? Number.MAX_SAFE_INTEGER
+        next.highSeedEntryId =
+          thisSeed <= otherSeed ? p.entryId : otherEntryId
+      } else {
+        next.highSeedEntryId = p.entryId
+      }
+      return next
+    })
   }
 
   const applyTemplate = useCallback(
@@ -391,6 +715,7 @@ function ArcadeOpsControlPage() {
     setBulkRound(String(currentSwissRound ?? 1))
   }, [bulkRound, currentSwissRound, stage])
 
+  /* ── feed polling ── */
   const fetchFeed = useCallback(
     async (options?: { force?: boolean }) => {
       const force = options?.force === true
@@ -481,7 +806,6 @@ function ArcadeOpsControlPage() {
 
   useEffect(() => {
     if (!operatorKey.trim()) return
-
     void fetchFeed({ force: true })
     const timer = window.setInterval(() => {
       void fetchFeed()
@@ -489,6 +813,7 @@ function ArcadeOpsControlPage() {
     return () => window.clearInterval(timer)
   }, [fetchFeed, operatorKey])
 
+  /* ── handlers ── */
   const validateRequiredFields = () => {
     for (const field of stageDef.fields) {
       if (!field.required) continue
@@ -511,7 +836,6 @@ function ArcadeOpsControlPage() {
       setErrorMessage('')
       return
     }
-
     if (stage === 'finalMatch') {
       const template = buildCurrentFinalMatchDraft(archive)
       if (!template) {
@@ -531,7 +855,6 @@ function ArcadeOpsControlPage() {
       setErrorMessage('')
       return
     }
-
     if (stage === 'finalMatch') {
       applyTemplate(buildNextFinalMatchDraft(archive))
       setInfoMessage('다음 Top8 경기 입력 슬롯을 불러왔습니다.')
@@ -544,22 +867,18 @@ function ArcadeOpsControlPage() {
       setErrorMessage('No regional feed data loaded yet')
       return
     }
-
     const round = Number(bulkRound)
     if (!Number.isInteger(round) || round <= 0) {
       setErrorMessage('Round must be a positive integer')
       return
     }
-
     const matches = regionArchive.swissMatches
       .filter((match) => match.round === round)
       .sort((a, b) => (a.table ?? 0) - (b.table ?? 0))
-
     if (matches.length === 0) {
       setErrorMessage(`No existing round ${round} matches found`)
       return
     }
-
     const lines = matches.map((match) => {
       const table = match.table ?? 0
       const p1 = match.player1.entryId || '-'
@@ -567,12 +886,10 @@ function ArcadeOpsControlPage() {
       const note = match.note ? `,${match.note}` : ''
       return `${table},${p1},${p2}${note}`
     })
-
     const first = matches[0]
     const game1 = first.games[0]
     const game2 = first.games[1]
     const game3 = first.games[2]
-
     setBulkRound(String(round))
     if (game1?.song) setBulkSong1(game1.song)
     if (game1?.level) setBulkLevel1(game1.level)
@@ -581,7 +898,6 @@ function ArcadeOpsControlPage() {
     if (game3?.song) setBulkSong3(game3.song)
     if (game3?.level) setBulkLevel3(game3.level)
     setBulkLines(lines.join('\n'))
-
     setErrorMessage('')
     setInfoMessage(`Loaded ${matches.length} table rows for round ${round}`)
   }
@@ -597,12 +913,10 @@ function ArcadeOpsControlPage() {
         if (aSeed !== bSeed) return aSeed - bSeed
         return a.entryId.localeCompare(b.entryId)
       })
-
     if (activePlayers.length < 2) {
       setErrorMessage('Need at least two players to auto-generate pairings')
       return
     }
-
     const lines: string[] = []
     for (let i = 0; i < activePlayers.length; i += 2) {
       const table = Math.floor(i / 2) + 1
@@ -610,7 +924,6 @@ function ArcadeOpsControlPage() {
       const p2 = activePlayers[i + 1]
       lines.push(`${table},${p1.entryId},${p2 ? p2.entryId : 'BYE'}`)
     }
-
     const suggestedRound = currentSwissRound ?? 1
     setBulkRound(String(suggestedRound))
     setBulkLines(lines.join('\n'))
@@ -625,7 +938,6 @@ function ArcadeOpsControlPage() {
       setIsBulkSeeding(true)
       setErrorMessage('')
       setInfoMessage('')
-
       const round = Number(bulkRound)
       if (!Number.isInteger(round) || round <= 0) {
         throw new Error('Round must be a positive integer')
@@ -633,24 +945,20 @@ function ArcadeOpsControlPage() {
       if (!bulkSong1.trim() || !bulkSong2.trim()) {
         throw new Error('song1 and song2 are required for round pre-draw')
       }
-
       const rows = parseBulkSwissLines(bulkLines)
       const normalizedSeason = season.trim() || DEFAULT_SEASON
-
       for (const row of rows) {
         const p1 = participantByEntryId.get(row.p1EntryId)
         const p2 = row.p2EntryId
           ? participantByEntryId.get(row.p2EntryId)
           : undefined
         const bye = !row.p2EntryId
-
         const p1Seed = p1?.seed
         const p2Seed = p2?.seed
         let highSeedEntryId = row.p1EntryId
         if (!bye && typeof p1Seed === 'number' && typeof p2Seed === 'number') {
           highSeedEntryId = p1Seed <= p2Seed ? row.p1EntryId : row.p2EntryId!
         }
-
         const payload = {
           stage: 'swissMatch' as const,
           season: normalizedSeason,
@@ -686,10 +994,8 @@ function ArcadeOpsControlPage() {
             note: row.note || `pre-draw round ${round}`,
           },
         }
-
         await requestOpsApi('/api/ops/upsert', 'POST', payload, operatorKey)
       }
-
       const fresh = await fetchFeed({ force: true })
       const nextArchive = resolveArcadeSeasonArchive(fresh)
       const nextRegion = getRegionByKey(nextArchive, region)
@@ -697,7 +1003,6 @@ function ArcadeOpsControlPage() {
         buildCurrentSwissMatchDraft(nextRegion) ??
           buildNextSwissMatchDraft(nextRegion)
       )
-
       setInfoMessage(`Round ${round} pre-draw saved (${rows.length} tables)`)
     } catch (err) {
       setErrorMessage(
@@ -714,18 +1019,10 @@ function ArcadeOpsControlPage() {
       setErrorMessage('')
       setInfoMessage('')
       validateRequiredFields()
-
-      const payload = buildOpsUpsertPayload({
-        stage,
-        season,
-        region,
-        draft,
-      })
-
+      const payload = buildOpsUpsertPayload({ stage, season, region, draft })
       await requestOpsApi('/api/ops/upsert', 'POST', payload, operatorKey)
       setValidationResult(null)
       const fresh = await fetchFeed({ force: true })
-
       if (stage === 'swissMatch') {
         const nextArchive = resolveArcadeSeasonArchive(fresh)
         const nextRegion = getRegionByKey(nextArchive, region)
@@ -734,7 +1031,6 @@ function ArcadeOpsControlPage() {
         const nextArchive = resolveArcadeSeasonArchive(fresh)
         applyTemplate(buildNextFinalMatchDraft(nextArchive))
       }
-
       setInfoMessage(`${stageDef.label} 입력 완료`)
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : '입력 저장 실패')
@@ -955,6 +1251,11 @@ function ArcadeOpsControlPage() {
     }
   }
 
+  const toggleOpsPanel = (panel: OpsPanel) => {
+    setOpsPanel((prev) => (prev === panel ? null : panel))
+  }
+
+  /* ── field rendering (generic stages) ── */
   const requiredFields = stageDef.fields.filter((f) => f.required)
   const optionalFields = stageDef.fields.filter((f) => !f.required)
 
@@ -964,10 +1265,10 @@ function ArcadeOpsControlPage() {
 
     return (
       <div key={field.name} className='space-y-1'>
-        <label className='text-xs text-white/70'>
+        <label className='text-xs font-medium text-white/40'>
           {field.label}
           {field.required ? (
-            <span className='ml-1 text-[#ff2a00]'>*</span>
+            <span className='ml-0.5 text-[#ff2a00]'>*</span>
           ) : null}
         </label>
 
@@ -976,7 +1277,7 @@ function ArcadeOpsControlPage() {
             value={value}
             onValueChange={(next) => setDraftField(field.name, next)}
           >
-            <SelectTrigger className='w-full'>
+            <SelectTrigger className='min-h-[48px] text-base'>
               <SelectValue placeholder={field.placeholder || '선택'} />
             </SelectTrigger>
             <SelectContent>
@@ -992,7 +1293,7 @@ function ArcadeOpsControlPage() {
             value={value || 'false'}
             onValueChange={(next) => setDraftField(field.name, next)}
           >
-            <SelectTrigger className='w-full'>
+            <SelectTrigger className='min-h-[48px] text-base'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -1010,789 +1311,1054 @@ function ArcadeOpsControlPage() {
             value={value}
             onChange={(event) => setDraftField(field.name, event.target.value)}
             placeholder={field.placeholder}
+            className='min-h-[48px] text-base'
           />
         )}
       </div>
     )
   }
 
-  return (
-    <TkcSection className='space-y-4 md:space-y-6'>
-      <TkcPageHeader
-        title='아케이드 운영 콘솔'
-        subtitle='지역은 주간 단위로 전환하고, 경기는 한 매치씩 순차 입력/송출합니다.'
-      />
+  /* Swiss 전용 추가 필드 (매치/점수 외) */
+  const swissExtraFields = stageDef.fields.filter(
+    (f) =>
+      ![
+        'round',
+        'table',
+        'p1EntryId',
+        'p1Nickname',
+        'p2EntryId',
+        'p2Nickname',
+        'song1',
+        'level1',
+        'p1Score1',
+        'p2Score1',
+        'song2',
+        'level2',
+        'p1Score2',
+        'p2Score2',
+        'song3',
+        'level3',
+        'p1Score3',
+        'p2Score3',
+        'winnerEntryId',
+      ].includes(f.name)
+  )
 
-      {/* ── 인증 + 설정 ── */}
-      <section className='rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-        <div className='grid gap-3 md:grid-cols-4'>
-          <div className='space-y-1.5 md:col-span-2'>
-            <label className='text-xs font-semibold text-white/70'>
+  const p1Label = `P1 ${draft.p1Nickname?.trim() || draft.p1EntryId?.trim() || ''}`
+  const p2Label = `P2 ${draft.p2Nickname?.trim() || draft.p2EntryId?.trim() || ''}`
+
+  /* ──────────────────────────────────────────────
+     RENDER
+     ────────────────────────────────────────────── */
+
+  return (
+    <div className='mx-auto max-w-lg px-4 pb-28 pt-4'>
+      {/* ════ HEADER ════ */}
+      <header className='mb-4 flex items-center justify-between'>
+        <h1 className='text-lg font-extrabold tracking-tight'>
+          운영 <span className='text-[#ff2a00]'>콘솔</span>
+        </h1>
+        <div className='flex items-center gap-2'>
+          <a
+            href={broadcastUrl}
+            target='_blank'
+            rel='noreferrer'
+            className='flex h-9 w-9 items-center justify-center rounded-lg border border-[#ff2a00]/20 text-base text-[#ff8c66] transition-colors hover:bg-[#ff2a00]/10'
+            title='실시간 송출 화면'
+          >
+            📡
+          </a>
+          <button
+            type='button'
+            onClick={() => setShowSettings((prev) => !prev)}
+            className='flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-base text-white/40 transition-colors hover:bg-white/5'
+            title='설정'
+          >
+            ⚙
+          </button>
+        </div>
+      </header>
+
+      {/* ════ SETTINGS DRAWER ════ */}
+      {showSettings ? (
+        <div className='mb-4 space-y-3 rounded-xl border border-white/10 bg-white/[0.04] p-4'>
+          <div className='space-y-1'>
+            <label className='text-xs font-semibold text-white/40'>
               운영자 키
             </label>
             <Input
               type='password'
               value={operatorKey}
               onChange={(event) => setOperatorKey(event.target.value)}
-              placeholder='Cloudflare OPS_OPERATOR_KEY'
+              placeholder='OPS_OPERATOR_KEY'
               autoComplete='off'
+              className='min-h-[48px] text-base'
             />
           </div>
-          <div className='space-y-1.5'>
-            <label className='text-xs font-semibold text-white/70'>시즌</label>
+          <div className='space-y-1'>
+            <label className='text-xs font-semibold text-white/40'>시즌</label>
             <Input
               value={season}
               onChange={(event) => setSeason(event.target.value)}
               placeholder='2026'
+              className='min-h-[48px] w-24 text-base'
             />
           </div>
-          <div className='flex items-end'>
-            <Button
-              variant='outline'
-              size='sm'
-              className='w-full'
-              onClick={() => {
-                void fetchFeed({ force: true })
-              }}
-              disabled={feedLoading}
-            >
-              {feedLoading ? '새로고침 중..' : 'DB 새로고침'}
-            </Button>
-          </div>
+          <Button
+            variant='outline'
+            className='min-h-[48px] w-full'
+            onClick={() => {
+              void fetchFeed({ force: true })
+            }}
+            disabled={feedLoading}
+          >
+            {feedLoading ? '새로고침 중..' : 'DB 새로고침'}
+          </Button>
         </div>
+      ) : null}
 
-        {infoMessage ? (
-          <p className='mt-3 rounded-md border border-emerald-300/25 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200'>
-            {infoMessage}
-          </p>
-        ) : null}
-        {errorMessage ? (
-          <p className='mt-3 rounded-md border border-red-300/25 bg-red-500/10 px-3 py-2 text-xs text-red-100'>
-            {errorMessage}
-          </p>
-        ) : null}
-      </section>
+      {/* ════ MESSAGES ════ */}
+      {infoMessage ? (
+        <p className='mb-3 rounded-lg border border-emerald-300/25 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-200'>
+          {infoMessage}
+        </p>
+      ) : null}
+      {errorMessage ? (
+        <p className='mb-3 rounded-lg border border-red-300/25 bg-red-500/10 px-3 py-2.5 text-sm text-red-100'>
+          {errorMessage}
+        </p>
+      ) : null}
+      {feedError ? (
+        <p className='mb-3 rounded-lg border border-red-300/25 bg-red-500/10 px-3 py-2.5 text-xs text-red-100'>
+          {feedError}
+        </p>
+      ) : null}
 
-      {/* ── 현재 송출 버전 ── */}
-      <div className='flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm'>
-        <div className='flex items-center gap-3'>
-          <span className='text-white/40'>현재 송출</span>
-          <span className='font-mono text-[#ff8c66]'>
+      {/* ════ PUB BAR ════ */}
+      <div className='mb-4 flex items-center justify-between border-b border-white/[0.08] pb-3 text-xs'>
+        <div>
+          <span className='text-white/25'>송출</span>
+          <span className='ml-2 font-mono text-[#ff8c66]'>
             {publishMeta?.lastPublishId || '—'}
           </span>
         </div>
-        <div className='flex items-center gap-4 text-xs text-white/50'>
-          <span>
-            {publishMeta?.lastPublishedAt
-              ? new Date(publishMeta.lastPublishedAt).toLocaleString('ko-KR')
-              : ''}
-          </span>
-          <span>{lastFeedAt ? `DB ${lastFeedAt}` : ''}</span>
+        <div className='text-white/25'>
+          {publishMeta?.lastPublishedAt
+            ? new Date(publishMeta.lastPublishedAt).toLocaleString('ko-KR')
+            : ''}
+          {lastFeedAt ? ` · DB ${lastFeedAt}` : ''}
         </div>
       </div>
 
-      {/* ── 지역 셀렉터 (축소) ── */}
-      <div className='flex flex-wrap gap-2'>
+      {/* ════ REGION PILLS ════ */}
+      <div className='-mx-4 mb-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden'>
         {weekStatuses.map((week) => (
           <button
             key={week.key}
             type='button'
             onClick={() => setRegion(week.key)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+            className={`flex min-h-[48px] flex-shrink-0 items-center gap-1.5 rounded-full px-5 text-sm font-semibold transition ${
               region === week.key
                 ? 'bg-[#ff2a00] text-white'
-                : 'bg-white/[0.06] text-white/60 hover:bg-white/10'
+                : 'border border-white/[0.08] bg-white/[0.04] text-white/45'
             }`}
           >
             {week.label}
-            <span className='ml-1.5 text-xs opacity-60'>W{week.weekNo}</span>
+            <span className='text-xs opacity-50'>W{week.weekNo}</span>
             <span
-              className={`ml-1 inline-block h-1.5 w-1.5 rounded-full ${
+              className={`ml-0.5 inline-block h-1.5 w-1.5 rounded-full ${
                 week.status === 'done'
                   ? 'bg-emerald-400'
                   : week.status === 'live'
-                    ? 'bg-[#ff2a00]'
-                    : 'bg-white/30'
+                    ? region === week.key
+                      ? 'bg-white/80'
+                      : 'bg-[#ff2a00]'
+                    : 'bg-white/25'
               }`}
             />
           </button>
         ))}
       </div>
 
-      {/* ── 메인 탭 ── */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className='w-full'>
-          <TabsTrigger value='input'>입력</TabsTrigger>
-          <TabsTrigger value='validate'>검증</TabsTrigger>
-          <TabsTrigger value='publish'>발행</TabsTrigger>
-          <TabsTrigger value='rollback'>롤백</TabsTrigger>
-          <TabsTrigger value='broadcast'>송출확인</TabsTrigger>
-          <TabsTrigger value='log'>로그</TabsTrigger>
-        </TabsList>
+      {/* ════ STATUS CARDS ════ */}
+      <div className='mb-6 space-y-3'>
+        {/* Current match */}
+        <div className='rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/[0.08] p-4'>
+          <div className='text-[10px] font-bold uppercase tracking-widest text-[#ff2a00]'>
+            현재 경기 ·{' '}
+            {stage === 'finalMatch'
+              ? 'Top8'
+              : `Swiss${currentSwissRound ? ` R${currentSwissRound}` : ''}`}
+          </div>
+          <div className='mt-1.5 text-xl font-extrabold leading-tight text-white'>
+            {stageCurrent
+              ? `${stageCurrent.leftName} vs ${stageCurrent.rightName}`
+              : '대기중'}
+          </div>
+          {stageCurrent ? (
+            <div className='mt-1 text-sm text-white/40'>
+              {stageCurrent.label}
+            </div>
+          ) : null}
+        </div>
 
-        {/* ════ 입력 탭 ════ */}
-        <TabsContent value='input'>
-          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-            <div className='space-y-1.5'>
-              <label className='text-xs font-semibold text-white/70'>
-                입력 스테이지
-              </label>
-              <Select
-                value={stage}
-                onValueChange={(value) => setStage(value as OpsStageKey)}
+        {/* Progress */}
+        <div className='rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+          <div className='mb-3'>
+            <div className='mb-1.5 flex items-baseline justify-between'>
+              <span className='text-sm font-semibold text-white/60'>Swiss</span>
+              <span className='font-mono text-xl font-semibold text-white'>
+                {swissProgress.completed}/{swissProgress.total}
+              </span>
+            </div>
+            <div className='h-1.5 overflow-hidden rounded-full bg-white/[0.06]'>
+              <div
+                className='h-full rounded-full bg-[#ff2a00] transition-all duration-500'
+                style={{
+                  width:
+                    swissProgress.total > 0
+                      ? `${(swissProgress.completed / swissProgress.total) * 100}%`
+                      : '0%',
+                }}
+              />
+            </div>
+          </div>
+          <div>
+            <div className='mb-1.5 flex items-baseline justify-between'>
+              <span className='text-sm font-semibold text-white/60'>Top 8</span>
+              <span className='font-mono text-xl font-semibold text-white'>
+                {finalsProgress.completed}/{finalsProgress.total}
+              </span>
+            </div>
+            <div className='h-1.5 overflow-hidden rounded-full bg-white/[0.06]'>
+              <div
+                className='h-full rounded-full bg-[#ff8c66] transition-all duration-500'
+                style={{
+                  width:
+                    finalsProgress.total > 0
+                      ? `${(finalsProgress.completed / finalsProgress.total) * 100}%`
+                      : '0%',
+                }}
+              />
+            </div>
+          </div>
+          <div className='mt-3 flex gap-4 border-t border-white/[0.08] pt-3'>
+            <span className='text-sm text-white/40'>
+              <strong className='mr-1 font-bold text-[#ff2a00]'>A</strong>
+              {regionArchive?.qualifiers.groupA
+                ? regionArchive.qualifiers.groupA.nickname
+                : '미확정'}
+            </span>
+            <span className='text-sm text-white/40'>
+              <strong className='mr-1 font-bold text-[#ff2a00]'>B</strong>
+              {regionArchive?.qualifiers.groupB
+                ? regionArchive.qualifiers.groupB.nickname
+                : '미확정'}
+            </span>
+          </div>
+        </div>
+
+        {/* Ranking preview */}
+        {finalRanking.length > 0 ? (
+          <details>
+            <summary className='flex min-h-[44px] cursor-pointer items-center text-sm font-medium text-white/40'>
+              ▸ 지역 순위 (Top 8)
+            </summary>
+            <div className='mt-1 overflow-x-auto rounded-xl border border-white/[0.08]'>
+              <table className='min-w-full text-left text-xs'>
+                <thead className='bg-white/[0.05] text-white/50'>
+                  <tr>
+                    <th className='px-3 py-2'>#</th>
+                    <th className='px-3 py-2'>닉네임</th>
+                    <th className='px-3 py-2'>전적</th>
+                    <th className='px-3 py-2'>상태</th>
+                  </tr>
+                </thead>
+                <tbody className='divide-y divide-white/[0.06]'>
+                  {finalRanking.slice(0, 8).map((row) => (
+                    <tr key={`${row.entryId}-${row.rank}`}>
+                      <td className='px-3 py-2 font-bold text-[#ff2a00]'>
+                        {row.rank}
+                      </td>
+                      <td className='px-3 py-2 text-white/80'>
+                        {row.nickname}
+                      </td>
+                      <td className='px-3 py-2 font-mono text-white/60'>
+                        {typeof row.wins === 'number' &&
+                        typeof row.losses === 'number'
+                          ? `${row.wins}-${row.losses}`
+                          : '-'}
+                      </td>
+                      <td className='px-3 py-2 text-white/50'>
+                        {row.statusLabel}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        ) : null}
+      </div>
+
+      {/* ════ DIVIDER ════ */}
+      <div className='mb-6 h-px bg-white/[0.08]' />
+
+      {/* ════ INPUT SECTION ════ */}
+      <div className='mb-3 text-[11px] font-bold uppercase tracking-widest text-white/30'>
+        경기 입력
+      </div>
+
+      {/* Stage selector */}
+      <div className='mb-1.5'>
+        <Select
+          value={stage}
+          onValueChange={(value) => setStage(value as OpsStageKey)}
+        >
+          <SelectTrigger className='min-h-[48px] w-full text-base'>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {OPS_STAGE_ORDER.map((key) => (
+              <SelectItem key={key} value={key}>
+                {OPS_STAGE_DEFINITIONS[key].label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <p className='mb-5 text-xs leading-relaxed text-white/25'>
+        {stageDef.description}
+      </p>
+
+      {/* Sequential guide */}
+      {isSequentialStage ? (
+        <>
+          <div className='-mx-4 mb-2.5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden'>
+            {[
+              { label: '현재 경기', value: matchShort(stageCurrent) },
+              { label: '다음 경기', value: matchShort(stageNext) },
+              { label: '직전 결과', value: matchShort(stagePrevious) },
+            ].map((cell) => (
+              <div
+                key={cell.label}
+                className='min-w-[130px] flex-shrink-0 rounded-lg border border-white/[0.08] bg-black/30 px-3.5 py-3'
               >
-                <SelectTrigger className='w-full'>
-                  <SelectValue />
+                <div className='text-[10px] text-white/25'>{cell.label}</div>
+                <div className='mt-1 text-sm font-semibold text-white'>
+                  {cell.value}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className='mb-5 flex gap-2'>
+            <Button
+              variant='outline'
+              className='min-h-[48px] flex-1'
+              onClick={handleLoadCurrentMatch}
+            >
+              현재 경기 불러오기
+            </Button>
+            <Button
+              variant='outline'
+              className='min-h-[48px] flex-1'
+              onClick={handleLoadNextMatch}
+            >
+              다음 경기 슬롯
+            </Button>
+          </div>
+        </>
+      ) : null}
+
+      {/* ════ SWISS-SPECIFIC FORM ════ */}
+      {stage === 'swissMatch' ? (
+        <>
+          {/* 매치 정보 */}
+          <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+            <div className='flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30'>
+              <span className='inline-block h-2 w-2 rounded-sm bg-[#ff2a00]' />
+              매치 정보
+            </div>
+            <div className='grid grid-cols-2 gap-3'>
+              <div className='space-y-1'>
+                <label className='text-xs font-medium text-white/40'>
+                  라운드<span className='ml-0.5 text-[#ff2a00]'>*</span>
+                </label>
+                <Input
+                  type='number'
+                  inputMode='numeric'
+                  value={draft.round ?? ''}
+                  onChange={(e) => setDraftField('round', e.target.value)}
+                  placeholder='1'
+                  className='min-h-[48px] text-base'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-xs font-medium text-white/40'>
+                  테이블<span className='ml-0.5 text-[#ff2a00]'>*</span>
+                </label>
+                <Input
+                  type='number'
+                  inputMode='numeric'
+                  value={draft.table ?? ''}
+                  onChange={(e) => setDraftField('table', e.target.value)}
+                  placeholder='1'
+                  className='min-h-[48px] text-base'
+                />
+              </div>
+            </div>
+            <div className='space-y-3'>
+              <div className='space-y-1'>
+                <label className='text-xs font-medium text-white/40'>
+                  P1 선수<span className='ml-0.5 text-[#ff2a00]'>*</span>
+                </label>
+                {playerOptions.length > 0 ? (
+                  <OpsCombobox
+                    displayValue={
+                      draft.p1EntryId
+                        ? `${draft.p1Nickname || draft.p1EntryId} (${draft.p1EntryId})`
+                        : ''
+                    }
+                    options={playerOptions}
+                    onSelect={(entryId) => handlePlayerSelect('p1', entryId)}
+                    placeholder='선수 검색...'
+                    searchPlaceholder='닉네임 또는 엔트리ID'
+                  />
+                ) : (
+                  <Input
+                    value={draft.p1EntryId ?? ''}
+                    onChange={(e) =>
+                      setDraftField('p1EntryId', e.target.value)
+                    }
+                    placeholder='SEO-01'
+                    className='min-h-[48px] text-base'
+                  />
+                )}
+              </div>
+              <div className='space-y-1'>
+                <label className='text-xs font-medium text-white/40'>
+                  P1 닉네임<span className='ml-0.5 text-[#ff2a00]'>*</span>
+                </label>
+                <Input
+                  value={draft.p1Nickname ?? ''}
+                  onChange={(e) => setDraftField('p1Nickname', e.target.value)}
+                  placeholder='서울선수01'
+                  className='min-h-[48px] text-base'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-xs font-medium text-white/40'>
+                  P2 선수
+                </label>
+                {playerOptions.length > 0 ? (
+                  <OpsCombobox
+                    displayValue={
+                      draft.p2EntryId
+                        ? `${draft.p2Nickname || draft.p2EntryId} (${draft.p2EntryId})`
+                        : ''
+                    }
+                    options={playerOptions}
+                    onSelect={(entryId) => handlePlayerSelect('p2', entryId)}
+                    placeholder='선수 검색...'
+                    searchPlaceholder='닉네임 또는 엔트리ID'
+                  />
+                ) : (
+                  <Input
+                    value={draft.p2EntryId ?? ''}
+                    onChange={(e) =>
+                      setDraftField('p2EntryId', e.target.value)
+                    }
+                    placeholder='SEO-16'
+                    className='min-h-[48px] text-base'
+                  />
+                )}
+              </div>
+              <div className='space-y-1'>
+                <label className='text-xs font-medium text-white/40'>
+                  P2 닉네임
+                </label>
+                <Input
+                  value={draft.p2Nickname ?? ''}
+                  onChange={(e) => setDraftField('p2Nickname', e.target.value)}
+                  placeholder='서울선수16'
+                  className='min-h-[48px] text-base'
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 곡별 점수 */}
+          <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+            <div className='flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30'>
+              <span className='inline-block h-2 w-2 rounded-sm bg-[#ff2a00]' />
+              곡별 점수
+            </div>
+            <SwissSongCard
+              badge='곡 1'
+              songField='song1'
+              levelField='level1'
+              p1ScoreField='p1Score1'
+              p2ScoreField='p2Score1'
+              p1Label={p1Label}
+              p2Label={p2Label}
+              draft={draft}
+              setDraftField={setDraftField}
+              songOptions={songOptions}
+              prioritySongs={p1SongPriority}
+              priorityLabel={`${draft.p1Nickname?.trim() || 'P1'} 선곡`}
+            />
+            <SwissSongCard
+              badge='곡 2'
+              songField='song2'
+              levelField='level2'
+              p1ScoreField='p1Score2'
+              p2ScoreField='p2Score2'
+              p1Label={p1Label}
+              p2Label={p2Label}
+              draft={draft}
+              setDraftField={setDraftField}
+              songOptions={songOptions}
+              prioritySongs={p2SongPriority}
+              priorityLabel={`${draft.p2Nickname?.trim() || 'P2'} 선곡`}
+            />
+            <SwissSongCard
+              badge='타이브레이커'
+              songField='song3'
+              levelField='level3'
+              p1ScoreField='p1Score3'
+              p2ScoreField='p2Score3'
+              p1Label={p1Label}
+              p2Label={p2Label}
+              draft={draft}
+              setDraftField={setDraftField}
+              dim
+              songOptions={songOptions}
+              prioritySongs={[...p1SongPriority, ...p2SongPriority]}
+              priorityLabel='P1 + P2 선곡'
+            />
+          </div>
+
+          {/* 승자 선택 */}
+          {winnerOptions.length > 0 ? (
+            <div className='mb-3 rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/[0.08] p-4'>
+              <div className='mb-3 text-[10px] font-bold uppercase tracking-widest text-[#ff2a00]'>
+                승자 선택
+              </div>
+              <div className='grid grid-cols-2 gap-2.5'>
+                {winnerOptions.map((option) => (
+                  <button
+                    key={option.entryId}
+                    type='button'
+                    onClick={() =>
+                      setDraftField('winnerEntryId', option.entryId)
+                    }
+                    className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 rounded-lg border-2 p-3 text-center transition ${
+                      draft.winnerEntryId === option.entryId
+                        ? 'border-[#ff2a00] bg-[#ff2a00] font-semibold text-white'
+                        : 'border-white/[0.08] bg-black/30 text-white/40'
+                    }`}
+                  >
+                    <span className='text-[15px] font-semibold'>
+                      {option.nickname || option.entryId}
+                    </span>
+                    <span className='text-[11px] opacity-50'>
+                      {option.entryId}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {/* 추가 필드 */}
+          {swissExtraFields.length > 0 ? (
+            <details className='mb-3'>
+              <summary className='flex min-h-[44px] cursor-pointer items-center text-sm font-medium text-white/40'>
+                ▸ 추가 필드 ({swissExtraFields.length}개)
+              </summary>
+              <div className='mt-2 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+                {swissExtraFields.map(renderFieldInput)}
+              </div>
+            </details>
+          ) : null}
+        </>
+      ) : (
+        /* ════ GENERIC FORM (non-Swiss stages) ════ */
+        <>
+          <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+            <div className='flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30'>
+              <span className='inline-block h-2 w-2 rounded-sm bg-[#ff2a00]' />
+              필수 입력
+            </div>
+            <div className='space-y-3'>
+              {requiredFields.map(renderFieldInput)}
+            </div>
+          </div>
+
+          {winnerOptions.length > 0 ? (
+            <div className='mb-3 rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/[0.08] p-4'>
+              <div className='mb-3 text-[10px] font-bold uppercase tracking-widest text-[#ff2a00]'>
+                승자 선택
+              </div>
+              <div className='grid grid-cols-2 gap-2.5'>
+                {winnerOptions.map((option) => (
+                  <button
+                    key={option.entryId}
+                    type='button'
+                    onClick={() =>
+                      setDraftField('winnerEntryId', option.entryId)
+                    }
+                    className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 rounded-lg border-2 p-3 text-center transition ${
+                      draft.winnerEntryId === option.entryId
+                        ? 'border-[#ff2a00] bg-[#ff2a00] font-semibold text-white'
+                        : 'border-white/[0.08] bg-black/30 text-white/40'
+                    }`}
+                  >
+                    <span className='text-[15px] font-semibold'>
+                      {option.nickname || option.entryId}
+                    </span>
+                    <span className='text-[11px] opacity-50'>
+                      {option.entryId}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {optionalFields.length > 0 ? (
+            <details className='mb-3'>
+              <summary className='flex min-h-[44px] cursor-pointer items-center text-sm font-medium text-white/40'>
+                ▸ 추가 필드 ({optionalFields.length}개)
+              </summary>
+              <div className='mt-2 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+                {optionalFields.map(renderFieldInput)}
+              </div>
+            </details>
+          ) : null}
+        </>
+      )}
+
+      {/* Swiss bulk seeding */}
+      {stage === 'swissMatch' ? (
+        <details className='mb-3'>
+          <summary className='flex min-h-[44px] cursor-pointer items-center text-sm font-medium text-white/40'>
+            ▸ Round pre-draw (bulk schedule)
+          </summary>
+          <div className='mt-2 space-y-3 rounded-xl border border-white/[0.08] bg-black/20 p-4'>
+            <p className='text-xs text-white/40'>
+              players loaded: {regionParticipants.length} ·
+              table,p1EntryId,p2EntryId[,note]
+            </p>
+            <div className='space-y-2'>
+              <div className='space-y-1'>
+                <label className='text-xs text-white/40'>round</label>
+                <Input
+                  type='number'
+                  inputMode='numeric'
+                  value={bulkRound}
+                  onChange={(event) => setBulkRound(event.target.value)}
+                  placeholder={
+                    currentSwissRound ? String(currentSwissRound) : '1'
+                  }
+                  className='min-h-[48px] text-base'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-xs text-white/40'>
+                  Song 1{bulkLevel1 ? ` · ★${bulkLevel1}` : ''}
+                </label>
+                <OpsCombobox
+                  displayValue={bulkSong1}
+                  options={songOptions}
+                  onSelect={(val) => {
+                    const opt = parseSongOption(val)
+                    if (opt) {
+                      setBulkSong1(opt.title)
+                      setBulkLevel1(String(opt.level))
+                    }
+                  }}
+                  placeholder='곡 1 검색...'
+                  searchPlaceholder='곡명으로 검색'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-xs text-white/40'>
+                  Song 2{bulkLevel2 ? ` · ★${bulkLevel2}` : ''}
+                </label>
+                <OpsCombobox
+                  displayValue={bulkSong2}
+                  options={songOptions}
+                  onSelect={(val) => {
+                    const opt = parseSongOption(val)
+                    if (opt) {
+                      setBulkSong2(opt.title)
+                      setBulkLevel2(String(opt.level))
+                    }
+                  }}
+                  placeholder='곡 2 검색...'
+                  searchPlaceholder='곡명으로 검색'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-xs text-white/40'>
+                  Song 3 (opt){bulkLevel3 ? ` · ★${bulkLevel3}` : ''}
+                </label>
+                <OpsCombobox
+                  displayValue={bulkSong3}
+                  options={songOptions}
+                  onSelect={(val) => {
+                    const opt = parseSongOption(val)
+                    if (opt) {
+                      setBulkSong3(opt.title)
+                      setBulkLevel3(String(opt.level))
+                    }
+                  }}
+                  placeholder='곡 3 검색...'
+                  searchPlaceholder='곡명으로 검색'
+                />
+              </div>
+              <Textarea
+                value={bulkLines}
+                onChange={(event) => setBulkLines(event.target.value)}
+                placeholder={
+                  '1,SEO-01,SEO-16\n2,SEO-02,SEO-15\n3,SEO-03,BYE'
+                }
+                className='min-h-32 font-mono text-sm'
+              />
+            </div>
+            <div className='flex flex-wrap gap-2'>
+              <Button
+                variant='outline'
+                size='sm'
+                className='min-h-[44px]'
+                onClick={handlePrefillRoundLines}
+                disabled={isBulkSeeding}
+              >
+                Load round lines
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                className='min-h-[44px]'
+                onClick={handleGenerateSeedOrderLines}
+                disabled={isBulkSeeding}
+              >
+                Auto by seed
+              </Button>
+              <Button
+                size='sm'
+                className='min-h-[44px]'
+                onClick={handleBulkSeedRound}
+                disabled={isBulkSeeding}
+              >
+                {isBulkSeeding ? 'Saving..' : 'Save pre-draw'}
+              </Button>
+            </div>
+          </div>
+        </details>
+      ) : null}
+
+      {/* ════ OPS SECTION ════ */}
+      <div className='mb-5 mt-6 h-px bg-white/[0.08]' />
+      <div className='mb-3 text-[11px] font-bold uppercase tracking-widest text-white/30'>
+        운영 도구
+      </div>
+
+      <div className='mb-3 grid grid-cols-2 gap-2.5'>
+        <button
+          type='button'
+          onClick={() => toggleOpsPanel('validate')}
+          className={`flex min-h-[64px] flex-col justify-center rounded-xl border p-3.5 text-left transition ${
+            opsPanel === 'validate'
+              ? 'border-[#ff2a00]/30 bg-[#ff2a00]/15 text-[#ffd6cf]'
+              : 'border-[#ff2a00]/15 bg-[#ff2a00]/[0.08] text-[#ffd6cf]'
+          }`}
+        >
+          <span className='text-sm font-semibold'>검증 + 발행</span>
+          <span className='text-[10px] text-white/25'>검증 → 백업 → 송출</span>
+        </button>
+        <button
+          type='button'
+          onClick={() => toggleOpsPanel('rollback')}
+          className={`flex min-h-[64px] flex-col justify-center rounded-xl border p-3.5 text-left transition ${
+            opsPanel === 'rollback'
+              ? 'border-white/20 bg-white/10 text-white/80'
+              : 'border-white/[0.08] bg-white/[0.04] text-white/45'
+          }`}
+        >
+          <span className='text-sm font-semibold'>롤백</span>
+          <span className='text-[10px] text-white/25'>스냅샷 복원</span>
+        </button>
+        <button
+          type='button'
+          onClick={() => toggleOpsPanel('log')}
+          className={`flex min-h-[64px] flex-col justify-center rounded-xl border p-3.5 text-left transition ${
+            opsPanel === 'log'
+              ? 'border-white/20 bg-white/10 text-white/80'
+              : 'border-white/[0.08] bg-white/[0.04] text-white/45'
+          }`}
+        >
+          <span className='text-sm font-semibold'>발행 로그</span>
+          <span className='text-[10px] text-white/25'>최근 50건</span>
+        </button>
+        <button
+          type='button'
+          onClick={() => toggleOpsPanel('utility')}
+          className={`flex min-h-[64px] flex-col justify-center rounded-xl border p-3.5 text-left transition ${
+            opsPanel === 'utility'
+              ? 'border-white/20 bg-white/10 text-white/80'
+              : 'border-white/[0.08] bg-white/[0.04] text-white/45'
+          }`}
+        >
+          <span className='text-sm font-semibold'>유틸리티</span>
+          <span className='text-[10px] text-white/25'>DB 초기화</span>
+        </button>
+      </div>
+
+      {/* ── Validate + Publish panel ── */}
+      {opsPanel === 'validate' ? (
+        <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+          <h3 className='text-base font-bold'>검증 + 발행</h3>
+          <p className='text-sm text-white/40'>
+            검증 → 백업(스냅샷) → 송출 → 캐시 초기화 순차 실행
+          </p>
+
+          <Button
+            variant='outline'
+            className='min-h-[48px] w-full'
+            onClick={handleValidate}
+            disabled={isValidating}
+          >
+            {isValidating ? '검증 중..' : '데이터 검증 실행'}
+          </Button>
+
+          {validationResult ? (
+            <div className='space-y-2'>
+              <p
+                className={`text-sm font-semibold ${validationResult.valid ? 'text-emerald-300' : 'text-red-300'}`}
+              >
+                {validationResult.valid
+                  ? '✓ 검증 통과 — 송출 가능'
+                  : `✗ 검증 실패 — 오류 ${validationResult.errors.length}건`}
+              </p>
+
+              {validationResult.errors.length > 0 ? (
+                <div className='max-h-40 overflow-y-auto rounded-lg border border-red-300/25 bg-red-500/10 p-3 text-xs text-red-100'>
+                  {validationResult.errors.map((e, i) => (
+                    <div key={i} className='py-0.5'>
+                      <span className='font-mono text-red-300'>
+                        [{e.sheet}]
+                      </span>{' '}
+                      {e.rule}: {e.message}
+                      {e.row != null ? ` (행 ${e.row})` : ''}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {validationResult.warnings.length > 0 ? (
+                <div className='max-h-32 overflow-y-auto rounded-lg border border-yellow-300/25 bg-yellow-500/10 p-3 text-xs text-yellow-100'>
+                  {validationResult.warnings.map((w, i) => (
+                    <div key={i} className='py-0.5'>
+                      <span className='font-mono text-yellow-300'>
+                        [{w.sheet}]
+                      </span>{' '}
+                      {w.rule}: {w.message}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {validationResult.valid ? (
+                <div className='space-y-3 border-t border-white/[0.08] pt-3'>
+                  <label className='flex items-center gap-2 text-sm text-white/60'>
+                    <input
+                      type='checkbox'
+                      checked={exportReplaceMode}
+                      onChange={(e) => setExportReplaceMode(e.target.checked)}
+                      className='accent-[#ff2a00]'
+                    />
+                    replace 모드 (초기화 후 재송출)
+                  </label>
+                  <Button
+                    className='min-h-[48px] w-full'
+                    onClick={handlePublish}
+                    disabled={isPublishing}
+                  >
+                    {isPublishing ? '송출 중..' : '검증 + 백업 + 송출'}
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* ── Rollback panel ── */}
+      {opsPanel === 'rollback' ? (
+        <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+          <h3 className='text-base font-bold'>롤백</h3>
+          <p className='text-sm text-white/40'>
+            이전 스냅샷으로 pub_* 전체 복원. 현재 공개 데이터가 모두 교체됩니다.
+          </p>
+
+          <Button
+            variant='outline'
+            className='min-h-[48px] w-full'
+            onClick={loadSnapshots}
+            disabled={isLoadingSnapshots}
+          >
+            {isLoadingSnapshots ? '조회 중..' : '스냅샷 조회'}
+          </Button>
+
+          {snapshots.length > 0 ? (
+            <>
+              <Select
+                value={selectedSnapshotId}
+                onValueChange={setSelectedSnapshotId}
+              >
+                <SelectTrigger className='min-h-[48px] text-base'>
+                  <SelectValue placeholder='스냅샷 선택' />
                 </SelectTrigger>
                 <SelectContent>
-                  {OPS_STAGE_ORDER.map((key) => (
-                    <SelectItem key={key} value={key}>
-                      {OPS_STAGE_DEFINITIONS[key].label}
+                  {snapshots.map((snap) => (
+                    <SelectItem key={snap.snapshotId} value={snap.snapshotId}>
+                      {snap.snapshotId} ({snap.createdAt})
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <p className='text-xs text-white/55'>{stageDef.description}</p>
-            </div>
 
-            {isSequentialStage ? (
-              <div className='rounded-xl border border-[#ff2a00]/20 bg-[#ff2a00]/5 p-3'>
-                <p className='text-xs font-semibold text-[#ffd6cf]'>
-                  순차 진행 가이드 ({stage === 'swissMatch' ? 'Swiss' : 'Top8'})
-                </p>
-                <div className='mt-2 grid gap-2 text-xs md:grid-cols-3'>
-                  <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                    <div className='text-white/50'>현재 경기</div>
-                    <div className='mt-1 font-medium text-white/85'>
-                      {matchLine(stageCurrent)}
-                    </div>
-                  </div>
-                  <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                    <div className='text-white/50'>다음 경기</div>
-                    <div className='mt-1 font-medium text-white/85'>
-                      {matchLine(stageNext)}
-                    </div>
-                  </div>
-                  <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                    <div className='text-white/50'>직전 결과</div>
-                    <div className='mt-1 font-medium text-white/85'>
-                      {matchLine(stagePrevious)}
-                    </div>
-                  </div>
-                </div>
-                <div className='mt-3 flex flex-wrap gap-2'>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={handleLoadCurrentMatch}
-                  >
-                    현재 경기 불러오기
-                  </Button>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={handleLoadNextMatch}
-                  >
-                    다음 경기 슬롯
-                  </Button>
-                </div>
-              </div>
-            ) : null}
-
-            {/* 필수 필드 */}
-            <div className='grid gap-3 md:grid-cols-2'>
-              {requiredFields.map(renderFieldInput)}
-            </div>
-
-            {winnerOptions.length > 0 ? (
-              <div className='rounded-lg border border-white/10 bg-black/25 p-3'>
-                <p className='text-xs text-white/60'>승자 빠른 선택</p>
-                <div className='mt-2 flex flex-wrap gap-2'>
-                  {winnerOptions.map((option) => (
-                    <Button
-                      key={option.entryId}
-                      size='sm'
-                      variant='outline'
-                      onClick={() =>
-                        setDraftField('winnerEntryId', option.entryId)
-                      }
-                    >
-                      {option.nickname || option.entryId}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            {/* 선택 필드 */}
-            {optionalFields.length > 0 ? (
-              <details className='group'>
-                <summary className='cursor-pointer text-sm text-white/40 hover:text-white/60'>
-                  추가 필드 ({optionalFields.length}개)
-                </summary>
-                <div className='mt-3 grid gap-3 md:grid-cols-2'>
-                  {optionalFields.map(renderFieldInput)}
-                </div>
-              </details>
-            ) : null}
-
-            <div className='flex flex-wrap gap-2'>
-              <Button onClick={handleSaveRow} disabled={isSaving}>
-                {isSaving ? '저장 중..' : 'DB 저장'}
-              </Button>
-              <Button
-                variant='outline'
-                onClick={resetDraft}
-                disabled={isSaving}
-              >
-                입력 초기화
-              </Button>
-            </div>
-
-            {/* Swiss bulk seeding */}
-            {stage === 'swissMatch' ? (
-              <details className='group'>
-                <summary className='cursor-pointer text-sm text-white/40 hover:text-white/60'>
-                  Round pre-draw (bulk schedule)
-                </summary>
-                <div className='mt-3 rounded-xl border border-white/10 bg-black/20 p-3'>
-                  <div className='flex flex-wrap items-center justify-between gap-2'>
-                    <span className='text-xs text-white/55'>
-                      players loaded: {regionParticipants.length}
-                    </span>
-                  </div>
-                  <p className='mt-1 text-xs text-white/55'>
-                    Format: table,p1EntryId,p2EntryId[,note] — Use BYE or - for
-                    no opponent.
-                  </p>
-                  <div className='mt-3 grid gap-2 md:grid-cols-3'>
-                    <div className='space-y-1'>
-                      <label className='text-xs text-white/60'>round</label>
-                      <Input
-                        type='number'
-                        inputMode='numeric'
-                        value={bulkRound}
-                        onChange={(event) => setBulkRound(event.target.value)}
-                        placeholder={
-                          currentSwissRound ? String(currentSwissRound) : '1'
-                        }
-                      />
-                    </div>
-                    <div className='space-y-1'>
-                      <label className='text-xs text-white/60'>
-                        song1 / level1
-                      </label>
-                      <div className='grid grid-cols-3 gap-2'>
-                        <Input
-                          className='col-span-2'
-                          value={bulkSong1}
-                          onChange={(event) => setBulkSong1(event.target.value)}
-                          placeholder='Song 1'
-                        />
-                        <Input
-                          value={bulkLevel1}
-                          onChange={(event) =>
-                            setBulkLevel1(event.target.value)
-                          }
-                          placeholder='Lv'
-                        />
-                      </div>
-                    </div>
-                    <div className='space-y-1'>
-                      <label className='text-xs text-white/60'>
-                        song2 / level2
-                      </label>
-                      <div className='grid grid-cols-3 gap-2'>
-                        <Input
-                          className='col-span-2'
-                          value={bulkSong2}
-                          onChange={(event) => setBulkSong2(event.target.value)}
-                          placeholder='Song 2'
-                        />
-                        <Input
-                          value={bulkLevel2}
-                          onChange={(event) =>
-                            setBulkLevel2(event.target.value)
-                          }
-                          placeholder='Lv'
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className='mt-2 grid gap-2 md:grid-cols-3'>
-                    <div className='space-y-1 md:col-span-1'>
-                      <label className='text-xs text-white/60'>
-                        song3 / level3 (optional)
-                      </label>
-                      <div className='grid grid-cols-3 gap-2'>
-                        <Input
-                          className='col-span-2'
-                          value={bulkSong3}
-                          onChange={(event) => setBulkSong3(event.target.value)}
-                          placeholder='Song 3'
-                        />
-                        <Input
-                          value={bulkLevel3}
-                          onChange={(event) =>
-                            setBulkLevel3(event.target.value)
-                          }
-                          placeholder='Lv'
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className='mt-2'>
-                    <Textarea
-                      value={bulkLines}
-                      onChange={(event) => setBulkLines(event.target.value)}
-                      placeholder={
-                        '1,SEO-01,SEO-16\n2,SEO-02,SEO-15\n3,SEO-03,BYE'
-                      }
-                      className='min-h-32 font-mono text-xs'
-                    />
-                  </div>
-                  <div className='mt-3 flex flex-wrap gap-2'>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={handlePrefillRoundLines}
-                      disabled={isBulkSeeding}
-                    >
-                      Load current round lines
-                    </Button>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={handleGenerateSeedOrderLines}
-                      disabled={isBulkSeeding}
-                    >
-                      Auto-generate by seed order
-                    </Button>
-                    <Button
-                      size='sm'
-                      onClick={handleBulkSeedRound}
-                      disabled={isBulkSeeding}
-                    >
-                      {isBulkSeeding
-                        ? 'Saving pre-draw...'
-                        : 'Save round pre-draw'}
-                    </Button>
-                  </div>
-                </div>
-              </details>
-            ) : null}
-
-            {/* 유틸리티 */}
-            <div className='flex flex-wrap gap-2 border-t border-white/10 pt-3'>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={handleInitOpsTabs}
-                disabled={isInitRunning}
-              >
-                {isInitRunning ? '초기화 중..' : '운영 DB 탭 초기화'}
-              </Button>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={handleWriteOpsGuide}
-                disabled={isGuideRunning}
-              >
-                {isGuideRunning ? 'Writing guide..' : 'Write ops guide sheet'}
-              </Button>
-            </div>
-          </div>
-        </TabsContent>
-
-        {/* ════ 검증 탭 ════ */}
-        <TabsContent value='validate'>
-          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-            <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>데이터 검증</h2>
-              <p className='text-xs text-white/60'>
-                운영 DB 데이터의 무결성을 확인합니다 (필수값, 키 중복, 참조
-                무결성).
-              </p>
-            </div>
-
-            <Button
-              variant='outline'
-              onClick={handleValidate}
-              disabled={isValidating}
-            >
-              {isValidating ? '검증 중..' : '데이터 검증 실행'}
-            </Button>
-
-            {validationResult ? (
-              <div className='space-y-2'>
-                <p
-                  className={`text-xs font-semibold ${validationResult.valid ? 'text-emerald-300' : 'text-red-300'}`}
+              {selectedSnapshotId ? (
+                <Button
+                  variant='destructive'
+                  className='min-h-[48px] w-full'
+                  onClick={handleRollback}
+                  disabled={isRollingBack}
                 >
-                  {validationResult.valid
-                    ? '검증 통과 — 송출 가능합니다.'
-                    : `검증 실패 — 오류 ${validationResult.errors.length}건`}
-                </p>
-
-                {validationResult.errors.length > 0 ? (
-                  <div className='max-h-40 overflow-y-auto rounded-lg border border-red-300/25 bg-red-500/10 p-2 text-xs text-red-100'>
-                    {validationResult.errors.map((e, i) => (
-                      <div key={i} className='py-0.5'>
-                        <span className='font-mono text-red-300'>
-                          [{e.sheet}]
-                        </span>{' '}
-                        {e.rule}: {e.message}
-                        {e.row != null ? ` (행 ${e.row})` : ''}
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-
-                {validationResult.warnings.length > 0 ? (
-                  <div className='max-h-32 overflow-y-auto rounded-lg border border-yellow-300/25 bg-yellow-500/10 p-2 text-xs text-yellow-100'>
-                    {validationResult.warnings.map((w, i) => (
-                      <div key={i} className='py-0.5'>
-                        <span className='font-mono text-yellow-300'>
-                          [{w.sheet}]
-                        </span>{' '}
-                        {w.rule}: {w.message}
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-
-                {validationResult.summary.length > 0 ? (
-                  <details className='text-xs text-white/60'>
-                    <summary className='cursor-pointer hover:text-white/80'>
-                      탭별 행 수 요약 ({validationResult.summary.length}개 탭)
-                    </summary>
-                    <div className='mt-1 grid grid-cols-2 gap-x-4 gap-y-0.5 font-mono md:grid-cols-3'>
-                      {validationResult.summary.map((s, i) => (
-                        <span key={i}>
-                          {s.target}: {s.rows}행
-                        </span>
-                      ))}
-                    </div>
-                  </details>
-                ) : null}
-
-                {validationResult.valid ? (
-                  <p className='mt-2 text-sm text-emerald-400'>
-                    검증 통과 — &quot;발행&quot; 탭에서 송출할 수 있습니다.
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-        </TabsContent>
-
-        {/* ════ 발행 탭 ════ */}
-        <TabsContent value='publish'>
-          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-            <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>안전 송출</h2>
-              <p className='text-xs text-white/60'>
-                자동으로 검증 → 백업(스냅샷) → 송출 → 캐시 초기화가 실행됩니다.
-              </p>
-            </div>
-
-            {!validationResult ? (
-              <div className='rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-300'>
-                검증을 먼저 실행해 주세요. &quot;검증&quot; 탭에서 데이터 검증을
-                실행할 수 있습니다.
-              </div>
-            ) : !validationResult.valid ? (
-              <div className='rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300'>
-                검증 실패 — 오류 {validationResult.errors.length}건을 수정 후
-                다시 검증해 주세요.
-              </div>
-            ) : (
-              <div className='space-y-3'>
-                <div className='rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300'>
-                  검증 통과 — 송출할 수 있습니다.
-                </div>
-                <label className='flex items-center gap-2 text-xs text-white/70'>
-                  <input
-                    type='checkbox'
-                    checked={exportReplaceMode}
-                    onChange={(e) => setExportReplaceMode(e.target.checked)}
-                    className='accent-[#ff2a00]'
-                  />
-                  replace 모드 (기존 아카이브 초기화 후 재송출)
-                </label>
-                <Button onClick={handlePublish} disabled={isPublishing}>
-                  {isPublishing ? '송출 중..' : '검증 + 백업 + 송출'}
+                  {isRollingBack ? '롤백 중..' : '롤백 실행'}
                 </Button>
-              </div>
-            )}
-          </div>
-        </TabsContent>
-
-        {/* ════ 롤백 탭 ════ */}
-        <TabsContent value='rollback'>
-          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-            <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>롤백</h2>
-              <p className='text-xs text-white/60'>
-                이전 스냅샷으로 pub_* 전체를 복원합니다. 현재 공개 데이터가 모두
-                교체됩니다.
-              </p>
-            </div>
-
-            <div className='flex flex-wrap items-end gap-2'>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={loadSnapshots}
-                disabled={isLoadingSnapshots}
-              >
-                {isLoadingSnapshots ? '조회 중..' : '스냅샷 조회'}
-              </Button>
-              {snapshots.length > 0 ? (
-                <Select
-                  value={selectedSnapshotId}
-                  onValueChange={setSelectedSnapshotId}
-                >
-                  <SelectTrigger className='w-64'>
-                    <SelectValue placeholder='스냅샷 선택' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {snapshots.map((snap) => (
-                      <SelectItem key={snap.snapshotId} value={snap.snapshotId}>
-                        {snap.snapshotId} ({snap.createdAt})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               ) : null}
-            </div>
+            </>
+          ) : null}
+        </div>
+      ) : null}
 
-            {snapshots.length > 0 && selectedSnapshotId ? (
-              <Button
-                variant='destructive'
-                onClick={handleRollback}
-                disabled={isRollingBack}
-              >
-                {isRollingBack
-                  ? '롤백 중..'
-                  : `"${selectedSnapshotId}" 롤백 실행`}
-              </Button>
-            ) : null}
-          </div>
-        </TabsContent>
+      {/* ── Log panel ── */}
+      {opsPanel === 'log' ? (
+        <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+          <h3 className='text-base font-bold'>발행 로그</h3>
 
-        {/* ════ 송출확인 탭 ════ */}
-        <TabsContent value='broadcast'>
-          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-            <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>송출 확인</h2>
-              <p className='text-xs text-white/60'>
-                현재 공개 중인 데이터의 요약과 실시간 송출 화면을 확인합니다.
-              </p>
-            </div>
+          <Button
+            variant='outline'
+            className='min-h-[48px] w-full'
+            onClick={loadPublishLog}
+            disabled={isLoadingLog}
+          >
+            {isLoadingLog ? '조회 중..' : '로그 조회'}
+          </Button>
 
-            <a
-              href={broadcastUrl}
-              target='_blank'
-              rel='noreferrer'
-              className='inline-flex h-9 items-center gap-2 rounded-md border border-[#ff2a00]/30 bg-[#ff2a00]/10 px-4 text-sm font-semibold text-[#ffd6cf] transition-colors hover:bg-[#ff2a00]/20'
-            >
-              실시간 송출 화면 열기 &rarr;
-            </a>
-
-            {/* 순위 미리보기 */}
-            <div className='rounded-xl border border-white/10 bg-white/[0.02] p-4'>
-              <div className='flex items-center justify-between'>
-                <h3 className='text-sm font-bold text-white'>
-                  {
-                    OPS_REGION_OPTIONS.find((option) => option.value === region)
-                      ?.label
-                  }{' '}
-                  지역 순위
-                </h3>
-                <span className='text-xs text-white/45'>
-                  {lastFeedAt ? `DB ${lastFeedAt} 갱신` : '갱신 대기'}
-                </span>
-              </div>
-
-              {feedError ? (
-                <p className='mt-3 rounded-md border border-red-300/25 bg-red-500/10 px-3 py-2 text-xs text-red-100'>
-                  {feedError}
-                </p>
-              ) : null}
-
-              {finalRanking.length === 0 ? (
-                <p className='mt-3 text-xs text-white/60'>
-                  운영 DB에 순위 데이터가 없습니다.
-                </p>
-              ) : (
-                <div className='mt-3 overflow-x-auto rounded-lg border border-white/10'>
-                  <table className='min-w-full text-left text-xs'>
-                    <thead className='bg-white/[0.07] text-white/70'>
-                      <tr>
-                        <th className='px-3 py-2'>순위</th>
-                        <th className='px-3 py-2'>동더 네임</th>
-                        <th className='px-3 py-2'>전적</th>
-                        <th className='px-3 py-2'>상태</th>
+          {publishLog.length > 0 ? (
+            <div className='overflow-x-auto rounded-lg border border-white/[0.08]'>
+              <table className='min-w-full text-left text-xs'>
+                <thead className='bg-white/[0.05] text-white/50'>
+                  <tr>
+                    <th className='px-3 py-2'>ID</th>
+                    <th className='px-3 py-2'>모드</th>
+                    <th className='px-3 py-2'>시각</th>
+                    <th className='px-3 py-2'>행</th>
+                  </tr>
+                </thead>
+                <tbody className='divide-y divide-white/[0.06]'>
+                  {publishLog.map((entry, i) => {
+                    const mode = String(entry.mode ?? '')
+                    const modeColor =
+                      mode === 'rollback'
+                        ? 'text-red-300 bg-red-500/10'
+                        : mode === 'replace'
+                          ? 'text-orange-300 bg-orange-500/10'
+                          : mode === 'commit'
+                            ? 'text-white/60 bg-white/[0.06]'
+                            : 'text-blue-300 bg-blue-500/10'
+                    return (
+                      <tr key={i}>
+                        <td className='px-3 py-2 font-mono text-white/70'>
+                          {String(entry.publishId ?? '')}
+                        </td>
+                        <td className='px-3 py-2'>
+                          <span
+                            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${modeColor}`}
+                          >
+                            {mode || '?'}
+                          </span>
+                        </td>
+                        <td className='px-3 py-2 text-white/50'>
+                          {entry.publishedAt
+                            ? new Date(
+                                String(entry.publishedAt)
+                              ).toLocaleString('ko-KR')
+                            : ''}
+                        </td>
+                        <td className='px-3 py-2 font-mono text-white/50'>
+                          {String(entry.totalRows ?? '')}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className='divide-y divide-white/[0.07]'>
-                      {finalRanking.slice(0, 8).map((row) => (
-                        <tr key={`${row.entryId}-${row.rank}`}>
-                          <td className='px-3 py-2 font-bold text-[#ff2a00]'>
-                            {row.rank}
-                          </td>
-                          <td className='px-3 py-2 text-white/85'>
-                            {row.nickname}
-                            <span className='ml-1 font-mono text-xs text-white/45'>
-                              ({row.entryId})
-                            </span>
-                          </td>
-                          <td className='px-3 py-2 text-white/70 tabular-nums'>
-                            {typeof row.wins === 'number' &&
-                            typeof row.losses === 'number'
-                              ? `${row.wins}-${row.losses}`
-                              : '-'}
-                          </td>
-                          <td className='px-3 py-2 text-white/65'>
-                            {row.statusLabel}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
+          ) : null}
+        </div>
+      ) : null}
 
-            {/* 경기 진행 요약 */}
-            <div className='rounded-xl border border-white/10 bg-white/[0.02] p-4'>
-              <h3 className='text-sm font-bold text-white'>경기 진행 요약</h3>
-              <div className='mt-3 grid gap-2 text-xs md:grid-cols-2'>
-                <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
-                  <span className='text-white/55'>Swiss 진행:</span>{' '}
-                  <span className='font-semibold text-white/80'>
-                    {swissProgress.completed}/{swissProgress.total}
-                  </span>
-                </div>
-                <div className='rounded-lg border border-[#ff2a00]/20 bg-[#ff2a00]/5 px-3 py-2'>
-                  <span className='text-white/55'>Top8 진행:</span>{' '}
-                  <span className='font-semibold text-white/80'>
-                    {finalsProgress.completed}/{finalsProgress.total}
-                  </span>
-                </div>
-                <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                  <span className='text-white/55'>현재 Swiss:</span>{' '}
-                  <span className='font-semibold text-white/80'>
-                    {matchLine(swissProgress.current)}
-                  </span>
-                </div>
-                <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                  <span className='text-white/55'>현재 Top8:</span>{' '}
-                  <span className='font-semibold text-white/80'>
-                    {matchLine(finalsProgress.current)}
-                  </span>
-                </div>
-                <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                  <span className='text-white/55'>A그룹:</span>{' '}
-                  <span className='font-semibold text-white/80'>
-                    {regionArchive?.qualifiers.groupA
-                      ? `${regionArchive.qualifiers.groupA.nickname} (${regionArchive.qualifiers.groupA.entryId})`
-                      : '미확정'}
-                  </span>
-                </div>
-                <div className='rounded-lg border border-white/10 bg-black/25 px-3 py-2'>
-                  <span className='text-white/55'>B그룹:</span>{' '}
-                  <span className='font-semibold text-white/80'>
-                    {regionArchive?.qualifiers.groupB
-                      ? `${regionArchive.qualifiers.groupB.nickname} (${regionArchive.qualifiers.groupB.entryId})`
-                      : '미확정'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-
-        {/* ════ 로그 탭 ════ */}
-        <TabsContent value='log'>
-          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5'>
-            <div className='space-y-1.5'>
-              <h2 className='text-base font-bold text-white'>발행 로그</h2>
-              <p className='text-xs text-white/60'>
-                송출/롤백/커밋 이력을 확인합니다 (최근 50건).
-              </p>
-            </div>
-
+      {/* ── Utility panel ── */}
+      {opsPanel === 'utility' ? (
+        <div className='mb-3 space-y-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-4'>
+          <h3 className='text-base font-bold'>유틸리티</h3>
+          <div className='space-y-2'>
             <Button
               variant='outline'
-              onClick={loadPublishLog}
-              disabled={isLoadingLog}
+              className='min-h-[48px] w-full'
+              onClick={handleInitOpsTabs}
+              disabled={isInitRunning}
             >
-              {isLoadingLog ? '조회 중..' : '발행 로그 조회'}
+              {isInitRunning ? '초기화 중..' : '운영 DB 탭 초기화'}
             </Button>
-
-            {publishLog.length > 0 ? (
-              <div className='overflow-x-auto rounded-lg border border-white/10'>
-                <table className='min-w-full text-left text-xs'>
-                  <thead className='bg-white/[0.07] text-white/70'>
-                    <tr>
-                      <th className='px-3 py-2'>ID</th>
-                      <th className='px-3 py-2'>모드</th>
-                      <th className='px-3 py-2'>시각</th>
-                      <th className='px-3 py-2'>시즌</th>
-                      <th className='px-3 py-2'>지역</th>
-                      <th className='px-3 py-2'>행</th>
-                    </tr>
-                  </thead>
-                  <tbody className='divide-y divide-white/[0.07]'>
-                    {publishLog.map((entry, i) => {
-                      const mode = String(entry.mode ?? '')
-                      const modeColor =
-                        mode === 'rollback'
-                          ? 'text-red-300 bg-red-500/10 border-red-300/25'
-                          : mode === 'replace'
-                            ? 'text-orange-300 bg-orange-500/10 border-orange-300/25'
-                            : mode === 'commit'
-                              ? 'text-white/60 bg-white/[0.06] border-white/15'
-                              : 'text-blue-300 bg-blue-500/10 border-blue-300/25'
-                      return (
-                        <tr key={i}>
-                          <td className='px-3 py-2 font-mono text-xs text-white/80'>
-                            {String(entry.publishId ?? '')}
-                          </td>
-                          <td className='px-3 py-2'>
-                            <span
-                              className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${modeColor}`}
-                            >
-                              {mode || '?'}
-                            </span>
-                          </td>
-                          <td className='px-3 py-2 text-white/60'>
-                            {entry.publishedAt
-                              ? new Date(
-                                  String(entry.publishedAt)
-                                ).toLocaleString('ko-KR')
-                              : ''}
-                          </td>
-                          <td className='px-3 py-2 text-white/60'>
-                            {String(entry.season ?? '')}
-                          </td>
-                          <td className='px-3 py-2 text-white/60'>
-                            {String(entry.region ?? '')}
-                          </td>
-                          <td className='px-3 py-2 text-white/60 tabular-nums'>
-                            {String(entry.totalRows ?? '')}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : null}
+            <Button
+              variant='outline'
+              className='min-h-[48px] w-full'
+              onClick={handleWriteOpsGuide}
+              disabled={isGuideRunning}
+            >
+              {isGuideRunning ? 'Writing..' : 'Write ops guide sheet'}
+            </Button>
           </div>
-        </TabsContent>
-      </Tabs>
-    </TkcSection>
+        </div>
+      ) : null}
+
+      {/* spacer for sticky save bar */}
+      <div className='h-20' />
+
+      {/* ════ STICKY SAVE BAR ════ */}
+      <div className='fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-lg gap-2.5 border-t border-white/[0.08] bg-[#0b0b10]/95 px-4 py-3 backdrop-blur-sm'>
+        <Button
+          onClick={handleSaveRow}
+          disabled={isSaving}
+          className='min-h-[52px] flex-1 bg-[#ff2a00] text-base font-bold hover:bg-[#ff2a00]/90'
+        >
+          {isSaving ? '저장 중..' : 'DB 저장'}
+        </Button>
+        <Button
+          variant='outline'
+          onClick={resetDraft}
+          disabled={isSaving}
+          className='min-h-[52px] min-w-[80px]'
+        >
+          초기화
+        </Button>
+      </div>
+    </div>
   )
 }

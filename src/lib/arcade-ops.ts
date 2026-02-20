@@ -696,6 +696,7 @@ export type OpsRegionParticipant = {
   nickname: string
   seed?: number
   status?: ArcadeStandingRow['status']
+  offlineSongs?: string[]
 }
 
 function numToDraft(value?: number) {
@@ -933,6 +934,21 @@ export function buildRegionParticipants(
 
   mergeParticipant(map, region.qualifiers.groupA)
   mergeParticipant(map, region.qualifiers.groupB)
+
+  if (region.registrations) {
+    // Registrations are keyed by nickname (from ops_registrations sheet)
+    // Match to participants by nickname (trimmed) to merge offlineSongs
+    for (const [nickname, reg] of Object.entries(region.registrations)) {
+      if (!reg.offlineSongs) continue
+      const normalizedNickname = nickname.trim()
+      for (const [entryId, p] of map.entries()) {
+        if (p.nickname.trim() === normalizedNickname) {
+          map.set(entryId, { ...p, offlineSongs: reg.offlineSongs })
+          break
+        }
+      }
+    }
+  }
 
   return [...map.values()].sort((a, b) => {
     const aSeed = typeof a.seed === 'number' ? a.seed : Number.MAX_SAFE_INTEGER
