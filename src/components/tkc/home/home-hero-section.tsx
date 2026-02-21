@@ -5,9 +5,10 @@ import { useCanHover } from '@/components/tkc/home/use-can-hover'
 
 const HERO_ASSETS = {
   heroBg: '/branding/v2/hero-bg.webp',
+  // Asset file names are historical; keep mapping by visual role.
   heroMain: '/branding/v2/hero-title.webp',
-  heroSide: '/branding/v2/hero-side.webp',
-  heroTitle: '/branding/v2/hero-main.webp',
+  heroSide: '/branding/v2/hero-main.webp',
+  heroTitle: '/branding/v2/hero-side.webp',
 }
 
 const HERO_LAYER_COUNT = 4
@@ -81,7 +82,7 @@ export function HomeHeroSection() {
         heroAnimOn && 'hero-anim'
       )}
     >
-      <div className='relative h-[340px] sm:h-[380px] md:h-[520px] lg:h-[560px]'>
+      <div className='relative h-[320px] sm:h-[380px] md:h-[520px] lg:h-[560px]'>
         <div className='hero-layer hero-layer-bg absolute inset-0 z-[1] flex items-center justify-center'>
           <img
             src={HERO_ASSETS.heroBg}
@@ -94,11 +95,11 @@ export function HomeHeroSection() {
           />
         </div>
 
-        <div className='hero-layer hero-layer-side absolute inset-0 z-[2] flex items-center justify-center'>
+        <div className='hero-layer hero-layer-side absolute inset-0 z-[3] flex items-center justify-center'>
           <img
             src={HERO_ASSETS.heroSide}
             alt=''
-            className='h-full w-full object-cover object-[center_top] md:object-center'
+            className='hero-text-image h-full w-full object-contain'
             loading='eager'
             draggable={false}
             onLoad={markHeroLayerReady}
@@ -106,11 +107,11 @@ export function HomeHeroSection() {
           />
         </div>
 
-        <div className='hero-layer hero-layer-main absolute inset-0 z-[3] flex items-center justify-center'>
+        <div className='hero-layer hero-layer-main absolute inset-0 z-[2] flex items-center justify-center'>
           <img
             src={HERO_ASSETS.heroMain}
             alt=''
-            className='h-full w-full object-cover object-[center_top] md:object-center'
+            className='hero-main-image h-full w-full object-contain'
             loading='eager'
             draggable={false}
             onLoad={markHeroLayerReady}
@@ -122,7 +123,7 @@ export function HomeHeroSection() {
           <img
             src={HERO_ASSETS.heroTitle}
             alt=''
-            className='hero-title-image h-full w-full object-cover object-[center_top] md:object-center'
+            className='hero-title-image h-full w-full object-contain'
             loading='eager'
             draggable={false}
             onLoad={markHeroLayerReady}
