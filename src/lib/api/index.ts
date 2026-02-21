@@ -22,6 +22,16 @@ type ApiRequestOptions = {
   timeoutMs?: number
 }
 
+function isRateLimitedMessage(message: string) {
+  return /too many requests/i.test(message)
+}
+
+function shouldRetryReadRequest(failureCount: number, error: unknown) {
+  const message = error instanceof Error ? error.message : String(error ?? '')
+  if (isRateLimitedMessage(message)) return false
+  return failureCount < 2
+}
+
 function canUseStorage() {
   return (
     typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
@@ -158,6 +168,7 @@ export function useSite<T = unknown>() {
     initialData: persisted?.data,
     initialDataUpdatedAt: persisted?.updatedAt,
     staleTime: SITE_STALE_MS,
+    retry: shouldRetryReadRequest,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
@@ -176,6 +187,7 @@ export function useResults<T = unknown>() {
     initialData: persisted?.data,
     initialDataUpdatedAt: persisted?.updatedAt,
     staleTime: RESULTS_STALE_MS,
+    retry: shouldRetryReadRequest,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
@@ -197,6 +209,7 @@ export function useContent<T = unknown>(
     initialData: persisted?.data,
     initialDataUpdatedAt: persisted?.updatedAt,
     staleTime: CONTENT_STALE_MS,
+    retry: shouldRetryReadRequest,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
@@ -215,6 +228,7 @@ export function useSongs<T = unknown>() {
     initialData: persisted?.data,
     initialDataUpdatedAt: persisted?.updatedAt,
     staleTime: SONGS_STALE_MS,
+    retry: shouldRetryReadRequest,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   })
@@ -233,6 +247,7 @@ export function useSongPools<T = unknown>() {
     initialData: persisted?.data,
     initialDataUpdatedAt: persisted?.updatedAt,
     staleTime: SONG_POOLS_STALE_MS,
+    retry: shouldRetryReadRequest,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   })

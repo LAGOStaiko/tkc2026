@@ -13,7 +13,7 @@ const registerRateConfig = (env: RegisterEnv) =>
   buildRateLimitConfig(env, {
     prefix: "register:rate-limit",
     defaultWindowMs: 10 * 60 * 1000, // 10 minutes
-    defaultMax: 10,                   // 10 requests per window
+    defaultMax: 30,                   // 30 requests per window
   });
 
 const trimString = (value: unknown) => {
