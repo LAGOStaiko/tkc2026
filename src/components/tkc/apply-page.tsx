@@ -21,6 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { FadeIn } from '@/components/tkc/guide-shared'
 import { PageHero } from '@/components/tkc/layout'
 import { REGISTER_LIMITS as L } from '../../../shared/register-limits'
@@ -252,6 +260,17 @@ function SectionDivider() {
   return <div className='my-7 h-px bg-[#1e1e1e]' />
 }
 
+function ConfirmRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className='flex gap-3 border-b border-white/[0.04] py-2.5 last:border-b-0'>
+      <span className='w-[100px] shrink-0 text-[13px] font-semibold text-white/50'>
+        {label}
+      </span>
+      <span className='break-all text-[14px] text-white/90'>{value}</span>
+    </div>
+  )
+}
+
 function SectionLabel({ title, desc }: { title: string; desc?: string }) {
   return (
     <div className='mb-5'>
@@ -302,6 +321,8 @@ export function ApplyPage() {
   )
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || undefined
 
+  const [confirmOpen, setConfirmOpen] = React.useState(false)
+  const [pendingValues, setPendingValues] = React.useState<ApplyFormValues | null>(null)
   const [privacyOpen, setPrivacyOpen] = React.useState(false)
   const [videoGuideOpen, setVideoGuideOpen] = React.useState(false)
 
@@ -457,7 +478,8 @@ export function ApplyPage() {
     toast.error('입력 내용을 확인해주세요.', { description: message })
   }
 
-  const onSubmit = async (values: ApplyFormValues) => {
+  const onShowConfirm = (values: ApplyFormValues) => {
+    // Turnstile check before showing modal
     if (turnstileSiteKey && !values.turnstileToken?.trim()) {
       window.turnstile?.reset?.()
       form.setError('turnstileToken', {
@@ -469,6 +491,12 @@ export function ApplyPage() {
       })
       return
     }
+    setPendingValues(values)
+    setConfirmOpen(true)
+  }
+
+  const onSubmit = async (values: ApplyFormValues) => {
+    setConfirmOpen(false)
 
     const payload: RegisterPayload = {
       division: values.division,
@@ -575,7 +603,7 @@ export function ApplyPage() {
 
           {/* Form body */}
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)}>
+            <form onSubmit={form.handleSubmit(onShowConfirm, onInvalidSubmit)}>
               <div className='p-7 sm:p-9'>
                 {/* Honeypot */}
                 <input
@@ -1295,6 +1323,123 @@ export function ApplyPage() {
           </Form>
         </div>
       </FadeIn>
+
+      {/* ── Confirmation Modal ── */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent
+          showCloseButton={false}
+          className='max-w-[480px] gap-0 overflow-hidden rounded-2xl border-[#1e1e1e] bg-[#111] p-0 shadow-[0_25px_50px_rgba(0,0,0,0.5)]'
+        >
+          <DialogHeader className='border-b border-[#1e1e1e] px-6 py-5'>
+            <DialogTitle className='text-[18px] font-bold text-white/90'>
+              입력 정보 확인
+            </DialogTitle>
+            <DialogDescription className='mt-1 text-[13px] text-white/40'>
+              아래 내용이 맞는지 확인한 뒤 제출해 주세요.
+            </DialogDescription>
+          </DialogHeader>
+
+          {pendingValues && (
+            <div className='max-h-[50vh] overflow-y-auto px-6 py-5'>
+              <div className='space-y-0'>
+                <ConfirmRow
+                  label='부문'
+                  value={
+                    pendingValues.division === 'console'
+                      ? '콘솔'
+                      : '아케이드'
+                  }
+                />
+                <ConfirmRow label='이름' value={pendingValues.name} />
+                <ConfirmRow label='동더 네임' value={pendingValues.nickname} />
+                <ConfirmRow label='전화번호' value={pendingValues.phone} />
+                <ConfirmRow label='이메일' value={pendingValues.email} />
+                <ConfirmRow
+                  label='남코 아이디'
+                  value={pendingValues.namcoId}
+                />
+
+                {pendingValues.division === 'console' && (
+                  <ConfirmRow
+                    label='동영상 링크'
+                    value={pendingValues.videoLink || ''}
+                  />
+                )}
+
+                {pendingValues.division === 'arcade' && (
+                  <>
+                    <ConfirmRow
+                      label='동더 광장 북번호'
+                      value={pendingValues.dohirobaNo || ''}
+                    />
+                    <ConfirmRow
+                      label='예선 지역'
+                      value={
+                        REGIONS.find(
+                          (r) => r.value === pendingValues.qualifierRegion
+                        )?.label ?? pendingValues.qualifierRegion ?? ''
+                      }
+                    />
+                    <ConfirmRow
+                      label='우선 선곡'
+                      value={[
+                        pendingValues.offlineSong1,
+                        pendingValues.offlineSong2,
+                        pendingValues.offlineSong3,
+                        pendingValues.offlineSong4,
+                      ]
+                        .filter(Boolean)
+                        .map(
+                          (s) => parseSongOption(s!)?.label ?? s
+                        )
+                        .join(', ')}
+                    />
+                  </>
+                )}
+
+                <ConfirmRow
+                  label='직관 참여'
+                  value={pendingValues.spectator ? '신청' : '미신청'}
+                />
+                <ConfirmRow
+                  label='미성년자'
+                  value={pendingValues.isMinor ? '예' : '아니오'}
+                />
+                {pendingValues.isMinor && pendingValues.consentLink && (
+                  <ConfirmRow
+                    label='보호자 동의서'
+                    value={pendingValues.consentLink}
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className='flex-row gap-3 border-t border-[#1e1e1e] px-6 py-4'>
+            <button
+              type='button'
+              disabled={isSubmitting}
+              onClick={() => setConfirmOpen(false)}
+              className='flex-1 cursor-pointer rounded-[10px] border border-[#2a2a2a] bg-transparent px-4 py-3 text-[14px] font-semibold text-white/70 transition-all hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-50'
+            >
+              수정하기
+            </button>
+            <button
+              type='button'
+              disabled={isSubmitting}
+              onClick={() => {
+                if (pendingValues) onSubmit(pendingValues)
+              }}
+              className='flex-1 cursor-pointer rounded-[10px] bg-[#e74c3c] px-4 py-3 text-[14px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50'
+              style={{
+                boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
+              }}
+            >
+              {isSubmitting ? t('apply.submitting') : '제출하기'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* ── Footer ── */}
       <footer className='border-t border-[#1e1e1e] py-10 text-center'>

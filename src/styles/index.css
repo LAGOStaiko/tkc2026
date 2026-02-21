@@ -923,17 +923,17 @@
   animation: hero-title-slam 1s cubic-bezier(0.22, 1, 0.36, 1) 1.5s both;
 }
 .hero-title-image {
-  transform: translateY(44px) scale(0.6);
+  transform: translateY(26px) scale(0.72);
   transform-origin: center center;
 }
 @media (min-width: 768px) {
   .hero-title-image {
-    transform: translateY(62px) scale(0.53);
+    transform: translateY(30px) scale(0.68);
   }
 }
 @media (min-width: 1024px) {
   .hero-title-image {
-    transform: translateY(78px) scale(0.47);
+    transform: translateY(34px) scale(0.7);
   }
 }
 
