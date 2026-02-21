@@ -122,7 +122,7 @@ export function HomeHeroSection() {
           <img
             src={HERO_ASSETS.heroTitle}
             alt=''
-            className='h-full w-full object-cover object-[center_top] md:object-center'
+            className='hero-title-image h-full w-full object-cover object-[center_top] md:object-center'
             loading='eager'
             draggable={false}
             onLoad={markHeroLayerReady}
