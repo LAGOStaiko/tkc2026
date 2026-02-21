@@ -8,6 +8,14 @@ import { ChevronDown, Download } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRegister, useSite, useSongPools } from '@/lib/api'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   Form,
   FormControl,
   FormField,
@@ -21,14 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { FadeIn } from '@/components/tkc/guide-shared'
 import { PageHero } from '@/components/tkc/layout'
 import { REGISTER_LIMITS as L } from '../../../shared/register-limits'
@@ -266,7 +266,7 @@ function ConfirmRow({ label, value }: { label: string; value: string }) {
       <span className='w-[100px] shrink-0 text-[13px] font-semibold text-white/50'>
         {label}
       </span>
-      <span className='break-all text-[14px] text-white/90'>{value}</span>
+      <span className='text-[14px] break-all text-white/90'>{value}</span>
     </div>
   )
 }
@@ -322,7 +322,8 @@ export function ApplyPage() {
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || undefined
 
   const [confirmOpen, setConfirmOpen] = React.useState(false)
-  const [pendingValues, setPendingValues] = React.useState<ApplyFormValues | null>(null)
+  const [pendingValues, setPendingValues] =
+    React.useState<ApplyFormValues | null>(null)
   const [privacyOpen, setPrivacyOpen] = React.useState(false)
   const [videoGuideOpen, setVideoGuideOpen] = React.useState(false)
 
@@ -1345,19 +1346,14 @@ export function ApplyPage() {
                 <ConfirmRow
                   label='부문'
                   value={
-                    pendingValues.division === 'console'
-                      ? '콘솔'
-                      : '아케이드'
+                    pendingValues.division === 'console' ? '콘솔' : '아케이드'
                   }
                 />
                 <ConfirmRow label='이름' value={pendingValues.name} />
                 <ConfirmRow label='동더 네임' value={pendingValues.nickname} />
                 <ConfirmRow label='전화번호' value={pendingValues.phone} />
                 <ConfirmRow label='이메일' value={pendingValues.email} />
-                <ConfirmRow
-                  label='남코 아이디'
-                  value={pendingValues.namcoId}
-                />
+                <ConfirmRow label='남코 아이디' value={pendingValues.namcoId} />
 
                 {pendingValues.division === 'console' && (
                   <ConfirmRow
@@ -1377,7 +1373,9 @@ export function ApplyPage() {
                       value={
                         REGIONS.find(
                           (r) => r.value === pendingValues.qualifierRegion
-                        )?.label ?? pendingValues.qualifierRegion ?? ''
+                        )?.label ??
+                        pendingValues.qualifierRegion ??
+                        ''
                       }
                     />
                     <ConfirmRow
@@ -1389,9 +1387,7 @@ export function ApplyPage() {
                         pendingValues.offlineSong4,
                       ]
                         .filter(Boolean)
-                        .map(
-                          (s) => parseSongOption(s!)?.label ?? s
-                        )
+                        .map((s) => parseSongOption(s!)?.label ?? s)
                         .join(', ')}
                     />
                   </>
