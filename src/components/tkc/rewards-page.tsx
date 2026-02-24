@@ -129,7 +129,7 @@ const HIDDEN_STYLE = {
   filter: 'brightness(0.4)',
 }
 
-function RewardsNameplateCarousel() {
+function RewardsNameplateCarousel({ ready }: { ready: boolean }) {
   const [current, setCurrent] = useState(0)
   const [labelVisible, setLabelVisible] = useState(true)
   const timerRef = useRef<number | null>(null)
@@ -150,11 +150,13 @@ function RewardsNameplateCarousel() {
   }, [count])
 
   useEffect(() => {
-    startAutoTimer()
+    if (!ready) return
+    const delay = window.setTimeout(() => startAutoTimer(), 600)
     return () => {
+      window.clearTimeout(delay)
       if (timerRef.current != null) clearInterval(timerRef.current)
     }
-  }, [startAutoTimer])
+  }, [ready, startAutoTimer])
 
   const goTo = useCallback(
     (index: number) => {
@@ -185,7 +187,15 @@ function RewardsNameplateCarousel() {
   }
 
   return (
-    <div className='group/carousel relative overflow-hidden rounded-[14px] border border-[#f5a623]/15 bg-[radial-gradient(ellipse_at_50%_60%,_rgba(200,40,30,0.12)_0%,_rgba(245,166,35,0.04)_40%,_rgba(17,17,17,0.95)_80%)]'>
+    <div
+      className='group/carousel relative overflow-hidden rounded-[14px] border border-[#f5a623]/15 bg-[radial-gradient(ellipse_at_50%_60%,_rgba(200,40,30,0.12)_0%,_rgba(245,166,35,0.04)_40%,_rgba(17,17,17,0.95)_80%)] transition-all duration-800 ease-[cubic-bezier(0.34,1.56,0.64,1)]'
+      style={{
+        opacity: ready ? 1 : 0,
+        transform: ready
+          ? 'translateY(0) scale(1)'
+          : 'translateY(36px) scale(0.88)',
+      }}
+    >
       <div
         className='relative flex h-[320px] cursor-grab items-center justify-center overflow-hidden active:cursor-grabbing md:h-[360px]'
         style={{ perspective: '800px' }}
@@ -205,7 +215,7 @@ function RewardsNameplateCarousel() {
           return (
             <div
               key={slide.label}
-              className='absolute w-[180px] origin-center transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[transform,opacity] md:w-[200px]'
+              className='absolute w-[180px] origin-center transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[transform,opacity] md:w-[200px]'
               style={{
                 transform: style.transform,
                 zIndex: style.zIndex,
@@ -249,7 +259,7 @@ function RewardsNameplateCarousel() {
       <div className='pb-1 text-center'>
         <span
           className={cn(
-            'inline-block text-[13px] font-bold tracking-[1px] text-[#f5a623] transition-all duration-400',
+            'inline-block text-[13px] font-bold tracking-[1px] text-[#f5a623] transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)]',
             labelVisible
               ? 'translate-y-0 opacity-100'
               : 'translate-y-1 opacity-0'
@@ -265,7 +275,7 @@ function RewardsNameplateCarousel() {
             key={slide.label}
             onClick={() => move(i - current)}
             className={cn(
-              'h-[5px] rounded-full transition-all duration-350',
+              'h-[5px] rounded-full transition-all duration-350 ease-[cubic-bezier(0.22,1,0.36,1)]',
               i === current
                 ? 'w-[20px] bg-[#f5a623] shadow-[0_0_8px_rgba(245,166,35,0.3)]'
                 : 'w-[5px] bg-[#f5a623]/15 hover:bg-[#f5a623]/40'
@@ -277,9 +287,17 @@ function RewardsNameplateCarousel() {
   )
 }
 
-function TitleHero() {
+function TitleHero({ visible }: { visible: boolean }) {
   return (
-    <div className='relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-[14px] border border-[#e74c3c]/12 bg-[radial-gradient(ellipse_at_50%_55%,_rgba(231,76,60,0.08)_0%,_rgba(231,76,60,0.02)_50%,_rgba(17,17,17,0.98)_80%)] px-6 py-14 text-center md:py-16'>
+    <div
+      className='relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-[14px] border border-[#e74c3c]/12 bg-[radial-gradient(ellipse_at_50%_55%,_rgba(231,76,60,0.08)_0%,_rgba(231,76,60,0.02)_50%,_rgba(17,17,17,0.98)_80%)] px-6 py-14 text-center transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:py-16'
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible
+          ? 'translateY(0) scale(1)'
+          : 'translateY(18px) scale(0.97)',
+      }}
+    >
       <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_rgba(231,76,60,0.06)_0%,_transparent_50%)]' />
       <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_rgba(231,76,60,0.04)_0%,_transparent_50%)]' />
       <div
@@ -468,6 +486,7 @@ function NameplateBanner() {
   const [tag2On, setTag2On] = useState(false)
   const [tag3On, setTag3On] = useState(false)
   const [shimmerOn, setShimmerOn] = useState(false)
+  const [carouselReady, setCarouselReady] = useState(false)
 
   useEffect(() => {
     return () => {
@@ -491,6 +510,7 @@ function NameplateBanner() {
         setTag2On(true)
         setTag3On(true)
         setShimmerOn(true)
+        setCarouselReady(true)
         return
       }
 
@@ -520,6 +540,7 @@ function NameplateBanner() {
       schedule(() => setFlowStage(5), tStep3)
       schedule(() => setTag3On(true), tStep3 + cardDur + tagDelay)
       schedule(() => setShimmerOn(true), tDone + 90)
+      schedule(() => setCarouselReady(true), tDone + 350)
     }, 0)
 
     timersRef.current.push(kickId)
@@ -639,7 +660,7 @@ function NameplateBanner() {
           </div>
         </div>
 
-        <RewardsNameplateCarousel />
+        <RewardsNameplateCarousel ready={carouselReady} />
       </div>
     </BannerFrame>
   )
@@ -650,11 +671,9 @@ function TitleBanner() {
   const red = '#e74c3c'
   const { ref, seen } = useOnceInView<HTMLDivElement>({ threshold: 0.18 })
   const { ref: calloutsRef, seen: calloutsSeen } =
-    useOnceInView<HTMLDivElement>({
-      threshold: 0.18,
-    })
+    useOnceInView<HTMLDivElement>({ threshold: 0.25 })
   const { ref: chipsRef, seen: chipsSeen } = useOnceInView<HTMLDivElement>({
-    threshold: 0.18,
+    threshold: 0.25,
   })
 
   const hasStartedRef = useRef(false)
@@ -816,18 +835,19 @@ function TitleBanner() {
             </div>
           </div>
 
-          <TitleHero />
+          <TitleHero visible={stage >= 2} />
 
           <div ref={calloutsRef} className='grid gap-2 md:grid-cols-3'>
             {callouts.map((x, i) => (
               <div
                 key={x.text}
-                className={cn(
-                  'rewards-callout flex items-center gap-2 rounded-xl border px-4 py-3 text-[13px] font-semibold text-white/75',
-                  calloutsOn && 'is-on'
-                )}
+                className='flex items-center gap-2 rounded-xl border px-4 py-3 text-[13px] font-semibold text-white/75 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
                 style={{
-                  animationDelay: `${i * 140}ms`,
+                  opacity: calloutsOn ? 1 : 0,
+                  transform: calloutsOn
+                    ? 'translateY(0)'
+                    : 'translateY(12px)',
+                  transitionDelay: calloutsOn ? `${i * 140}ms` : '0ms',
                   background: 'rgba(231,76,60,0.04)',
                   borderColor: 'rgba(231,76,60,0.12)',
                 }}
@@ -875,12 +895,13 @@ function TitleBanner() {
               return (
                 <span
                   key={chip.label}
-                  className={cn(
-                    'rewards-chip inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-semibold',
-                    chipsOn && 'is-on'
-                  )}
+                  className='inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
                   style={{
-                    animationDelay: `${i * 90}ms`,
+                    opacity: chipsOn ? 1 : 0,
+                    transform: chipsOn
+                      ? 'translateY(0) scale(1)'
+                      : 'translateY(-10px) scale(0.96)',
+                    transitionDelay: chipsOn ? `${i * 90}ms` : '0ms',
                     background: tone.bg,
                     borderColor: tone.border,
                     color: tone.color,
@@ -899,117 +920,202 @@ function TitleBanner() {
 
 function PlaqueBanner() {
   const purple = '#8b5cf6'
+  const { ref, seen } = useOnceInView<HTMLDivElement>({ threshold: 0.18 })
+  const { ref: previewRef, seen: previewSeen } =
+    useOnceInView<HTMLDivElement>({ threshold: 0.18 })
+  const { ref: chipsRef, seen: chipsSeen } = useOnceInView<HTMLDivElement>({
+    threshold: 0.18,
+  })
+
+  const hasStartedRef = useRef(false)
+  const timersRef = useRef<number[]>([])
+  const [stage, setStage] = useState(0)
+
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach((id) => window.clearTimeout(id))
+      timersRef.current = []
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!seen) return
+    if (hasStartedRef.current) return
+    hasStartedRef.current = true
+
+    const kickId = window.setTimeout(() => {
+      const reduceMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches
+      if (reduceMotion) {
+        setStage(3)
+        return
+      }
+
+      const isMobile = window.matchMedia('(max-width: 767px)').matches
+      const previewDelay = isMobile ? 500 : 600
+      const chipsDelay = isMobile ? 400 : 480
+
+      const schedule = (fn: () => void, ms: number) => {
+        const id = window.setTimeout(fn, ms)
+        timersRef.current.push(id)
+      }
+
+      setStage(1)
+      schedule(() => setStage(2), previewDelay)
+      schedule(() => setStage(3), previewDelay + chipsDelay)
+    }, 0)
+
+    timersRef.current.push(kickId)
+  }, [seen])
+
+  const previewOn = stage >= 2 && previewSeen
+  const chipsOn = stage >= 3 && chipsSeen
+
+  const plaqueChips = [
+    {
+      label: '👑 우승',
+      cls: 'border-[#f5a623]/15 bg-[#f5a623]/10 text-[#f5a623]',
+    },
+    {
+      label: '준우승',
+      cls: 'border-[#a8b4c0]/12 bg-[#a8b4c0]/10 text-[#a8b4c0]',
+    },
+    {
+      label: '3위',
+      cls: 'border-[#cd7f32]/12 bg-[#cd7f32]/10 text-[#cd7f32]',
+    },
+    { label: '4위', cls: 'border-white/[0.08] bg-white/[0.04] text-white/50' },
+    {
+      label: '5~8위',
+      cls: 'border-white/[0.08] bg-white/[0.04] text-white/50',
+    },
+  ]
 
   return (
-    <BannerFrame
-      accent={purple}
-      borderClassName='border border-[#8b5cf6]/20'
-      background={`linear-gradient(135deg, ${purple}08 0%, transparent 60%)`}
-    >
-      <div className='mb-6 flex flex-wrap items-center gap-3'>
-        <div
-          className='flex size-10 items-center justify-center rounded-[10px] text-lg'
-          style={{
-            background: `${purple}14`,
-            border: `1px solid ${purple}1f`,
-          }}
-        >
-          🏆
-        </div>
-        <div>
-          <div className='flex flex-wrap items-center gap-1.5'>
-            <span
-              className='font-mono text-[11px] font-bold tracking-[1.5px] sm:text-[12px]'
-              style={{ color: purple }}
-            >
-              OFFICIAL PLAQUE
-            </span>
-            <span
-              className='rounded px-1.5 pt-[3px] pb-[1px] text-[11px] leading-none font-bold text-white sm:text-[12px]'
-              style={{ background: purple }}
-            >
-              콘솔
-            </span>
-          </div>
-          <h3 className='mt-1 text-[18px] font-extrabold tracking-tight break-keep text-white sm:text-[20px]'>
-            개발진 사인 공식 상패
-          </h3>
-        </div>
-      </div>
-
-      <p className='mb-6 max-w-xl text-[13px] leading-relaxed break-keep text-white/50 sm:text-sm'>
-        콘솔 부문 입상자에게 지급되는 태고의 달인 개발진 사인이 담긴 공식
-        상패입니다. 개발진이 직접 서명한 한정 상패로, TKC 2026 콘솔 부문
-        입상의 영예를 기념합니다.
-      </p>
-
-      <div
-        className='relative overflow-hidden rounded-[14px] border border-dashed'
-        style={{
-          borderColor: `${purple}40`,
-          background: `radial-gradient(ellipse at 50% 55%, ${purple}14 0%, ${purple}08 50%, rgba(17,17,17,0.98) 80%)`,
-        }}
+    <div ref={ref}>
+      <BannerFrame
+        accent={purple}
+        borderClassName='border border-[#8b5cf6]/20'
+        background={`linear-gradient(135deg, ${purple}08 0%, transparent 60%)`}
       >
-        <div
-          className='pointer-events-none absolute inset-0'
-          style={{
-            background: `radial-gradient(circle at 30% 20%, ${purple}0f 0%, transparent 50%)`,
-          }}
-        />
-        <div
-          className='pointer-events-none absolute inset-0'
-          style={{
-            background: `radial-gradient(circle at 70% 80%, ${purple}0a 0%, transparent 50%)`,
-          }}
-        />
+        <div className='flex flex-col gap-6'>
+          <div className={cn('rewards-enter', stage >= 1 && 'is-on')}>
+            <div className='flex flex-wrap items-center gap-3'>
+              <div
+                className='flex size-10 items-center justify-center rounded-[10px] text-lg'
+                style={{
+                  background: `${purple}14`,
+                  border: `1px solid ${purple}1f`,
+                }}
+              >
+                🏆
+              </div>
+              <div>
+                <div className='flex flex-wrap items-center gap-1.5'>
+                  <span
+                    className='font-mono text-[11px] font-bold tracking-[1.5px] sm:text-[12px]'
+                    style={{ color: purple }}
+                  >
+                    OFFICIAL PLAQUE
+                  </span>
+                  <span
+                    className='rounded px-1.5 pt-[3px] pb-[1px] text-[11px] leading-none font-bold text-white sm:text-[12px]'
+                    style={{ background: purple }}
+                  >
+                    콘솔
+                  </span>
+                </div>
+                <h3 className='mt-1 text-[18px] font-extrabold tracking-tight break-keep text-white sm:text-[20px]'>
+                  개발진 사인 공식 상패
+                </h3>
+              </div>
+            </div>
 
-        <div className='flex min-h-[220px] flex-col items-center justify-center gap-3 p-8 text-center md:min-h-[260px] md:p-10'>
-          <span
-            className='font-mono text-[11px] font-bold uppercase tracking-[2.5px] sm:text-[12px]'
-            style={{ color: `${purple}73` }}
-          >
-            CONSOLE DIVISION
-          </span>
+            <p className='mt-4 max-w-xl text-[13px] leading-relaxed break-keep text-white/50 sm:text-sm'>
+              콘솔 부문 입상자에게 지급되는 태고의 달인 개발진 사인이 담긴 공식
+              상패입니다. 개발진이 직접 서명한 한정 상패로, TKC 2026 콘솔 부문
+              입상의 영예를 기념합니다.
+            </p>
+          </div>
+
           <div
-            className='h-0.5 w-10 rounded-full'
+            ref={previewRef}
+            className='relative overflow-hidden rounded-[14px] border border-dashed transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]'
             style={{
-              background: `linear-gradient(90deg, transparent, ${purple}80, transparent)`,
-            }}
-          />
-          <span className='text-sm font-bold text-white/30'>
-            상패 디자인 미리보기
-          </span>
-          <span
-            className='rounded-md border px-3 py-1 font-mono text-[11px] font-bold tracking-[1.5px]'
-            style={{
-              color: `${purple}66`,
-              background: `${purple}0a`,
-              borderColor: `${purple}1a`,
+              opacity: previewOn ? 1 : 0,
+              transform: previewOn
+                ? 'translateY(0) scale(1)'
+                : 'translateY(18px) scale(0.97)',
+              borderColor: `${purple}40`,
+              background: `radial-gradient(ellipse at 50% 55%, ${purple}14 0%, ${purple}08 50%, rgba(17,17,17,0.98) 80%)`,
             }}
           >
-            COMING SOON
-          </span>
-        </div>
-      </div>
+            <div
+              className='pointer-events-none absolute inset-0'
+              style={{
+                background: `radial-gradient(circle at 30% 20%, ${purple}0f 0%, transparent 50%)`,
+              }}
+            />
+            <div
+              className='pointer-events-none absolute inset-0'
+              style={{
+                background: `radial-gradient(circle at 70% 80%, ${purple}0a 0%, transparent 50%)`,
+              }}
+            />
 
-      <div className='mt-6 flex flex-wrap gap-2'>
-        <span className='inline-flex items-center gap-1 rounded-md border border-[#f5a623]/15 bg-[#f5a623]/10 px-2.5 py-1 text-[12px] font-semibold text-[#f5a623]'>
-          👑 우승
-        </span>
-        <span className='inline-flex rounded-md border border-[#a8b4c0]/12 bg-[#a8b4c0]/10 px-2.5 py-1 text-[12px] font-semibold text-[#a8b4c0]'>
-          준우승
-        </span>
-        <span className='inline-flex rounded-md border border-[#cd7f32]/12 bg-[#cd7f32]/10 px-2.5 py-1 text-[12px] font-semibold text-[#cd7f32]'>
-          3위
-        </span>
-        <span className='inline-flex rounded-md border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[12px] font-semibold text-white/50'>
-          4위
-        </span>
-        <span className='inline-flex rounded-md border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[12px] font-semibold text-white/50'>
-          5~8위
-        </span>
-      </div>
-    </BannerFrame>
+            <div className='flex min-h-[220px] flex-col items-center justify-center gap-3 p-8 text-center md:min-h-[260px] md:p-10'>
+              <span
+                className='font-mono text-[11px] font-bold uppercase tracking-[2.5px] sm:text-[12px]'
+                style={{ color: `${purple}73` }}
+              >
+                CONSOLE DIVISION
+              </span>
+              <div
+                className='h-0.5 w-10 rounded-full'
+                style={{
+                  background: `linear-gradient(90deg, transparent, ${purple}80, transparent)`,
+                }}
+              />
+              <span className='text-sm font-bold text-white/30'>
+                상패 디자인 미리보기
+              </span>
+              <span
+                className='rounded-md border px-3 py-1 font-mono text-[11px] font-bold tracking-[1.5px]'
+                style={{
+                  color: `${purple}66`,
+                  background: `${purple}0a`,
+                  borderColor: `${purple}1a`,
+                }}
+              >
+                COMING SOON
+              </span>
+            </div>
+          </div>
+
+          <div ref={chipsRef} className='flex flex-wrap gap-2'>
+            {plaqueChips.map((chip, i) => (
+              <span
+                key={chip.label}
+                className={cn(
+                  'inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-[12px] font-semibold transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
+                  chip.cls
+                )}
+                style={{
+                  opacity: chipsOn ? 1 : 0,
+                  transform: chipsOn
+                    ? 'translateY(0) scale(1)'
+                    : 'translateY(-10px) scale(0.96)',
+                  transitionDelay: chipsOn ? `${i * 90}ms` : '0ms',
+                }}
+              >
+                {chip.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      </BannerFrame>
+    </div>
   )
 }
 

@@ -710,6 +710,16 @@
     pointer-events: none;
   }
 
+  .rewards-carousel {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+    will-change: opacity, transform;
+  }
+
+  .rewards-carousel.is-on {
+    animation: rewards-fade-up-scale 680ms var(--tkc-motion-ease) both;
+  }
+
   .rewards-callout {
     opacity: 0;
     transform: translateY(12px);
@@ -1071,6 +1081,7 @@
   .rewards-connector,
   .rewards-preview-curtain,
   .rewards-coming-pulse,
+  .rewards-carousel,
   .rewards-callout,
   .rewards-chip,
   .rewards-icon-float-glow,
