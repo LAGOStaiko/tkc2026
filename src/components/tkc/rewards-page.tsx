@@ -361,66 +361,6 @@ function BannerFrame({
   )
 }
 
-function PreviewSlot({
-  variant,
-  icon,
-  title,
-  desc,
-  pulse = false,
-  className,
-}: {
-  variant: 'gold' | 'red'
-  icon: string
-  title: string
-  desc: string
-  pulse?: boolean
-  className?: string
-}) {
-  const accent = variant === 'gold' ? '#f5a623' : '#e74c3c'
-
-  return (
-    <div
-      className={cn(
-        'relative overflow-hidden rounded-[14px] border border-dashed',
-        className
-      )}
-      style={{
-        borderColor: `${accent}40`,
-        background: `linear-gradient(135deg, ${accent}0d 0%, ${accent}05 100%)`,
-      }}
-    >
-      <div className='flex min-h-[200px] flex-col items-center justify-center gap-3 p-8 text-center md:p-10'>
-        <div
-          className='flex size-14 items-center justify-center rounded-[14px] text-2xl'
-          style={{
-            background: `${accent}14`,
-            border: `1px solid ${accent}1f`,
-          }}
-        >
-          {icon}
-        </div>
-        <div className='text-sm font-bold text-white/50'>{title}</div>
-        <div className='max-w-[280px] text-xs leading-relaxed text-white/25'>
-          {desc}
-        </div>
-        <div
-          className={cn(
-            'rounded-md border px-3 py-1 font-mono text-[11px] font-bold tracking-[1.5px]',
-            pulse && 'rewards-coming-pulse'
-          )}
-          style={{
-            color: `${accent}66`,
-            background: `${accent}0a`,
-            borderColor: `${accent}1a`,
-          }}
-        >
-          COMING SOON
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function FlowStep({
   accent,
   num,
