@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { ARCADE_SONGS } from '@/content/arcade-songs'
 import {
@@ -170,6 +170,32 @@ function CalloutCharIcon({
 /*  Page-specific components                                           */
 /* ════════════════════════════════════════════════════════════════════ */
 
+function StepConnector() {
+  return (
+    <div className='flex flex-col items-center py-1'>
+      <div className='h-5 w-px bg-gradient-to-b from-[#f5a623]/40 to-[#f5a623]/15' />
+      <div className='flex size-6 items-center justify-center rounded-full border border-[#f5a623]/25 bg-[#f5a623]/[0.06]'>
+        <svg
+          width='10'
+          height='10'
+          viewBox='0 0 10 10'
+          fill='none'
+          className='text-[#f5a623]'
+        >
+          <path
+            d='M5 1.5V8.5M5 8.5L2 5.5M5 8.5L8 5.5'
+            stroke='currentColor'
+            strokeWidth='1.5'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          />
+        </svg>
+      </div>
+      <div className='h-5 w-px bg-gradient-to-b from-[#f5a623]/15 to-transparent' />
+    </div>
+  )
+}
+
 function HighlightCard({
   title,
   tag,
@@ -200,29 +226,9 @@ function HighlightCard({
 }
 
 function AdvanceVisual() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [animated, setAnimated] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setAnimated(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.3 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
   return (
     <div
-      ref={ref}
-      className='relative overflow-hidden rounded-2xl border border-[#f5a623]/20 px-7 pt-10 pb-8 text-center'
+      className='relative overflow-hidden rounded-2xl border border-[#f5a623]/20 px-7 pt-8 pb-7 text-center'
       style={{
         background:
           'linear-gradient(180deg, rgba(245,166,35,0.06) 0%, rgba(10,10,10,0.9) 100%)',
@@ -232,48 +238,26 @@ function AdvanceVisual() {
       <div className='tkc-motion-glow pointer-events-none absolute -top-16 left-1/2 h-[260px] w-[260px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(245,166,35,0.18)_0%,transparent_70%)]' />
 
       {/* Ring */}
-      <div className='relative mx-auto mb-5 flex size-[100px] items-center justify-center rounded-full border-[3px] border-[#f5a623] shadow-[0_0_30px_rgba(245,166,35,0.2),inset_0_0_20px_rgba(245,166,35,0.05)]'>
+      <div className='relative mx-auto mb-4 flex size-[90px] items-center justify-center rounded-full border-[3px] border-[#f5a623] shadow-[0_0_30px_rgba(245,166,35,0.2),inset_0_0_20px_rgba(245,166,35,0.05)]'>
         <div className='absolute -inset-2 rounded-full border border-[#f5a623]/12' />
-        <div className='tkc-motion-spin-slow absolute -inset-4 rounded-full border border-dashed border-[#f5a623]/8' />
         <div className='flex items-baseline gap-0.5'>
-          <span className='text-[38px] leading-none font-extrabold text-[#f5a623]'>
+          <span className='text-[34px] leading-none font-extrabold text-[#f5a623]'>
             16
           </span>
-          <span className='text-base font-bold text-[#f5a623]/70'>명</span>
+          <span className='text-sm font-bold text-[#f5a623]/70'>명</span>
         </div>
       </div>
 
       <div className='text-[13px] font-semibold tracking-wide text-[#f5a623]'>
         스위스 스테이지 진출
       </div>
-      <div className='mt-1 text-[26px] font-extrabold tracking-tight text-white/90'>
+      <div className='mt-1 text-[24px] font-extrabold tracking-tight text-white/90'>
         차수별 Top 16
       </div>
-      <div className='mx-auto mt-2 mb-6 max-w-[300px] text-[13px] leading-[1.55] text-white/55'>
+      <div className='mx-auto mt-2 max-w-[300px] text-[13px] leading-[1.55] text-white/55'>
         해당 차수 통산 점수 상위 16명이
         <br />
         스위스 스테이지에 진출
-      </div>
-
-      {/* Slots */}
-      <div className='mx-auto flex max-w-[320px] flex-wrap justify-center gap-[5px]'>
-        {Array.from({ length: 16 }).map((_, i) => (
-          <div
-            key={i}
-            className='flex size-7 items-center justify-center rounded-[7px] border border-[#f5a623]/30 bg-[#f5a623]/12'
-            style={{
-              transform: animated ? 'scale(1)' : 'scale(0)',
-              opacity: animated ? 1 : 0,
-              transition: `transform 420ms cubic-bezier(0.22,1,0.36,1) ${i * 50}ms, opacity 420ms cubic-bezier(0.22,1,0.36,1) ${i * 50}ms`,
-            }}
-          >
-            <span className='size-2 rounded-sm bg-[#f5a623] opacity-70' />
-          </div>
-        ))}
-      </div>
-      <div className='mt-3.5 flex items-center justify-center gap-1.5 text-[11px] font-medium text-white/35'>
-        <span className='size-2 rounded-sm border border-[#f5a623] bg-[#f5a623]/50' />
-        진출 확정 16석
       </div>
     </div>
   )
@@ -335,7 +319,7 @@ function ArcadeOnlinePage() {
       </FadeIn>
 
       {/* ── Steps ── */}
-      <div className='space-y-4'>
+      <div className='flex flex-col'>
         {/* ── Step 01: 신청 & 차수 선택 ── */}
         <StepCard
           num='01'
@@ -363,7 +347,7 @@ function ArcadeOnlinePage() {
             구조입니다.
           </HighlightCard>
 
-          <div>
+          <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.015] p-4'>
             <DetailSubtitle>차수 안내</DetailSubtitle>
             <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
               {REGIONS.map((r) => (
@@ -396,16 +380,21 @@ function ArcadeOnlinePage() {
             </Callout>
           </div>
 
-          <HighlightCard
-            title='오프라인 예선곡 선택'
-            tag='필수'
-            tagCls='bg-[#f5a623]/[0.08] text-[#f5a623]'
-          >
-            신청 시 <strong>스위스 스테이지에서 사용할 곡 4곡</strong>을 미리
-            선택해야 합니다. 이 곡은 오프라인 대회에서 사이드 선택 시 활용되며,
-            신청 이후에는 변경할 수 없습니다.
-          </HighlightCard>
+          <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.015] p-4'>
+            <HighlightCard
+              title='오프라인 예선곡 선택'
+              tag='필수'
+              tagCls='bg-[#f5a623]/[0.08] text-[#f5a623]'
+            >
+              신청 시 <strong>스위스 스테이지에서 사용할 곡 4곡</strong>을 미리
+              선택해야 합니다. 이 곡은 오프라인 대회에서 사이드 선택 시
+              활용되며, 신청 이후에는 변경할 수 없습니다.
+            </HighlightCard>
+          </div>
         </StepCard>
+
+        {/* ── 연결선 01 → 02 ── */}
+        <StepConnector />
 
         {/* ── Step 02: 동더 광장 연동 & 점수 제출 ── */}
         <StepCard
@@ -493,6 +482,9 @@ function ArcadeOnlinePage() {
           </div>
         </StepCard>
 
+        {/* ── 연결선 02 → 03 ── */}
+        <StepConnector />
+
         {/* ── Step 03: 스위스 스테이지 진출 ── */}
         <StepCard
           num='03'
@@ -556,6 +548,22 @@ function ArcadeOnlinePage() {
           </div>
           <span className='shrink-0 text-white/35'>→</span>
         </Link>
+      </FadeIn>
+
+      {/* ── CTA — 참가 신청 ── */}
+      <FadeIn>
+        <div className='mt-6 mb-2'>
+          <Link
+            to='/arcade/apply'
+            className='group relative flex items-center justify-center gap-3 overflow-hidden rounded-2xl border border-[#f5a623]/40 bg-[#f5a623] px-8 py-5 text-center transition-all hover:shadow-[0_0_32px_rgba(245,166,35,0.25)]'
+          >
+            <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 transition-opacity group-hover:opacity-100' />
+            <span className='text-[17px] font-extrabold tracking-tight text-[#0a0a0a]'>
+              대회 참가 신청하기
+            </span>
+            <span className='text-lg text-[#0a0a0a]/60'>→</span>
+          </Link>
+        </div>
       </FadeIn>
 
       {/* ── Detailed Rules ── */}
@@ -661,6 +669,19 @@ function ArcadeOnlinePage() {
           </div>
         </FadeIn>
       </div>
+
+      {/* ── 하단 최종 CTA (세부 규정 아래) ── */}
+      <FadeIn>
+        <div className='mt-12 mb-8 text-center'>
+          <Link
+            to='/arcade/apply'
+            className='inline-flex items-center gap-2 rounded-full border border-[#f5a623]/30 bg-[#f5a623]/[0.08] px-8 py-3.5 text-[15px] font-bold text-[#f5a623] transition-all hover:border-[#f5a623]/50 hover:bg-[#f5a623]/[0.12]'
+          >
+            대회 참가 신청하기
+            <span className='text-[#f5a623]/60'>→</span>
+          </Link>
+        </div>
+      </FadeIn>
     </>
   )
 }
