@@ -264,11 +264,13 @@ export function DetailRow({
   value,
   isBadge,
   accentColor = '#f5a623',
+  valueClassName,
 }: {
   label: string
   value: string
   isBadge?: boolean
   accentColor?: string
+  valueClassName?: string
 }) {
   return (
     <div className='flex items-center justify-between gap-3 border-b border-[#1e1e1e] py-2.5 text-[12px] last:border-b-0 sm:text-[13px]'>
@@ -284,7 +286,13 @@ export function DetailRow({
           {value}
         </span>
       ) : (
-        <span className='shrink-0 font-semibold text-white/90'>{value}</span>
+        <span
+          className={
+            valueClassName ?? 'shrink-0 font-semibold text-white/90'
+          }
+        >
+          {value}
+        </span>
       )}
     </div>
   )

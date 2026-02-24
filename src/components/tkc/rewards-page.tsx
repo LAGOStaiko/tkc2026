@@ -985,7 +985,7 @@ function PlaqueBanner() {
               OFFICIAL PLAQUE
             </span>
             <span
-              className='tkc-text-trim rounded px-1.5 py-0.5 text-[11px] leading-none font-bold text-white sm:text-[12px]'
+              className='rounded px-1.5 pt-[3px] pb-[1px] text-[11px] leading-none font-bold text-white sm:text-[12px]'
               style={{ background: purple }}
             >
               콘솔
