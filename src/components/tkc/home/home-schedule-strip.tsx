@@ -223,7 +223,7 @@ export function HomeScheduleStrip() {
                           >
                             {fmtDate(ev.fullDate)}
                           </span>
-                          <span className='size-1.5 shrink-0 rounded-full bg-[#4a9eff] shadow-[0_0_6px_rgba(74,158,255,0.3)]' />
+                          <span className='mt-[7px] size-1.5 shrink-0 rounded-full bg-[#4a9eff] shadow-[0_0_6px_rgba(74,158,255,0.3)]' />
                           <div className='min-w-0 flex-1'>
                             <div className='text-[13px] leading-[1.35] font-semibold break-keep text-white/80'>
                               {ev.name}
@@ -276,7 +276,7 @@ export function HomeScheduleStrip() {
                           >
                             {fmtDate(ev.fullDate)}
                           </span>
-                          <span className='size-1.5 shrink-0 rounded-full bg-white/25' />
+                          <span className='mt-[7px] size-1.5 shrink-0 rounded-full bg-white/25' />
                           <div className='min-w-0 flex-1'>
                             <div className='text-[13px] leading-[1.35] font-semibold break-keep text-white/55'>
                               {ev.name}
@@ -300,7 +300,7 @@ export function HomeScheduleStrip() {
                           >
                             {fmtDate(ev.fullDate)}
                           </span>
-                          <span className='size-1.5 shrink-0 rounded-full bg-[#f5a623] shadow-[0_0_6px_rgba(245,166,35,0.35)]' />
+                          <span className='mt-[7px] size-1.5 shrink-0 rounded-full bg-[#f5a623] shadow-[0_0_6px_rgba(245,166,35,0.35)]' />
                           <div className='min-w-0 flex-1'>
                             <div className='text-[14px] leading-[1.35] font-bold break-keep text-white/90'>
                               {ev.name}

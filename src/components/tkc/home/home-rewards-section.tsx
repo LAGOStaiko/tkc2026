@@ -254,25 +254,9 @@ export function HomeRewardsSection() {
 
               <NameplateCarousel />
 
-              <div className='mt-auto grid grid-cols-1 gap-1.5 min-[420px]:grid-cols-3'>
-                {[
-                  { num: '1', label: '엔트리 등록' },
-                  { num: '2', label: '참가 확인' },
-                  { num: '3', label: '현장 수령' },
-                ].map((step) => (
-                  <div
-                    key={step.num}
-                    className='flex items-center gap-1.5 rounded-md border border-[#f5a623]/15 bg-[#f5a623]/[0.05] px-2.5 py-1.5'
-                  >
-                    <span className='flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-[#f5a623]/10 text-[12px] font-extrabold text-[#f5a623]'>
-                      {step.num}
-                    </span>
-                    <span className='text-[12px] font-medium break-keep text-white/55 sm:text-[13px]'>
-                      {step.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <p className='mt-auto text-[12px] font-bold break-keep text-white/40'>
+                온라인 예선 참가 후 결선 직관 시 지급
+              </p>
             </div>
           </div>
         </FadeIn>
@@ -312,7 +296,7 @@ export function HomeRewardsSection() {
                 전원에게 지급됩니다.
               </p>
 
-              <div className='relative mb-5 flex flex-1 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-lg border border-[#e74c3c]/12 bg-[radial-gradient(ellipse_at_50%_55%,_rgba(231,76,60,0.08)_0%,_rgba(231,76,60,0.02)_50%,_rgba(17,17,17,0.98)_80%)] px-5 py-9 text-center'>
+              <div className='relative mb-5 flex min-h-[320px] flex-1 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-lg border border-[#e74c3c]/12 bg-[radial-gradient(ellipse_at_50%_55%,_rgba(231,76,60,0.08)_0%,_rgba(231,76,60,0.02)_50%,_rgba(17,17,17,0.98)_80%)] px-5 py-9 text-center'>
                 <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_rgba(231,76,60,0.06)_0%,_transparent_50%)]' />
                 <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_rgba(231,76,60,0.04)_0%,_transparent_50%)]' />
 
@@ -377,7 +361,7 @@ export function HomeRewardsSection() {
                 공식 상패입니다.
               </p>
 
-              <div className='relative mb-5 flex flex-1 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-lg border border-dashed border-[#8b5cf6]/20 bg-[radial-gradient(ellipse_at_50%_55%,_rgba(139,92,246,0.08)_0%,_rgba(139,92,246,0.02)_50%,_rgba(17,17,17,0.98)_80%)] px-5 py-9 text-center'>
+              <div className='relative mb-5 flex min-h-[320px] flex-1 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-lg border border-dashed border-[#8b5cf6]/20 bg-[radial-gradient(ellipse_at_50%_55%,_rgba(139,92,246,0.08)_0%,_rgba(139,92,246,0.02)_50%,_rgba(17,17,17,0.98)_80%)] px-5 py-9 text-center'>
                 <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_rgba(139,92,246,0.06)_0%,_transparent_50%)]' />
                 <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_rgba(139,92,246,0.04)_0%,_transparent_50%)]' />
 
