@@ -1,9 +1,12 @@
-﻿import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { t } from '@/text'
 import { useSongs } from '@/lib/api'
-import { cn } from '@/lib/utils'
 import { PageHero, TkcSection } from '@/components/tkc/layout'
 import { LevelBadge } from '@/components/tkc/level-badge'
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Types                                                              */
+/* ════════════════════════════════════════════════════════════════════ */
 
 type SongStage = {
   division: string
@@ -21,10 +24,55 @@ type SongsData = {
   songs?: SongStage[]
 }
 
+type StageGroup = {
+  stageLabel: string
+  songs: SongStage[]
+  isFinals: boolean
+}
+
 const DIFF_LABEL: Record<string, string> = {
   ura: '뒷보면',
   oni: '귀신',
 }
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Helpers                                                            */
+/* ════════════════════════════════════════════════════════════════════ */
+
+const FINALS_RE = /final|결선|결승/i
+
+function isFinalStage(stageKey: string, stageLabel: string): boolean {
+  return FINALS_RE.test(stageKey) || FINALS_RE.test(stageLabel)
+}
+
+function isGrandFinal(stageKey: string, stageLabel: string): boolean {
+  return /grand.?final|결승/i.test(stageKey) || /결승/.test(stageLabel)
+}
+
+/** Group flat song list into stage groups, preserving order. */
+function groupByStage(songs: SongStage[]): StageGroup[] {
+  const map = new Map<string, StageGroup>()
+  const order: string[] = []
+
+  for (const song of songs) {
+    const key = song.stageLabel
+    if (!map.has(key)) {
+      map.set(key, {
+        stageLabel: key,
+        songs: [],
+        isFinals: isFinalStage(song.stageKey, song.stageLabel),
+      })
+      order.push(key)
+    }
+    map.get(key)!.songs.push(song)
+  }
+
+  return order.map((k) => map.get(k)!)
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Page                                                               */
+/* ════════════════════════════════════════════════════════════════════ */
 
 export function SongsPage() {
   const { data, isLoading, isError } = useSongs<SongsData>()
@@ -50,6 +98,21 @@ export function SongsPage() {
 
   return (
     <TkcSection className='space-y-8'>
+      <style>{`
+        @keyframes shimmer {
+          0%   { left: -100%; }
+          100% { left: 200%; }
+        }
+        @keyframes gradient-shift {
+          0%, 100% { background-position: 0% 50%; }
+          50%      { background-position: 100% 50%; }
+        }
+        @keyframes pulse-grand {
+          0%, 100% { box-shadow: 0 0 16px rgba(245,166,35,0.06); }
+          50%      { box-shadow: 0 0 28px rgba(245,166,35,0.14); }
+        }
+      `}</style>
+
       <PageHero
         badge='TASK SONGS'
         title={title}
@@ -66,7 +129,7 @@ export function SongsPage() {
         <p className='text-sm text-white/60'>과제곡을 불러오는 중...</p>
       ) : null}
 
-      <div className='grid gap-14 lg:grid-cols-2'>
+      <div className='grid gap-12 lg:grid-cols-2'>
         <DivisionColumn
           label='콘솔 부문'
           variant='console'
@@ -100,51 +163,35 @@ function DivisionColumn({
   isLoading: boolean
 }) {
   const accent = variant === 'console' ? '#e74c3c' : '#f5a623'
+  const groups = useMemo(() => groupByStage(songs), [songs])
 
   return (
     <div>
-      {/* Column header */}
-      <div className='mb-8 flex items-center gap-3'>
+      {/* Division header — simple dot + name */}
+      <div className='mb-6 flex items-center gap-2.5'>
         <div
-          className='flex size-9 shrink-0 items-center justify-center rounded-lg'
-          style={{
-            background: `${accent}1a`,
-            border: `1px solid ${accent}33`,
-            boxShadow: `0 0 12px ${accent}0f`,
-          }}
-        >
-          <span
-            className='size-2 rounded-full'
-            style={{ backgroundColor: accent }}
-          />
-        </div>
-        <h2 className='text-[22px] font-extrabold tracking-tight text-white'>
+          className='size-3 shrink-0 rounded-full'
+          style={{ backgroundColor: accent }}
+        />
+        <h2 className='text-[22px] font-black tracking-tight text-white'>
           {label}
         </h2>
       </div>
 
       {/* Timeline */}
-      {songs.length > 0 ? (
+      {groups.length > 0 ? (
         <div className='relative pl-7'>
-          <div className='absolute top-1.5 bottom-1.5 left-[5px] w-0.5 bg-[#1e1e1e]' />
+          {/* Vertical timeline line */}
+          <div className='absolute top-2 bottom-2 left-[5px] w-[2px] bg-[#1e1e1e]' />
 
-          <div className='space-y-6'>
-            {songs.map((song, index) => {
-              const isRevealed = song.revealed && !!song.songTitle
-              const isFinals =
-                /final|결승/i.test(song.stageKey) ||
-                /결승/.test(song.stageLabel) ||
-                index === songs.length - 1
-
-              return (
-                <TaskCard
-                  key={song.stageKey}
-                  song={song}
-                  isRevealed={isRevealed}
-                  isFinals={!isRevealed && isFinals}
-                />
-              )
-            })}
+          <div className='space-y-7'>
+            {groups.map((group) => (
+              <StageGroupSection
+                key={group.stageLabel}
+                group={group}
+                variant={variant}
+              />
+            ))}
           </div>
         </div>
       ) : !isLoading ? (
@@ -157,102 +204,268 @@ function DivisionColumn({
 }
 
 /* ════════════════════════════════════════════════════════════════════ */
-/*  Task Card                                                          */
+/*  Stage Group                                                        */
 /* ════════════════════════════════════════════════════════════════════ */
 
-function TaskCard({
-  song,
-  isRevealed,
-  isFinals,
+function StageGroupSection({
+  group,
+  variant,
 }: {
-  song: SongStage
-  isRevealed: boolean
-  isFinals: boolean
+  group: StageGroup
+  variant: 'console' | 'arcade'
 }) {
+  return (
+    <div>
+      {/* Stage label */}
+      <p className='mb-2.5 font-mono text-[11px] font-bold uppercase tracking-[1.5px] text-white/30'>
+        {group.stageLabel}
+      </p>
+
+      {/* Song cards */}
+      <div className='space-y-3'>
+        {group.songs.map((song) => {
+          const isRevealed = song.revealed && !!song.songTitle
+          const grandFinal =
+            !isRevealed && isGrandFinal(song.stageKey, song.stageLabel)
+          const finalsMystery =
+            !isRevealed && group.isFinals && !grandFinal
+
+          return (
+            <TimelineItem
+              key={song.stageKey}
+              dotType={
+                isRevealed
+                  ? 'revealed'
+                  : grandFinal
+                    ? 'grand'
+                    : finalsMystery
+                      ? 'finals'
+                      : 'empty'
+              }
+              variant={variant}
+            >
+              {isRevealed ? (
+                <RevealedCard song={song} variant={variant} />
+              ) : grandFinal ? (
+                <GrandFinalCard song={song} />
+              ) : finalsMystery ? (
+                <FinalsMysteryCard song={song} />
+              ) : (
+                <UnrevealedCard song={song} />
+              )}
+            </TimelineItem>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Timeline Item (dot + card wrapper)                                 */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function TimelineItem({
+  dotType,
+  variant,
+  children,
+}: {
+  dotType: 'empty' | 'revealed' | 'finals' | 'grand'
+  variant: 'console' | 'arcade'
+  children: React.ReactNode
+}) {
+  const dotClass = (() => {
+    switch (dotType) {
+      case 'revealed':
+        return variant === 'console'
+          ? 'border-2 border-[#0a0a0a] bg-[#e74c3c] shadow-[0_0_0_3px_rgba(231,76,60,0.15)]'
+          : 'border-2 border-[#0a0a0a] bg-[#f5a623] shadow-[0_0_0_3px_rgba(245,166,35,0.15)]'
+      case 'finals':
+        return 'border-2 border-[#0a0a0a] bg-[#e74c3c] shadow-[0_0_0_3px_rgba(231,76,60,0.2),0_0_10px_rgba(231,76,60,0.15)]'
+      case 'grand':
+        return 'border-2 border-[#0a0a0a] bg-[#f5a623] shadow-[0_0_0_3px_rgba(245,166,35,0.2),0_0_12px_rgba(245,166,35,0.2)]'
+      default:
+        return 'border-2 border-[rgba(128,128,128,0.4)] bg-transparent'
+    }
+  })()
+
   return (
     <div className='relative'>
       {/* Timeline dot */}
       <div
-        className={cn(
-          'absolute top-[18px] -left-7 z-10 size-3 rounded-full',
-          isRevealed
-            ? 'border-2 border-[#0a0a0a] bg-[#f5a623] shadow-[0_0_0_3px_rgba(245,166,35,0.15),0_0_10px_rgba(245,166,35,0.2)]'
-            : isFinals
-              ? 'border-2 border-[#0a0a0a] bg-[#e74c3c] shadow-[0_0_0_3px_rgba(231,76,60,0.2),0_0_12px_rgba(231,76,60,0.3)]'
-              : 'border-2 border-[#808080]/50 bg-transparent'
-        )}
+        className={`absolute top-[24px] -left-7 z-[2] size-3 rounded-full ${dotClass}`}
       />
+      {children}
+    </div>
+  )
+}
 
-      {/* Card */}
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Revealed Card                                                      */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function RevealedCard({
+  song,
+  variant,
+}: {
+  song: SongStage
+  variant: 'console' | 'arcade'
+}) {
+  const isConsole = variant === 'console'
+  const accent = isConsole ? '#e74c3c' : '#f5a623'
+
+  return (
+    <div
+      className='group relative overflow-hidden rounded-[14px] bg-[#111] transition-all duration-[250ms]
+        hover:-translate-y-0.5'
+      style={{
+        border: `1px solid ${accent}26`,
+      }}
+    >
+      {/* Top shimmer bar */}
       <div
-        className={cn(
-          'overflow-hidden rounded-[14px] bg-[#111] transition-all duration-300',
-          isRevealed
-            ? 'border border-l-[3px] border-[#f5a623]/15 border-l-[#f5a623] hover:-translate-y-0.5 hover:border-[#f5a623]/30'
-            : isFinals
-              ? 'relative border border-l-[3px] border-[#e74c3c]/20 border-l-[#e74c3c] hover:-translate-y-0.5 hover:border-[#e74c3c]/35'
-              : 'border border-[#1e1e1e] hover:border-[#2a2a2a]'
-        )}
+        className='absolute top-0 right-0 left-0 h-[2px] overflow-hidden'
+        style={{ background: accent }}
       >
-        {isFinals && (
-          <div className='pointer-events-none absolute inset-0 rounded-[14px] bg-gradient-to-br from-[#e74c3c]/[0.03] to-transparent' />
-        )}
+        <div className='absolute top-0 -left-full h-full w-3/5 animate-[shimmer_3.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/35 to-transparent' />
+      </div>
 
-        <div className='relative p-5'>
-          {/* Stage label */}
-          <div className='mb-2.5 flex items-center gap-2'>
+      {/* Content */}
+      <div className='px-5 py-[18px]'>
+        <span className='text-[clamp(18px,3vw,24px)] font-black leading-tight tracking-tight text-white'>
+          {song.songTitle}
+        </span>
+
+        <div className='mt-1.5 flex flex-wrap items-center gap-2'>
+          {song.difficulty && (
             <span
-              className={cn(
-                'text-sm font-semibold break-keep',
-                isRevealed ? 'text-[#f5a623]' : 'text-[#e74c3c]'
-              )}
+              className='text-[13px] font-semibold'
+              style={{ color: `${accent}cc` }}
             >
-              {song.stageLabel}
+              {DIFF_LABEL[song.difficulty] ?? song.difficulty}
             </span>
-            {!isRevealed && (
-              <span className='rounded bg-[#e74c3c]/[0.08] px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wider text-[#e74c3c]'>
-                추후 공지
-              </span>
-            )}
-          </div>
-
-          {/* Song content */}
-          {isRevealed ? (
-            <div>
-              <div className='flex flex-wrap items-center gap-2.5'>
-                <span className='text-[22px] leading-tight font-extrabold text-white'>
-                  {song.songTitle}
-                </span>
-                {song.difficulty && (
-                  <span className='inline-flex items-center gap-1.5 text-sm font-medium text-[#808080]'>
-                    {DIFF_LABEL[song.difficulty] ?? song.difficulty}
-                    {song.level != null && (
-                      <LevelBadge
-                        level={song.level}
-                        isUra={song.difficulty === 'ura'}
-                      />
-                    )}
-                  </span>
-                )}
-              </div>
-              {song.descriptionMd && (
-                <p className='mt-1 text-[15px] break-keep text-[#808080]'>
-                  {song.descriptionMd}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div>
-              <p className='font-mono text-2xl font-bold tracking-[2px] text-[#808080]/40'>
-                ???
-              </p>
-              <p className='mt-1 text-sm text-[#808080]/60'>
-                추후 공개 예정입니다.
-              </p>
-            </div>
+          )}
+          {song.level != null && (
+            <LevelBadge
+              level={song.level}
+              isUra={song.difficulty === 'ura'}
+            />
           )}
         </div>
+
+        {song.descriptionMd && (
+          <p className='mt-1 text-[13px] break-keep text-white/30'>
+            {song.descriptionMd}
+          </p>
+        )}
       </div>
+
+      {/* Hover glow */}
+      <div
+        className='pointer-events-none absolute inset-0 rounded-[14px] opacity-0 transition-opacity duration-[250ms] group-hover:opacity-100'
+        style={{
+          boxShadow: `0 6px 24px ${accent}0f`,
+          borderColor: `${accent}4d`,
+        }}
+      />
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Unrevealed Card                                                    */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function UnrevealedCard({ song }: { song: SongStage }) {
+  return (
+    <div className='overflow-hidden rounded-[14px] border border-[#1e1e1e] bg-[#111] transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-[#2a2a2a]'>
+      <div className='flex items-center gap-3.5 px-5 py-4'>
+        {/* Mystery icon */}
+        <div className='flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-dashed border-[#808080]/25 bg-[#808080]/[0.03] font-mono text-lg font-bold text-white/30'>
+          ?
+        </div>
+        <div>
+          <p className='text-sm font-semibold text-white/35'>
+            {song.stageLabel}
+          </p>
+          <p className='mt-0.5 text-[11px] text-white/20'>추후 공개 예정</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Finals Mystery Card                                                */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function FinalsMysteryCard({ song }: { song: SongStage }) {
+  return (
+    <div className='group relative overflow-hidden rounded-[14px] bg-gradient-to-br from-[#111] to-[#e74c3c]/[0.03] transition-all duration-[250ms] hover:-translate-y-0.5' style={{ border: '1px solid rgba(231,76,60,0.2)' }}>
+      <div className='relative flex items-center gap-3.5 px-5 py-[18px]'>
+        {/* Mystery icon */}
+        <div className='flex size-11 shrink-0 items-center justify-center rounded-xl border border-dashed border-[#e74c3c]/25 bg-[#e74c3c]/[0.04] font-mono text-xl font-bold text-[#e74c3c]/45'>
+          ?
+        </div>
+        <div>
+          <p className='text-[15px] font-bold text-[#e74c3c]/75'>
+            {song.stageLabel}
+          </p>
+          <p className='mt-0.5 text-xs text-white/30'>
+            대회 당일 현장에서 공개
+          </p>
+        </div>
+
+        {/* Badge */}
+        <span className='absolute top-2.5 right-3.5 font-mono text-[10px] font-bold uppercase tracking-[1.5px] text-[#e74c3c]/30'>
+          Finals
+        </span>
+      </div>
+
+      {/* Hover glow */}
+      <div className='pointer-events-none absolute inset-0 rounded-[14px] opacity-0 shadow-[0_6px_24px_rgba(231,76,60,0.05)] transition-opacity duration-[250ms] group-hover:opacity-100' />
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  Grand Final Card                                                   */
+/* ════════════════════════════════════════════════════════════════════ */
+
+function GrandFinalCard({ song }: { song: SongStage }) {
+  return (
+    <div className='group relative overflow-hidden rounded-[14px] bg-gradient-to-br from-[#111] to-[#f5a623]/[0.04] transition-all duration-[250ms] hover:-translate-y-[3px]' style={{ border: '1px solid rgba(245,166,35,0.25)' }}>
+      {/* Animated gradient bar */}
+      <div className='absolute top-0 right-0 left-0 h-[3px] animate-[gradient-shift_4s_ease_infinite] bg-[length:200%_100%] bg-gradient-to-r from-[#f5a623] via-[#e74c3c] to-[#f5a623]' />
+
+      <div className='relative flex items-center gap-3.5 px-5 py-[22px]'>
+        {/* Mystery icon with pulse */}
+        <div className='flex size-12 shrink-0 animate-[pulse-grand_3s_ease-in-out_infinite] items-center justify-center rounded-[14px] border border-dashed border-[#f5a623]/30 bg-[#f5a623]/[0.05] font-mono text-[22px] font-bold text-[#f5a623]/50'>
+          ?
+        </div>
+        <div>
+          <p className='text-[17px] font-extrabold text-[#f5a623]/85'>
+            {song.stageLabel}
+          </p>
+          <p className='mt-0.5 text-xs text-white/30'>
+            대회 당일 현장에서 공개됩니다
+          </p>
+        </div>
+
+        {/* Badge */}
+        <span className='absolute top-2.5 right-3.5 font-mono text-[10px] font-bold uppercase tracking-[1.5px] text-[#f5a623]/40'>
+          Grand Final
+        </span>
+      </div>
+
+      {/* Hover glow */}
+      <div
+        className='pointer-events-none absolute inset-0 rounded-[14px] opacity-0 transition-opacity duration-[250ms] group-hover:opacity-100'
+        style={{
+          boxShadow:
+            '0 8px 32px rgba(245,166,35,0.07), 0 0 0 1px rgba(245,166,35,0.15)',
+        }}
+      />
     </div>
   )
 }
