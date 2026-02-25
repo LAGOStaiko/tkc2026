@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Callout, Card, FadeIn, TkcIcon } from '@/components/tkc/guide-shared'
+import {
+  Callout,
+  Card,
+  DetailRow,
+  FadeIn,
+  TkcIcon,
+} from '@/components/tkc/guide-shared'
 
 export const Route = createFileRoute('/(site)/arcade/finals')({
   component: ArcadeFinalsPage,
@@ -16,47 +22,43 @@ const NAV_ITEMS = [
   { id: 'prep', label: '곡 준비' },
   { id: 'banpick', label: '밴픽 절차' },
   { id: 'rounds', label: '라운드별 규정' },
-  { id: 'rules', label: '플레이 규정' },
 ]
 
-type OverviewStat = {
-  value: string
-  label: string
-  sub?: string
-  color?: string
-}
-type RoundOverviewItem = {
-  name: string
-  info: string
-  songs: string
-  highlight?: boolean
-}
 type RoundDetailItem = {
   name: string
-  songs: string
   picks: string
-  challenge: boolean
+  total: string
   highlight?: boolean
 }
 
-const OVERVIEW_STATS: OverviewStat[] = [
+const FLOW_CARDS = [
   {
-    value: '8명',
-    label: '결선 진출자',
-    sub: '예선 4-0 · 3-1 통과',
-    color: '#e74c3c',
+    step: 'STEP 01',
+    label: '결선 참가',
+    value: '8명 단판\n토너먼트',
+    sub: '예선 4-0 · 3-1 통과자',
+    hasArrow: true,
   },
-  { value: '단판', label: '대전 방식' },
-  { value: '5곡', label: '사전 준비', color: '#e74c3c' },
-  { value: '밴픽', label: '선곡 방식', color: '#f5a623' },
-]
-
-const ROUND_OVERVIEW: RoundOverviewItem[] = [
-  { name: '8강', info: '4경기', songs: '각 3곡' },
-  { name: '4강', info: '2경기', songs: '각 3곡' },
-  { name: '3·4위', info: '1경기', songs: '3곡' },
-  { name: '결승', info: '1경기', songs: '5곡', highlight: true },
-]
+  {
+    step: 'STEP 02',
+    label: '선곡 방식',
+    value: '밴픽 시스템',
+    sub: '5곡 준비, 상대 곡 1곡 밴',
+    gold: true,
+  },
+  {
+    step: '곡 준비',
+    label: '',
+    value: '5곡 사전 제출',
+    sub: '선곡풀에서 선택',
+  },
+  {
+    step: '과제곡',
+    label: '',
+    value: '총 4곡',
+    sub: '8강 · 4강 · 3·4위 · 결승 각 1곡\n당일 현장 공개',
+  },
+] as const
 
 const QF_MATCHES = [
   {
@@ -121,7 +123,7 @@ const BP_FINALS = [
 const SONG_RULES = [
   {
     num: '1',
-    text: '한 번 플레이한 곡은 이후 라운드에서 재사용할 수 있습니다.',
+    text: '한 번 플레이한 곡은 이후 라운드에서 재사용할 수 없습니다.',
   },
   {
     num: '2',
@@ -130,62 +132,32 @@ const SONG_RULES = [
 ] as const
 
 const ROUND_DETAILS: RoundDetailItem[] = [
-  { name: '8강', songs: '총 3곡', picks: '각 1곡 선곡', challenge: true },
-  { name: '4강', songs: '총 3곡', picks: '각 1곡 선곡', challenge: true },
-  { name: '3·4위', songs: '총 3곡', picks: '각 1곡 선곡', challenge: true },
-  {
-    name: '결승',
-    songs: '총 5곡',
-    picks: '각 2곡 선곡',
-    challenge: true,
-    highlight: true,
-  },
+  { name: '8강', picks: '각 1곡 선곡', total: '3곡' },
+  { name: '4강', picks: '각 1곡 선곡', total: '3곡' },
+  { name: '3·4위', picks: '각 1곡 선곡', total: '3곡' },
+  { name: '결승', picks: '각 2곡 선곡', total: '5곡', highlight: true },
 ]
 
-const PLAY_RULES = [
+const PREP_STEPS = [
   {
-    icon: 'match',
-    title: '사이드 선택권',
-    lines: [
-      { bold: '선곡곡', text: '해당 곡을 선곡한 선수' },
-      { bold: '과제곡', text: '직전까지 합산 점수 높은 선수' },
-      { bold: '과제곡이 첫 곡', text: '시드 상위자' },
-    ],
+    num: '5',
+    label: '사전 준비 곡',
+    desc: '선곡풀에서 선택',
+    color: '#e74c3c',
   },
   {
-    icon: 'details',
-    title: '플레이 순서',
-    lines: [
-      { bold: '', text: '시드 상위자의 선곡곡을 먼저 플레이' },
-      { bold: '', text: '과제곡은 항상 마지막에 플레이' },
-    ],
+    num: '밴',
+    label: '상대가 제거',
+    desc: '해당 라운드 사용 불가',
+    color: undefined,
   },
   {
-    icon: 'song-pick',
-    title: '난이도 및 옵션',
-    lines: [
-      { bold: '', text: '난이도는 선곡한 보면 기준' },
-      { bold: '배속 조정', text: '허용' },
-      { bold: '랜덤 · 미러 등', text: '불가' },
-    ],
-  },
-  {
-    icon: 'tie',
-    title: '동점 · 기기 트러블',
-    lines: [
-      { bold: '동점', text: '마지막 곡 동일 조건 재대결' },
-      { bold: '재대결도 동점', text: '양(良) 수 비교' },
-      { bold: '기기 오류', text: '운영진 판단 후 재경기' },
-    ],
+    num: '픽',
+    label: '잔여 곡 선택',
+    desc: '경기에 사용할 곡 확정',
+    color: '#f5a623',
   },
 ] as const
-
-const PLAY_RULE_ICON_MAP: Record<string, string> = {
-  match: '/characters/arcade-rule-match.png',
-  details: '/characters/arcade-rule-details.png',
-  'song-pick': '/characters/arcade-rule-song-pick.png',
-  tie: '/characters/arcade-rule-tie.png',
-}
 
 /* ════════════════════════════════════════════════════════════════════ */
 /*  Utility Components                                                 */
@@ -193,22 +165,25 @@ const PLAY_RULE_ICON_MAP: Record<string, string> = {
 
 function SectionBlock({
   id,
-  num,
+  category,
   title,
   desc,
   children,
 }: {
   id: string
-  num: string
+  category: string
   title: string
   desc: string
   children: ReactNode
 }) {
   return (
     <section id={id} data-section={id} className='mb-20'>
+      {id !== 'overview' && (
+        <div className='mb-12 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent' />
+      )}
       <FadeIn>
         <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e74c3c] uppercase'>
-          Section {num}
+          {category}
         </div>
         <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
           {title}
@@ -263,67 +238,96 @@ function OverviewSection() {
   return (
     <SectionBlock
       id='overview'
-      num='01'
+      category='OVERVIEW'
       title='대회 구조'
       desc='8명 단판 토너먼트. 밴픽 전략과 과제곡이 승패를 좌우합니다.'
     >
-      {/* Stat Boxes */}
-      <Card className='overflow-hidden p-0'>
-        <div className='flex items-center gap-2.5 border-b border-[#1e1e1e] bg-[#111] px-6 py-4'>
-          <span className='size-2 rounded-full bg-[#f5a623]' />
-          <span className='text-[15px] font-bold text-white/90'>
-            한눈에 보기
-          </span>
-        </div>
-        <div className='grid grid-cols-2 bg-[#111] sm:grid-cols-4'>
-          {OVERVIEW_STATS.map((s, i) => (
+      {/* Main 2×2 flow grid + Bottom strip */}
+      <div>
+        <div className='grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[#2a2a2a] bg-[#2a2a2a] sm:grid-cols-2'>
+          {FLOW_CARDS.map((card) => (
             <div
-              key={s.label}
-              className={`relative flex min-h-[100px] flex-col items-center justify-center border-[#1e1e1e] px-5 pt-7 pb-4 text-center ${i < 2 ? 'border-b sm:border-b-0' : ''} ${i % 2 === 0 ? 'border-r' : i < 3 ? 'sm:border-r' : ''}`}
+              key={card.step}
+              className='relative bg-[#141414] px-6 py-7 transition-colors hover:bg-[#1a1a1a]'
             >
-              <div className='absolute top-2.5 left-3.5 text-[12px] font-medium tracking-wide text-white/35'>
-                {s.label}
+              <div className='mb-1.5 font-mono text-[11px] font-bold tracking-[1.5px] text-[#b83a30] uppercase'>
+                {card.step}
               </div>
+              {card.label && (
+                <div className='mb-1 text-[12px] text-white/50'>
+                  {card.label}
+                </div>
+              )}
               <div
-                className='text-[24px] font-extrabold tracking-tight sm:text-[28px]'
-                style={{ color: s.color ?? 'rgba(255,255,255,0.9)' }}
+                className={`text-[22px] font-black leading-[1.3] tracking-tight whitespace-pre-line ${
+                  'gold' in card && card.gold
+                    ? 'text-[#f5a623]'
+                    : 'text-white/90'
+                }`}
               >
-                {s.value}
+                {card.value}
               </div>
-              {s.sub && (
-                <div className='mt-0.5 text-[12px] text-white/40'>{s.sub}</div>
+              <div className='mt-1.5 whitespace-pre-line text-[12px] leading-relaxed text-white/40'>
+                {card.sub}
+              </div>
+              {'hasArrow' in card && card.hasArrow && (
+                <span className='absolute top-1/2 right-0 z-[2] hidden -translate-y-1/2 translate-x-1/2 text-sm text-[#b83a30] sm:block'>
+                  →
+                </span>
               )}
             </div>
           ))}
         </div>
-      </Card>
 
-      {/* Round Composition */}
-      <Card>
-        <div className='mb-4 text-sm font-bold text-white/90'>라운드 구성</div>
-        <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
-          {ROUND_OVERVIEW.map((r) => (
-            <div
-              key={r.name}
-              className={`rounded-xl p-5 text-center ${
-                r.highlight
-                  ? 'border border-[#f5a623]/20 bg-[#f5a623]/[0.04]'
-                  : 'border border-[#e74c3c]/10 bg-[#e74c3c]/[0.04]'
-              }`}
-            >
-              <div
-                className='text-[22px] font-extrabold'
-                style={{ color: r.highlight ? '#f5a623' : '#e74c3c' }}
+        <div className='mt-0.5 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#2a2a2a] sm:grid-cols-2'>
+          <div className='flex items-center gap-3.5 bg-[#141414] px-6 py-5 transition-colors hover:bg-[#1a1a1a]'>
+            <div className='flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-[#e74c3c]/15 bg-[#e74c3c]/[0.08]'>
+              <svg
+                width='18'
+                height='18'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='#e74c3c'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
               >
-                {r.name}
-              </div>
-              <div className='mt-1.5 text-sm text-white/35'>
-                {r.info} · {r.songs}
+                <path d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z' />
+                <circle cx='12' cy='10' r='3' />
+              </svg>
+            </div>
+            <div>
+              <div className='text-[11px] text-white/50'>대회 장소</div>
+              <div className='text-[15px] font-bold text-white/90'>
+                PlayX4
               </div>
             </div>
-          ))}
+          </div>
+          <div className='flex items-center gap-3.5 bg-[#141414] px-6 py-5 transition-colors hover:bg-[#1a1a1a]'>
+            <div className='flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-[#e74c3c]/15 bg-[#e74c3c]/[0.08]'>
+              <svg
+                width='18'
+                height='18'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='#e74c3c'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              >
+                <circle cx='12' cy='12' r='10' />
+                <polyline points='12 6 12 12 16 14' />
+              </svg>
+            </div>
+            <div>
+              <div className='text-[11px] text-white/50'>대회 시간</div>
+              <div className='text-[15px] font-bold text-white/90'>
+                오전 10시 ~ 오후 2시
+              </div>
+            </div>
+          </div>
         </div>
-      </Card>
+      </div>
     </SectionBlock>
   )
 }
@@ -372,7 +376,7 @@ function BracketSection() {
   return (
     <SectionBlock
       id='bracket'
-      num='02'
+      category='BRACKET'
       title='8강 대진표 — 크로스 시딩'
       desc='예선 A그룹(4-0 진출)과 B그룹(3-1 진출)을 교차 배치합니다.'
     >
@@ -631,36 +635,25 @@ function PrepSection() {
   return (
     <SectionBlock
       id='prep'
-      num='03'
+      category='SONG PREP'
       title='곡 준비 규정'
       desc='참가자는 선곡풀에서 5곡을 사전에 준비하여 제출합니다. 곡 목록은 대회 전에 공개됩니다.'
     >
-      {/* Flow */}
-      {/* Desktop */}
-      <div className='hidden items-stretch gap-0 sm:flex'>
-        {[
-          {
-            num: '5',
-            label: '사전 준비 곡',
-            desc: '선곡풀에서 선택',
-            color: '#e74c3c',
-          },
-          {
-            num: '밴',
-            label: '상대가 제거',
-            desc: '해당 라운드 사용 불가',
-            color: undefined,
-          },
-          {
-            num: '픽',
-            label: '잔여 곡 선택',
-            desc: '경기에 사용할 곡 확정',
-            color: '#f5a623',
-          },
-        ].map((step, i) => (
-          <div key={step.label} className='flex flex-1 items-center'>
+      {/* Flow — unified responsive */}
+      <div className='flex flex-col sm:flex-row sm:items-stretch'>
+        {PREP_STEPS.map((step, i) => (
+          <div
+            key={step.label}
+            className='flex flex-col sm:flex-1 sm:flex-row sm:items-center'
+          >
             <div
-              className={`flex-1 border border-[#1e1e1e] bg-[#111] px-4 py-7 text-center ${i === 0 ? 'rounded-l-2xl' : i === 2 ? 'rounded-r-2xl' : ''}`}
+              className={`border border-[#1e1e1e] bg-[#111] px-4 py-6 text-center sm:flex-1 sm:py-7 ${
+                i === 0
+                  ? 'rounded-t-2xl sm:rounded-none sm:rounded-l-2xl'
+                  : i === 2
+                    ? 'rounded-b-2xl sm:rounded-none sm:rounded-r-2xl'
+                    : ''
+              }`}
             >
               <div
                 className='text-[36px] font-extrabold'
@@ -674,50 +667,14 @@ function PrepSection() {
               <div className='mt-1 text-sm text-white/35'>{step.desc}</div>
             </div>
             {i < 2 && (
-              <span className='shrink-0 px-1 text-lg text-[#e74c3c]'>→</span>
-            )}
-          </div>
-        ))}
-      </div>
-      {/* Mobile */}
-      <div className='flex flex-col gap-0 sm:hidden'>
-        {[
-          {
-            num: '5',
-            label: '사전 준비 곡',
-            desc: '선곡풀에서 선택',
-            color: '#e74c3c',
-          },
-          {
-            num: '밴',
-            label: '상대가 제거',
-            desc: '해당 라운드 사용 불가',
-            color: undefined,
-          },
-          {
-            num: '픽',
-            label: '잔여 곡 선택',
-            desc: '경기에 사용할 곡 확정',
-            color: '#f5a623',
-          },
-        ].map((step, i) => (
-          <div key={step.label}>
-            <div
-              className={`border border-[#1e1e1e] bg-[#111] px-4 py-6 text-center ${i === 0 ? 'rounded-t-2xl' : i === 2 ? 'rounded-b-2xl' : ''}`}
-            >
-              <div
-                className='text-[36px] font-extrabold'
-                style={{ color: step.color ?? 'rgba(255,255,255,0.9)' }}
-              >
-                {step.num}
-              </div>
-              <div className='mt-1.5 text-[15px] font-bold text-white/90'>
-                {step.label}
-              </div>
-              <div className='mt-1 text-sm text-white/35'>{step.desc}</div>
-            </div>
-            {i < 2 && (
-              <div className='flex justify-center py-0.5 text-[#e74c3c]'>▼</div>
+              <>
+                <div className='flex justify-center py-0.5 text-[#e74c3c] sm:hidden'>
+                  ▼
+                </div>
+                <span className='hidden shrink-0 px-1 text-lg text-[#e74c3c] sm:inline'>
+                  →
+                </span>
+              </>
             )}
           </div>
         ))}
@@ -746,7 +703,13 @@ function PrepSection() {
       <Callout type='warning' icon={<TkcIcon name='warning' />}>
         밴당한 곡은 "사용"으로 치지 않으므로{' '}
         <strong className='text-white/80'>다음 라운드에서 재사용 가능</strong>
-        합니다. 한 번 플레이한 곡만 소모됩니다.
+        합니다. 한 번 플레이한 곡은 이후 라운드에서 사용할 수 없습니다.
+      </Callout>
+
+      <Callout type='info' icon={<TkcIcon name='info' />}>
+        난이도는 선곡한 보면 기준. 허용 옵션은{' '}
+        <strong className='text-white/80'>음표 위치 조정, 목소리</strong>만 사용
+        가능하며 그 외 옵션은 사용 불가.
       </Callout>
     </SectionBlock>
   )
@@ -773,6 +736,7 @@ function BanPickSection() {
     return () => obs.disconnect()
   }, [])
 
+  /* Single cycle, then stop */
   useEffect(() => {
     if (!inView) return
     const ids: ReturnType<typeof setTimeout>[] = []
@@ -788,18 +752,12 @@ function BanPickSection() {
 
     const STEP_MS = 1200
     const PAUSE_MS = 2000
-    const CYCLE = PAUSE_MS + 4 * STEP_MS
 
-    const cycle = () => {
-      if (cancelled) return
-      setStep(-1)
-      for (let i = 0; i < 4; i++) {
-        sched(() => setStep(i), PAUSE_MS + i * STEP_MS)
-      }
-      sched(cycle, CYCLE)
+    for (let i = 0; i < 4; i++) {
+      sched(() => setStep(i), PAUSE_MS + i * STEP_MS)
     }
+    sched(() => setStep(-1), PAUSE_MS + 4 * STEP_MS + 500)
 
-    sched(cycle, 500)
     return () => {
       cancelled = true
       ids.forEach(clearTimeout)
@@ -828,8 +786,9 @@ function BanPickSection() {
       </span>
       <div className='flex gap-1.5'>
         {[0, 1, 2, 3].map((i) => (
-          <div
+          <button
             key={i}
+            onClick={() => setStep(step === i ? -1 : i)}
             className='size-1.5 rounded-full transition-all duration-300'
             style={{
               background:
@@ -867,10 +826,23 @@ function BanPickSection() {
     )
   }
 
+  const CORNER_CLS = [
+    'rounded-tl-xl sm:rounded-none sm:rounded-l-xl',
+    'rounded-tr-xl sm:rounded-none',
+    'rounded-bl-xl sm:rounded-none',
+    'rounded-br-xl sm:rounded-none sm:rounded-r-xl',
+  ]
+  const MARGIN_CLS = [
+    '',
+    '-ml-px',
+    '-mt-px sm:mt-0 sm:-ml-px',
+    '-ml-px -mt-px sm:mt-0',
+  ]
+
   return (
     <SectionBlock
       id='banpick'
-      num='04'
+      category='BAN / PICK'
       title='밴픽 절차'
       desc='시드 상위자(A)가 먼저 밴하고, 교대로 밴/픽을 진행합니다.'
     >
@@ -880,15 +852,13 @@ function BanPickSection() {
           <div className='mb-4 text-sm font-bold text-white/90'>
             8강 · 4강 · 3·4위전
           </div>
-          {/* Desktop */}
-          <div className='hidden gap-0 sm:flex'>
+          <div className='grid grid-cols-2 sm:flex'>
             {BP_STANDARD.map((s, i) => (
               <div
                 key={s.step}
-                className={`relative flex-1 border border-[#1e1e1e] px-3 py-6 text-center ${
-                  i === 0 ? 'rounded-l-xl' : i === 3 ? 'rounded-r-xl' : ''
-                } ${i > 0 ? '-ml-px' : ''}`}
+                className={`relative cursor-pointer border border-[#1e1e1e] px-3 py-5 text-center sm:flex-1 sm:py-6 ${CORNER_CLS[i]} ${MARGIN_CLS[i]}`}
                 style={cellStyle(i)}
+                onClick={() => setStep(step === i ? -1 : i)}
               >
                 <div
                   className='absolute top-0 right-0 left-0 h-0.5'
@@ -897,10 +867,10 @@ function BanPickSection() {
                       s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e74c3c',
                   }}
                 />
-                <div className='mb-2.5 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
+                <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35 sm:mb-2.5'>
                   {s.step}
                 </div>
-                <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
+                <div className='mb-2 text-[28px] font-extrabold text-white/90 sm:mb-2.5'>
                   {s.player}
                 </div>
                 <span
@@ -912,49 +882,9 @@ function BanPickSection() {
                 >
                   {s.type.toUpperCase()}
                 </span>
-                <div className='mt-2 text-sm text-white/35'>{s.note}</div>
-              </div>
-            ))}
-          </div>
-          {/* Mobile */}
-          <div className='grid grid-cols-2 gap-0 sm:hidden'>
-            {BP_STANDARD.map((s, i) => (
-              <div
-                key={s.step}
-                className={`relative border border-[#1e1e1e] px-3 py-5 text-center ${
-                  i === 0
-                    ? 'rounded-tl-xl'
-                    : i === 1
-                      ? 'rounded-tr-xl'
-                      : i === 2
-                        ? 'rounded-bl-xl'
-                        : 'rounded-br-xl'
-                } ${i % 2 === 1 ? '-ml-px' : ''} ${i >= 2 ? '-mt-px' : ''}`}
-                style={cellStyle(i)}
-              >
-                <div
-                  className='absolute top-0 right-0 left-0 h-0.5'
-                  style={{
-                    background:
-                      s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#e74c3c',
-                  }}
-                />
-                <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
-                  {s.step}
+                <div className='mt-2 text-sm break-keep text-white/35'>
+                  {s.note}
                 </div>
-                <div className='mb-2 text-[28px] font-extrabold text-white/90'>
-                  {s.player}
-                </div>
-                <span
-                  className={`inline-block rounded-[5px] px-3 py-1 font-mono text-xs font-semibold tracking-[1px] ${
-                    s.type === 'ban'
-                      ? 'bg-white/[0.05] text-white/55'
-                      : 'bg-[#e74c3c]/10 text-[#e74c3c]'
-                  }`}
-                >
-                  {s.type.toUpperCase()}
-                </span>
-                <div className='mt-2 text-sm text-white/35'>{s.note}</div>
               </div>
             ))}
           </div>
@@ -967,15 +897,13 @@ function BanPickSection() {
           <div className='mb-4 text-[13px] text-white/35'>
             각자 2곡씩 선곡, 총 5곡(선곡 4 + 과제곡 1)
           </div>
-          {/* Desktop */}
-          <div className='hidden gap-0 sm:flex'>
+          <div className='grid grid-cols-2 sm:flex'>
             {BP_FINALS.map((s, i) => (
               <div
                 key={s.step}
-                className={`relative flex-1 border border-[#1e1e1e] px-3 py-6 text-center ${
-                  i === 0 ? 'rounded-l-xl' : i === 3 ? 'rounded-r-xl' : ''
-                } ${i > 0 ? '-ml-px' : ''}`}
+                className={`relative cursor-pointer border border-[#1e1e1e] px-3 py-5 text-center sm:flex-1 sm:py-6 ${CORNER_CLS[i]} ${MARGIN_CLS[i]}`}
                 style={cellStyle(i, true)}
+                onClick={() => setStep(step === i ? -1 : i)}
               >
                 <div
                   className='absolute top-0 right-0 left-0 h-0.5'
@@ -984,44 +912,10 @@ function BanPickSection() {
                       s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#f5a623',
                   }}
                 />
-                <div className='mb-2.5 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
+                <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35 sm:mb-2.5'>
                   {s.step}
                 </div>
-                <div className='mb-2.5 text-[28px] font-extrabold text-white/90'>
-                  {s.player}
-                </div>
-                {badge(s.type, true)}
-                <div className='mt-2 text-sm text-white/35'>{s.note}</div>
-              </div>
-            ))}
-          </div>
-          {/* Mobile */}
-          <div className='grid grid-cols-2 gap-0 sm:hidden'>
-            {BP_FINALS.map((s, i) => (
-              <div
-                key={s.step}
-                className={`relative border border-[#1e1e1e] px-3 py-5 text-center ${
-                  i === 0
-                    ? 'rounded-tl-xl'
-                    : i === 1
-                      ? 'rounded-tr-xl'
-                      : i === 2
-                        ? 'rounded-bl-xl'
-                        : 'rounded-br-xl'
-                } ${i % 2 === 1 ? '-ml-px' : ''} ${i >= 2 ? '-mt-px' : ''}`}
-                style={cellStyle(i, true)}
-              >
-                <div
-                  className='absolute top-0 right-0 left-0 h-0.5'
-                  style={{
-                    background:
-                      s.type === 'ban' ? 'rgba(255,255,255,0.15)' : '#f5a623',
-                  }}
-                />
-                <div className='mb-2 font-mono text-[11px] font-semibold tracking-[1px] text-white/35'>
-                  {s.step}
-                </div>
-                <div className='mb-2 text-[28px] font-extrabold text-white/90'>
+                <div className='mb-2 text-[28px] font-extrabold text-white/90 sm:mb-2.5'>
                   {s.player}
                 </div>
                 {badge(s.type, true)}
@@ -1036,9 +930,20 @@ function BanPickSection() {
       </div>
 
       <Callout type='info' icon={<TkcIcon name='info' />}>
-        A는 <strong className='text-white/80'>시드 상위자</strong>입니다. 밴픽
-        순서 및 플레이 순서에서 선택 권한을 가집니다.
+        A는 <strong className='text-white/80'>시드 상위자</strong>입니다. 밴을
+        먼저 진행합니다.
       </Callout>
+
+      <Card>
+        <div className='mb-3.5 text-sm font-bold text-white/90'>
+          경기 진행 규칙
+        </div>
+        <DetailRow label='선곡곡 사이드' value='해당 곡을 선곡한 선수' accentColor='#e74c3c' />
+        <DetailRow label='과제곡 사이드' value='직전까지 합산 점수 높은 선수' accentColor='#e74c3c' />
+        <DetailRow label='과제곡이 첫 곡' value='시드 상위자' accentColor='#e74c3c' />
+        <DetailRow label='시드 상위자 선곡곡' value='먼저 플레이' accentColor='#e74c3c' />
+        <DetailRow label='과제곡 순서' value='항상 마지막에 플레이' accentColor='#e74c3c' />
+      </Card>
     </SectionBlock>
   )
 }
@@ -1047,169 +952,144 @@ function RoundsSection() {
   return (
     <SectionBlock
       id='rounds'
-      num='05'
+      category='ROUNDS'
       title='라운드별 규정'
-      desc='각 라운드마다 선곡 수와 과제곡이 다릅니다. 과제곡은 추후 공개됩니다.'
+      desc='각 라운드마다 선곡 수와 과제곡이 다릅니다.'
     >
-      <div className='space-y-3'>
-        {ROUND_DETAILS.map((r) => (
+      <style>{`
+        @keyframes slot-pulse {
+          0%, 100% { border-color: rgba(231,76,60,0.15); }
+          50% { border-color: rgba(231,76,60,0.35); }
+        }
+        @keyframes slot-shimmer {
+          0%, 100% { transform: translateX(-60%) translateY(-60%); }
+          50% { transform: translateX(60%) translateY(60%); }
+        }
+      `}</style>
+
+      {/* Compact Table */}
+      <Card className='overflow-hidden p-0'>
+        <div className='grid grid-cols-[70px_1fr_1fr_60px] border-b border-[#1e1e1e] bg-white/[0.02] px-3.5 py-3 text-[11px] font-semibold tracking-[0.5px] text-white/35 sm:grid-cols-[90px_1fr_1fr_80px] sm:px-5'>
+          <span>라운드</span>
+          <span>선곡</span>
+          <span>과제곡</span>
+          <span>총 곡수</span>
+        </div>
+        {ROUND_DETAILS.map((r, i) => (
           <div
             key={r.name}
-            className={`overflow-hidden rounded-2xl border transition-colors ${
-              r.highlight
-                ? 'border-[#e74c3c]/35 shadow-[0_0_24px_rgba(231,76,60,0.06),inset_0_0_0_1px_rgba(231,76,60,0.05)]'
-                : 'border-[#1e1e1e] hover:border-[#2a2a2a]'
-            }`}
+            className={`grid grid-cols-[70px_1fr_1fr_60px] items-center px-3.5 py-3.5 transition-colors sm:grid-cols-[90px_1fr_1fr_80px] sm:px-5 sm:py-4 ${
+              i < ROUND_DETAILS.length - 1 ? 'border-b border-[#1e1e1e]' : ''
+            } ${r.highlight ? 'bg-[#e74c3c]/[0.03]' : 'hover:bg-white/[0.015]'}`}
           >
-            {/* Desktop */}
-            <div className='hidden sm:grid sm:grid-cols-[150px_1fr]'>
-              <div
-                className={`flex flex-col items-center justify-center border-r border-[#1e1e1e] px-4 py-7 ${
-                  r.highlight ? 'bg-[#e74c3c]/[0.06]' : 'bg-[#111]'
-                }`}
-              >
-                <div
-                  className='text-[22px] font-extrabold'
-                  style={{
-                    color: r.highlight ? '#e74c3c' : 'rgba(255,255,255,0.9)',
-                  }}
-                >
-                  {r.name}
-                </div>
-                <div className='mt-0.5 font-mono text-sm font-semibold text-[#e74c3c]'>
-                  {r.songs}
-                </div>
-              </div>
-              <div className='flex flex-col justify-center gap-3 bg-[#111] p-5'>
-                <div className='flex flex-wrap gap-2'>
-                  <span className='rounded-lg border border-[#1e1e1e] bg-white/[0.03] px-3.5 py-1.5 text-[15px] font-medium text-white/55'>
-                    {r.picks}
-                  </span>
-                  <span className='rounded-lg border border-[#1e1e1e] bg-white/[0.03] px-3.5 py-1.5 text-[15px] font-medium text-white/55'>
-                    + 과제곡 1곡
-                  </span>
-                </div>
-                {r.challenge && (
-                  <div className='inline-flex items-center gap-2.5 self-start rounded-xl border border-dashed border-[#e74c3c]/15 bg-[#e74c3c]/[0.03] px-4 py-3'>
-                    <div className='text-xs font-semibold text-white/35'>
-                      과제곡
-                    </div>
-                    <div className='font-mono text-xl font-bold tracking-[3px] text-white/35'>
-                      ???
-                    </div>
-                    <div className='font-mono text-[11px] font-semibold text-[#e74c3c] opacity-50'>
-                      추후 공개
-                    </div>
-                  </div>
-                )}
-              </div>
+            <div
+              className='text-[15px] font-extrabold sm:text-[17px]'
+              style={{ color: r.highlight ? '#e74c3c' : undefined }}
+            >
+              {r.name}
             </div>
-
-            {/* Mobile */}
-            <div className='sm:hidden'>
-              <div
-                className={`relative flex items-center gap-3 border-b border-[#1e1e1e] px-5 py-4 ${
-                  r.highlight ? 'bg-[#e74c3c]/[0.06]' : 'bg-[#111]'
+            <div
+              className={`text-[13px] font-medium text-white/55 sm:text-sm ${r.highlight ? '!font-bold !text-white/90' : ''}`}
+            >
+              {r.picks}
+            </div>
+            <div className='text-[13px] font-semibold text-[#e74c3c] sm:text-sm'>
+              + 1곡
+            </div>
+            <div>
+              <span
+                className={`inline-block rounded-md px-2.5 py-0.5 font-mono text-[11px] font-bold sm:text-[12px] ${
+                  r.highlight
+                    ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                    : 'bg-[#e74c3c]/[0.08] text-[#e74c3c]'
                 }`}
               >
-                <div className='absolute top-0 right-0 left-0 h-[3px] bg-[#e74c3c] opacity-40' />
-                <div
-                  className='text-[22px] font-extrabold'
-                  style={{
-                    color: r.highlight ? '#e74c3c' : 'rgba(255,255,255,0.9)',
-                  }}
-                >
-                  {r.name}
-                </div>
-                <div className='font-mono text-sm font-semibold text-[#e74c3c]'>
-                  {r.songs}
-                </div>
-              </div>
-              <div className='flex flex-col gap-3 bg-[#111] p-5'>
-                <div className='flex flex-wrap gap-2'>
-                  <span className='rounded-lg border border-[#1e1e1e] bg-white/[0.03] px-3.5 py-1.5 text-[15px] font-medium text-white/55'>
-                    {r.picks}
-                  </span>
-                  <span className='rounded-lg border border-[#1e1e1e] bg-white/[0.03] px-3.5 py-1.5 text-[15px] font-medium text-white/55'>
-                    + 과제곡 1곡
-                  </span>
-                </div>
-                {r.challenge && (
-                  <div className='inline-flex items-center gap-2.5 self-start rounded-xl border border-dashed border-[#e74c3c]/15 bg-[#e74c3c]/[0.03] px-4 py-3'>
-                    <div className='text-xs font-semibold text-white/35'>
-                      과제곡
-                    </div>
-                    <div className='font-mono text-xl font-bold tracking-[3px] text-white/35'>
-                      ???
-                    </div>
-                    <div className='font-mono text-[11px] font-semibold text-[#e74c3c] opacity-50'>
-                      추후 공개
-                    </div>
-                  </div>
-                )}
-              </div>
+                {r.total}
+              </span>
             </div>
           </div>
         ))}
-      </div>
-    </SectionBlock>
-  )
-}
+      </Card>
 
-function PlayRulesSection() {
-  return (
-    <SectionBlock
-      id='rules'
-      num='06'
-      title='플레이 규정'
-      desc='사이드 선택, 플레이 순서, 옵션, 동점 처리 등 경기 규정입니다.'
-    >
-      <div className='grid gap-3 sm:grid-cols-2'>
-        {PLAY_RULES.map((rule) => (
-          <div
-            key={rule.title}
-            className='relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] p-6 transition-colors hover:border-[#2a2a2a]'
-          >
-            <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#e74c3c] opacity-40' />
-            <div className='mb-3 flex items-center gap-2.5'>
-              <div className='flex size-[30px] shrink-0 items-center justify-center'>
-                {PLAY_RULE_ICON_MAP[rule.icon] ? (
-                  <img
-                    src={PLAY_RULE_ICON_MAP[rule.icon]}
-                    alt=''
-                    className='size-7 object-contain'
-                    loading='lazy'
-                    draggable={false}
-                  />
-                ) : (
-                  <TkcIcon name={rule.icon} className='size-6' />
-                )}
-              </div>
-              <div className='text-[17px] font-bold text-white/90'>
-                {rule.title}
-              </div>
-            </div>
-            <div className='space-y-1.5 text-[15px] leading-[1.55] text-white/55'>
-              {rule.lines.map((line, i) => (
-                <div key={i}>
-                  {line.bold ? (
-                    <>
-                      <strong className='text-white/90'>{line.bold}</strong> —{' '}
-                      {line.text}
-                    </>
-                  ) : (
-                    line.text
-                  )}
-                </div>
-              ))}
-            </div>
+      {/* Challenge Song Area */}
+      <div className='relative overflow-hidden rounded-2xl border border-[#e74c3c]/20 bg-[#111] px-6 py-12 text-center'>
+        <div className='absolute top-0 right-0 left-0 h-[3px] bg-gradient-to-r from-transparent via-[#e74c3c] to-[#f5a623]' />
+        <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,_rgba(231,76,60,0.08)_0%,_transparent_70%)]' />
+        <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_40%_60%_at_50%_100%,_rgba(245,166,35,0.05)_0%,_transparent_70%)]' />
+
+        <div className='relative'>
+          <div className='mb-5 font-mono text-[11px] font-bold tracking-[3px] text-[#e74c3c]/60 uppercase'>
+            Challenge Song
           </div>
-        ))}
+          <div className='mb-4 text-sm font-semibold text-white/35'>
+            각 라운드 과제곡
+          </div>
+
+          <div className='mb-2 flex justify-center gap-3'>
+            {['8강', '4강', '3·4위', '결승'].map((label, i) => {
+              const isFinal = i === 3
+              return (
+                <div key={label} className='flex flex-col items-center'>
+                  <div
+                    className='relative flex h-16 w-12 items-center justify-center overflow-hidden rounded-xl border border-dashed font-mono text-xl font-bold sm:h-[72px] sm:w-14 sm:text-2xl'
+                    style={{
+                      borderColor: isFinal
+                        ? 'rgba(245,166,35,0.25)'
+                        : 'rgba(231,76,60,0.25)',
+                      background: isFinal
+                        ? 'rgba(245,166,35,0.04)'
+                        : 'rgba(231,76,60,0.03)',
+                      color: isFinal
+                        ? 'rgba(245,166,35,0.5)'
+                        : 'rgba(255,255,255,0.35)',
+                      animation: `slot-pulse 3s ease-in-out ${i * 0.5}s infinite`,
+                    }}
+                  >
+                    ?
+                    <div
+                      className='pointer-events-none absolute -top-1/2 -left-1/2 h-[200%] w-[200%]'
+                      style={{
+                        background:
+                          'linear-gradient(135deg, transparent 40%, rgba(231,76,60,0.04) 50%, transparent 60%)',
+                        animation: 'slot-shimmer 4s ease-in-out infinite',
+                      }}
+                    />
+                  </div>
+                  <span
+                    className='mt-1.5 text-[11px] font-semibold'
+                    style={{
+                      color: isFinal ? '#f5a623' : 'rgba(255,255,255,0.35)',
+                    }}
+                  >
+                    {label}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+
+          <div className='mt-6 text-[13px] text-white/35'>
+            과제곡은{' '}
+            <strong className='text-[#e74c3c]'>대회 당일 현장에서 공개</strong>
+            됩니다
+          </div>
+        </div>
       </div>
+
+      <Callout type='info' icon={<TkcIcon name='info' />}>
+        모든 라운드에{' '}
+        <strong className='text-white/80'>과제곡 1곡</strong>이 포함됩니다.
+        과제곡은 항상 마지막에 플레이합니다.
+      </Callout>
 
       <Callout type='danger' icon={<TkcIcon name='warning' />}>
-        선수 과실에 의한 미스는{' '}
-        <strong className='text-[#e74c3c]'>
+        동점 시 마지막 곡 동일 조건 재대결.{' '}
+        <strong className='text-[#e74c3c]'>재대결도 동점 시 良(양) 수 비교.</strong>
+      </Callout>
+
+      <Callout type='info' icon={<TkcIcon name='info' />}>
+        기기 오류 발생 시 운영진 판단 후 재경기. 선수 과실에 의한 미스는{' '}
+        <strong className='text-white/80'>
           재경기 사유에 해당하지 않습니다.
         </strong>
       </Callout>
@@ -1224,23 +1104,26 @@ function PlayRulesSection() {
 function SectionNav({ activeId }: { activeId: string }) {
   return (
     <nav className='sticky top-0 z-50 -mx-4 mb-10 border-b border-[#1e1e1e] bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-2xl md:-mx-6 md:px-6'>
-      <div
-        className='flex gap-1.5 overflow-x-auto'
-        style={{ scrollbarWidth: 'none' }}
-      >
-        {NAV_ITEMS.map((item) => (
-          <a
-            key={item.id}
-            href={`#${item.id}`}
-            className={`shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-all ${
-              activeId === item.id
-                ? 'border-[#2a2a2a] bg-[#111] text-white/90'
-                : 'border-transparent text-white/35 hover:bg-[#111] hover:text-white/55'
-            }`}
-          >
-            {item.label}
-          </a>
-        ))}
+      <div className='relative'>
+        <div
+          className='flex gap-1.5 overflow-x-auto'
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={`shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-all ${
+                activeId === item.id
+                  ? 'border-[#2a2a2a] bg-[#111] text-white/90'
+                  : 'border-transparent text-white/35 hover:bg-[#111] hover:text-white/55'
+              }`}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+        <div className='pointer-events-none absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-[#0a0a0a] to-transparent sm:hidden' />
       </div>
     </nav>
   )
@@ -1282,7 +1165,6 @@ function ArcadeFinalsPage() {
         <PrepSection />
         <BanPickSection />
         <RoundsSection />
-        <PlayRulesSection />
       </div>
 
       {/* ── Back Link ── */}

@@ -501,11 +501,8 @@ function NameplateBanner() {
     const reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches
-    if (reduceMotion) {
-      setIconGlow(true)
-      return
-    }
-    const id = window.setTimeout(() => setIconGlow(true), 500)
+    const delay = reduceMotion ? 0 : 500
+    const id = window.setTimeout(() => setIconGlow(true), delay)
     return () => window.clearTimeout(id)
   }, [topSeen])
 

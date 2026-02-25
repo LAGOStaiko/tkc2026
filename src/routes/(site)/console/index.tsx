@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   Callout,
   FadeIn,
-  Card,
   Accordion,
   StepCard,
   DetailSubtitle,
@@ -19,19 +17,34 @@ export const Route = createFileRoute('/(site)/console/')({
 /*  Constants                                                          */
 /* ════════════════════════════════════════════════════════════════════ */
 
-type GlanceItem = {
-  label: string
-  value: string
-  color?: string
-  sub?: string
-}
-
-const GLANCE_ITEMS: GlanceItem[] = [
-  { label: '방식', value: '2곡 합산\n스코어 어택' },
-  { label: '결선 진출', value: '상위 4명', color: '#f7d154' },
-  { label: '신청 기간', value: '3.2 ~ 4.30' },
-  { label: '제출 방법', value: '유튜브 영상', color: '#f5a623' },
-]
+const FLOW_CARDS = [
+  {
+    step: 'STEP 01',
+    label: '과제곡 플레이',
+    value: '2곡 합산\n스코어 어택',
+    sub: '과제곡 2곡의 점수 합산으로 순위 결정',
+    hasArrow: true,
+  },
+  {
+    step: 'STEP 02',
+    label: '결선 진출',
+    value: '상위 4명',
+    sub: 'PlayX4 결선 직행',
+    gold: true,
+  },
+  {
+    step: '제출 방식',
+    label: '영상 제출',
+    value: '유튜브 영상 제출',
+    sub: '지정 앵글 촬영 → 일부공개 업로드',
+  },
+  {
+    step: '입력 방식',
+    label: '컨트롤러 선택',
+    value: '컨트롤러 · 조이콘',
+    sub: '한 번 선택 시 결선까지 변경 불가',
+  },
+] as const
 
 const SONGS = [
   {
@@ -67,8 +80,6 @@ const SUBMIT_FLOW = [
   { num: '②', label: '업로드', desc: '유튜브 일부공개' },
   { num: '③', label: '제출', desc: '신청 폼에 링크 첨부' },
 ] as const
-
-const RANKING_SCORES = [97, 91, 85, 80, 74, 68]
 
 const APPLY_FIELDS = [
   { label: '이름', value: '실명 기재' },
@@ -139,69 +150,6 @@ function CalloutCharIcon({
   )
 }
 
-function RankingVisual() {
-  const ref = useRef<HTMLDivElement>(null)
-  const [animated, setAnimated] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setAnimated(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.3 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
-  return (
-    <div ref={ref} className='space-y-1'>
-      {RANKING_SCORES.map((score, i) => {
-        const qualify = i < 4
-        return (
-          <div
-            key={i}
-            className={`flex items-center gap-2.5 rounded-xl border p-2.5 px-3.5 ${
-              qualify
-                ? 'border-[#f7d154]/20 bg-[#f7d154]/[0.02]'
-                : 'border-[#1e1e1e] opacity-45'
-            }`}
-          >
-            <div
-              className={`w-[26px] text-center text-base font-extrabold ${qualify ? 'text-[#f7d154]' : 'text-white/35'}`}
-            >
-              {i + 1}
-            </div>
-            <div className='h-1.5 flex-1 overflow-hidden rounded-full bg-[#1e1e1e]'>
-              <div
-                className={`h-full rounded-full transition-all duration-800 ease-out ${qualify ? 'bg-gradient-to-r from-[#f7d154] to-[#f7d154]' : 'bg-white/25'}`}
-                style={{
-                  width: animated ? `${score}%` : '0%',
-                  transitionDelay: `${i * 80}ms`,
-                }}
-              />
-            </div>
-            <span
-              className={`rounded px-1.5 py-0.5 font-mono text-[11px] font-bold tracking-wide ${
-                qualify
-                  ? 'bg-[#f7d154]/[0.08] text-[#f7d154]'
-                  : 'bg-white/[0.02] text-white/35'
-              }`}
-            >
-              {qualify ? '진출' : '예비'}
-            </span>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 /* ════════════════════════════════════════════════════════════════════ */
 /*  Page                                                               */
 /* ════════════════════════════════════════════════════════════════════ */
@@ -211,38 +159,105 @@ function ConsoleQualifierPage() {
     <>
       {/* ── At a Glance ── */}
       <FadeIn delay={300}>
-        <Card className='mb-12 overflow-hidden p-0'>
-          <div className='flex items-center gap-2.5 border-b border-[#1e1e1e] bg-[#111] px-6 py-4'>
-            <span className='size-2 rounded-full bg-[#e74c3c]' />
-            <span className='text-[15px] font-bold text-white/90'>
-              한눈에 보기
-            </span>
+        <div className='mb-12'>
+          <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#e74c3c] uppercase'>
+            Console Qualifier
           </div>
-          <div className='grid grid-cols-2 bg-[#111]'>
-            {GLANCE_ITEMS.map((item, i) => (
-              <div
-                key={item.label}
-                className={`relative flex min-h-[100px] flex-col items-center justify-center border-[#1e1e1e] px-5 pt-7 pb-4 text-center ${i < 2 ? 'border-b' : ''} ${i % 2 === 0 ? 'border-r' : ''}`}
-              >
-                <div className='absolute top-2.5 left-3.5 text-[12px] font-medium tracking-wide text-white/35'>
-                  {item.label}
-                </div>
+          <h2 className='mb-6 text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
+            한눈에 보기
+          </h2>
+
+          <div>
+            <div className='grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[#2a2a2a] bg-[#2a2a2a] sm:grid-cols-2'>
+              {FLOW_CARDS.map((card) => (
                 <div
-                  className='text-[24px] font-extrabold tracking-tight whitespace-pre-line sm:text-[28px] sm:whitespace-normal'
-                  style={{ color: item.color ?? 'rgba(255,255,255,0.9)' }}
+                  key={card.step}
+                  className='relative bg-[#141414] px-6 py-7 transition-colors hover:bg-[#1a1a1a]'
                 >
-                  {item.value}
-                </div>
-                {item.sub && (
-                  <div className='mt-0.5 text-[12px] text-white/40'>
-                    {item.sub}
+                  <div className='mb-1.5 font-mono text-[11px] font-bold tracking-[1.5px] text-[#b83a30] uppercase'>
+                    {card.step}
                   </div>
-                )}
+                  {card.label && (
+                    <div className='mb-1 text-[12px] text-white/50'>
+                      {card.label}
+                    </div>
+                  )}
+                  <div
+                    className={`text-[22px] font-black leading-[1.3] tracking-tight whitespace-pre-line ${
+                      'gold' in card && card.gold
+                        ? 'text-[#f5a623]'
+                        : 'text-white/90'
+                    }`}
+                  >
+                    {card.value}
+                  </div>
+                  <div className='mt-1.5 whitespace-pre-line text-[12px] leading-relaxed text-white/40'>
+                    {card.sub}
+                  </div>
+                  {'hasArrow' in card && card.hasArrow && (
+                    <span className='absolute top-1/2 right-0 z-[2] hidden -translate-y-1/2 translate-x-1/2 text-sm text-[#b83a30] sm:block'>
+                      →
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className='mt-0.5 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#2a2a2a] sm:grid-cols-2'>
+              <div className='flex items-center gap-3.5 bg-[#141414] px-6 py-5 transition-colors hover:bg-[#1a1a1a]'>
+                <div className='flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-[#e74c3c]/15 bg-[#e74c3c]/[0.08]'>
+                  <svg
+                    width='18'
+                    height='18'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='#e74c3c'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  >
+                    <rect x='3' y='4' width='18' height='18' rx='2' ry='2' />
+                    <line x1='16' y1='2' x2='16' y2='6' />
+                    <line x1='8' y1='2' x2='8' y2='6' />
+                    <line x1='3' y1='10' x2='21' y2='10' />
+                  </svg>
+                </div>
+                <div>
+                  <div className='text-[11px] text-white/50'>신청 기간</div>
+                  <div className='text-[15px] font-bold text-white/90'>
+                    3.2 ~ 4.30
+                  </div>
+                </div>
               </div>
-            ))}
+              <div className='flex items-center gap-3.5 bg-[#141414] px-6 py-5 transition-colors hover:bg-[#1a1a1a]'>
+                <div className='flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-[#e74c3c]/15 bg-[#e74c3c]/[0.08]'>
+                  <svg
+                    width='18'
+                    height='18'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='#e74c3c'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  >
+                    <path d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z' />
+                    <circle cx='12' cy='10' r='3' />
+                  </svg>
+                </div>
+                <div>
+                  <div className='text-[11px] text-white/50'>결선 장소</div>
+                  <div className='text-[15px] font-bold text-white/90'>
+                    PlayX4
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </Card>
+        </div>
       </FadeIn>
+
+      <div className='mb-12 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent' />
 
       {/* ── Steps Header ── */}
       <FadeIn>
@@ -250,10 +265,10 @@ function ConsoleQualifierPage() {
           How to participate
         </div>
         <h2 className='mb-2 text-[clamp(22px,4vw,30px)] font-extrabold tracking-tight text-white/90'>
-          참가 3단계
+          참가 방법
         </h2>
         <p className='mb-8 text-sm font-light text-white/55'>
-          아래 세 단계를 따라가면 됩니다.
+          과제곡을 플레이하고, 영상을 제출하세요.
         </p>
       </FadeIn>
 
@@ -396,50 +411,6 @@ function ConsoleQualifierPage() {
               규정 미준수 영상은{' '}
               <strong className='text-[#e74c3c]'>심사 대상에서 제외</strong>될
               수 있습니다.
-            </Callout>
-          </div>
-        </StepCard>
-
-        {/* ── Step 03: 결선 진출 확인 ── */}
-        <StepCard
-          num='03'
-          heading='결선 진출 확인'
-          accentColor='#e74c3c'
-          summary={
-            <>
-              2곡 합산 점수 <strong className='text-white/90'>상위 4명</strong>
-              이 PlayX4 결선에 진출합니다. 기권 시 예비 순번으로 대체됩니다.
-            </>
-          }
-          toggleLabel='점수 산정 · 순위 상세 보기'
-        >
-          <div>
-            <DetailSubtitle>점수 산정 방식</DetailSubtitle>
-            <div className='flex flex-wrap items-center justify-center gap-3 py-2'>
-              <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.02] px-5 py-2.5 text-center'>
-                <div className='text-[11px] text-white/35'>과제곡 1</div>
-                <div className='text-sm font-bold text-white/90'>점수 A</div>
-              </div>
-              <div className='text-xl font-extrabold text-[#e74c3c]'>+</div>
-              <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.02] px-5 py-2.5 text-center'>
-                <div className='text-[11px] text-white/35'>과제곡 2</div>
-                <div className='text-sm font-bold text-white/90'>점수 B</div>
-              </div>
-              <div className='text-xl font-extrabold text-[#e74c3c]'>=</div>
-              <div className='rounded-xl border border-[#f7d154]/25 bg-[#f7d154]/[0.03] px-5 py-2.5 text-center'>
-                <div className='text-[11px] text-white/35'>통산 점수</div>
-                <div className='text-sm font-bold text-[#f7d154]'>A + B</div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <DetailSubtitle>순위 예시</DetailSubtitle>
-            <RankingVisual />
-            <Callout type='warning' icon={<CalloutCharIcon type='warning' />}>
-              아케이드·콘솔 예선 중복 참가도 가능하지만,{' '}
-              <strong className='text-white/80'>결선 동시 진출은 불가</strong>
-              합니다. (택 1)
             </Callout>
           </div>
         </StepCard>

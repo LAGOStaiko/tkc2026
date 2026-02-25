@@ -21,11 +21,33 @@ const NAV_ITEMS = [
   { id: 'seed', label: '시드 산정' },
 ]
 
-const STAT_ITEMS = [
-  { value: '4회', label: '오프라인 예선', color: '#e74c3c' },
-  { value: '16명', label: '지역별 참가자', color: '#f5a623' },
-  { value: '2명', label: '회차별 진출', color: '#f7d154' },
-  { value: 'Top 8', label: '결선 진출 인원', color: '#f7d154' },
+const FLOW_CARDS = [
+  {
+    step: 'STEP 01',
+    label: '오프라인 예선',
+    value: '스위스 시스템',
+    sub: '같은 전적끼리 매칭, 2패 탈락',
+    hasArrow: true,
+  },
+  {
+    step: 'STEP 02',
+    label: '진출',
+    value: '차수별 2명 진출',
+    sub: '4-0 자동 진출 + 3-1 선발전 1명',
+    gold: true,
+  },
+  {
+    step: '참가 인원',
+    label: '차수별',
+    value: '16명',
+    sub: '온라인 예선 상위 16명 참가',
+  },
+  {
+    step: '진행 방식',
+    label: '',
+    value: '최대 4라운드',
+    sub: '선곡 대전, 2곡 합산 승패',
+  },
 ] as const
 
 const REGIONS = [
@@ -226,13 +248,13 @@ const SWISS_ROUNDS: Record<1 | 2 | 3 | 4, SwissGroup[]> = {
 
 function SectionBlock({
   id,
-  num,
+  category,
   title,
   desc,
   children,
 }: {
   id: string
-  num: string
+  category: string
   title: string
   desc: string
   children: ReactNode
@@ -244,7 +266,7 @@ function SectionBlock({
       )}
       <FadeIn>
         <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#f5a623] uppercase'>
-          Section {num}
+          {category}
         </div>
         <h2 className='mb-3 text-2xl font-bold tracking-tight text-white/90 md:text-[32px]'>
           {title}
@@ -422,32 +444,94 @@ function OverviewSection() {
   return (
     <SectionBlock
       id='overview'
-      num='00'
+      category='OVERVIEW'
       title='개요 및 전반 구조'
       desc='전국 4개 지역 오프라인 예선을 거쳐, 총 8명이 최종 결선에 진출합니다.'
     >
-      {/* Stats */}
-      <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
-        {STAT_ITEMS.map((s) => (
-          <div
-            key={s.label}
-            className='relative overflow-hidden rounded-2xl border border-[#1e1e1e] bg-[#111] px-4 py-5 text-center'
-          >
+      {/* Main 2×2 flow grid + Bottom strip */}
+      <div>
+        <div className='grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[#2a2a2a] bg-[#2a2a2a] sm:grid-cols-2'>
+          {FLOW_CARDS.map((card) => (
             <div
-              className='absolute top-0 right-0 left-0 h-0.5'
-              style={{ background: s.color }}
-            />
-            <div
-              className='text-[28px] font-extrabold'
-              style={{ color: s.color }}
+              key={card.step}
+              className='relative bg-[#141414] px-6 py-7 transition-colors hover:bg-[#1a1a1a]'
             >
-              {s.value}
+              <div className='mb-1.5 font-mono text-[11px] font-bold tracking-[1.5px] text-[#b8842a] uppercase'>
+                {card.step}
+              </div>
+              {card.label && (
+                <div className='mb-1 text-[12px] text-white/50'>
+                  {card.label}
+                </div>
+              )}
+              <div
+                className={`text-[22px] font-black leading-[1.3] tracking-tight whitespace-pre-line ${
+                  'gold' in card && card.gold
+                    ? 'text-[#f5a623]'
+                    : 'text-white/90'
+                }`}
+              >
+                {card.value}
+              </div>
+              <div className='mt-1.5 whitespace-pre-line text-[12px] leading-relaxed text-white/40'>
+                {card.sub}
+              </div>
+              {'hasArrow' in card && card.hasArrow && (
+                <span className='absolute top-1/2 right-0 z-[2] hidden -translate-y-1/2 translate-x-1/2 text-sm text-[#b8842a] sm:block'>
+                  →
+                </span>
+              )}
             </div>
-            <div className='mt-1 text-xs font-medium text-white/35'>
-              {s.label}
+          ))}
+        </div>
+
+        <div className='mt-0.5 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#2a2a2a] sm:grid-cols-2'>
+          <div className='flex items-center gap-3.5 bg-[#141414] px-6 py-5 transition-colors hover:bg-[#1a1a1a]'>
+            <div className='flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-[#f5a623]/15 bg-[#f5a623]/[0.08]'>
+              <svg
+                width='18'
+                height='18'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='#f5a623'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              >
+                <path d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z' />
+                <circle cx='12' cy='10' r='3' />
+              </svg>
+            </div>
+            <div>
+              <div className='text-[11px] text-white/50'>오프라인 장소</div>
+              <div className='text-[15px] font-bold text-white/90'>
+                전국 4개 지역
+              </div>
             </div>
           </div>
-        ))}
+          <div className='flex items-center gap-3.5 bg-[#141414] px-6 py-5 transition-colors hover:bg-[#1a1a1a]'>
+            <div className='flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-[#f5a623]/15 bg-[#f5a623]/[0.08]'>
+              <svg
+                width='18'
+                height='18'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='#f5a623'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              >
+                <polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' />
+              </svg>
+            </div>
+            <div>
+              <div className='text-[11px] text-white/50'>결선 진출</div>
+              <div className='text-[15px] font-bold text-white/90'>
+                총 8명 (4지역 × 2명)
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Region Timeline */}
@@ -506,7 +590,7 @@ function SwissSection() {
   return (
     <SectionBlock
       id='swiss'
-      num='01'
+      category='SWISS STAGE'
       title='스위스 스테이지 (2패 탈락)'
       desc='같은 전적의 참가자끼리 매칭하는 스위스 시스템. 패배가 2회 누적되면 즉시 탈락합니다.'
     >
@@ -577,7 +661,7 @@ function MatchSection() {
   return (
     <SectionBlock
       id='match'
-      num='02'
+      category='MATCH RULES'
       title='1경기(매치) 규칙: 2곡 합산'
       desc='각 선수가 1곡씩 제공하여, 총 2곡의 점수를 합산해 승패를 결정합니다.'
     >
@@ -741,7 +825,7 @@ function TiebreakSection() {
   return (
     <SectionBlock
       id='tiebreak'
-      num='03'
+      category='TIEBREAK'
       title='동점 처리'
       desc='2곡 합산 점수가 동점일 경우, 다음 절차로 처리합니다.'
     >
@@ -794,7 +878,7 @@ function AdvanceSection() {
   return (
     <SectionBlock
       id='advance'
-      num='04'
+      category='ADVANCE'
       title='스위스 종료 후: 진출자 선발'
       desc='각 예선에서 총 2명이 진출합니다. 자동 진출 1명 + 선발전 1명.'
     >
@@ -872,7 +956,7 @@ function SeedSection() {
   return (
     <SectionBlock
       id='seed'
-      num='05'
+      category='SEEDING'
       title='결선(Top 8) 시드 산정'
       desc='각 지역 진출자 2명이 시드 산정용 과제곡을 플레이합니다.'
     >

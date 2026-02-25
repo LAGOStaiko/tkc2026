@@ -152,12 +152,16 @@ export function Card({
 
 export function Accordion({
   title,
+  icon,
   children,
+  defaultOpen = false,
 }: {
   title: string
+  icon?: ReactNode
   children: ReactNode
+  defaultOpen?: boolean
 }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(defaultOpen)
 
   return (
     <div className='tkc-motion-surface rounded-2xl border border-[#1e1e1e] bg-[#111] hover:border-[#2a2a2a]'>
@@ -166,7 +170,8 @@ export function Accordion({
         onClick={() => setOpen((v) => !v)}
         className='flex w-full items-center justify-between px-4 py-3.5 text-left text-white/35 transition-colors hover:text-white/55 sm:px-6 sm:py-4'
       >
-        <span className='text-[13px] font-bold text-white/90 sm:text-sm'>
+        <span className='flex items-center gap-2.5 text-[13px] font-bold text-white/90 sm:text-sm'>
+          {icon}
           {title}
         </span>
         <DropdownToggleIcon
