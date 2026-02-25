@@ -1085,21 +1085,14 @@ function ArcadeRegionDetailPage() {
                 score: row.score,
                 badge:
                   regionData.deciderWinnerEntryId === row.entryId ||
-                  row.rank <= (sortedDeciderRows.length > 3 ? 3 : 1)
+                  row.rank <= 1
                     ? '통과'
                     : undefined,
               }))}
-              cutlineAfter={
-                sortedDeciderRows.length > 3
-                  ? 3
-                  : sortedDeciderRows.length > 1
-                    ? 1
-                    : undefined
-              }
+              cutlineAfter={sortedDeciderRows.length > 1 ? 1 : undefined}
               callout={
                 <span className='break-keep'>
-                  3-1 중 상위 {sortedDeciderRows.length > 3 ? 3 : 1}명이 선발전
-                  통과 → 시드전 진출
+                  3-1 중 상위 1명이 선발전 통과 → 시드전 진출
                 </span>
               }
             />
