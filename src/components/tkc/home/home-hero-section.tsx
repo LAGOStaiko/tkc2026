@@ -6,12 +6,13 @@ import { useCanHover } from '@/components/tkc/home/use-can-hover'
 const HERO_ASSETS = {
   heroBg: '/branding/v2/hero-bg.webp',
   // Asset file names are historical; keep mapping by visual role.
-  heroMain: '/branding/v2/hero-title.webp',
+  heroMain: '/branding/v2/logo-3.png',
   heroSide: '/branding/v2/hero-main.webp',
-  heroTitle: '/branding/v2/hero-side.webp',
+  heroTitle: '/branding/v2/logo-4.png',
+  heroTop: '/branding/v2/logo-5.png',
 }
 
-const HERO_LAYER_COUNT = 4
+const HERO_LAYER_COUNT = 5
 
 export function HomeHeroSection() {
   const canHover = useCanHover()
@@ -124,6 +125,18 @@ export function HomeHeroSection() {
             src={HERO_ASSETS.heroTitle}
             alt=''
             className='hero-title-image h-full w-full object-contain'
+            loading='eager'
+            draggable={false}
+            onLoad={markHeroLayerReady}
+            onError={markHeroLayerReady}
+          />
+        </div>
+
+        <div className='hero-layer hero-layer-top absolute inset-0 z-[4] flex items-center justify-center'>
+          <img
+            src={HERO_ASSETS.heroTop}
+            alt=''
+            className='hero-top-image h-full w-full object-contain'
             loading='eager'
             draggable={false}
             onLoad={markHeroLayerReady}
