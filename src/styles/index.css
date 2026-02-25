@@ -462,14 +462,14 @@
   100% {
     transform: translateY(0);
     box-shadow:
-      0 0 30px rgba(231, 76, 60, 0.1),
+      0 0 30px rgba(var(--glow-rgb, 231, 76, 60), 0.1),
       0 4px 20px rgba(0, 0, 0, 0.3);
   }
   50% {
     transform: translateY(-4px);
     box-shadow:
-      0 0 50px rgba(231, 76, 60, 0.35),
-      0 0 80px rgba(231, 76, 60, 0.15),
+      0 0 50px rgba(var(--glow-rgb, 231, 76, 60), 0.35),
+      0 0 80px rgba(var(--glow-rgb, 231, 76, 60), 0.15),
       0 8px 25px rgba(0, 0, 0, 0.35);
   }
 }

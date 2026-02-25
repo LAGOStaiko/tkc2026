@@ -16,7 +16,6 @@ const NAV_ITEMS = [
   { id: 'overview', label: '개요' },
   { id: 'swiss', label: '스위스 스테이지' },
   { id: 'match', label: '경기 규칙' },
-  { id: 'side', label: '사이드 규칙' },
   { id: 'tiebreak', label: '동점 처리' },
   { id: 'advance', label: '진출자 선발' },
   { id: 'seed', label: '시드 산정' },
@@ -55,7 +54,7 @@ const REGIONS = [
     num: 4,
     name: '부산',
     detail: '4차 예선',
-    arcade: '게임D',
+    arcade: '경성대 게임 D',
     image: '/branding/venue-busan.png',
   },
 ] as const
@@ -86,6 +85,11 @@ const MATCH_RULES = [
     num: 'C',
     title: '홀수 인원 처리',
     desc: '노쇼·기권으로 홀수가 발생할 경우, 남는 1명에게 부전승(Bye) 1승을 부여합니다.',
+  },
+  {
+    num: 'D',
+    title: '재대전 허용',
+    desc: '이전 라운드에서 대전한 상대와 다시 매칭될 수 있습니다.',
   },
 ] as const
 
@@ -235,6 +239,9 @@ function SectionBlock({
 }) {
   return (
     <section id={id} data-section={id} className='mb-20'>
+      {id !== 'overview' && (
+        <div className='mb-12 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent' />
+      )}
       <FadeIn>
         <div className='mb-2 font-mono text-xs font-semibold tracking-[1px] text-[#f5a623] uppercase'>
           Section {num}
@@ -263,7 +270,13 @@ function SwissAnimator() {
   useEffect(() => {
     if (!autoPlay) return
     const id = setInterval(() => {
-      setActiveRound((prev) => (prev >= 4 ? 1 : ((prev + 1) as 1 | 2 | 3 | 4)))
+      setActiveRound((prev) => {
+        if (prev >= 4) {
+          setAutoPlay(false)
+          return prev
+        }
+        return (prev + 1) as 1 | 2 | 3 | 4
+      })
     }, 3500)
     return () => clearInterval(id)
   }, [autoPlay])
@@ -442,57 +455,39 @@ function OverviewSection() {
         <div className='mb-4 text-[13px] font-semibold text-white/35'>
           예선 일정
         </div>
-        {/* Mobile */}
-        <div className='flex flex-col gap-3 sm:hidden'>
-          {REGIONS.map((r) => (
+        <div className='grid grid-cols-1 gap-3 sm:grid-cols-4 sm:gap-0 sm:py-5'>
+          {REGIONS.map((r, i) => (
             <div
               key={r.num}
-              className='relative overflow-hidden rounded-lg border border-[#f5a623]/15 bg-[#111] px-4 py-3.5'
+              className='relative overflow-hidden rounded-lg border border-[#f5a623]/15 bg-[#111] sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent sm:text-center'
             >
-              <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#f5a623]/40' />
-              <div className='flex items-center gap-3.5'>
+              <div className='h-0.5 bg-[#f5a623]/40 sm:hidden' />
+              <div className='flex items-center gap-3.5 px-4 py-3.5 sm:flex-col sm:gap-0 sm:px-0 sm:py-0'>
                 <img
                   src={r.image}
                   alt={r.arcade}
-                  className='size-9 shrink-0 rounded-lg object-cover'
+                  className='size-9 shrink-0 rounded-lg object-cover sm:relative sm:z-10 sm:mb-2.5 sm:size-10'
                   loading='lazy'
                 />
-                <div className='min-w-0 flex-1'>
-                  <div className='flex items-center gap-2'>
+                <div className='min-w-0 flex-1 sm:flex-none'>
+                  <div className='flex items-center gap-2 sm:justify-center'>
                     <span className='text-sm font-semibold text-white/90'>
                       {r.name}
                     </span>
-                    <span className='text-[11px] text-white/35'>
+                    <span className='text-[11px] text-white/35 sm:hidden'>
                       {r.detail}
                     </span>
                   </div>
-                  <div className='mt-0.5 text-[13px] font-bold text-[#f5a623]'>
+                  <div className='mt-0.5 text-[13px] font-bold text-[#f5a623] sm:mt-1'>
                     {r.arcade}
+                  </div>
+                  <div className='mt-0.5 hidden text-[11px] text-white/35 sm:block'>
+                    {r.detail}
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-        {/* Desktop */}
-        <div className='hidden items-center py-5 sm:flex'>
-          {REGIONS.map((r, i) => (
-            <div key={r.num} className='relative flex-1 text-center'>
-              <img
-                src={r.image}
-                alt={r.arcade}
-                className='relative z-10 mx-auto mb-2.5 size-10 rounded-lg object-cover'
-                loading='lazy'
-              />
-              <div className='text-sm font-semibold text-white/90'>
-                {r.name}
-              </div>
-              <div className='mt-1 text-[13px] font-bold text-[#f5a623]'>
-                {r.arcade}
-              </div>
-              <div className='mt-0.5 text-[11px] text-white/35'>{r.detail}</div>
               {i < REGIONS.length - 1 && (
-                <div className='absolute top-[20px] left-1/2 h-px w-full bg-[#2a2a2a]' />
+                <div className='absolute top-[20px] left-1/2 hidden h-px w-full bg-[#2a2a2a] sm:block' />
               )}
             </div>
           ))}
@@ -646,47 +641,44 @@ function MatchSection() {
         ))}
       </div>
 
-      {/* Song Submission */}
+      {/* Song Submission — 4곡 풀 소모 */}
       <Card>
         <div className='mb-1 text-sm font-bold text-white/90'>
           사전 선곡 제출
         </div>
         <div className='mb-4 text-xs text-white/35'>
-          참가자는 신청 시점에 최대 4라운드까지 사용할 곡을 미리 제출합니다
+          예선 선곡풀에서 4곡을 사전 제출합니다
         </div>
-        <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
-          {(['R1', 'R2', 'R3', 'R4'] as const).map((r) => (
+        <div className='grid grid-cols-4 gap-1.5'>
+          {(['곡 1', '곡 2', '곡 3', '곡 4'] as const).map((label) => (
             <div
-              key={r}
-              className='relative overflow-hidden rounded-xl border border-[#1e1e1e] bg-[#111] px-3 py-4 text-center'
+              key={label}
+              className='relative overflow-hidden rounded-lg border border-[#f5a623]/15 bg-[#f5a623]/[0.04] py-3.5 text-center'
             >
-              <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#f5a623]/60' />
-              <div className='text-xl font-extrabold text-[#f5a623]'>{r}</div>
-              <div className='mt-1 text-[11px] text-white/35'>신청 시 제출</div>
+              <div className='absolute top-0 right-0 left-0 h-0.5 bg-[#f5a623]/40' />
+              <div className='text-[13px] font-bold text-[#f5a623]'>
+                {label}
+              </div>
             </div>
           ))}
+        </div>
+        <div className='mt-3 text-[13px] leading-[1.55] break-keep text-white/45'>
+          매 라운드 남은 곡 중 1곡을 선택하여 사용하며, 한 번 사용한 곡은 이후
+          라운드에서 재사용할 수 없습니다.
         </div>
       </Card>
 
       <Callout type='info' icon={<TkcIcon name='info' />}>
-        해당 라운드 매치에서 사용되는 "자기 곡"은 사전 제출된 해당 라운드 곡으로
-        고정됩니다. (예: R3 배정 시 → 자신이 제출한 R3 곡 사용)
+        한 번 플레이한 곡은 이후 라운드에서 재사용할 수 없습니다.
       </Callout>
-    </SectionBlock>
-  )
-}
 
-function SideSection() {
-  return (
-    <SectionBlock
-      id='side'
-      num='03'
-      title='사이드(자리) 규칙'
-      desc='곡 제공자가 원하는 사이드를 선택할 수 있습니다.'
-    >
+      <Callout type='danger' icon={<TkcIcon name='warning' />}>
+        당일 노쇼 또는 기권 시, 상대 선수에게 부전승이 부여됩니다.
+      </Callout>
+
+      {/* Side rules (merged) */}
       <Card>
-        {/* Mobile */}
-        <div className='flex flex-col items-center gap-4 sm:hidden'>
+        <div className='flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-8 sm:py-7'>
           <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e74c3c] bg-[#e74c3c]/[0.06]'>
             <img
               src='/characters/arcade-side-1p.png'
@@ -697,35 +689,7 @@ function SideSection() {
             />
             <div className='text-sm font-bold text-[#e74c3c]'>1P</div>
           </div>
-          <div className='text-center text-xs leading-[1.55] text-white/35'>
-            자기 곡 차례에
-            <br />
-            <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
-          </div>
-          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#f7d154] bg-[#f7d154]/[0.06]'>
-            <img
-              src='/characters/arcade-side-2p.png'
-              alt=''
-              className='mb-1.5 size-14 object-contain'
-              loading='lazy'
-              draggable={false}
-            />
-            <div className='text-sm font-bold text-[#f7d154]'>2P</div>
-          </div>
-        </div>
-        {/* Desktop */}
-        <div className='hidden items-center justify-center gap-8 py-7 sm:flex'>
-          <div className='flex h-[130px] w-[100px] flex-col items-center justify-center rounded-xl border-2 border-[#e74c3c] bg-[#e74c3c]/[0.06]'>
-            <img
-              src='/characters/arcade-side-1p.png'
-              alt=''
-              className='mb-1.5 size-14 object-contain'
-              loading='lazy'
-              draggable={false}
-            />
-            <div className='text-sm font-bold text-[#e74c3c]'>1P</div>
-          </div>
-          <div className='text-center text-[13px] leading-[1.55] text-white/35'>
+          <div className='text-center text-xs leading-[1.55] text-white/35 sm:text-[13px]'>
             자기 곡 차례에
             <br />
             <strong className='text-[#f5a623]'>곡 제공자가 선택</strong>
@@ -743,7 +707,6 @@ function SideSection() {
         </div>
       </Card>
 
-      {/* Per-song side selection */}
       <Card>
         <div className='mb-3.5 text-sm font-bold text-white/90'>
           곡별 사이드 선택
@@ -766,15 +729,10 @@ function SideSection() {
             </div>
           </div>
         </div>
+        <div className='mt-3 text-[12px] break-keep text-white/35'>
+          재경기 등 운영상 우선권이 필요한 경우, <strong className='text-white/55'>온라인 예선 순위가 더 높은 선수</strong>가 사이드 선택 우선권을 가집니다.
+        </div>
       </Card>
-
-      <Callout type='warning' icon={<TkcIcon name='warning' />}>
-        재경기 등 운영상 우선권이 필요한 경우,{' '}
-        <strong className='text-white/80'>
-          온라인 예선 순위가 더 높은 선수
-        </strong>
-        가 사이드 선택 우선권을 가집니다.
-      </Callout>
     </SectionBlock>
   )
 }
@@ -783,7 +741,7 @@ function TiebreakSection() {
   return (
     <SectionBlock
       id='tiebreak'
-      num='04'
+      num='03'
       title='동점 처리'
       desc='2곡 합산 점수가 동점일 경우, 다음 절차로 처리합니다.'
     >
@@ -810,25 +768,15 @@ function TiebreakSection() {
             ▼
           </span>
         </div>
-        {/* Node 2 */}
+        {/* Node 2 — 재경기 (운영진 선곡 + 良 판정 통합) */}
         <div className='w-full max-w-md rounded-xl border border-[#1e1e1e] bg-[#111] px-7 py-[18px] text-center'>
           <div className='text-[15px] font-bold text-white/90'>
-            선곡풀 랜덤 1곡
+            재경기 단판
           </div>
-          <div className='mt-1 text-xs text-white/35'>
-            선곡풀에서 랜덤으로 1곡을 선정
-          </div>
-        </div>
-        <div className='relative h-7 w-0.5 bg-[#2a2a2a]'>
-          <span className='absolute -bottom-1 left-1/2 -translate-x-1/2 text-[11px] text-[#f5a623]'>
-            ▼
-          </span>
-        </div>
-        {/* Node 3 */}
-        <div className='w-full max-w-md rounded-xl border border-[#1e1e1e] bg-[#111] px-7 py-[18px] text-center'>
-          <div className='text-[15px] font-bold text-white/90'>재경기 단판</div>
-          <div className='mt-1 text-xs text-white/35'>
-            1곡 재경기로 승패 결정
+          <div className='mt-1.5 text-xs leading-[1.55] break-keep text-white/35'>
+            양 선수가 미사용한 곡 중 운영진이 1곡을 선정하여 재경기.
+            <br />
+            재경기에서도 동점 시, <strong className='text-[#f5a623]'>良(양) 개수</strong>가 많은 선수가 승리.
           </div>
         </div>
       </div>
@@ -846,7 +794,7 @@ function AdvanceSection() {
   return (
     <SectionBlock
       id='advance'
-      num='05'
+      num='04'
       title='스위스 종료 후: 진출자 선발'
       desc='각 예선에서 총 2명이 진출합니다. 자동 진출 1명 + 선발전 1명.'
     >
@@ -924,7 +872,7 @@ function SeedSection() {
   return (
     <SectionBlock
       id='seed'
-      num='06'
+      num='05'
       title='결선(Top 8) 시드 산정'
       desc='각 지역 진출자 2명이 시드 산정용 과제곡을 플레이합니다.'
     >
@@ -949,6 +897,9 @@ function SeedSection() {
       <Callout type='info' icon={<TkcIcon name='info' />}>
         시드 과제곡은 사전에 비공개이며, 진출 확정 후 현장에서 각 1회
         플레이합니다.
+        <br />
+        4-0 진출자(A그룹)가 3-1 진출자(B그룹)보다 상위 시드를 받으며, 상세
+        대진은 결선 페이지를 참고해 주세요.
       </Callout>
     </SectionBlock>
   )
@@ -961,23 +912,26 @@ function SeedSection() {
 function SectionNav({ activeId }: { activeId: string }) {
   return (
     <nav className='sticky top-0 z-50 -mx-4 mb-10 border-b border-[#1e1e1e] bg-[#0a0a0a]/85 px-4 py-3 backdrop-blur-2xl md:-mx-6 md:px-6'>
-      <div
-        className='flex gap-1.5 overflow-x-auto'
-        style={{ scrollbarWidth: 'none' }}
-      >
-        {NAV_ITEMS.map((item) => (
-          <a
-            key={item.id}
-            href={`#${item.id}`}
-            className={`shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-all ${
-              activeId === item.id
-                ? 'border-[#2a2a2a] bg-[#111] text-white/90'
-                : 'border-transparent text-white/35 hover:bg-[#111] hover:text-white/55'
-            }`}
-          >
-            {item.label}
-          </a>
-        ))}
+      <div className='relative'>
+        <div
+          className='flex gap-1.5 overflow-x-auto'
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={`shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium whitespace-nowrap transition-all ${
+                activeId === item.id
+                  ? 'border-[#2a2a2a] bg-[#111] text-white/90'
+                  : 'border-transparent text-white/35 hover:bg-[#111] hover:text-white/55'
+              }`}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+        <div className='pointer-events-none absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-[#0a0a0a] to-transparent sm:hidden' />
       </div>
     </nav>
   )
@@ -1017,7 +971,6 @@ function ArcadeSwissPage() {
         <OverviewSection />
         <SwissSection />
         <MatchSection />
-        <SideSection />
         <TiebreakSection />
         <AdvanceSection />
         <SeedSection />

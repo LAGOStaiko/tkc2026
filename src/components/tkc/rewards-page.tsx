@@ -487,6 +487,7 @@ function NameplateBanner() {
   const [tag3On, setTag3On] = useState(false)
   const [shimmerOn, setShimmerOn] = useState(false)
   const [carouselReady, setCarouselReady] = useState(false)
+  const [iconGlow, setIconGlow] = useState(false)
 
   useEffect(() => {
     return () => {
@@ -494,6 +495,19 @@ function NameplateBanner() {
       timersRef.current = []
     }
   }, [])
+
+  useEffect(() => {
+    if (!topSeen) return
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+    if (reduceMotion) {
+      setIconGlow(true)
+      return
+    }
+    const id = window.setTimeout(() => setIconGlow(true), 500)
+    return () => window.clearTimeout(id)
+  }, [topSeen])
 
   useEffect(() => {
     if (!flowSeen) return
@@ -558,14 +572,18 @@ function NameplateBanner() {
         <div ref={topRef} className={cn('rewards-enter', topSeen && 'is-on')}>
           <div className='flex flex-col gap-4 md:flex-row md:items-start md:gap-5'>
             <div
-              className='relative flex size-[68px] shrink-0 items-center justify-center rounded-[18px] text-[30px]'
+              className={cn(
+                'relative flex size-[68px] shrink-0 items-center justify-center rounded-[18px] text-[30px]',
+                iconGlow && 'rewards-icon-float-glow'
+              )}
               style={{
+                '--glow-rgb': '245, 166, 35',
                 background:
                   'linear-gradient(135deg, rgba(245,166,35,0.22), rgba(245,166,35,0.06))',
                 border: '1px solid rgba(245,166,35,0.25)',
                 boxShadow:
                   '0 0 30px rgba(245,166,35,0.10), 0 4px 20px rgba(0,0,0,0.30)',
-              }}
+              } as React.CSSProperties}
             >
               <div
                 className='pointer-events-none absolute -inset-[3px] rounded-[20px] border'
@@ -772,12 +790,13 @@ function TitleBanner() {
                   iconGlow && 'rewards-icon-float-glow'
                 )}
                 style={{
+                  '--glow-rgb': '231, 76, 60',
                   background:
                     'linear-gradient(135deg, rgba(231,76,60,0.22), rgba(231,76,60,0.06))',
                   border: '1px solid rgba(231,76,60,0.25)',
                   boxShadow:
                     '0 0 30px rgba(231,76,60,0.10), 0 4px 20px rgba(0,0,0,0.30)',
-                }}
+                } as React.CSSProperties}
               >
                 <div
                   className='pointer-events-none absolute -inset-[3px] rounded-[20px] border'
@@ -930,6 +949,7 @@ function PlaqueBanner() {
   const hasStartedRef = useRef(false)
   const timersRef = useRef<number[]>([])
   const [stage, setStage] = useState(0)
+  const [iconGlow, setIconGlow] = useState(false)
 
   useEffect(() => {
     return () => {
@@ -949,12 +969,14 @@ function PlaqueBanner() {
       ).matches
       if (reduceMotion) {
         setStage(3)
+        setIconGlow(true)
         return
       }
 
       const isMobile = window.matchMedia('(max-width: 767px)').matches
       const previewDelay = isMobile ? 500 : 600
       const chipsDelay = isMobile ? 400 : 480
+      const glowDelay = isMobile ? 300 : 350
 
       const schedule = (fn: () => void, ms: number) => {
         const id = window.setTimeout(fn, ms)
@@ -962,6 +984,7 @@ function PlaqueBanner() {
       }
 
       setStage(1)
+      schedule(() => setIconGlow(true), glowDelay)
       schedule(() => setStage(2), previewDelay)
       schedule(() => setStage(3), previewDelay + chipsDelay)
     }, 0)
@@ -1001,42 +1024,53 @@ function PlaqueBanner() {
       >
         <div className='flex flex-col gap-6'>
           <div className={cn('rewards-enter', stage >= 1 && 'is-on')}>
-            <div className='flex flex-wrap items-center gap-3'>
+            <div className='flex flex-col gap-4 md:flex-row md:items-start md:gap-5'>
               <div
-                className='flex size-10 items-center justify-center rounded-[10px] text-lg'
+                className={cn(
+                  'relative flex size-[68px] shrink-0 items-center justify-center rounded-[18px] text-[30px]',
+                  iconGlow && 'rewards-icon-float-glow'
+                )}
                 style={{
-                  background: `${purple}14`,
-                  border: `1px solid ${purple}1f`,
-                }}
+                  '--glow-rgb': '139, 92, 246',
+                  background:
+                    'linear-gradient(135deg, rgba(139,92,246,0.22), rgba(139,92,246,0.06))',
+                  border: '1px solid rgba(139,92,246,0.25)',
+                  boxShadow:
+                    '0 0 30px rgba(139,92,246,0.10), 0 4px 20px rgba(0,0,0,0.30)',
+                } as React.CSSProperties}
               >
+                <div
+                  className='pointer-events-none absolute -inset-[3px] rounded-[20px] border'
+                  style={{ borderColor: 'rgba(139,92,246,0.08)' }}
+                />
                 🏆
               </div>
-              <div>
-                <div className='flex flex-wrap items-center gap-1.5'>
+
+              <div className='flex-1'>
+                <div className='flex flex-wrap items-center gap-2'>
                   <span
-                    className='font-mono text-[11px] font-bold tracking-[1.5px] sm:text-[12px]'
+                    className='font-mono text-[11px] font-bold tracking-[2px]'
                     style={{ color: purple }}
                   >
                     OFFICIAL PLAQUE
                   </span>
                   <span
-                    className='rounded px-1.5 pt-[3px] pb-[1px] text-[11px] leading-none font-bold text-white sm:text-[12px]'
+                    className='rounded px-2 py-0.5 text-[11px] font-bold tracking-wide text-white'
                     style={{ background: purple }}
                   >
                     콘솔
                   </span>
                 </div>
-                <h3 className='mt-1 text-[18px] font-extrabold tracking-tight break-keep text-white sm:text-[20px]'>
+                <div className='mt-1 text-[26px] font-black tracking-tight text-white md:text-[28px]'>
                   개발진 사인 공식 상패
-                </h3>
+                </div>
+                <p className='mt-1 text-[14px] leading-relaxed break-keep text-white/55'>
+                  콘솔 부문 입상자에게 지급되는 태고의 달인 개발진 사인이 담긴 공식
+                  상패입니다. 개발진이 직접 서명한 한정 상패로, TKC 2026 콘솔 부문
+                  입상의 영예를 기념합니다.
+                </p>
               </div>
             </div>
-
-            <p className='mt-4 max-w-xl text-[13px] leading-relaxed break-keep text-white/50 sm:text-sm'>
-              콘솔 부문 입상자에게 지급되는 태고의 달인 개발진 사인이 담긴 공식
-              상패입니다. 개발진이 직접 서명한 한정 상패로, TKC 2026 콘솔 부문
-              입상의 영예를 기념합니다.
-            </p>
           </div>
 
           <div
