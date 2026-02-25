@@ -259,7 +259,7 @@ function OverviewSection() {
                 </div>
               )}
               <div
-                className={`text-[22px] font-black leading-[1.3] tracking-tight whitespace-pre-line ${
+                className={`text-[22px] leading-[1.3] font-black tracking-tight whitespace-pre-line ${
                   'gold' in card && card.gold
                     ? 'text-[#f5a623]'
                     : 'text-white/90'
@@ -267,11 +267,11 @@ function OverviewSection() {
               >
                 {card.value}
               </div>
-              <div className='mt-1.5 whitespace-pre-line text-[12px] leading-relaxed text-white/40'>
+              <div className='mt-1.5 text-[12px] leading-relaxed whitespace-pre-line text-white/40'>
                 {card.sub}
               </div>
               {'hasArrow' in card && card.hasArrow && (
-                <span className='absolute top-1/2 right-0 z-[2] hidden -translate-y-1/2 translate-x-1/2 text-sm text-[#b83a30] sm:block'>
+                <span className='absolute top-1/2 right-0 z-[2] hidden translate-x-1/2 -translate-y-1/2 text-sm text-[#b83a30] sm:block'>
                   →
                 </span>
               )}
@@ -298,9 +298,7 @@ function OverviewSection() {
             </div>
             <div>
               <div className='text-[11px] text-white/50'>대회 장소</div>
-              <div className='text-[15px] font-bold text-white/90'>
-                PlayX4
-              </div>
+              <div className='text-[15px] font-bold text-white/90'>PlayX4</div>
             </div>
           </div>
           <div className='flex items-center gap-3.5 bg-[#141414] px-6 py-5 transition-colors hover:bg-[#1a1a1a]'>
@@ -938,11 +936,31 @@ function BanPickSection() {
         <div className='mb-3.5 text-sm font-bold text-white/90'>
           경기 진행 규칙
         </div>
-        <DetailRow label='선곡곡 사이드' value='해당 곡을 선곡한 선수' accentColor='#e74c3c' />
-        <DetailRow label='과제곡 사이드' value='직전까지 합산 점수 높은 선수' accentColor='#e74c3c' />
-        <DetailRow label='과제곡이 첫 곡' value='시드 상위자' accentColor='#e74c3c' />
-        <DetailRow label='시드 상위자 선곡곡' value='먼저 플레이' accentColor='#e74c3c' />
-        <DetailRow label='과제곡 순서' value='항상 마지막에 플레이' accentColor='#e74c3c' />
+        <DetailRow
+          label='선곡곡 사이드'
+          value='해당 곡을 선곡한 선수'
+          accentColor='#e74c3c'
+        />
+        <DetailRow
+          label='과제곡 사이드'
+          value='직전까지 합산 점수 높은 선수'
+          accentColor='#e74c3c'
+        />
+        <DetailRow
+          label='과제곡이 첫 곡'
+          value='시드 상위자'
+          accentColor='#e74c3c'
+        />
+        <DetailRow
+          label='시드 상위자 선곡곡'
+          value='먼저 플레이'
+          accentColor='#e74c3c'
+        />
+        <DetailRow
+          label='과제곡 순서'
+          value='항상 마지막에 플레이'
+          accentColor='#e74c3c'
+        />
       </Card>
     </SectionBlock>
   )
@@ -1077,14 +1095,15 @@ function RoundsSection() {
       </div>
 
       <Callout type='info' icon={<TkcIcon name='info' />}>
-        모든 라운드에{' '}
-        <strong className='text-white/80'>과제곡 1곡</strong>이 포함됩니다.
-        과제곡은 항상 마지막에 플레이합니다.
+        모든 라운드에 <strong className='text-white/80'>과제곡 1곡</strong>이
+        포함됩니다. 과제곡은 항상 마지막에 플레이합니다.
       </Callout>
 
       <Callout type='danger' icon={<TkcIcon name='warning' />}>
         동점 시 마지막 곡 동일 조건 재대결.{' '}
-        <strong className='text-[#e74c3c]'>재대결도 동점 시 良(양) 수 비교.</strong>
+        <strong className='text-[#e74c3c]'>
+          재대결도 동점 시 良(양) 수 비교.
+        </strong>
       </Callout>
 
       <Callout type='info' icon={<TkcIcon name='info' />}>

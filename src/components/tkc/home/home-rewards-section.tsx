@@ -164,13 +164,13 @@ function NameplateCarousel() {
 
       <button
         onClick={() => move(-1)}
-        className='absolute top-1/2 left-2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#f5a623]/15 bg-black/50 text-[15px] text-[#f5a623]/70 opacity-0 backdrop-blur-md transition-all hover:border-[#f5a623]/35 hover:bg-[#f5a623]/12 hover:text-[#f5a623] group-hover/carousel:opacity-100'
+        className='absolute top-1/2 left-2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#f5a623]/15 bg-black/50 text-[15px] text-[#f5a623]/70 opacity-0 backdrop-blur-md transition-all group-hover/carousel:opacity-100 hover:border-[#f5a623]/35 hover:bg-[#f5a623]/12 hover:text-[#f5a623]'
       >
         ‹
       </button>
       <button
         onClick={() => move(1)}
-        className='absolute top-1/2 right-2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#f5a623]/15 bg-black/50 text-[15px] text-[#f5a623]/70 opacity-0 backdrop-blur-md transition-all hover:border-[#f5a623]/35 hover:bg-[#f5a623]/12 hover:text-[#f5a623] group-hover/carousel:opacity-100'
+        className='absolute top-1/2 right-2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#f5a623]/15 bg-black/50 text-[15px] text-[#f5a623]/70 opacity-0 backdrop-blur-md transition-all group-hover/carousel:opacity-100 hover:border-[#f5a623]/35 hover:bg-[#f5a623]/12 hover:text-[#f5a623]'
       >
         ›
       </button>
@@ -234,7 +234,7 @@ export function HomeRewardsSection() {
                 </div>
                 <div>
                   <div className='mb-1 flex flex-wrap items-center gap-1.5 leading-none'>
-                    <span className='inline-flex h-5 items-center whitespace-nowrap font-mono text-[12px] font-bold leading-none tracking-[1.5px] text-[#f5a623]'>
+                    <span className='inline-flex h-5 items-center font-mono text-[12px] leading-none font-bold tracking-[1.5px] whitespace-nowrap text-[#f5a623]'>
                       LIMITED NAMEPLATE
                     </span>
                     <span className='inline-flex h-5 items-center rounded bg-[#f5a623] px-1.5 text-[12px] leading-none font-bold whitespace-nowrap text-[#0a0a0a]'>
@@ -274,7 +274,7 @@ export function HomeRewardsSection() {
                 </div>
                 <div>
                   <div className='mb-1 flex flex-wrap items-center gap-1.5 leading-none'>
-                    <span className='inline-flex h-5 items-center whitespace-nowrap font-mono text-[12px] font-bold leading-none tracking-[1.5px] text-[#e74c3c]'>
+                    <span className='inline-flex h-5 items-center font-mono text-[12px] leading-none font-bold tracking-[1.5px] whitespace-nowrap text-[#e74c3c]'>
                       IN-GAME TITLE
                     </span>
                     <span className='inline-flex h-5 items-center rounded bg-[#e74c3c] px-1.5 text-[12px] leading-none font-bold whitespace-nowrap text-white'>
@@ -300,7 +300,7 @@ export function HomeRewardsSection() {
                 <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_rgba(231,76,60,0.06)_0%,_transparent_50%)]' />
                 <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_rgba(231,76,60,0.04)_0%,_transparent_50%)]' />
 
-                <span className='relative z-[1] font-mono text-[11px] font-bold uppercase tracking-[2px] text-[#e74c3c]/45'>
+                <span className='relative z-[1] font-mono text-[11px] font-bold tracking-[2px] text-[#e74c3c]/45 uppercase'>
                   EXCLUSIVE · TOP 8 FINALISTS
                 </span>
                 <div className='relative z-[1] h-0.5 w-8 rounded-full bg-gradient-to-r from-transparent via-[#e74c3c]/50 to-transparent' />
@@ -365,7 +365,7 @@ export function HomeRewardsSection() {
                 <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_rgba(139,92,246,0.06)_0%,_transparent_50%)]' />
                 <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_rgba(139,92,246,0.04)_0%,_transparent_50%)]' />
 
-                <span className='relative z-[1] font-mono text-[11px] font-bold uppercase tracking-[2px] text-[#8b5cf6]/45'>
+                <span className='relative z-[1] font-mono text-[11px] font-bold tracking-[2px] text-[#8b5cf6]/45 uppercase'>
                   CONSOLE DIVISION
                 </span>
                 <div className='relative z-[1] h-0.5 w-8 rounded-full bg-gradient-to-r from-transparent via-[#8b5cf6]/50 to-transparent' />

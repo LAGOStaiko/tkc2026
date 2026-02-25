@@ -292,9 +292,7 @@ export function DetailRow({
         </span>
       ) : (
         <span
-          className={
-            valueClassName ?? 'shrink-0 font-semibold text-white/90'
-          }
+          className={valueClassName ?? 'shrink-0 font-semibold text-white/90'}
         >
           {value}
         </span>

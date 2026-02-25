@@ -465,7 +465,7 @@ function OverviewSection() {
                 </div>
               )}
               <div
-                className={`text-[22px] font-black leading-[1.3] tracking-tight whitespace-pre-line ${
+                className={`text-[22px] leading-[1.3] font-black tracking-tight whitespace-pre-line ${
                   'gold' in card && card.gold
                     ? 'text-[#f5a623]'
                     : 'text-white/90'
@@ -473,11 +473,11 @@ function OverviewSection() {
               >
                 {card.value}
               </div>
-              <div className='mt-1.5 whitespace-pre-line text-[12px] leading-relaxed text-white/40'>
+              <div className='mt-1.5 text-[12px] leading-relaxed whitespace-pre-line text-white/40'>
                 {card.sub}
               </div>
               {'hasArrow' in card && card.hasArrow && (
-                <span className='absolute top-1/2 right-0 z-[2] hidden -translate-y-1/2 translate-x-1/2 text-sm text-[#b8842a] sm:block'>
+                <span className='absolute top-1/2 right-0 z-[2] hidden translate-x-1/2 -translate-y-1/2 text-sm text-[#b8842a] sm:block'>
                   →
                 </span>
               )}
@@ -814,7 +814,11 @@ function MatchSection() {
           </div>
         </div>
         <div className='mt-3 text-[12px] break-keep text-white/35'>
-          재경기 등 운영상 우선권이 필요한 경우, <strong className='text-white/55'>온라인 예선 순위가 더 높은 선수</strong>가 사이드 선택 우선권을 가집니다.
+          재경기 등 운영상 우선권이 필요한 경우,{' '}
+          <strong className='text-white/55'>
+            온라인 예선 순위가 더 높은 선수
+          </strong>
+          가 사이드 선택 우선권을 가집니다.
         </div>
       </Card>
     </SectionBlock>
@@ -854,13 +858,13 @@ function TiebreakSection() {
         </div>
         {/* Node 2 — 재경기 (운영진 선곡 + 良 판정 통합) */}
         <div className='w-full max-w-md rounded-xl border border-[#1e1e1e] bg-[#111] px-7 py-[18px] text-center'>
-          <div className='text-[15px] font-bold text-white/90'>
-            재경기 단판
-          </div>
+          <div className='text-[15px] font-bold text-white/90'>재경기 단판</div>
           <div className='mt-1.5 text-xs leading-[1.55] break-keep text-white/35'>
             양 선수가 미사용한 곡 중 운영진이 1곡을 선정하여 재경기.
             <br />
-            재경기에서도 동점 시, <strong className='text-[#f5a623]'>良(양) 개수</strong>가 많은 선수가 승리.
+            재경기에서도 동점 시,{' '}
+            <strong className='text-[#f5a623]'>良(양) 개수</strong>가 많은
+            선수가 승리.
           </div>
         </div>
       </div>

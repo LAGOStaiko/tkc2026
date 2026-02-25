@@ -245,13 +245,13 @@ function RewardsNameplateCarousel({ ready }: { ready: boolean }) {
 
       <button
         onClick={() => move(-1)}
-        className='absolute top-1/2 left-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#f5a623]/15 bg-black/50 text-base text-[#f5a623]/70 opacity-0 backdrop-blur-md transition-all hover:border-[#f5a623]/35 hover:bg-[#f5a623]/12 hover:text-[#f5a623] group-hover/carousel:opacity-100'
+        className='absolute top-1/2 left-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#f5a623]/15 bg-black/50 text-base text-[#f5a623]/70 opacity-0 backdrop-blur-md transition-all group-hover/carousel:opacity-100 hover:border-[#f5a623]/35 hover:bg-[#f5a623]/12 hover:text-[#f5a623]'
       >
         ‹
       </button>
       <button
         onClick={() => move(1)}
-        className='absolute top-1/2 right-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#f5a623]/15 bg-black/50 text-base text-[#f5a623]/70 opacity-0 backdrop-blur-md transition-all hover:border-[#f5a623]/35 hover:bg-[#f5a623]/12 hover:text-[#f5a623] group-hover/carousel:opacity-100'
+        className='absolute top-1/2 right-3 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#f5a623]/15 bg-black/50 text-base text-[#f5a623]/70 opacity-0 backdrop-blur-md transition-all group-hover/carousel:opacity-100 hover:border-[#f5a623]/35 hover:bg-[#f5a623]/12 hover:text-[#f5a623]'
       >
         ›
       </button>
@@ -308,7 +308,7 @@ function TitleHero({ visible }: { visible: boolean }) {
         }}
       />
 
-      <span className='relative z-[1] font-mono text-[11px] font-bold uppercase tracking-[2.5px] text-[#e74c3c]/45 sm:text-[12px]'>
+      <span className='relative z-[1] font-mono text-[11px] font-bold tracking-[2.5px] text-[#e74c3c]/45 uppercase sm:text-[12px]'>
         EXCLUSIVE · TOP 8 FINALISTS
       </span>
       <div className='relative z-[1] h-0.5 w-10 rounded-full bg-gradient-to-r from-transparent via-[#e74c3c]/50 to-transparent' />
@@ -573,14 +573,16 @@ function NameplateBanner() {
                 'relative flex size-[68px] shrink-0 items-center justify-center rounded-[18px] text-[30px]',
                 iconGlow && 'rewards-icon-float-glow'
               )}
-              style={{
-                '--glow-rgb': '245, 166, 35',
-                background:
-                  'linear-gradient(135deg, rgba(245,166,35,0.22), rgba(245,166,35,0.06))',
-                border: '1px solid rgba(245,166,35,0.25)',
-                boxShadow:
-                  '0 0 30px rgba(245,166,35,0.10), 0 4px 20px rgba(0,0,0,0.30)',
-              } as React.CSSProperties}
+              style={
+                {
+                  '--glow-rgb': '245, 166, 35',
+                  background:
+                    'linear-gradient(135deg, rgba(245,166,35,0.22), rgba(245,166,35,0.06))',
+                  border: '1px solid rgba(245,166,35,0.25)',
+                  boxShadow:
+                    '0 0 30px rgba(245,166,35,0.10), 0 4px 20px rgba(0,0,0,0.30)',
+                } as React.CSSProperties
+              }
             >
               <div
                 className='pointer-events-none absolute -inset-[3px] rounded-[20px] border'
@@ -786,14 +788,16 @@ function TitleBanner() {
                   'relative flex size-[68px] shrink-0 items-center justify-center rounded-[18px] text-[30px]',
                   iconGlow && 'rewards-icon-float-glow'
                 )}
-                style={{
-                  '--glow-rgb': '231, 76, 60',
-                  background:
-                    'linear-gradient(135deg, rgba(231,76,60,0.22), rgba(231,76,60,0.06))',
-                  border: '1px solid rgba(231,76,60,0.25)',
-                  boxShadow:
-                    '0 0 30px rgba(231,76,60,0.10), 0 4px 20px rgba(0,0,0,0.30)',
-                } as React.CSSProperties}
+                style={
+                  {
+                    '--glow-rgb': '231, 76, 60',
+                    background:
+                      'linear-gradient(135deg, rgba(231,76,60,0.22), rgba(231,76,60,0.06))',
+                    border: '1px solid rgba(231,76,60,0.25)',
+                    boxShadow:
+                      '0 0 30px rgba(231,76,60,0.10), 0 4px 20px rgba(0,0,0,0.30)',
+                  } as React.CSSProperties
+                }
               >
                 <div
                   className='pointer-events-none absolute -inset-[3px] rounded-[20px] border'
@@ -860,9 +864,7 @@ function TitleBanner() {
                 className='flex items-center gap-2 rounded-xl border px-4 py-3 text-[13px] font-semibold text-white/75 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
                 style={{
                   opacity: calloutsOn ? 1 : 0,
-                  transform: calloutsOn
-                    ? 'translateY(0)'
-                    : 'translateY(12px)',
+                  transform: calloutsOn ? 'translateY(0)' : 'translateY(12px)',
                   transitionDelay: calloutsOn ? `${i * 140}ms` : '0ms',
                   background: 'rgba(231,76,60,0.04)',
                   borderColor: 'rgba(231,76,60,0.12)',
@@ -937,8 +939,9 @@ function TitleBanner() {
 function PlaqueBanner() {
   const purple = '#8b5cf6'
   const { ref, seen } = useOnceInView<HTMLDivElement>({ threshold: 0.18 })
-  const { ref: previewRef, seen: previewSeen } =
-    useOnceInView<HTMLDivElement>({ threshold: 0.18 })
+  const { ref: previewRef, seen: previewSeen } = useOnceInView<HTMLDivElement>({
+    threshold: 0.18,
+  })
   const { ref: chipsRef, seen: chipsSeen } = useOnceInView<HTMLDivElement>({
     threshold: 0.18,
   })
@@ -1027,14 +1030,16 @@ function PlaqueBanner() {
                   'relative flex size-[68px] shrink-0 items-center justify-center rounded-[18px] text-[30px]',
                   iconGlow && 'rewards-icon-float-glow'
                 )}
-                style={{
-                  '--glow-rgb': '139, 92, 246',
-                  background:
-                    'linear-gradient(135deg, rgba(139,92,246,0.22), rgba(139,92,246,0.06))',
-                  border: '1px solid rgba(139,92,246,0.25)',
-                  boxShadow:
-                    '0 0 30px rgba(139,92,246,0.10), 0 4px 20px rgba(0,0,0,0.30)',
-                } as React.CSSProperties}
+                style={
+                  {
+                    '--glow-rgb': '139, 92, 246',
+                    background:
+                      'linear-gradient(135deg, rgba(139,92,246,0.22), rgba(139,92,246,0.06))',
+                    border: '1px solid rgba(139,92,246,0.25)',
+                    boxShadow:
+                      '0 0 30px rgba(139,92,246,0.10), 0 4px 20px rgba(0,0,0,0.30)',
+                  } as React.CSSProperties
+                }
               >
                 <div
                   className='pointer-events-none absolute -inset-[3px] rounded-[20px] border'
@@ -1062,9 +1067,9 @@ function PlaqueBanner() {
                   개발진 사인 공식 상패
                 </div>
                 <p className='mt-1 text-[14px] leading-relaxed break-keep text-white/55'>
-                  콘솔 부문 입상자에게 지급되는 태고의 달인 개발진 사인이 담긴 공식
-                  상패입니다. 개발진이 직접 서명한 한정 상패로, TKC 2026 콘솔 부문
-                  입상의 영예를 기념합니다.
+                  콘솔 부문 입상자에게 지급되는 태고의 달인 개발진 사인이 담긴
+                  공식 상패입니다. 개발진이 직접 서명한 한정 상패로, TKC 2026
+                  콘솔 부문 입상의 영예를 기념합니다.
                 </p>
               </div>
             </div>
@@ -1097,7 +1102,7 @@ function PlaqueBanner() {
 
             <div className='flex min-h-[220px] flex-col items-center justify-center gap-3 p-8 text-center md:min-h-[260px] md:p-10'>
               <span
-                className='font-mono text-[11px] font-bold uppercase tracking-[2.5px] sm:text-[12px]'
+                className='font-mono text-[11px] font-bold tracking-[2.5px] uppercase sm:text-[12px]'
                 style={{ color: `${purple}73` }}
               >
                 CONSOLE DIVISION

@@ -183,7 +183,7 @@ function ConsoleQualifierPage() {
                     </div>
                   )}
                   <div
-                    className={`text-[22px] font-black leading-[1.3] tracking-tight whitespace-pre-line ${
+                    className={`text-[22px] leading-[1.3] font-black tracking-tight whitespace-pre-line ${
                       'gold' in card && card.gold
                         ? 'text-[#f5a623]'
                         : 'text-white/90'
@@ -191,11 +191,11 @@ function ConsoleQualifierPage() {
                   >
                     {card.value}
                   </div>
-                  <div className='mt-1.5 whitespace-pre-line text-[12px] leading-relaxed text-white/40'>
+                  <div className='mt-1.5 text-[12px] leading-relaxed whitespace-pre-line text-white/40'>
                     {card.sub}
                   </div>
                   {'hasArrow' in card && card.hasArrow && (
-                    <span className='absolute top-1/2 right-0 z-[2] hidden -translate-y-1/2 translate-x-1/2 text-sm text-[#b83a30] sm:block'>
+                    <span className='absolute top-1/2 right-0 z-[2] hidden translate-x-1/2 -translate-y-1/2 text-sm text-[#b83a30] sm:block'>
                       →
                     </span>
                   )}

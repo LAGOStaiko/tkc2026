@@ -313,7 +313,7 @@ function ArcadeOnlinePage() {
                   {card.label}
                 </div>
                 <div
-                  className={`text-[22px] font-black leading-[1.3] tracking-tight whitespace-pre-line ${
+                  className={`text-[22px] leading-[1.3] font-black tracking-tight whitespace-pre-line ${
                     'gold' in card && card.gold
                       ? 'text-[#f5a623]'
                       : 'text-white/90'
@@ -321,11 +321,11 @@ function ArcadeOnlinePage() {
                 >
                   {card.value}
                 </div>
-                <div className='mt-1.5 whitespace-pre-line text-[12px] leading-relaxed text-white/40'>
+                <div className='mt-1.5 text-[12px] leading-relaxed whitespace-pre-line text-white/40'>
                   {card.sub}
                 </div>
                 {'hasArrow' in card && card.hasArrow && (
-                  <span className='absolute top-1/2 right-0 z-[2] hidden -translate-y-1/2 translate-x-1/2 text-sm text-[#b8842a] sm:block'>
+                  <span className='absolute top-1/2 right-0 z-[2] hidden translate-x-1/2 -translate-y-1/2 text-sm text-[#b8842a] sm:block'>
                     →
                   </span>
                 )}
@@ -572,8 +572,8 @@ function ArcadeOnlinePage() {
               온라인 예선에서는{' '}
               <strong className='text-[#e74c3c]'>
                 '음표 위치 조정', '목소리', '연주 스킵', '음색'
-              </strong>만{' '}
-              사용할 수 있으며, 그 외 옵션 사용 시 집계에서 제외됩니다.
+              </strong>
+              만 사용할 수 있으며, 그 외 옵션 사용 시 집계에서 제외됩니다.
             </Callout>
           </div>
 
@@ -630,8 +630,8 @@ function ArcadeOnlinePage() {
             오프라인 예선에서는{' '}
             <strong className='text-[#e74c3c]'>
               '음표 위치 조정'과 '목소리'
-            </strong>만{' '}
-            사용할 수 있으며, 그 외의 연주 옵션은 사용할 수 없습니다.
+            </strong>
+            만 사용할 수 있으며, 그 외의 연주 옵션은 사용할 수 없습니다.
           </Callout>
 
           <Callout type='info' icon={<CalloutCharIcon type='info' />}>
@@ -699,250 +699,248 @@ function ArcadeOnlinePage() {
             {/* ① 참가 자격 및 카드 규정 */}
             <Accordion title='참가 자격 및 카드 규정'>
               <div className='space-y-5 sm:space-y-6'>
-              <div>
-                <DetailSubtitle>자격 요건</DetailSubtitle>
-                              {ELIGIBILITY_ROWS.map((r) => (
-                                <DetailRow key={r.label} label={r.label} value={r.value} />
-                              ))}
-              </div>
+                <div>
+                  <DetailSubtitle>자격 요건</DetailSubtitle>
+                  {ELIGIBILITY_ROWS.map((r) => (
+                    <DetailRow key={r.label} label={r.label} value={r.value} />
+                  ))}
+                </div>
 
-              <div>
-                <DetailSubtitle>Bandai Namco Passport 규정</DetailSubtitle>
-                              {CARD_RULES.map((r) => (
-                                <DetailRow
-                                  key={r.label}
-                                  label={r.label}
-                                  value={r.value}
-                                  valueClassName={
-                                    'isRed' in r && r.isRed
-                                      ? 'shrink-0 font-semibold text-[#e74c3c]/80'
-                                      : undefined
-                                  }
-                                />
-                              ))}
-              </div>
+                <div>
+                  <DetailSubtitle>Bandai Namco Passport 규정</DetailSubtitle>
+                  {CARD_RULES.map((r) => (
+                    <DetailRow
+                      key={r.label}
+                      label={r.label}
+                      value={r.value}
+                      valueClassName={
+                        'isRed' in r && r.isRed
+                          ? 'shrink-0 font-semibold text-[#e74c3c]/80'
+                          : undefined
+                      }
+                    />
+                  ))}
+                </div>
 
-              <div className='[&>div]:mt-0'>
-                <Callout
-                                type='info'
-                                icon={<CalloutCharIcon type='info' />}
-                              >
-                                2장 이상의 카드로 신청 시{' '}
-                                <strong className='text-white/80'>규칙 위반으로 간주</strong>
-                                됩니다. 신청한 카드가 아닌 별도의 카드로 연주한 점수는 집계되지
-                                않습니다. 중복 신청 시 동더 광장에서 직접 취소해 주세요.
-                              </Callout>
-              </div>
+                <div className='[&>div]:mt-0'>
+                  <Callout type='info' icon={<CalloutCharIcon type='info' />}>
+                    2장 이상의 카드로 신청 시{' '}
+                    <strong className='text-white/80'>
+                      규칙 위반으로 간주
+                    </strong>
+                    됩니다. 신청한 카드가 아닌 별도의 카드로 연주한 점수는
+                    집계되지 않습니다. 중복 신청 시 동더 광장에서 직접 취소해
+                    주세요.
+                  </Callout>
+                </div>
 
-              <div>
-                <DetailSubtitle>위반 시 조치</DetailSubtitle>
-                              <div className='flex flex-wrap gap-1.5'>
-                                {PENALTIES.map((p) => (
-                                  <span
-                                    key={p}
-                                    className='rounded-lg border border-[#e74c3c]/15 bg-[#e74c3c]/[0.06] px-2.5 py-1 text-xs font-semibold text-[#e74c3c]/80'
-                                  >
-                                    {p}
-                                  </span>
-                                ))}
-                              </div>
-              </div>
+                <div>
+                  <DetailSubtitle>위반 시 조치</DetailSubtitle>
+                  <div className='flex flex-wrap gap-1.5'>
+                    {PENALTIES.map((p) => (
+                      <span
+                        key={p}
+                        className='rounded-lg border border-[#e74c3c]/15 bg-[#e74c3c]/[0.06] px-2.5 py-1 text-xs font-semibold text-[#e74c3c]/80'
+                      >
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
-              <div className='[&>div]:mt-0'>
-                <Callout
-                                type='danger'
-                                icon={<CalloutCharIcon type='warning' />}
-                              >
-                                규칙 위반 의심 시 주최 측에서{' '}
-                                <strong className='text-[#e74c3c]'>
-                                  독자적으로 조사를 시행
-                                </strong>
-                                하며, 악질적인 위반 시{' '}
-                                <strong className='text-[#e74c3c]'>
-                                  향후 공식 이벤트 참가가 영구 제한
-                                </strong>
-                                될 수 있습니다.
-                              </Callout>
-              </div>
+                <div className='[&>div]:mt-0'>
+                  <Callout
+                    type='danger'
+                    icon={<CalloutCharIcon type='warning' />}
+                  >
+                    규칙 위반 의심 시 주최 측에서{' '}
+                    <strong className='text-[#e74c3c]'>
+                      독자적으로 조사를 시행
+                    </strong>
+                    하며, 악질적인 위반 시{' '}
+                    <strong className='text-[#e74c3c]'>
+                      향후 공식 이벤트 참가가 영구 제한
+                    </strong>
+                    될 수 있습니다.
+                  </Callout>
+                </div>
               </div>
             </Accordion>
 
             {/* ② 연주 규정 */}
             <Accordion title='연주 규정'>
               <div className='space-y-5 sm:space-y-6'>
-              <div>
-                <DetailSubtitle>연주 옵션</DetailSubtitle>
-                              <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
-                                {/* 온라인 예선 */}
-                                <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.015] p-4'>
-                                  <div className='mb-2 text-[11px] font-semibold tracking-[0.5px] text-white/35'>
-                                    온라인 예선
-                                  </div>
-                                  <div className='flex flex-wrap gap-1.5'>
-                                    {['음표 위치 조정', '목소리', '연주 스킵', '음색'].map(
-                                      (opt) => (
-                                        <span
-                                          key={opt}
-                                          className='rounded-md border border-[#f5a623]/15 bg-[#f5a623]/[0.08] px-2 py-0.5 text-xs font-semibold text-[#f5a623]'
-                                        >
-                                          {opt}
-                                        </span>
-                                      ),
-                                    )}
-                                  </div>
-                                  <div className='mt-2 text-[11px] text-white/35'>
-                                    위 4개만 허용, 그 외 사용 시 집계 제외
-                                  </div>
-                                </div>
-                                {/* 오프라인 예선 */}
-                                <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.015] p-4'>
-                                  <div className='mb-2 text-[11px] font-semibold tracking-[0.5px] text-white/35'>
-                                    오프라인 예선
-                                  </div>
-                                  <div className='flex flex-wrap gap-1.5'>
-                                    {[
-                                      { name: '음표 위치 조정', ok: true },
-                                      { name: '목소리', ok: true },
-                                      { name: '연주 스킵', ok: false },
-                                      { name: '음색', ok: false },
-                                    ].map((opt) => (
-                                      <span
-                                        key={opt.name}
-                                        className={
-                                          opt.ok
-                                            ? 'rounded-md border border-[#f5a623]/15 bg-[#f5a623]/[0.08] px-2 py-0.5 text-xs font-semibold text-[#f5a623]'
-                                            : 'rounded-md border border-[#1e1e1e] bg-white/[0.03] px-2 py-0.5 text-xs font-semibold text-white/35 line-through'
-                                        }
-                                      >
-                                        {opt.name}
-                                      </span>
-                                    ))}
-                                  </div>
-                                  <div className='mt-2 text-[11px] text-white/35'>
-                                    위 2개만 허용, 연주 스킵 · 음색 사용 불가
-                                  </div>
-                                </div>
-                              </div>
-              </div>
+                <div>
+                  <DetailSubtitle>연주 옵션</DetailSubtitle>
+                  <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+                    {/* 온라인 예선 */}
+                    <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.015] p-4'>
+                      <div className='mb-2 text-[11px] font-semibold tracking-[0.5px] text-white/35'>
+                        온라인 예선
+                      </div>
+                      <div className='flex flex-wrap gap-1.5'>
+                        {['음표 위치 조정', '목소리', '연주 스킵', '음색'].map(
+                          (opt) => (
+                            <span
+                              key={opt}
+                              className='rounded-md border border-[#f5a623]/15 bg-[#f5a623]/[0.08] px-2 py-0.5 text-xs font-semibold text-[#f5a623]'
+                            >
+                              {opt}
+                            </span>
+                          )
+                        )}
+                      </div>
+                      <div className='mt-2 text-[11px] text-white/35'>
+                        위 4개만 허용, 그 외 사용 시 집계 제외
+                      </div>
+                    </div>
+                    {/* 오프라인 예선 */}
+                    <div className='rounded-xl border border-[#1e1e1e] bg-white/[0.015] p-4'>
+                      <div className='mb-2 text-[11px] font-semibold tracking-[0.5px] text-white/35'>
+                        오프라인 예선
+                      </div>
+                      <div className='flex flex-wrap gap-1.5'>
+                        {[
+                          { name: '음표 위치 조정', ok: true },
+                          { name: '목소리', ok: true },
+                          { name: '연주 스킵', ok: false },
+                          { name: '음색', ok: false },
+                        ].map((opt) => (
+                          <span
+                            key={opt.name}
+                            className={
+                              opt.ok
+                                ? 'rounded-md border border-[#f5a623]/15 bg-[#f5a623]/[0.08] px-2 py-0.5 text-xs font-semibold text-[#f5a623]'
+                                : 'rounded-md border border-[#1e1e1e] bg-white/[0.03] px-2 py-0.5 text-xs font-semibold text-white/35 line-through'
+                            }
+                          >
+                            {opt.name}
+                          </span>
+                        ))}
+                      </div>
+                      <div className='mt-2 text-[11px] text-white/35'>
+                        위 2개만 허용, 연주 스킵 · 음색 사용 불가
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-              <div>
-                <DetailSubtitle>북채 규정</DetailSubtitle>
-                              <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
-                                <div className='rounded-[10px] border border-[#f5a623]/20 bg-white/[0.015] p-3 text-center'>
-                                  <div className='mb-1 text-[11px] font-semibold text-[#f5a623]'>
-                                    ✓ 사용 가능
-                                  </div>
-                                  <div className='text-xs leading-relaxed text-white/55'>
-                                    기기 부속 북채(정품)
-                                    <br />
-                                    태고의 달인 공식 커스텀 북채
-                                  </div>
-                                </div>
-                                <div className='rounded-[10px] border border-[#e74c3c]/15 bg-white/[0.015] p-3 text-center'>
-                                  <div className='mb-1 text-[11px] font-semibold text-[#e74c3c]'>
-                                    ✕ 사용 불가
-                                  </div>
-                                  <div className='text-xs leading-relaxed text-white/55'>
-                                    가공된 북채
-                                    <br />
-                                    (절단, 테이핑 등 변형)
-                                  </div>
-                                </div>
-                              </div>
-                              <a
-                                href='https://taiko.namco-ch.net/taiko/kr/mybachi/attention/'
-                                target='_blank'
-                                rel='noopener noreferrer'
-                                className='mt-1 inline-block text-xs text-[#f5a623] hover:underline'
-                              >
-                                공식 커스텀 북채 확인 사항 보기 →
-                              </a>
-              </div>
+                <div>
+                  <DetailSubtitle>북채 규정</DetailSubtitle>
+                  <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+                    <div className='rounded-[10px] border border-[#f5a623]/20 bg-white/[0.015] p-3 text-center'>
+                      <div className='mb-1 text-[11px] font-semibold text-[#f5a623]'>
+                        ✓ 사용 가능
+                      </div>
+                      <div className='text-xs leading-relaxed text-white/55'>
+                        기기 부속 북채(정품)
+                        <br />
+                        태고의 달인 공식 커스텀 북채
+                      </div>
+                    </div>
+                    <div className='rounded-[10px] border border-[#e74c3c]/15 bg-white/[0.015] p-3 text-center'>
+                      <div className='mb-1 text-[11px] font-semibold text-[#e74c3c]'>
+                        ✕ 사용 불가
+                      </div>
+                      <div className='text-xs leading-relaxed text-white/55'>
+                        가공된 북채
+                        <br />
+                        (절단, 테이핑 등 변형)
+                      </div>
+                    </div>
+                  </div>
+                  <a
+                    href='https://taiko.namco-ch.net/taiko/kr/mybachi/attention/'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='mt-1 inline-block text-xs text-[#f5a623] hover:underline'
+                  >
+                    공식 커스텀 북채 확인 사항 보기 →
+                  </a>
+                </div>
 
-              <div>
-                <DetailSubtitle>스코어 집계</DetailSubtitle>
-                              {SCORE_RULES.map((r) => (
-                                <DetailRow key={r.label} label={r.label} value={r.value} />
-                              ))}
-              </div>
+                <div>
+                  <DetailSubtitle>스코어 집계</DetailSubtitle>
+                  {SCORE_RULES.map((r) => (
+                    <DetailRow key={r.label} label={r.label} value={r.value} />
+                  ))}
+                </div>
               </div>
             </Accordion>
 
             {/* ③ 미성년자 참가 규정 */}
             <Accordion title='미성년자 참가 규정'>
               <div className='space-y-5 sm:space-y-6'>
-              <div>
-                {MINOR_ROWS.map((r) => (
-                                <DetailRow
-                                  key={r.label}
-                                  label={r.label}
-                                  value={r.value}
-                                  isBadge={'isBadge' in r ? r.isBadge : undefined}
-                                />
-                              ))}
-              </div>
+                <div>
+                  {MINOR_ROWS.map((r) => (
+                    <DetailRow
+                      key={r.label}
+                      label={r.label}
+                      value={r.value}
+                      isBadge={'isBadge' in r ? r.isBadge : undefined}
+                    />
+                  ))}
+                </div>
 
-              <div className='[&>div]:mt-0'>
-                <Callout type='info' icon={<CalloutCharIcon type='info' />}>
-                                보호자 동의 요건을 충족하면{' '}
-                                <strong className='text-white/80'>연령 제한 없이</strong> 참가할
-                                수 있습니다.
-                              </Callout>
-              </div>
+                <div className='[&>div]:mt-0'>
+                  <Callout type='info' icon={<CalloutCharIcon type='info' />}>
+                    보호자 동의 요건을 충족하면{' '}
+                    <strong className='text-white/80'>연령 제한 없이</strong>{' '}
+                    참가할 수 있습니다.
+                  </Callout>
+                </div>
               </div>
             </Accordion>
 
             {/* ④ 유의사항 및 면책 */}
             <Accordion title='유의사항 및 면책'>
               <div className='space-y-5 sm:space-y-6'>
-              <div>
-                <DetailSubtitle>대회 규정</DetailSubtitle>
-                              <div className='space-y-1.5'>
-                                {NOTICES.map((html, i) => (
-                                  <div
-                                    key={i}
-                                    className='flex items-center gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
-                                  >
-                                    <img
-                                      src={NOTICE_ROW_ICONS[i % NOTICE_ROW_ICONS.length]}
-                                      alt=''
-                                      className='size-6 shrink-0 object-contain opacity-90'
-                                      loading='lazy'
-                                      draggable={false}
-                                    />
-                                    <span
-                                      className='break-keep text-white/55 [&>strong]:text-white/90'
-                                      dangerouslySetInnerHTML={{ __html: html }}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-              </div>
+                <div>
+                  <DetailSubtitle>대회 규정</DetailSubtitle>
+                  <div className='space-y-1.5'>
+                    {NOTICES.map((html, i) => (
+                      <div
+                        key={i}
+                        className='flex items-center gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
+                      >
+                        <img
+                          src={NOTICE_ROW_ICONS[i % NOTICE_ROW_ICONS.length]}
+                          alt=''
+                          className='size-6 shrink-0 object-contain opacity-90'
+                          loading='lazy'
+                          draggable={false}
+                        />
+                        <span
+                          className='break-keep text-white/55 [&>strong]:text-white/90'
+                          dangerouslySetInnerHTML={{ __html: html }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-              <div>
-                <DetailSubtitle>면책 사항</DetailSubtitle>
-                              <div className='space-y-1.5'>
-                                {DISCLAIMERS.map((html, i) => (
-                                  <div
-                                    key={i}
-                                    className='flex items-start gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
-                                  >
-                                    <span className='shrink-0 text-white/35'>·</span>
-                                    <span
-                                      className='break-keep text-white/55 [&>strong]:text-white/90'
-                                      dangerouslySetInnerHTML={{ __html: html }}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-              </div>
+                <div>
+                  <DetailSubtitle>면책 사항</DetailSubtitle>
+                  <div className='space-y-1.5'>
+                    {DISCLAIMERS.map((html, i) => (
+                      <div
+                        key={i}
+                        className='flex items-start gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
+                      >
+                        <span className='shrink-0 text-white/35'>·</span>
+                        <span
+                          className='break-keep text-white/55 [&>strong]:text-white/90'
+                          dangerouslySetInnerHTML={{ __html: html }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </Accordion>
           </div>
         </FadeIn>
       </div>
-
     </>
   )
 }
-

@@ -191,7 +191,7 @@ export function HomeScheduleStrip() {
                         group.isFinals
                           ? 'bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-transparent opacity-60'
                           : 'text-white/[0.12]'
-                      } tabular-nums lining-nums`}
+                      } lining-nums tabular-nums`}
                     >
                       {group.month}
                     </span>
@@ -218,9 +218,7 @@ export function HomeScheduleStrip() {
                           key={`${ev.name}-${ev.fullDate}`}
                           className='flex items-start gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
                         >
-                          <span
-                            className={`${EVENT_DATE_CLASS} text-white/75`}
-                          >
+                          <span className={`${EVENT_DATE_CLASS} text-white/75`}>
                             {fmtDate(ev.fullDate)}
                           </span>
                           <span className='mt-[7px] size-1.5 shrink-0 rounded-full bg-[#4a9eff] shadow-[0_0_6px_rgba(74,158,255,0.3)]' />
@@ -247,9 +245,7 @@ export function HomeScheduleStrip() {
                           key={`${ev.name}-${ev.fullDate}`}
                           className='flex items-start gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
                         >
-                          <span
-                            className={`${EVENT_DATE_CLASS} text-white/75`}
-                          >
+                          <span className={`${EVENT_DATE_CLASS} text-white/75`}>
                             {fmtDate(ev.fullDate)}
                           </span>
                           <VenueThumb src={ev.venueImage} />
@@ -271,9 +267,7 @@ export function HomeScheduleStrip() {
                           key={`${ev.name}-${ev.fullDate}`}
                           className='flex items-start gap-2.5 rounded-lg border border-white/[0.03] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.04]'
                         >
-                          <span
-                            className={`${EVENT_DATE_CLASS} text-white/55`}
-                          >
+                          <span className={`${EVENT_DATE_CLASS} text-white/55`}>
                             {fmtDate(ev.fullDate)}
                           </span>
                           <span className='mt-[7px] size-1.5 shrink-0 rounded-full bg-white/25' />
@@ -330,7 +324,7 @@ export function HomeScheduleStrip() {
                       <span className='text-[12px] text-white/35'>
                         {finalsEvent.footerLabel}
                       </span>
-                      <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-[13px] leading-none font-extrabold tracking-[-0.3px] tabular-nums lining-nums text-transparent'>
+                      <span className='bg-gradient-to-br from-[#e74c3c] to-[#f5a623] bg-clip-text text-[13px] leading-none font-extrabold tracking-[-0.3px] text-transparent lining-nums tabular-nums'>
                         {finalsEvent.footerDate}
                       </span>
                     </div>
