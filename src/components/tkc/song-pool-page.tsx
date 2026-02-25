@@ -1,4 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { getRouteApi } from '@tanstack/react-router'
 import { t } from '@/text'
 import { useSongPools } from '@/lib/api'
 import { cn } from '@/lib/utils'
@@ -26,6 +27,10 @@ type GroupedSong = {
   revealed: boolean
 }
 
+type SongPoolTabKey = 'arcadeSwiss' | 'arcadeFinals' | 'consoleFinals'
+
+const songPoolRoute = getRouteApi('/(site)/song-pool')
+
 function groupByTitle(entries: PoolEntry[]): GroupedSong[] {
   const map = new Map<string, { oni?: number; ura?: number }>()
   const order: string[] = []
@@ -50,13 +55,14 @@ function groupByTitle(entries: PoolEntry[]): GroupedSong[] {
 }
 
 type TabDef = {
-  key: string
+  key: SongPoolTabKey
   label: string
   dotColor: string
   pool: GroupedSong[]
 }
 
 export function SongPoolPage() {
+  const { tab } = songPoolRoute.useSearch()
   const { data, isLoading, isError } = useSongPools<SongPoolsData>()
   const title = t('nav.songPool')
 
@@ -97,7 +103,11 @@ export function SongPoolPage() {
     [arcadeSwiss, arcadeFinals, consoleFinals]
   )
 
-  const [activeTab, setActiveTab] = useState(tabs[0].key)
+  const [activeTab, setActiveTab] = useState<SongPoolTabKey>(() =>
+    tab === 'arcadeSwiss' || tab === 'arcadeFinals' || tab === 'consoleFinals'
+      ? tab
+      : 'arcadeSwiss'
+  )
   const active = tabs.find((t) => t.key === activeTab) ?? tabs[0]
   const isEmpty = tabs.every((t) => t.pool.length === 0)
 

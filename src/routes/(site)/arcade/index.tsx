@@ -470,9 +470,15 @@ function ArcadeOnlinePage() {
               tagCls='bg-[#f5a623]/[0.08] text-[#f5a623]'
             >
               신청 시 <strong>스위스 스테이지에서 사용할 곡 4곡</strong>을 미리
-              선택해야 합니다. 이 곡은 오프라인 대회에서 사이드 선택 시
-              활용되며, 신청 이후에는 변경할 수 없습니다.
+              선택해야 합니다. 신청 이후에는 변경할 수 없습니다.
             </HighlightCard>
+            <Link
+              to='/song-pool'
+              className='inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#f5a623]/70 transition-colors hover:text-[#f5a623]'
+            >
+              선곡풀 확인하기
+              <span aria-hidden>→</span>
+            </Link>
           </div>
 
           <Callout type='danger' icon={<CalloutCharIcon type='warning' />}>

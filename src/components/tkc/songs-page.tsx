@@ -121,12 +121,12 @@ export function SongsPage() {
 
       {isError && (
         <p className='text-sm text-destructive'>
-          과제곡을 불러오지 못했습니다.
+          과제곡이 잠시 숨어버렸습니다. 새로고침하면 돌아올지도…?
         </p>
       )}
 
       {isLoading && !data ? (
-        <p className='text-sm text-white/60'>과제곡을 불러오는 중...</p>
+        <p className='text-sm text-white/60'>과제곡이 찾아오는 중…</p>
       ) : null}
 
       <div className='grid gap-12 lg:grid-cols-2'>
@@ -196,9 +196,10 @@ function DivisionColumn({
         </div>
       ) : !isLoading ? (
         <p className='py-4 text-sm text-white/50'>
-          과제곡이 아직 준비되지 않았습니다.
+          아직 과제곡이 공개되지 않았습니다. 조금만 기다려 주세요!
         </p>
       ) : null}
+
     </div>
   )
 }

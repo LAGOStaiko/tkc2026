@@ -1091,6 +1091,21 @@ function RoundsSection() {
             <strong className='text-[#e74c3c]'>대회 당일 현장에서 공개</strong>
             됩니다
           </div>
+          <div className='mt-3 flex items-center justify-center gap-4'>
+            <Link
+              to='/songs'
+              className='inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#e74c3c]/70 transition-colors hover:text-[#e74c3c]'
+            >
+              과제곡 목록 보기 →
+            </Link>
+            <Link
+              to='/song-pool'
+              search={{ tab: 'arcadeFinals' }}
+              className='inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#e74c3c]/70 transition-colors hover:text-[#e74c3c]'
+            >
+              결선 선곡풀 보기 →
+            </Link>
+          </div>
         </div>
       </div>
 
