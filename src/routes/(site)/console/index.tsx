@@ -41,7 +41,7 @@ const FLOW_CARDS = [
   {
     step: '입력 방식',
     label: '컨트롤러 선택',
-    value: '컨트롤러 · 조이콘',
+    value: '태고와 북채 · 조이콘',
     sub: '한 번 선택 시 결선까지 변경 불가',
   },
 ] as const
@@ -81,16 +81,6 @@ const SUBMIT_FLOW = [
   { num: '③', label: '제출', desc: '신청 폼에 링크 첨부' },
 ] as const
 
-const APPLY_FIELDS = [
-  { label: '이름', value: '실명 기재' },
-  { label: '동더 네임', value: '게임 내 동더 네임' },
-  { label: '전화번호', value: '본인 연락처' },
-  { label: '이메일', value: '본인 이메일 주소' },
-  { label: '개인정보활용 동의', value: '필수', isBadge: true },
-  { label: '영상 링크', value: '유튜브 일부공개 링크' },
-  { label: '부모님 동의서', value: '미성년자 한정 · PDF' },
-] as const
-
 const ELIGIBILITY_ROWS = [
   { label: '국적', value: '대한민국 국적 보유' },
   { label: '거주', value: '대한민국 거주자' },
@@ -103,9 +93,11 @@ const MINOR_ROWS = [
   { label: '연령 제한', value: '별도 없음' },
 ] as const
 
-const PLAYX4_ROWS = [
-  { label: '직관 참여 시', value: '확정 명찰 현장 수령' },
-  { label: '불참 시', value: '명찰 미지급 (별도 발송 불가)' },
+const PENALTIES = [
+  '참가 자격 취소',
+  '스코어 삭제',
+  '랭킹 제외',
+  '수상 권리 박탈',
 ] as const
 
 const NOTICES = [
@@ -113,6 +105,11 @@ const NOTICES = [
   '모든 참가자는 본 룰북의 내용을 <strong>숙지하고 동의한 것으로 간주</strong>합니다.',
   '대회 중 발생하는 분쟁사항에 대한 <strong>최종 판단은 운영 측</strong>에 있습니다.',
   '부정행위 적발 시 <strong>실격 및 향후 대회 참가 제한</strong> 조치가 이루어질 수 있습니다.',
+] as const
+
+const DISCLAIMERS = [
+  '영상 심사 중 트러블·사고 등으로 점수 확인이 불가한 경우 <strong>주최 측은 책임지지 않습니다.</strong>',
+  '본 대회는 사전 예고 없이 <strong>변경·중지·종료</strong>될 수 있으며, 변경 사항은 사이트 게재 시점부터 모든 참가자에게 적용됩니다.',
 ] as const
 
 /* ════════════════════════════════════════════════════════════════════ */
@@ -433,114 +430,143 @@ function ConsoleQualifierPage() {
 
         <FadeIn delay={150}>
           <div className='space-y-3'>
-            {/* 신청 및 제출 정보 */}
-            <Accordion title='신청 및 제출 정보'>
-              <DetailSubtitle>필수 제출 항목</DetailSubtitle>
-              {APPLY_FIELDS.map((f) => (
-                <DetailRow
-                  key={f.label}
-                  label={f.label}
-                  value={f.value}
-                  isBadge={'isBadge' in f ? f.isBadge : undefined}
-                  accentColor='#e74c3c'
-                />
-              ))}
-            </Accordion>
-
-            {/* 참가 자격 및 제한 */}
+            {/* ① 참가 자격 및 제한 */}
             <Accordion title='참가 자격 및 제한'>
-              <DetailSubtitle>자격 요건</DetailSubtitle>
-              {ELIGIBILITY_ROWS.map((r) => (
-                <DetailRow key={r.label} label={r.label} value={r.value} />
-              ))}
+              <div className='space-y-5 sm:space-y-6'>
+                <div>
+                  <DetailSubtitle>자격 요건</DetailSubtitle>
+                  {ELIGIBILITY_ROWS.map((r) => (
+                    <DetailRow key={r.label} label={r.label} value={r.value} />
+                  ))}
+                </div>
 
-              <div className='mt-4'>
-                <DetailSubtitle>중복 참가 규정</DetailSubtitle>
-                <DetailRow
-                  label='아케이드·콘솔 예선 참가'
-                  value='가능'
-                  isBadge={false}
-                  accentColor='#e74c3c'
-                />
-                <DetailRow
-                  label='아케이드·콘솔 동시 결선 진출'
-                  value='불가'
-                  isBadge={false}
-                  accentColor='#e74c3c'
-                />
-                <Callout
-                  type='warning'
-                  icon={<CalloutCharIcon type='warning' />}
-                >
-                  예선 중복 참가 가능하지만,{' '}
-                  <strong className='text-white/80'>결선 진출은 택 1</strong>{' '}
-                  구조입니다.
-                </Callout>
-              </div>
-
-              <div className='mt-4'>
-                <DetailSubtitle>대리 참가 · 부정행위</DetailSubtitle>
-                <Callout
-                  type='danger'
-                  icon={<CalloutCharIcon type='warning' />}
-                >
-                  중복 참가 및 대리 참가는{' '}
-                  <strong className='text-[#e74c3c]'>엄격히 금지</strong>
-                  됩니다. 위반 시 실격 처리되며, 향후 대회 참가에 불이익이 있을
-                  수 있습니다.
-                </Callout>
-              </div>
-            </Accordion>
-
-            {/* 미성년자 참가 규정 */}
-            <Accordion title='미성년자 참가 규정'>
-              {MINOR_ROWS.map((r) => (
-                <DetailRow
-                  key={r.label}
-                  label={r.label}
-                  value={r.value}
-                  isBadge={'isBadge' in r ? r.isBadge : undefined}
-                  accentColor='#e74c3c'
-                />
-              ))}
-              <Callout type='info' icon={<CalloutCharIcon type='info' />}>
-                보호자 동의 요건을 충족하면{' '}
-                <strong className='text-white/80'>연령 제한 없이</strong> 참가할
-                수 있습니다.
-              </Callout>
-            </Accordion>
-
-            {/* PlayX4 직관 참여 */}
-            <Accordion title='PlayX4 직관 참여 · 명찰'>
-              {PLAYX4_ROWS.map((r) => (
-                <DetailRow key={r.label} label={r.label} value={r.value} />
-              ))}
-              <Callout type='info' icon={<CalloutCharIcon type='info' />}>
-                신청 시 PlayX4 직관 참여 여부를 함께 선택합니다.
-              </Callout>
-            </Accordion>
-
-            {/* 유의사항 */}
-            <Accordion title='유의사항'>
-              <div className='space-y-1.5'>
-                {NOTICES.map((html, i) => (
-                  <div
-                    key={i}
-                    className='flex items-center gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
-                  >
-                    <img
-                      src={NOTICE_ROW_ICONS[i % NOTICE_ROW_ICONS.length]}
-                      alt=''
-                      className='size-6 shrink-0 object-contain opacity-90'
-                      loading='lazy'
-                      draggable={false}
-                    />
-                    <span
-                      className='break-keep text-white/55 [&>strong]:text-white/90'
-                      dangerouslySetInnerHTML={{ __html: html }}
-                    />
+                <div>
+                  <DetailSubtitle>중복 참가 규정</DetailSubtitle>
+                  <DetailRow
+                    label='아케이드·콘솔 예선 참가'
+                    value='가능'
+                    accentColor='#e74c3c'
+                  />
+                  <DetailRow
+                    label='아케이드·콘솔 동시 결선 진출'
+                    value='불가'
+                    valueClassName='shrink-0 font-semibold text-[#e74c3c]/80'
+                    accentColor='#e74c3c'
+                  />
+                  <div className='[&>div]:mt-0'>
+                    <Callout
+                      type='warning'
+                      icon={<CalloutCharIcon type='warning' />}
+                    >
+                      예선 중복 참가 가능하지만,{' '}
+                      <strong className='text-white/80'>
+                        결선 진출은 택 1
+                      </strong>{' '}
+                      구조입니다.
+                    </Callout>
                   </div>
-                ))}
+                </div>
+
+                <div>
+                  <DetailSubtitle>위반 시 조치</DetailSubtitle>
+                  <div className='flex flex-wrap gap-1.5'>
+                    {PENALTIES.map((p) => (
+                      <span
+                        key={p}
+                        className='rounded-lg border border-[#e74c3c]/15 bg-[#e74c3c]/[0.06] px-2.5 py-1 text-xs font-semibold text-[#e74c3c]/80'
+                      >
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className='[&>div]:mt-0'>
+                  <Callout
+                    type='danger'
+                    icon={<CalloutCharIcon type='warning' />}
+                  >
+                    중복 참가 및 대리 참가는{' '}
+                    <strong className='text-[#e74c3c]'>엄격히 금지</strong>
+                    됩니다. 위반 시 실격 처리되며, 악질적인 위반 시{' '}
+                    <strong className='text-[#e74c3c]'>
+                      향후 공식 이벤트 참가가 영구 제한
+                    </strong>
+                    될 수 있습니다.
+                  </Callout>
+                </div>
+              </div>
+            </Accordion>
+
+            {/* ② 미성년자 참가 규정 */}
+            <Accordion title='미성년자 참가 규정'>
+              <div className='space-y-5 sm:space-y-6'>
+                <div>
+                  {MINOR_ROWS.map((r) => (
+                    <DetailRow
+                      key={r.label}
+                      label={r.label}
+                      value={r.value}
+                      isBadge={'isBadge' in r ? r.isBadge : undefined}
+                      accentColor='#e74c3c'
+                    />
+                  ))}
+                </div>
+
+                <div className='[&>div]:mt-0'>
+                  <Callout type='info' icon={<CalloutCharIcon type='info' />}>
+                    보호자 동의 요건을 충족하면{' '}
+                    <strong className='text-white/80'>연령 제한 없이</strong>{' '}
+                    참가할 수 있습니다.
+                  </Callout>
+                </div>
+              </div>
+            </Accordion>
+
+            {/* ③ 유의사항 및 면책 */}
+            <Accordion title='유의사항 및 면책'>
+              <div className='space-y-5 sm:space-y-6'>
+                <div>
+                  <DetailSubtitle>대회 규정</DetailSubtitle>
+                  <div className='space-y-1.5'>
+                    {NOTICES.map((html, i) => (
+                      <div
+                        key={i}
+                        className='flex items-center gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
+                      >
+                        <img
+                          src={NOTICE_ROW_ICONS[i % NOTICE_ROW_ICONS.length]}
+                          alt=''
+                          className='size-6 shrink-0 object-contain opacity-90'
+                          loading='lazy'
+                          draggable={false}
+                        />
+                        <span
+                          className='break-keep text-white/55 [&>strong]:text-white/90'
+                          dangerouslySetInnerHTML={{ __html: html }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <DetailSubtitle>면책 사항</DetailSubtitle>
+                  <div className='space-y-1.5'>
+                    {DISCLAIMERS.map((html, i) => (
+                      <div
+                        key={i}
+                        className='flex items-start gap-2.5 rounded-xl border border-[#1e1e1e] bg-white/[0.015] px-3.5 py-2.5 text-[13px]'
+                      >
+                        <span className='shrink-0 text-white/35'>·</span>
+                        <span
+                          className='break-keep text-white/55 [&>strong]:text-white/90'
+                          dangerouslySetInnerHTML={{ __html: html }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </Accordion>
           </div>
