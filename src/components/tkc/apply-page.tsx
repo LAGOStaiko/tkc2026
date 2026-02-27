@@ -77,7 +77,6 @@ type RegisterPayload = {
   phone: string
   email: string
   nickname: string
-  namcoId: string
   videoLink?: string
   dohirobaNo?: string
   qualifierRegion?: string
@@ -106,7 +105,6 @@ const v = {
   emailRequired: t('apply.validation.emailRequired'),
   emailInvalid: t('apply.validation.emailInvalid'),
   nicknameRequired: t('apply.validation.nicknameRequired'),
-  namcoIdRequired: t('apply.validation.namcoIdRequired'),
   videoLinkRequired: t('apply.validation.videoLinkRequired'),
   dohirobaNoRequired: t('apply.validation.dohirobaNoRequired'),
   qualifierRegionRequired: t('apply.validation.qualifierRegionRequired'),
@@ -134,7 +132,6 @@ const formSchema = z
       .string()
       .min(1, { message: v.nicknameRequired })
       .max(L.nickname),
-    namcoId: z.string().min(1, { message: v.namcoIdRequired }).max(L.namcoId),
     // Console only
     videoLink: z.string().max(L.videoLink).optional(),
     // Arcade only
@@ -213,7 +210,6 @@ const defaultValues: ApplyFormValues = {
   phone: '',
   email: '',
   nickname: '',
-  namcoId: '',
   videoLink: '',
   dohirobaNo: '',
   qualifierRegion: '',
@@ -507,7 +503,6 @@ export function ApplyPage() {
       phone: values.phone,
       email: values.email,
       nickname: values.nickname,
-      namcoId: values.namcoId,
       spectator: values.spectator,
       isMinor: values.isMinor,
       consentLink: values.consentLink?.trim() ?? '',
@@ -805,27 +800,6 @@ export function ApplyPage() {
                       />
                     </div>
 
-                    {/* Namco ID */}
-                    <FormField
-                      control={form.control}
-                      name='namcoId'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FieldLabel required>
-                            {t('apply.field.namcoId')}
-                          </FieldLabel>
-                          <FormControl>
-                            <input
-                              autoComplete='off'
-                              className={inputClass}
-                              placeholder={t('apply.placeholder.namcoId')}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
-                        </FormItem>
-                      )}
-                    />
                   </div>
 
                   <SectionDivider />
@@ -1219,8 +1193,7 @@ export function ApplyPage() {
                                     <strong className='text-white/70'>
                                       수집 항목:
                                     </strong>{' '}
-                                    이름, 전화번호, 이메일, 남코 아이디, 동더
-                                    네임
+                                    이름, 전화번호, 이메일, 동더 네임
                                     <br />
                                     <strong className='text-white/70'>
                                       수집 목적:
@@ -1353,7 +1326,6 @@ export function ApplyPage() {
                 <ConfirmRow label='동더 네임' value={pendingValues.nickname} />
                 <ConfirmRow label='전화번호' value={pendingValues.phone} />
                 <ConfirmRow label='이메일' value={pendingValues.email} />
-                <ConfirmRow label='남코 아이디' value={pendingValues.namcoId} />
 
                 {pendingValues.division === 'console' && (
                   <ConfirmRow

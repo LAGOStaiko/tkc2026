@@ -62,7 +62,7 @@ export const registerSchema = z
     ),
     namcoId: z.preprocess(
       trimString,
-      z.string().min(1, "namcoId is required").max(L.namcoId)
+      z.string().max(L.namcoId).optional()
     ),
     // Console only
     videoLink: z.preprocess(
@@ -246,7 +246,7 @@ export const onRequestPost = async ({ env, request }) => {
       phone: escapeFormulaField(payloadBase.phone),
       email: escapeFormulaField(payloadBase.email),
       nickname: escapeFormulaField(payloadBase.nickname),
-      namcoId: escapeFormulaField(payloadBase.namcoId),
+      namcoId: escapeFormulaField(payloadBase.namcoId ?? ""),
       videoLink: escapeFormulaField(parsed.data.videoLink ?? ""),
       dohirobaNo: escapeFormulaField(parsed.data.dohirobaNo ?? ""),
       qualifierRegion: parsed.data.qualifierRegion ?? "",

@@ -1932,10 +1932,9 @@ function validateRegister_(p) {
   var email = req('email');     maxLen('email', LIMITS.email);
   var nickname = req('nickname'); maxLen('nickname', LIMITS.nickname);
 
-  // namcoId is primary; cardNo accepted as backward-compatible alias
+  // namcoId is optional (cardNo alias kept for backward compatibility)
   var namcoId = String(p.namcoId || p.cardNo || '').trim();
-  if (!namcoId) throw new Error('namcoId is required');
-  if (namcoId.length > LIMITS.namcoId) throw new Error('namcoId exceeds max length (' + LIMITS.namcoId + ')');
+  if (namcoId && namcoId.length > LIMITS.namcoId) throw new Error('namcoId exceeds max length (' + LIMITS.namcoId + ')');
 
   var privacyAgree = toBool_(p.privacyAgree);
   if (!privacyAgree) throw new Error('privacyAgree must be true');
