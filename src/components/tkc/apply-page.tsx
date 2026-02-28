@@ -4,7 +4,7 @@ import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { parseSongOption, parseSongTitle } from '@/content/swiss-song-pool'
 import { t } from '@/text'
-import { ChevronDown, Download } from 'lucide-react'
+import { CheckCircle2, ChevronDown, Download, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRegister, useSite, useSongPools } from '@/lib/api'
 import {
@@ -99,6 +99,7 @@ const REGIONS = [
 
 const CONSENT_PDF_URL = '/docs/consent-form.pdf'
 const LEGACY_NAMCO_ID_PLACEHOLDER = 'NOT_COLLECTED'
+const SUCCESS_MODAL_DELAY_MS = 600
 
 const v = {
   divisionRequired: t('apply.validation.divisionRequired'),
@@ -322,6 +323,13 @@ export function ApplyPage() {
   const [confirmOpen, setConfirmOpen] = React.useState(false)
   const [pendingValues, setPendingValues] =
     React.useState<ApplyFormValues | null>(null)
+  const [isDelayingSuccess, setIsDelayingSuccess] = React.useState(false)
+  const [modalReceiptId, setModalReceiptId] = React.useState<string | null>(
+    null
+  )
+  const [modalSubmitError, setModalSubmitError] = React.useState<string | null>(
+    null
+  )
   const [privacyOpen, setPrivacyOpen] = React.useState(false)
   const [videoGuideOpen, setVideoGuideOpen] = React.useState(false)
 
@@ -345,9 +353,9 @@ export function ApplyPage() {
   const isConsole = division === 'console'
   const isArcade = division === 'arcade'
   const isSubmitting = registerMutation.isPending
+  const isBusy = isSubmitting || isDelayingSuccess
   const isCompleted = receiptId !== null
-  const isDisabled = isSubmitting || isCompleted
-  const submitError = registerMutation.error ? t('apply.submitFailed') : null
+  const isDisabled = isBusy || isCompleted
   const turnstileFieldError = form.formState.errors.turnstileToken?.message
 
   const getAvailableSongs = (currentIndex: number) => {
@@ -361,6 +369,31 @@ export function ApplyPage() {
         song === currentValue || !usedTitles.includes(parseSongTitle(song))
     )
   }
+
+  const prevDivisionRef = React.useRef<'console' | 'arcade'>(division)
+
+  React.useEffect(() => {
+    const prevDivision = prevDivisionRef.current
+    if (prevDivision === division) return
+
+    if (division === 'arcade') {
+      form.resetField('videoLink', { defaultValue: '' })
+    } else {
+      form.resetField('dohirobaNo', { defaultValue: '' })
+      form.resetField('qualifierRegion', { defaultValue: '' })
+      form.resetField('offlineSong1', { defaultValue: '' })
+      form.resetField('offlineSong2', { defaultValue: '' })
+      form.resetField('offlineSong3', { defaultValue: '' })
+      form.resetField('offlineSong4', { defaultValue: '' })
+    }
+
+    prevDivisionRef.current = division
+  }, [division, form])
+
+  React.useEffect(() => {
+    if (!isCompleted || typeof window === 'undefined') return
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [isCompleted])
 
   React.useEffect(() => {
     if (!turnstileSiteKey || !turnstileRef.current) return
@@ -490,12 +523,15 @@ export function ApplyPage() {
       })
       return
     }
+    setModalSubmitError(null)
+    setIsDelayingSuccess(false)
+    setModalReceiptId(null)
     setPendingValues(values)
     setConfirmOpen(true)
   }
 
   const onSubmit = async (values: ApplyFormValues) => {
-    setConfirmOpen(false)
+    setModalSubmitError(null)
 
     const payload: RegisterPayload = {
       division: values.division,
@@ -528,7 +564,11 @@ export function ApplyPage() {
 
     try {
       const result = await registerMutation.mutateAsync(payload)
-      setReceiptId(String(result?.receiptId ?? ''))
+      setIsDelayingSuccess(true)
+      await new Promise((resolve) =>
+        window.setTimeout(resolve, SUCCESS_MODAL_DELAY_MS)
+      )
+      setModalReceiptId(String(result?.receiptId ?? ''))
     } catch (error) {
       const rawMessage =
         error instanceof Error ? error.message : '신청 중 오류가 발생했습니다.'
@@ -540,8 +580,20 @@ export function ApplyPage() {
             : rawMessage === 'Request timed out'
               ? '요청이 지연되고 있습니다. 잠시 후 다시 시도해주세요.'
               : rawMessage
-      toast.error('신청 실패', { description: message })
+      setModalSubmitError(message)
+    } finally {
+      setIsDelayingSuccess(false)
     }
+  }
+
+  const onConfirmComplete = () => {
+    if (modalReceiptId === null) return
+    setReceiptId(modalReceiptId)
+    setModalReceiptId(null)
+    setModalSubmitError(null)
+    setPendingValues(null)
+    setIsDelayingSuccess(false)
+    setConfirmOpen(false)
   }
 
   if (applyOpen === false) {
@@ -551,13 +603,6 @@ export function ApplyPage() {
       </div>
     )
   }
-
-  /* ── step indicators ── */
-  const STEPS = [
-    { num: '01', label: '참가 정보' },
-    { num: '02', label: isConsole ? '영상 제출' : '예선 정보' },
-    { num: '03', label: '동의 및 확인' },
-  ]
 
   return (
     <div className='w-full'>
@@ -582,27 +627,27 @@ export function ApplyPage() {
       {/* ── Form Card ── */}
       <FadeIn delay={300}>
         <div className='mb-10 overflow-hidden rounded-[20px] border border-[#1e1e1e] bg-[#111]'>
-          {/* Step indicator */}
-          <div className='flex border-b border-[#1e1e1e]'>
-            {STEPS.map((step, i) => (
-              <div
-                key={step.num}
-                className={`relative flex-1 py-4 text-center text-[14px] font-semibold ${
-                  i < STEPS.length - 1 ? 'border-r border-[#1e1e1e]' : ''
-                } text-white/90`}
+          {isCompleted ? (
+            <div className='px-7 py-12 text-center sm:px-9'>
+              <CheckCircle2 className='mx-auto mb-4 size-14 text-[#4ecb71]' />
+              <h2 className='text-[22px] font-bold text-white/90'>
+                신청이 완료되었습니다
+              </h2>
+              <p className='mt-2 text-[14px] text-white/50'>
+                접수 번호를 확인해 주세요.
+              </p>
+              <p className='mt-4 font-mono text-3xl font-bold break-all text-white/95'>
+                {receiptId || t('common.none')}
+              </p>
+              <a
+                href='/'
+                className='mt-8 inline-flex w-full items-center justify-center rounded-[10px] bg-white/90 px-10 py-3.5 text-[16px] font-bold text-black transition-all hover:bg-white sm:w-auto'
               >
-                <span className='mr-1.5 font-mono text-[11px] font-semibold text-[#e74c3c]'>
-                  {step.num}
-                </span>
-                <span className='text-[13px] break-keep sm:text-[14px]'>
-                  {step.label}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Form body */}
-          <Form {...form}>
+                홈페이지로 돌아가기
+              </a>
+            </div>
+          ) : (
+            <Form {...form}>
             <form onSubmit={form.handleSubmit(onShowConfirm, onInvalidSubmit)}>
               <div className='p-7 sm:p-9'>
                 {/* Honeypot */}
@@ -1260,170 +1305,197 @@ export function ApplyPage() {
                   )}
                 </fieldset>
 
-                {/* Completed banner */}
-                {isCompleted && (
-                  <div className='mt-6 rounded-xl border border-[#4ecb71]/30 bg-[#4ecb71]/[0.06] p-5 text-center'>
-                    <p className='text-[15px] font-bold text-white/90'>
-                      {t('apply.completed')}
-                    </p>
-                    <p className='mt-1 text-[13px] text-white/55'>
-                      {t('apply.receiptId')}
-                    </p>
-                    <p className='mt-2 font-mono text-2xl font-bold break-all text-white/90'>
-                      {receiptId || t('common.none')}
-                    </p>
-                  </div>
-                )}
-
-                {submitError && (
-                  <p className='mt-4 text-sm text-[#e74c3c]'>{submitError}</p>
-                )}
               </div>
 
               {/* Submit bar */}
               <div className='flex flex-col items-center justify-between gap-4 border-t border-[#1e1e1e] px-7 py-6 sm:flex-row sm:px-9'>
                 <div className='text-[13px] text-white/40'>
-                  {isCompleted ? (
-                    '신청이 완료되었습니다. 홈으로 돌아가실 수 있습니다.'
-                  ) : (
-                    <>
-                      <span className='text-[#e74c3c]'>*</span> 표시는 필수 입력
-                      항목입니다.
-                    </>
-                  )}
+                  <span className='text-[#e74c3c]'>*</span> 표시는 필수 입력
+                  항목입니다.
                 </div>
-                {isCompleted ? (
-                  <a
-                    href='/'
-                    className='inline-flex w-full shrink-0 items-center justify-center rounded-[10px] bg-white/90 px-10 py-3.5 text-[16px] font-bold text-black transition-all hover:bg-white sm:w-auto'
-                  >
-                    홈페이지로 나가기
-                  </a>
-                ) : (
-                  <button
-                    type='submit'
-                    disabled={isDisabled}
-                    className='w-full shrink-0 cursor-pointer rounded-[10px] bg-[#e74c3c] px-10 py-3.5 text-[16px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
-                    style={{
-                      boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
-                    }}
-                  >
-                    {isSubmitting ? t('apply.submitting') : t('apply.submit')}
-                  </button>
-                )}
+                <button
+                  type='submit'
+                  disabled={isDisabled}
+                  className='w-full shrink-0 cursor-pointer rounded-[10px] bg-[#e74c3c] px-10 py-3.5 text-[16px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
+                  style={{
+                    boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
+                  }}
+                >
+                  {isBusy ? t('apply.submitting') : t('apply.submit')}
+                </button>
               </div>
             </form>
           </Form>
+          )}
         </div>
       </FadeIn>
 
       {/* ── Confirmation Modal ── */}
-      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+      <Dialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          if (isBusy) return
+          if (!open && modalReceiptId !== null) return
+
+          setConfirmOpen(open)
+          if (!open) {
+            setPendingValues(null)
+            setModalSubmitError(null)
+            setIsDelayingSuccess(false)
+          }
+        }}
+      >
         <DialogContent
           showCloseButton={false}
           className='max-w-[480px] gap-0 overflow-hidden rounded-2xl border-[#1e1e1e] bg-[#111] p-0 shadow-[0_25px_50px_rgba(0,0,0,0.5)]'
         >
           <DialogHeader className='border-b border-[#1e1e1e] px-6 py-5'>
             <DialogTitle className='text-[18px] font-bold text-white/90'>
-              입력 정보 확인
+              {modalReceiptId !== null ? '신청 완료' : '입력 정보 확인'}
             </DialogTitle>
             <DialogDescription className='mt-1 text-[13px] text-white/40'>
-              아래 내용이 맞는지 확인한 뒤 제출해 주세요.
+              {modalReceiptId !== null
+                ? '접수가 완료되었습니다. 내용을 확인해 주세요.'
+                : '아래 내용이 맞는지 확인한 뒤 제출해 주세요.'}
             </DialogDescription>
           </DialogHeader>
 
-          {pendingValues && (
-            <div className='max-h-[50vh] overflow-y-auto px-6 py-5'>
-              <div className='space-y-0'>
-                <ConfirmRow
-                  label='부문'
-                  value={
-                    pendingValues.division === 'console' ? '콘솔' : '아케이드'
-                  }
-                />
-                <ConfirmRow label='이름' value={pendingValues.name} />
-                <ConfirmRow label='동더 네임' value={pendingValues.nickname} />
-                <ConfirmRow label='전화번호' value={pendingValues.phone} />
-                <ConfirmRow label='이메일' value={pendingValues.email} />
-
-                {pendingValues.division === 'console' && (
-                  <ConfirmRow
-                    label='동영상 링크'
-                    value={pendingValues.videoLink || ''}
-                  />
-                )}
-
-                {pendingValues.division === 'arcade' && (
-                  <>
-                    <ConfirmRow
-                      label='동더 광장 북번호'
-                      value={pendingValues.dohirobaNo || ''}
-                    />
-                    <ConfirmRow
-                      label='예선 지역'
-                      value={
-                        REGIONS.find(
-                          (r) => r.value === pendingValues.qualifierRegion
-                        )?.label ??
-                        pendingValues.qualifierRegion ??
-                        ''
-                      }
-                    />
-                    <ConfirmRow
-                      label='우선 선곡'
-                      value={[
-                        pendingValues.offlineSong1,
-                        pendingValues.offlineSong2,
-                        pendingValues.offlineSong3,
-                        pendingValues.offlineSong4,
-                      ]
-                        .filter(Boolean)
-                        .map((s) => parseSongOption(s!)?.label ?? s)
-                        .join(', ')}
-                    />
-                  </>
-                )}
-
-                <ConfirmRow
-                  label='직관 참여'
-                  value={pendingValues.spectator ? '신청' : '미신청'}
-                />
-                <ConfirmRow
-                  label='미성년자'
-                  value={pendingValues.isMinor ? '예' : '아니오'}
-                />
-                {pendingValues.isMinor && pendingValues.consentLink && (
-                  <ConfirmRow
-                    label='보호자 동의서'
-                    value={pendingValues.consentLink}
-                  />
-                )}
-              </div>
+          {modalReceiptId !== null ? (
+            <div className='px-6 py-8 text-center'>
+              <CheckCircle2 className='mx-auto mb-3 size-12 text-[#4ecb71]' />
+              <p className='text-[16px] font-bold text-white/90'>
+                신청이 완료되었습니다
+              </p>
+              <p className='mt-1 text-[13px] text-white/50'>접수 번호</p>
+              <p className='mt-2 font-mono text-2xl font-bold break-all text-white/95'>
+                {modalReceiptId || t('common.none')}
+              </p>
             </div>
+          ) : (
+            pendingValues && (
+              <div className='max-h-[50vh] overflow-y-auto px-6 py-5'>
+                <div className='space-y-0'>
+                  <ConfirmRow
+                    label='부문'
+                    value={
+                      pendingValues.division === 'console' ? '콘솔' : '아케이드'
+                    }
+                  />
+                  <ConfirmRow label='이름' value={pendingValues.name} />
+                  <ConfirmRow label='동더 네임' value={pendingValues.nickname} />
+                  <ConfirmRow label='전화번호' value={pendingValues.phone} />
+                  <ConfirmRow label='이메일' value={pendingValues.email} />
+
+                  {pendingValues.division === 'console' && (
+                    <ConfirmRow
+                      label='동영상 링크'
+                      value={pendingValues.videoLink || ''}
+                    />
+                  )}
+
+                  {pendingValues.division === 'arcade' && (
+                    <>
+                      <ConfirmRow
+                        label='동더 광장 북번호'
+                        value={pendingValues.dohirobaNo || ''}
+                      />
+                      <ConfirmRow
+                        label='예선 지역'
+                        value={
+                          REGIONS.find(
+                            (r) => r.value === pendingValues.qualifierRegion
+                          )?.label ??
+                          pendingValues.qualifierRegion ??
+                          ''
+                        }
+                      />
+                      <ConfirmRow
+                        label='우선 선곡'
+                        value={[
+                          pendingValues.offlineSong1,
+                          pendingValues.offlineSong2,
+                          pendingValues.offlineSong3,
+                          pendingValues.offlineSong4,
+                        ]
+                          .filter(Boolean)
+                          .map((s) => parseSongOption(s!)?.label ?? s)
+                          .join(', ')}
+                      />
+                    </>
+                  )}
+
+                  <ConfirmRow
+                    label='직관 참여'
+                    value={pendingValues.spectator ? '신청' : '미신청'}
+                  />
+                  <ConfirmRow
+                    label='미성년자'
+                    value={pendingValues.isMinor ? '예' : '아니오'}
+                  />
+                  {pendingValues.isMinor && pendingValues.consentLink && (
+                    <ConfirmRow
+                      label='보호자 동의서'
+                      value={pendingValues.consentLink}
+                    />
+                  )}
+                </div>
+              </div>
+            )
           )}
 
+          {modalSubmitError && modalReceiptId === null ? (
+            <p className='px-6 text-sm text-[#e74c3c]'>{modalSubmitError}</p>
+          ) : null}
+
           <DialogFooter className='flex-row gap-3 border-t border-[#1e1e1e] px-6 py-4'>
-            <button
-              type='button'
-              disabled={isSubmitting}
-              onClick={() => setConfirmOpen(false)}
-              className='flex-1 cursor-pointer rounded-[10px] border border-[#2a2a2a] bg-transparent px-4 py-3 text-[14px] font-semibold text-white/70 transition-all hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-50'
-            >
-              수정하기
-            </button>
-            <button
-              type='button'
-              disabled={isSubmitting}
-              onClick={() => {
-                if (pendingValues) onSubmit(pendingValues)
-              }}
-              className='flex-1 cursor-pointer rounded-[10px] bg-[#e74c3c] px-4 py-3 text-[14px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50'
-              style={{
-                boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
-              }}
-            >
-              {isSubmitting ? t('apply.submitting') : '제출하기'}
-            </button>
+            {modalReceiptId !== null ? (
+              <button
+                type='button'
+                onClick={onConfirmComplete}
+                className='w-full cursor-pointer rounded-[10px] bg-[#e74c3c] px-4 py-3 text-[14px] font-bold text-white transition-all hover:brightness-110'
+                style={{
+                  boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
+                }}
+              >
+                확인
+              </button>
+            ) : (
+              <>
+                <button
+                  type='button'
+                  disabled={isBusy}
+                  onClick={() => {
+                    setConfirmOpen(false)
+                    setPendingValues(null)
+                    setModalSubmitError(null)
+                    setIsDelayingSuccess(false)
+                  }}
+                  className='flex-1 cursor-pointer rounded-[10px] border border-[#2a2a2a] bg-transparent px-4 py-3 text-[14px] font-semibold text-white/70 transition-all hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-50'
+                >
+                  수정하기
+                </button>
+                <button
+                  type='button'
+                  disabled={isBusy}
+                  onClick={() => {
+                    if (pendingValues) onSubmit(pendingValues)
+                  }}
+                  className='flex-1 cursor-pointer rounded-[10px] bg-[#e74c3c] px-4 py-3 text-[14px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50'
+                  style={{
+                    boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
+                  }}
+                >
+                  {isBusy ? (
+                    <span className='inline-flex items-center gap-2'>
+                      <Loader2 className='size-4 animate-spin' />
+                      {t('apply.submitting')}
+                    </span>
+                  ) : (
+                    '제출하기'
+                  )}
+                </button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
