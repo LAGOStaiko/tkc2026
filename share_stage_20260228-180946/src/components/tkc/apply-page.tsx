@@ -4,7 +4,7 @@ import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { parseSongOption, parseSongTitle } from '@/content/swiss-song-pool'
 import { t } from '@/text'
-import { CheckCircle2, Download, HelpCircle, Loader2 } from 'lucide-react'
+import { CheckCircle2, ChevronDown, Download, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRegister, useSite, useSongPools } from '@/lib/api'
 import {
@@ -288,82 +288,6 @@ function SectionLabel({ title, desc }: { title: string; desc?: string }) {
   )
 }
 
-function GuidePopup({
-  trigger,
-  title,
-  imageSrc,
-  imageAlt,
-  description,
-  children,
-}: {
-  trigger: string
-  title: string
-  imageSrc?: string
-  imageAlt?: string
-  description?: string
-  children?: React.ReactNode
-}) {
-  const [open, setOpen] = React.useState(false)
-  const [imgError, setImgError] = React.useState(false)
-
-  return (
-    <>
-      <button
-        type='button'
-        onClick={() => setOpen(true)}
-        className={`inline-flex items-center gap-1 text-[13px] text-[#e74c3c]/70 transition-colors hover:text-[#e74c3c]${!trigger ? ' align-middle' : ''}`}
-      >
-        <HelpCircle className='size-3.5' />
-        {trigger || null}
-      </button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className='max-w-[480px] gap-0 overflow-hidden rounded-2xl border-[#1e1e1e] bg-[#111] p-0 shadow-[0_25px_50px_rgba(0,0,0,0.5)]'>
-          <DialogHeader className='border-b border-[#1e1e1e] px-6 py-5'>
-            <DialogTitle className='text-[18px] font-bold text-white/90'>
-              {title}
-            </DialogTitle>
-            <DialogDescription className='sr-only'>
-              {title} 안내
-            </DialogDescription>
-          </DialogHeader>
-          <div className='px-6 py-5'>
-            {imageSrc && !imgError && (
-              <img
-                src={imageSrc}
-                alt={imageAlt ?? title}
-                className='max-h-[70vh] w-full rounded-lg object-contain'
-                onError={() => setImgError(true)}
-              />
-            )}
-            {imageSrc && imgError && (
-              <div className='flex aspect-video items-center justify-center rounded-lg bg-[#0e0e0e]'>
-                <span className='text-[13px] text-white/30'>
-                  이미지 준비 중
-                </span>
-              </div>
-            )}
-            {description && (
-              <p className={`${imageSrc ? 'mt-3' : ''} text-[13px] leading-[1.6] whitespace-pre-line text-white/40`}>
-                {description}
-              </p>
-            )}
-            {children}
-          </div>
-          <div className='border-t border-[#1e1e1e] px-6 py-4'>
-            <button
-              type='button'
-              onClick={() => setOpen(false)}
-              className='w-full cursor-pointer rounded-[10px] border border-[#2a2a2a] bg-transparent px-4 py-3 text-[14px] font-semibold text-white/70 transition-all hover:bg-white/[0.04]'
-            >
-              닫기
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
-}
-
 const inputClass =
   'w-full rounded-[10px] border border-[#1e1e1e] bg-[#0e0e0e] px-4 py-3.5 text-[15px] text-white/90 outline-none transition-[border-color,box-shadow] placeholder:text-white/25 focus:border-[#e74c3c]/40 focus:shadow-[0_0_0_3px_rgba(231,76,60,0.08)] disabled:cursor-not-allowed disabled:opacity-50'
 
@@ -409,7 +333,8 @@ export function ApplyPage() {
   const [modalSubmitError, setModalSubmitError] = React.useState<string | null>(
     null
   )
-
+  const [privacyOpen, setPrivacyOpen] = React.useState(false)
+  const [videoGuideOpen, setVideoGuideOpen] = React.useState(false)
 
   const form = useForm<ApplyFormValues>({
     resolver: zodResolver(formSchema),
@@ -839,7 +764,7 @@ export function ApplyPage() {
 
                   <div className='space-y-4'>
                     {/* Name + Nickname */}
-                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-start'>
+                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                       <FormField
                         control={form.control}
                         name='name'
@@ -864,24 +789,9 @@ export function ApplyPage() {
                         name='nickname'
                         render={({ field }) => (
                           <FormItem>
-                            <div className='mb-1.5 flex items-center gap-1'>
-                              <span className='text-[14px] font-semibold text-white/90'>
-                                {t('apply.field.nickname')}
-                                <span className='ml-1.5 text-[11px] font-bold text-[#e74c3c]'>
-                                  *
-                                </span>
-                              </span>
-                              <GuidePopup
-                                trigger=''
-                                title='닉네임 규정 안내'
-                              >
-                                <div className='text-[13px] leading-[1.7] text-white/40'>
-                                  특정 단체·종교·비도덕적 표현이 포함된 닉네임은
-                                  사용할 수 없으며, 운영진이 수정 요청을 드릴 수
-                                  있습니다.
-                                </div>
-                              </GuidePopup>
-                            </div>
+                            <FieldLabel required>
+                              {t('apply.field.nickname')}
+                            </FieldLabel>
                             <FormControl>
                               <input
                                 className={inputClass}
@@ -890,8 +800,10 @@ export function ApplyPage() {
                               />
                             </FormControl>
                             <FieldHint>
-                              게임 내 닉네임을 입력해 주세요. 한글만 입력
-                              가능합니다.
+                              게임 내에서 사용하는 닉네임을 입력해 주세요.
+                              한글만 입력 가능하며, 특정 단체·종교·비도덕적
+                              표현이 포함된 이름은 사용할 수 없으며 수정 요청을
+                              드릴 수 있습니다.
                             </FieldHint>
                             <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                           </FormItem>
@@ -900,7 +812,7 @@ export function ApplyPage() {
                     </div>
 
                     {/* Phone + Email */}
-                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-start'>
+                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                       <FormField
                         control={form.control}
                         name='phone'
@@ -972,18 +884,31 @@ export function ApplyPage() {
                               />
                             </FormControl>
                             <FieldHint>
-                              <GuidePopup
-                                trigger='영상 업로드 방법 보기'
-                                title='동영상 링크 제출 안내'
-                                imageSrc='/images/guide-video-upload.png'
-                                imageAlt='동영상 링크 제출 안내'
-                                description={t('apply.field.videoLinkGuide')}
-                              />
+                              <button
+                                type='button'
+                                onClick={() =>
+                                  setVideoGuideOpen(!videoGuideOpen)
+                                }
+                                className='inline-flex items-center gap-1 text-[#e74c3c]/70 transition-colors hover:text-[#e74c3c]'
+                              >
+                                <ChevronDown
+                                  className={`size-3.5 transition-transform ${videoGuideOpen ? 'rotate-180' : ''}`}
+                                />
+                                {t('apply.field.videoLinkGuideTitle')}
+                              </button>
                             </FieldHint>
                             <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                           </FormItem>
                         )}
                       />
+
+                      {videoGuideOpen && (
+                        <div className='mt-3 rounded-[10px] border border-[#1e1e1e] bg-[#0e0e0e] p-4'>
+                          <p className='text-[13px] leading-[1.7] whitespace-pre-line text-white/40'>
+                            {t('apply.field.videoLinkGuide')}
+                          </p>
+                        </div>
+                      )}
                     </>
                   )}
 
@@ -1014,12 +939,17 @@ export function ApplyPage() {
                                   {...field}
                                 />
                               </FormControl>
-                              <GuidePopup
-                                trigger='북번호 확인 방법 보기'
-                                title='동더 광장 북번호 확인 방법'
-                                imageSrc='/images/dohiroba-guide.png'
-                                imageAlt='동더 광장 북번호 확인 방법'
-                              />
+                              <FieldHint>
+                                동더히로바(donderful-hiroba.com) 마이페이지에서
+                                확인할 수 있습니다.
+                              </FieldHint>
+                              <div className='mt-3 overflow-hidden rounded-[10px] border border-[#1e1e1e] bg-[#0e0e0e]'>
+                                <img
+                                  src='/images/dohiroba-guide.png'
+                                  alt='동더 광장 북번호 확인 방법'
+                                  className='w-full'
+                                />
+                              </div>
                               <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                             </FormItem>
                           )}
@@ -1056,12 +986,16 @@ export function ApplyPage() {
                                   ))}
                                 </SelectContent>
                               </Select>
-                              <GuidePopup
-                                trigger='일정 상세 보기'
-                                title='예선 일정 안내'
-                                imageSrc='/images/guide-schedule.png'
-                                imageAlt='예선 일정 안내'
-                              />
+                              <FieldHint>
+                                <a
+                                  href='/schedule'
+                                  target='_blank'
+                                  rel='noopener noreferrer'
+                                  className='text-[#e74c3c]/70 transition-colors hover:text-[#e74c3c]'
+                                >
+                                  일정 상세 보기 →
+                                </a>
+                              </FieldHint>
                               <FormMessage className='mt-1.5 text-xs text-[#e74c3c]' />
                             </FormItem>
                           )}
@@ -1200,14 +1134,14 @@ export function ApplyPage() {
                               <div className='mt-0.5 text-[13px] leading-[1.5] text-white/40'>
                                 {t('apply.field.spectatorHelp')}
                               </div>
-                              <div className='mt-1.5'>
-                                <GuidePopup
-                                  trigger='보상 내용 보기'
-                                  title='직관 참여 보상 안내'
-                                  imageSrc='/images/guide-spectator-rewards.png'
-                                  imageAlt='직관 참여 보상 안내'
-                                />
-                              </div>
+                              <a
+                                href='/rewards'
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='mt-1 inline-block text-[13px] text-[#e74c3c]/70 transition-colors hover:text-[#e74c3c]'
+                              >
+                                자세한 보상 내용 보기 →
+                              </a>
                             </div>
                           </label>
                         </FormItem>
@@ -1264,14 +1198,6 @@ export function ApplyPage() {
                               </div>
                               <div className='mt-0.5 text-[13px] leading-[1.5] text-white/40'>
                                 {t('apply.field.isMinorHelp')}
-                              </div>
-                              <div className='mt-1.5'>
-                                <GuidePopup
-                                  trigger='동의서 작성 방법 보기'
-                                  title='보호자 동의서 안내'
-                                  imageSrc='/images/guide-minor-consent.png'
-                                  imageAlt='보호자 동의서 안내'
-                                />
                               </div>
                             </div>
                           </label>
@@ -1334,12 +1260,23 @@ export function ApplyPage() {
                                 {t('apply.field.privacyHelp')}
                               </div>
 
+                              {/* Privacy accordion */}
                               <div className='mt-2.5 border-t border-[#1e1e1e] pt-2.5'>
-                                <GuidePopup
-                                  trigger='개인정보 수집 및 이용 세부사항'
-                                  title='개인정보 수집 및 이용 안내'
+                                <button
+                                  type='button'
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    setPrivacyOpen(!privacyOpen)
+                                  }}
+                                  className='flex items-center gap-1 text-[13px] text-white/40 transition-colors hover:text-white/60'
                                 >
-                                  <div className='text-[13px] leading-[1.7] text-white/40'>
+                                  <ChevronDown
+                                    className={`size-3.5 transition-transform ${privacyOpen ? 'rotate-180' : ''}`}
+                                  />
+                                  개인정보 수집 및 이용 세부사항
+                                </button>
+                                {privacyOpen && (
+                                  <div className='mt-2.5 text-[13px] leading-[1.7] text-white/40'>
                                     <strong className='text-white/70'>
                                       수집 항목:
                                     </strong>{' '}
@@ -1359,7 +1296,7 @@ export function ApplyPage() {
                                     동의를 거부할 수 있으나, 거부 시 대회 참가가
                                     불가합니다.
                                   </div>
-                                </GuidePopup>
+                                )}
                               </div>
                             </div>
                           </label>
@@ -1501,7 +1438,7 @@ export function ApplyPage() {
                         value={pendingValues.dohirobaNo || ''}
                       />
                       <ConfirmRow
-                        label='온라인 예선 차수'
+                        label='예선 지역'
                         value={
                           REGIONS.find(
                             (r) => r.value === pendingValues.qualifierRegion
@@ -1511,7 +1448,7 @@ export function ApplyPage() {
                         }
                       />
                       <ConfirmRow
-                        label='오프라인 예선곡'
+                        label='우선 선곡'
                         value={[
                           pendingValues.offlineSong1,
                           pendingValues.offlineSong2,
@@ -1530,7 +1467,7 @@ export function ApplyPage() {
                     value={pendingValues.spectator ? '신청' : '미신청'}
                   />
                   <ConfirmRow
-                    label='미성년자 여부'
+                    label='미성년자'
                     value={pendingValues.isMinor ? '예' : '아니오'}
                   />
                   {pendingValues.isMinor && pendingValues.consentLink && (

@@ -7,8 +7,8 @@ const HERO_ASSETS = {
   heroBg: '/branding/v2/hero-bg.webp',
   // Asset file names are historical; keep mapping by visual role.
   heroMain: '/branding/v2/logo-3.png',
-  heroSide: '/branding/v2/hero-main.webp',
-  heroTitle: '/branding/v2/logo-4.png',
+  heroSide: '/branding/v2/logo-1.png',
+  heroTitle: '/branding/v2/hero-side.png',
   heroTop: '/branding/v2/logo-5.png',
 }
 

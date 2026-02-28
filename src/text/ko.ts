@@ -27,7 +27,7 @@ export const ko = {
   'apply.field.offlineSongPlaceholder': '곡을 선택해 주세요',
   'apply.field.spectator': '직관 참여 여부',
   'apply.field.spectatorHelp':
-    '대회에 참가하고 PlayX4 결선까지 직관 참여하시면 대회 기념 굿즈를 지급합니다.',
+    '온라인 예선 참가 후 PlayX4 현장 직관 시 기념 굿즈를 증정합니다. 진출 단계에 따라 디자인이 달라집니다.',
   'apply.field.videoLink': '동영상 링크',
   'apply.field.videoLinkHelp':
     '본인의 플레이 영상을 유튜브에 일부공개로 업로드하고 링크를 입력해 주세요.',
@@ -45,10 +45,10 @@ export const ko = {
   'apply.placeholder.phone': '예: 010-0000-0000',
   'apply.placeholder.videoLink': '예: https://youtu.be/...',
   'apply.receiptId': '접수 번호',
-  'apply.region.seoul': '1차 서울 · TAIKO LABS',
-  'apply.region.daejeon': '2차 대전 · 대전 싸이뮤직 게임월드',
-  'apply.region.gwangju': '3차 광주 · 광주 게임플라자',
-  'apply.region.busan': '4차 부산 · 게임D',
+  'apply.region.seoul': '1차 서울 · TAIKO LABS (3/29)',
+  'apply.region.daejeon': '2차 대전 · 대전 싸이뮤직 게임월드 (4/5)',
+  'apply.region.gwangju': '3차 광주 · 광주 게임플라자 (4/12)',
+  'apply.region.busan': '4차 부산 · 게임D (4/19)',
   'apply.songPoolEmpty': '곡 풀이 아직 준비되지 않았습니다.',
   'apply.submit': '신청하기',
   'apply.submitting': '신청 중...',
