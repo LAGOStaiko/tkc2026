@@ -536,10 +536,6 @@ function ArcadeOpsControlPage() {
     () => getRegionByKey(archive, region),
     [archive, region]
   )
-  const finalRanking = useMemo(() => {
-    if (!regionArchive) return []
-    return buildRegionFinalRanking(regionArchive)
-  }, [regionArchive])
   const swissProgress = useMemo(
     () => buildSwissProgress(regionArchive),
     [regionArchive]
@@ -558,13 +554,21 @@ function ArcadeOpsControlPage() {
     )
   }, [regionParticipants])
 
+  const finalRanking = useMemo(() => {
+    if (!regionArchive) return []
+    return buildRegionFinalRanking(regionArchive).map((row) => ({
+      ...row,
+      cardNo: participantByEntryId.get(row.entryId)?.cardNo,
+    }))
+  }, [regionArchive, participantByEntryId])
+
   const songOptions = useMemo(() => buildSongOptions(SWISS_SONG_POOL), [])
 
   const playerOptions = useMemo(
     () =>
       regionParticipants.map((p) => ({
         value: p.entryId,
-        label: `${p.nickname} (${p.entryId})${p.seed != null ? ` #${p.seed}` : ''}`,
+        label: `${p.nickname}${p.cardNo ? ` · 북${p.cardNo}` : ''} (${p.entryId})${p.seed != null ? ` #${p.seed}` : ''}`,
       })),
     [regionParticipants]
   )
@@ -671,6 +675,8 @@ function ArcadeOpsControlPage() {
       next[`${prefix}EntryId`] = p.entryId
       next[`${prefix}Nickname`] = p.nickname
       if (p.seed != null) next[`${prefix}Seed`] = String(p.seed)
+      if (p.cardNo) next[`${prefix}CardNo`] = p.cardNo
+      if (p.qualifierRegion) next[`${prefix}QualRegion`] = p.qualifierRegion
       const otherPrefix = prefix === 'p1' ? 'p2' : 'p1'
       const otherEntryId = next[`${otherPrefix}EntryId`]?.trim()
       if (otherEntryId) {
@@ -1564,6 +1570,7 @@ function ArcadeOpsControlPage() {
                   <tr>
                     <th className='px-3 py-2'>#</th>
                     <th className='px-3 py-2'>닉네임</th>
+                    <th className='px-3 py-2'>북번호</th>
                     <th className='px-3 py-2'>전적</th>
                     <th className='px-3 py-2'>상태</th>
                   </tr>
@@ -1576,6 +1583,9 @@ function ArcadeOpsControlPage() {
                       </td>
                       <td className='px-3 py-2 text-white/80'>
                         {row.nickname}
+                      </td>
+                      <td className='px-3 py-2 font-mono text-white/40'>
+                        {row.cardNo || '-'}
                       </td>
                       <td className='px-3 py-2 font-mono text-white/60'>
                         {typeof row.wins === 'number' &&
@@ -1737,6 +1747,28 @@ function ArcadeOpsControlPage() {
                   placeholder='서울선수01'
                   className='min-h-[48px] text-base'
                 />
+                {draft.p1EntryId && participantByEntryId.get(draft.p1EntryId) ? (() => {
+                  const p = participantByEntryId.get(draft.p1EntryId)!
+                  return (
+                    <div className='flex flex-wrap gap-1.5 pt-1'>
+                      {p.cardNo ? (
+                        <span className='rounded-md bg-white/[0.06] px-2 py-1 text-[11px] text-white/50'>
+                          북 {p.cardNo}
+                        </span>
+                      ) : null}
+                      {p.qualifierRegion ? (
+                        <span className='rounded-md bg-white/[0.06] px-2 py-1 text-[11px] text-white/50'>
+                          온라인 {p.qualifierRegion}
+                        </span>
+                      ) : null}
+                      {p.offlineSongs && p.offlineSongs.length > 0 ? (
+                        <span className='rounded-md bg-[#ff2a00]/10 px-2 py-1 text-[11px] text-[#ff8c66]'>
+                          선곡 {p.offlineSongs.length}곡
+                        </span>
+                      ) : null}
+                    </div>
+                  )
+                })() : null}
               </div>
               <div className='space-y-1'>
                 <label className='text-xs font-medium text-white/40'>
@@ -1773,6 +1805,28 @@ function ArcadeOpsControlPage() {
                   placeholder='서울선수16'
                   className='min-h-[48px] text-base'
                 />
+                {draft.p2EntryId && participantByEntryId.get(draft.p2EntryId) ? (() => {
+                  const p = participantByEntryId.get(draft.p2EntryId)!
+                  return (
+                    <div className='flex flex-wrap gap-1.5 pt-1'>
+                      {p.cardNo ? (
+                        <span className='rounded-md bg-white/[0.06] px-2 py-1 text-[11px] text-white/50'>
+                          북 {p.cardNo}
+                        </span>
+                      ) : null}
+                      {p.qualifierRegion ? (
+                        <span className='rounded-md bg-white/[0.06] px-2 py-1 text-[11px] text-white/50'>
+                          온라인 {p.qualifierRegion}
+                        </span>
+                      ) : null}
+                      {p.offlineSongs && p.offlineSongs.length > 0 ? (
+                        <span className='rounded-md bg-[#ff2a00]/10 px-2 py-1 text-[11px] text-[#ff8c66]'>
+                          선곡 {p.offlineSongs.length}곡
+                        </span>
+                      ) : null}
+                    </div>
+                  )
+                })() : null}
               </div>
             </div>
           </div>

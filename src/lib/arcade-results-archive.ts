@@ -95,7 +95,10 @@ export type ArcadeScoreAttackRow = {
   note?: string
 }
 
-export type ArcadeRegistrationMap = Record<string, { offlineSongs?: string[] }>
+export type ArcadeRegistrationMap = Record<
+  string,
+  { offlineSongs?: string[]; cardNo?: string; qualifierRegion?: string }
+>
 
 export type ArcadeRegionArchive = {
   key: ArcadeRegionKey
@@ -389,24 +392,34 @@ function normalizeRegistrations(
   for (const [key, raw] of Object.entries(record)) {
     const entry = toRecord(raw)
     if (!entry) continue
+
+    const item: ArcadeRegistrationMap[string] = {}
+
     // Handle both array and comma-separated string from GAS
-    let songs: string[]
     if (Array.isArray(entry.offlineSongs)) {
-      songs = entry.offlineSongs
+      const songs = entry.offlineSongs
         .map((s: unknown) => (typeof s === 'string' ? s.trim() : ''))
         .filter((s: string) => s.length > 0)
+      if (songs.length > 0) item.offlineSongs = songs
     } else if (typeof entry.offlineSongs === 'string') {
       const songsRaw = entry.offlineSongs
-      songs = (
+      const songs = (
         songsRaw.includes(' || ') ? songsRaw.split(' || ') : songsRaw.split(',')
       )
         .map((s: string) => s.trim())
         .filter((s: string) => s.length > 0)
-    } else {
-      continue
+      if (songs.length > 0) item.offlineSongs = songs
     }
-    if (songs.length > 0) {
-      result[key] = { offlineSongs: songs }
+
+    if (typeof entry.cardNo === 'string' && entry.cardNo.trim()) {
+      item.cardNo = entry.cardNo.trim()
+    }
+    if (typeof entry.qualifierRegion === 'string' && entry.qualifierRegion.trim()) {
+      item.qualifierRegion = entry.qualifierRegion.trim()
+    }
+
+    if (item.offlineSongs || item.cardNo || item.qualifierRegion) {
+      result[key] = item
     }
   }
 

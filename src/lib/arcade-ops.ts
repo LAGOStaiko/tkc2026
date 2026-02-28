@@ -697,6 +697,8 @@ export type OpsRegionParticipant = {
   seed?: number
   status?: ArcadeStandingRow['status']
   offlineSongs?: string[]
+  cardNo?: string
+  qualifierRegion?: string
 }
 
 function numToDraft(value?: number) {
@@ -937,13 +939,16 @@ export function buildRegionParticipants(
 
   if (region.registrations) {
     // Registrations are keyed by nickname (from ops_registrations sheet)
-    // Match to participants by nickname (trimmed) to merge offlineSongs
+    // Match to participants by nickname (trimmed) to merge offlineSongs, cardNo, qualifierRegion
     for (const [nickname, reg] of Object.entries(region.registrations)) {
-      if (!reg.offlineSongs) continue
       const normalizedNickname = nickname.trim()
       for (const [entryId, p] of map.entries()) {
         if (p.nickname.trim() === normalizedNickname) {
-          map.set(entryId, { ...p, offlineSongs: reg.offlineSongs })
+          const updated = { ...p }
+          if (reg.offlineSongs) updated.offlineSongs = reg.offlineSongs
+          if (reg.cardNo) updated.cardNo = reg.cardNo
+          if (reg.qualifierRegion) updated.qualifierRegion = reg.qualifierRegion
+          map.set(entryId, updated)
           break
         }
       }

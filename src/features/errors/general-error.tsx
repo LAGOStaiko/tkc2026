@@ -34,7 +34,7 @@ export function GeneralError({
             <Button variant='outline' onClick={() => history.go(-1)}>
               {t('error.action.goBack')}
             </Button>
-            <Button onClick={() => navigate({ to: '/admin' })}>
+            <Button onClick={() => navigate({ to: '/' })}>
               {t('error.action.backToHome')}
             </Button>
           </div>

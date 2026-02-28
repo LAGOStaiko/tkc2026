@@ -9,9 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as siteRouteRouteImport } from './routes/(site)/route'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as siteIndexRouteImport } from './routes/(site)/index'
 import { Route as siteSongsRouteImport } from './routes/(site)/songs'
 import { Route as siteSongPoolRouteImport } from './routes/(site)/song-pool'
@@ -27,22 +25,10 @@ import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors403RouteImport } from './routes/(errors)/403'
 import { Route as errors401RouteImport } from './routes/(errors)/401'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
-import { Route as AdminSettingsRouteRouteImport } from './routes/admin/settings/route'
 import { Route as siteConsoleRouteRouteImport } from './routes/(site)/console/route'
 import { Route as siteArcadeRouteRouteImport } from './routes/(site)/arcade/route'
-import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
-import { Route as AdminTasksIndexRouteImport } from './routes/admin/tasks/index'
-import { Route as AdminSettingsIndexRouteImport } from './routes/admin/settings/index'
-import { Route as AdminHelpCenterIndexRouteImport } from './routes/admin/help-center/index'
-import { Route as AdminChatsIndexRouteImport } from './routes/admin/chats/index'
-import { Route as AdminAppsIndexRouteImport } from './routes/admin/apps/index'
 import { Route as siteConsoleIndexRouteImport } from './routes/(site)/console/index'
 import { Route as siteArcadeIndexRouteImport } from './routes/(site)/arcade/index'
-import { Route as AdminSettingsNotificationsRouteImport } from './routes/admin/settings/notifications'
-import { Route as AdminSettingsDisplayRouteImport } from './routes/admin/settings/display'
-import { Route as AdminSettingsAppearanceRouteImport } from './routes/admin/settings/appearance'
-import { Route as AdminSettingsAccountRouteImport } from './routes/admin/settings/account'
-import { Route as AdminErrorsErrorRouteImport } from './routes/admin/errors/$error'
 import { Route as siteOpsArcadeControlRouteImport } from './routes/(site)/ops/arcade-control'
 import { Route as siteOpsArcadeBroadcastRouteImport } from './routes/(site)/ops/arcade-broadcast'
 import { Route as siteConsoleFinalsRouteImport } from './routes/(site)/console/finals'
@@ -53,19 +39,9 @@ import { Route as siteArcadeResults2026IndexRouteImport } from './routes/(site)/
 import { Route as siteArcadeResults2026FinalsRouteImport } from './routes/(site)/arcade-results/2026/finals'
 import { Route as siteArcadeResults2026RegionRouteImport } from './routes/(site)/arcade-results/2026/$region'
 
-const AdminRouteRoute = AdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const siteRouteRoute = siteRouteRouteImport.update({
   id: '/(site)',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRouteRoute,
 } as any)
 const siteIndexRoute = siteIndexRouteImport.update({
   id: '/',
@@ -142,11 +118,6 @@ const authSignInRoute = authSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminSettingsRouteRoute = AdminSettingsRouteRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const siteConsoleRouteRoute = siteConsoleRouteRouteImport.update({
   id: '/console',
   path: '/console',
@@ -157,36 +128,6 @@ const siteArcadeRouteRoute = siteArcadeRouteRouteImport.update({
   path: '/arcade',
   getParentRoute: () => siteRouteRoute,
 } as any)
-const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
-  id: '/users/',
-  path: '/users/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminTasksIndexRoute = AdminTasksIndexRouteImport.update({
-  id: '/tasks/',
-  path: '/tasks/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminSettingsIndexRoute = AdminSettingsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminSettingsRouteRoute,
-} as any)
-const AdminHelpCenterIndexRoute = AdminHelpCenterIndexRouteImport.update({
-  id: '/help-center/',
-  path: '/help-center/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminChatsIndexRoute = AdminChatsIndexRouteImport.update({
-  id: '/chats/',
-  path: '/chats/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminAppsIndexRoute = AdminAppsIndexRouteImport.update({
-  id: '/apps/',
-  path: '/apps/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const siteConsoleIndexRoute = siteConsoleIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -196,32 +137,6 @@ const siteArcadeIndexRoute = siteArcadeIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => siteArcadeRouteRoute,
-} as any)
-const AdminSettingsNotificationsRoute =
-  AdminSettingsNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AdminSettingsRouteRoute,
-  } as any)
-const AdminSettingsDisplayRoute = AdminSettingsDisplayRouteImport.update({
-  id: '/display',
-  path: '/display',
-  getParentRoute: () => AdminSettingsRouteRoute,
-} as any)
-const AdminSettingsAppearanceRoute = AdminSettingsAppearanceRouteImport.update({
-  id: '/appearance',
-  path: '/appearance',
-  getParentRoute: () => AdminSettingsRouteRoute,
-} as any)
-const AdminSettingsAccountRoute = AdminSettingsAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => AdminSettingsRouteRoute,
-} as any)
-const AdminErrorsErrorRoute = AdminErrorsErrorRouteImport.update({
-  id: '/errors/$error',
-  path: '/errors/$error',
-  getParentRoute: () => AdminRouteRoute,
 } as any)
 const siteOpsArcadeControlRoute = siteOpsArcadeControlRouteImport.update({
   id: '/ops/arcade-control',
@@ -274,10 +189,8 @@ const siteArcadeResults2026RegionRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/admin': typeof AdminRouteRouteWithChildren
   '/arcade': typeof siteArcadeRouteRouteWithChildren
   '/console': typeof siteConsoleRouteRouteWithChildren
-  '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
   '/sign-in': typeof authSignInRoute
   '/401': typeof errors401Route
   '/403': typeof errors403Route
@@ -293,25 +206,13 @@ export interface FileRoutesByFullPath {
   '/song-pool': typeof siteSongPoolRoute
   '/songs': typeof siteSongsRoute
   '/': typeof siteIndexRoute
-  '/admin/': typeof AdminIndexRoute
   '/arcade/finals': typeof siteArcadeFinalsRoute
   '/arcade/swiss': typeof siteArcadeSwissRoute
   '/console/finals': typeof siteConsoleFinalsRoute
   '/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
   '/ops/arcade-control': typeof siteOpsArcadeControlRoute
-  '/admin/errors/$error': typeof AdminErrorsErrorRoute
-  '/admin/settings/account': typeof AdminSettingsAccountRoute
-  '/admin/settings/appearance': typeof AdminSettingsAppearanceRoute
-  '/admin/settings/display': typeof AdminSettingsDisplayRoute
-  '/admin/settings/notifications': typeof AdminSettingsNotificationsRoute
   '/arcade/': typeof siteArcadeIndexRoute
   '/console/': typeof siteConsoleIndexRoute
-  '/admin/apps': typeof AdminAppsIndexRoute
-  '/admin/chats': typeof AdminChatsIndexRoute
-  '/admin/help-center': typeof AdminHelpCenterIndexRoute
-  '/admin/settings/': typeof AdminSettingsIndexRoute
-  '/admin/tasks': typeof AdminTasksIndexRoute
-  '/admin/users': typeof AdminUsersIndexRoute
   '/arcade-results/2026/$region': typeof siteArcadeResults2026RegionRoute
   '/arcade-results/2026/finals': typeof siteArcadeResults2026FinalsRoute
   '/arcade-results/2026': typeof siteArcadeResults2026IndexRoute
@@ -333,25 +234,13 @@ export interface FileRoutesByTo {
   '/song-pool': typeof siteSongPoolRoute
   '/songs': typeof siteSongsRoute
   '/': typeof siteIndexRoute
-  '/admin': typeof AdminIndexRoute
   '/arcade/finals': typeof siteArcadeFinalsRoute
   '/arcade/swiss': typeof siteArcadeSwissRoute
   '/console/finals': typeof siteConsoleFinalsRoute
   '/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
   '/ops/arcade-control': typeof siteOpsArcadeControlRoute
-  '/admin/errors/$error': typeof AdminErrorsErrorRoute
-  '/admin/settings/account': typeof AdminSettingsAccountRoute
-  '/admin/settings/appearance': typeof AdminSettingsAppearanceRoute
-  '/admin/settings/display': typeof AdminSettingsDisplayRoute
-  '/admin/settings/notifications': typeof AdminSettingsNotificationsRoute
   '/arcade': typeof siteArcadeIndexRoute
   '/console': typeof siteConsoleIndexRoute
-  '/admin/apps': typeof AdminAppsIndexRoute
-  '/admin/chats': typeof AdminChatsIndexRoute
-  '/admin/help-center': typeof AdminHelpCenterIndexRoute
-  '/admin/settings': typeof AdminSettingsIndexRoute
-  '/admin/tasks': typeof AdminTasksIndexRoute
-  '/admin/users': typeof AdminUsersIndexRoute
   '/arcade-results/2026/$region': typeof siteArcadeResults2026RegionRoute
   '/arcade-results/2026/finals': typeof siteArcadeResults2026FinalsRoute
   '/arcade-results/2026': typeof siteArcadeResults2026IndexRoute
@@ -360,10 +249,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(site)': typeof siteRouteRouteWithChildren
-  '/admin': typeof AdminRouteRouteWithChildren
   '/(site)/arcade': typeof siteArcadeRouteRouteWithChildren
   '/(site)/console': typeof siteConsoleRouteRouteWithChildren
-  '/admin/settings': typeof AdminSettingsRouteRouteWithChildren
   '/(auth)/sign-in': typeof authSignInRoute
   '/(errors)/401': typeof errors401Route
   '/(errors)/403': typeof errors403Route
@@ -379,25 +266,13 @@ export interface FileRoutesById {
   '/(site)/song-pool': typeof siteSongPoolRoute
   '/(site)/songs': typeof siteSongsRoute
   '/(site)/': typeof siteIndexRoute
-  '/admin/': typeof AdminIndexRoute
   '/(site)/arcade/finals': typeof siteArcadeFinalsRoute
   '/(site)/arcade/swiss': typeof siteArcadeSwissRoute
   '/(site)/console/finals': typeof siteConsoleFinalsRoute
   '/(site)/ops/arcade-broadcast': typeof siteOpsArcadeBroadcastRoute
   '/(site)/ops/arcade-control': typeof siteOpsArcadeControlRoute
-  '/admin/errors/$error': typeof AdminErrorsErrorRoute
-  '/admin/settings/account': typeof AdminSettingsAccountRoute
-  '/admin/settings/appearance': typeof AdminSettingsAppearanceRoute
-  '/admin/settings/display': typeof AdminSettingsDisplayRoute
-  '/admin/settings/notifications': typeof AdminSettingsNotificationsRoute
   '/(site)/arcade/': typeof siteArcadeIndexRoute
   '/(site)/console/': typeof siteConsoleIndexRoute
-  '/admin/apps/': typeof AdminAppsIndexRoute
-  '/admin/chats/': typeof AdminChatsIndexRoute
-  '/admin/help-center/': typeof AdminHelpCenterIndexRoute
-  '/admin/settings/': typeof AdminSettingsIndexRoute
-  '/admin/tasks/': typeof AdminTasksIndexRoute
-  '/admin/users/': typeof AdminUsersIndexRoute
   '/(site)/arcade-results/2026/$region': typeof siteArcadeResults2026RegionRoute
   '/(site)/arcade-results/2026/finals': typeof siteArcadeResults2026FinalsRoute
   '/(site)/arcade-results/2026/': typeof siteArcadeResults2026IndexRoute
@@ -406,10 +281,8 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/admin'
     | '/arcade'
     | '/console'
-    | '/admin/settings'
     | '/sign-in'
     | '/401'
     | '/403'
@@ -425,25 +298,13 @@ export interface FileRouteTypes {
     | '/song-pool'
     | '/songs'
     | '/'
-    | '/admin/'
     | '/arcade/finals'
     | '/arcade/swiss'
     | '/console/finals'
     | '/ops/arcade-broadcast'
     | '/ops/arcade-control'
-    | '/admin/errors/$error'
-    | '/admin/settings/account'
-    | '/admin/settings/appearance'
-    | '/admin/settings/display'
-    | '/admin/settings/notifications'
     | '/arcade/'
     | '/console/'
-    | '/admin/apps'
-    | '/admin/chats'
-    | '/admin/help-center'
-    | '/admin/settings/'
-    | '/admin/tasks'
-    | '/admin/users'
     | '/arcade-results/2026/$region'
     | '/arcade-results/2026/finals'
     | '/arcade-results/2026'
@@ -465,25 +326,13 @@ export interface FileRouteTypes {
     | '/song-pool'
     | '/songs'
     | '/'
-    | '/admin'
     | '/arcade/finals'
     | '/arcade/swiss'
     | '/console/finals'
     | '/ops/arcade-broadcast'
     | '/ops/arcade-control'
-    | '/admin/errors/$error'
-    | '/admin/settings/account'
-    | '/admin/settings/appearance'
-    | '/admin/settings/display'
-    | '/admin/settings/notifications'
     | '/arcade'
     | '/console'
-    | '/admin/apps'
-    | '/admin/chats'
-    | '/admin/help-center'
-    | '/admin/settings'
-    | '/admin/tasks'
-    | '/admin/users'
     | '/arcade-results/2026/$region'
     | '/arcade-results/2026/finals'
     | '/arcade-results/2026'
@@ -491,10 +340,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/(site)'
-    | '/admin'
     | '/(site)/arcade'
     | '/(site)/console'
-    | '/admin/settings'
     | '/(auth)/sign-in'
     | '/(errors)/401'
     | '/(errors)/403'
@@ -510,25 +357,13 @@ export interface FileRouteTypes {
     | '/(site)/song-pool'
     | '/(site)/songs'
     | '/(site)/'
-    | '/admin/'
     | '/(site)/arcade/finals'
     | '/(site)/arcade/swiss'
     | '/(site)/console/finals'
     | '/(site)/ops/arcade-broadcast'
     | '/(site)/ops/arcade-control'
-    | '/admin/errors/$error'
-    | '/admin/settings/account'
-    | '/admin/settings/appearance'
-    | '/admin/settings/display'
-    | '/admin/settings/notifications'
     | '/(site)/arcade/'
     | '/(site)/console/'
-    | '/admin/apps/'
-    | '/admin/chats/'
-    | '/admin/help-center/'
-    | '/admin/settings/'
-    | '/admin/tasks/'
-    | '/admin/users/'
     | '/(site)/arcade-results/2026/$region'
     | '/(site)/arcade-results/2026/finals'
     | '/(site)/arcade-results/2026/'
@@ -537,7 +372,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   siteRouteRoute: typeof siteRouteRouteWithChildren
-  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   authSignInRoute: typeof authSignInRoute
   errors401Route: typeof errors401Route
   errors403Route: typeof errors403Route
@@ -548,26 +382,12 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(site)': {
       id: '/(site)'
       path: ''
       fullPath: ''
       preLoaderRoute: typeof siteRouteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
     }
     '/(site)/': {
       id: '/(site)/'
@@ -674,13 +494,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/(site)/console': {
       id: '/(site)/console'
       path: '/console'
@@ -695,48 +508,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof siteArcadeRouteRouteImport
       parentRoute: typeof siteRouteRoute
     }
-    '/admin/users/': {
-      id: '/admin/users/'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/tasks/': {
-      id: '/admin/tasks/'
-      path: '/tasks'
-      fullPath: '/admin/tasks'
-      preLoaderRoute: typeof AdminTasksIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/settings/': {
-      id: '/admin/settings/'
-      path: '/'
-      fullPath: '/admin/settings/'
-      preLoaderRoute: typeof AdminSettingsIndexRouteImport
-      parentRoute: typeof AdminSettingsRouteRoute
-    }
-    '/admin/help-center/': {
-      id: '/admin/help-center/'
-      path: '/help-center'
-      fullPath: '/admin/help-center'
-      preLoaderRoute: typeof AdminHelpCenterIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/chats/': {
-      id: '/admin/chats/'
-      path: '/chats'
-      fullPath: '/admin/chats'
-      preLoaderRoute: typeof AdminChatsIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/apps/': {
-      id: '/admin/apps/'
-      path: '/apps'
-      fullPath: '/admin/apps'
-      preLoaderRoute: typeof AdminAppsIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/(site)/console/': {
       id: '/(site)/console/'
       path: '/'
@@ -750,41 +521,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/arcade/'
       preLoaderRoute: typeof siteArcadeIndexRouteImport
       parentRoute: typeof siteArcadeRouteRoute
-    }
-    '/admin/settings/notifications': {
-      id: '/admin/settings/notifications'
-      path: '/notifications'
-      fullPath: '/admin/settings/notifications'
-      preLoaderRoute: typeof AdminSettingsNotificationsRouteImport
-      parentRoute: typeof AdminSettingsRouteRoute
-    }
-    '/admin/settings/display': {
-      id: '/admin/settings/display'
-      path: '/display'
-      fullPath: '/admin/settings/display'
-      preLoaderRoute: typeof AdminSettingsDisplayRouteImport
-      parentRoute: typeof AdminSettingsRouteRoute
-    }
-    '/admin/settings/appearance': {
-      id: '/admin/settings/appearance'
-      path: '/appearance'
-      fullPath: '/admin/settings/appearance'
-      preLoaderRoute: typeof AdminSettingsAppearanceRouteImport
-      parentRoute: typeof AdminSettingsRouteRoute
-    }
-    '/admin/settings/account': {
-      id: '/admin/settings/account'
-      path: '/account'
-      fullPath: '/admin/settings/account'
-      preLoaderRoute: typeof AdminSettingsAccountRouteImport
-      parentRoute: typeof AdminSettingsRouteRoute
-    }
-    '/admin/errors/$error': {
-      id: '/admin/errors/$error'
-      path: '/errors/$error'
-      fullPath: '/admin/errors/$error'
-      preLoaderRoute: typeof AdminErrorsErrorRouteImport
-      parentRoute: typeof AdminRouteRoute
     }
     '/(site)/ops/arcade-control': {
       id: '/(site)/ops/arcade-control'
@@ -925,54 +661,8 @@ const siteRouteRouteWithChildren = siteRouteRoute._addFileChildren(
   siteRouteRouteChildren,
 )
 
-interface AdminSettingsRouteRouteChildren {
-  AdminSettingsAccountRoute: typeof AdminSettingsAccountRoute
-  AdminSettingsAppearanceRoute: typeof AdminSettingsAppearanceRoute
-  AdminSettingsDisplayRoute: typeof AdminSettingsDisplayRoute
-  AdminSettingsNotificationsRoute: typeof AdminSettingsNotificationsRoute
-  AdminSettingsIndexRoute: typeof AdminSettingsIndexRoute
-}
-
-const AdminSettingsRouteRouteChildren: AdminSettingsRouteRouteChildren = {
-  AdminSettingsAccountRoute: AdminSettingsAccountRoute,
-  AdminSettingsAppearanceRoute: AdminSettingsAppearanceRoute,
-  AdminSettingsDisplayRoute: AdminSettingsDisplayRoute,
-  AdminSettingsNotificationsRoute: AdminSettingsNotificationsRoute,
-  AdminSettingsIndexRoute: AdminSettingsIndexRoute,
-}
-
-const AdminSettingsRouteRouteWithChildren =
-  AdminSettingsRouteRoute._addFileChildren(AdminSettingsRouteRouteChildren)
-
-interface AdminRouteRouteChildren {
-  AdminSettingsRouteRoute: typeof AdminSettingsRouteRouteWithChildren
-  AdminIndexRoute: typeof AdminIndexRoute
-  AdminErrorsErrorRoute: typeof AdminErrorsErrorRoute
-  AdminAppsIndexRoute: typeof AdminAppsIndexRoute
-  AdminChatsIndexRoute: typeof AdminChatsIndexRoute
-  AdminHelpCenterIndexRoute: typeof AdminHelpCenterIndexRoute
-  AdminTasksIndexRoute: typeof AdminTasksIndexRoute
-  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
-}
-
-const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminSettingsRouteRoute: AdminSettingsRouteRouteWithChildren,
-  AdminIndexRoute: AdminIndexRoute,
-  AdminErrorsErrorRoute: AdminErrorsErrorRoute,
-  AdminAppsIndexRoute: AdminAppsIndexRoute,
-  AdminChatsIndexRoute: AdminChatsIndexRoute,
-  AdminHelpCenterIndexRoute: AdminHelpCenterIndexRoute,
-  AdminTasksIndexRoute: AdminTasksIndexRoute,
-  AdminUsersIndexRoute: AdminUsersIndexRoute,
-}
-
-const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
-  AdminRouteRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   siteRouteRoute: siteRouteRouteWithChildren,
-  AdminRouteRoute: AdminRouteRouteWithChildren,
   authSignInRoute: authSignInRoute,
   errors401Route: errors401Route,
   errors403Route: errors403Route,

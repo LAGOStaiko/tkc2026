@@ -11,6 +11,7 @@ export type RegionFinalRank = {
   wins?: number
   losses?: number
   statusLabel: string
+  cardNo?: string
 }
 
 export function standingStatusLabel(status: ArcadeStandingRow['status']) {

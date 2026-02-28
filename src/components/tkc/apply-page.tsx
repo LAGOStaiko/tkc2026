@@ -77,6 +77,7 @@ type RegisterPayload = {
   phone: string
   email: string
   nickname: string
+  namcoId?: string
   videoLink?: string
   dohirobaNo?: string
   qualifierRegion?: string
@@ -97,6 +98,7 @@ const REGIONS = [
 ] as const
 
 const CONSENT_PDF_URL = '/docs/consent-form.pdf'
+const LEGACY_NAMCO_ID_PLACEHOLDER = 'NOT_COLLECTED'
 
 const v = {
   divisionRequired: t('apply.validation.divisionRequired'),
@@ -503,6 +505,8 @@ export function ApplyPage() {
       phone: values.phone,
       email: values.email,
       nickname: values.nickname,
+      // Backward-compatible placeholder for older register backends.
+      namcoId: LEGACY_NAMCO_ID_PLACEHOLDER,
       spectator: values.spectator,
       isMinor: values.isMinor,
       consentLink: values.consentLink?.trim() ?? '',
@@ -1279,19 +1283,34 @@ export function ApplyPage() {
               {/* Submit bar */}
               <div className='flex flex-col items-center justify-between gap-4 border-t border-[#1e1e1e] px-7 py-6 sm:flex-row sm:px-9'>
                 <div className='text-[13px] text-white/40'>
-                  <span className='text-[#e74c3c]'>*</span> 표시는 필수 입력
-                  항목입니다.
+                  {isCompleted ? (
+                    '신청이 완료되었습니다. 홈으로 돌아가실 수 있습니다.'
+                  ) : (
+                    <>
+                      <span className='text-[#e74c3c]'>*</span> 표시는 필수 입력
+                      항목입니다.
+                    </>
+                  )}
                 </div>
-                <button
-                  type='submit'
-                  disabled={isDisabled}
-                  className='w-full shrink-0 cursor-pointer rounded-[10px] bg-[#e74c3c] px-10 py-3.5 text-[16px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
-                  style={{
-                    boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
-                  }}
-                >
-                  {isSubmitting ? t('apply.submitting') : t('apply.submit')}
-                </button>
+                {isCompleted ? (
+                  <a
+                    href='/'
+                    className='inline-flex w-full shrink-0 items-center justify-center rounded-[10px] bg-white/90 px-10 py-3.5 text-[16px] font-bold text-black transition-all hover:bg-white sm:w-auto'
+                  >
+                    홈페이지로 나가기
+                  </a>
+                ) : (
+                  <button
+                    type='submit'
+                    disabled={isDisabled}
+                    className='w-full shrink-0 cursor-pointer rounded-[10px] bg-[#e74c3c] px-10 py-3.5 text-[16px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
+                    style={{
+                      boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
+                    }}
+                  >
+                    {isSubmitting ? t('apply.submitting') : t('apply.submit')}
+                  </button>
+                )}
               </div>
             </form>
           </Form>

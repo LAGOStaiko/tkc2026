@@ -4044,7 +4044,7 @@ function buildArcadeArchiveFromOps_(params) {
     if (group === 'B') regionMap[key].qualifiers.groupB = participant;
   });
 
-  // Read registrations for offline song selections (keyed by nickname)
+  // Read registrations for participant info (keyed by nickname)
   var regRows = readOptionalTable_('ops_registrations').rows;
   regRows.forEach(function(r) {
     var div = trim_(r.division).toLowerCase();
@@ -4057,20 +4057,26 @@ function buildArcadeArchiveFromOps_(params) {
     var nickname = trim_(r.nickname);
     if (!nickname) return;
 
-    var songsRaw = trim_(r.offlineSongs);
-    if (!songsRaw) return;
-
-    var songs = songsRaw.indexOf(' || ') >= 0
-      ? songsRaw.split(' || ').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; })
-      : songsRaw.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
-    if (songs.length === 0) return;
-
     if (!regionMap[regKey].registrations) {
       regionMap[regKey].registrations = {};
     }
     if (!regionMap[regKey].registrations[nickname]) {
-      regionMap[regKey].registrations[nickname] = { offlineSongs: songs };
+      regionMap[regKey].registrations[nickname] = {};
     }
+    var regEntry = regionMap[regKey].registrations[nickname];
+
+    var songsRaw = trim_(r.offlineSongs);
+    if (songsRaw) {
+      var songs = songsRaw.indexOf(' || ') >= 0
+        ? songsRaw.split(' || ').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; })
+        : songsRaw.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+      if (songs.length > 0) regEntry.offlineSongs = songs;
+    }
+
+    var cardNoVal = trim_(r.cardNo);
+    if (cardNoVal) regEntry.cardNo = cardNoVal;
+
+    regEntry.qualifierRegion = regKey;
   });
 
   var finalsA = readOptionalTable_('ops_db_finals_a').rows

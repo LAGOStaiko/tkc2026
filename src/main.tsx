@@ -8,7 +8,6 @@ import {
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { t } from '@/text'
-import { ClerkProvider } from '@clerk/clerk-react'
 import { toast } from 'sonner'
 import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
@@ -90,10 +89,8 @@ declare module '@tanstack/react-router' {
   }
 }
 
-const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
 export function AppWithProviders() {
-  const app = (
+  return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <FontProvider>
@@ -103,19 +100,6 @@ export function AppWithProviders() {
         </FontProvider>
       </ThemeProvider>
     </QueryClientProvider>
-  )
-
-  if (!CLERK_PUBLISHABLE_KEY) return app
-
-  return (
-    <ClerkProvider
-      publishableKey={CLERK_PUBLISHABLE_KEY}
-      signInUrl='/sign-in'
-      afterSignOutUrl='/sign-in'
-      signInFallbackRedirectUrl='/admin'
-    >
-      {app}
-    </ClerkProvider>
   )
 }
 

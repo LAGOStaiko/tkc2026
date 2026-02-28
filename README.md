@@ -4,8 +4,6 @@ Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and a
 
 ![alt text](public/images/shadcn-admin.png)
 
-[![Sponsored by Clerk](https://img.shields.io/badge/Sponsored%20by-Clerk-5b6ee1?logo=clerk)](https://go.clerk.com/GttUAaK)
-
 I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
 
 > This is not a starter project (template) though. I'll probably make one in the future.
@@ -72,7 +70,7 @@ If you want to update components using the Shadcn CLI (e.g., `npx shadcn@latest 
 
 **Icons:** [Lucide Icons](https://lucide.dev/icons/), [Tabler Icons](https://tabler.io/icons) (Brand icons only)
 
-**Auth (partial):** [Clerk](https://go.clerk.com/GttUAaK)
+**Auth:** app-level route access + ops key based API authorization
 
 ## Run Locally
 
@@ -125,7 +123,7 @@ For questions or sponsorship inquiries, feel free to reach out at [satnaingdev@g
 
 ### Current Sponsor
 
-- [Clerk](https://go.clerk.com/GttUAaK) - authentication and user management for the modern web
+- None listed
 
 ## Author
 
