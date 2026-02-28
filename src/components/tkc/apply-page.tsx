@@ -141,7 +141,12 @@ const formSchema = z
     // Console only
     videoLink: z.string().max(L.videoLink).optional(),
     // Arcade only
-    dohirobaNo: z.string().max(L.dohirobaNo).optional(),
+    dohirobaNo: z
+      .string()
+      .max(L.dohirobaNo)
+      .regex(/^\d{12}$/, { message: '북번호는 12자리 숫자입니다.' })
+      .optional()
+      .or(z.literal('')),
     qualifierRegion: z.string().max(L.qualifierRegion).optional(),
     offlineSong1: z.string().max(L.offlineSong).optional(),
     offlineSong2: z.string().max(L.offlineSong).optional(),
@@ -1007,13 +1012,15 @@ export function ApplyPage() {
                                 <input
                                   inputMode='numeric'
                                   autoComplete='off'
+                                  maxLength={12}
                                   className={inputClass}
-                                  placeholder={t(
-                                    'apply.placeholder.dohirobaNo'
-                                  )}
+                                  placeholder='예: 000000000000'
                                   {...field}
                                 />
                               </FormControl>
+                              <FieldHint>
+                                12자리 숫자를 입력해 주세요.
+                              </FieldHint>
                               <GuidePopup
                                 trigger='북번호 확인 방법 보기'
                                 title='동더 광장 북번호 확인 방법'
