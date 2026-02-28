@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/clerk-react'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 
 interface SignOutDialogProps {
@@ -7,10 +6,8 @@ interface SignOutDialogProps {
 }
 
 export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
-  const { signOut } = useClerk()
-
   const handleSignOut = () => {
-    signOut({ redirectUrl: '/sign-in' })
+    window.location.assign('/sign-in')
   }
 
   return (
@@ -18,7 +15,7 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
       open={open}
       onOpenChange={onOpenChange}
       title='Sign out'
-      desc='Are you sure you want to sign out? You will need to sign in again to access your account.'
+      desc='Are you sure you want to sign out? You will be redirected to the sign-in page.'
       confirmText='Sign out'
       destructive
       handleConfirm={handleSignOut}

@@ -21,7 +21,7 @@
 - [ ] `pnpm audit --prod --audit-level high` reports 0 high/critical vulnerabilities
 - [ ] `_headers` CSP changes deployed as **Report-Only** first
 - [ ] Browser console captures (before/after) attached showing **0 CSP violations**
-- [ ] Verified pages: `/` (YouTube embed), `/apply` (Turnstile), `/sign-in` (Clerk)
+- [ ] Verified pages: `/` (YouTube embed), `/apply` (Turnstile), `/sign-in` (no external auth dependency)
 - [ ] Auth-protected endpoints return 401 without valid key
 - [ ] `base-uri 'self'`, `object-src 'none'`, `frame-ancestors 'none'` unchanged
 - [ ] `script-src` does NOT include `unsafe-inline` or `unsafe-eval`

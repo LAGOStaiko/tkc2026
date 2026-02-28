@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { AxiosError } from 'axios'
-import { ClerkProvider } from '@clerk/clerk-react'
 import {
   QueryCache,
   QueryClient,
@@ -87,10 +86,8 @@ declare module '@tanstack/react-router' {
   }
 }
 
-const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
 function AppWithProviders() {
-  const app = (
+  return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <FontProvider>
@@ -100,19 +97,6 @@ function AppWithProviders() {
         </FontProvider>
       </ThemeProvider>
     </QueryClientProvider>
-  )
-
-  if (!CLERK_PUBLISHABLE_KEY) return app
-
-  return (
-    <ClerkProvider
-      publishableKey={CLERK_PUBLISHABLE_KEY}
-      signInUrl='/sign-in'
-      afterSignOutUrl='/sign-in'
-      signInFallbackRedirectUrl='/admin'
-    >
-      {app}
-    </ClerkProvider>
   )
 }
 
