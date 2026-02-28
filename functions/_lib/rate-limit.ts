@@ -1,6 +1,5 @@
 import type { _Env } from "./gas";
-
-/* ── Types ── */
+import { parseBoundedInt } from "./number";
 
 export type KvNamespaceLike = {
   get: (key: string) => Promise<string | null>;
@@ -13,6 +12,8 @@ export type KvNamespaceLike = {
 
 export type RateLimitEnv = _Env & {
   RATE_LIMIT_KV?: KvNamespaceLike;
+  RATE_LIMIT_WINDOW_MS?: string | number;
+  RATE_LIMIT_MAX?: string | number;
 };
 
 export type RateLimitConfig = {
@@ -26,27 +27,11 @@ type RateLimitResult = {
   retryAfter: number;
 };
 
-/* ── Helpers ── */
-
-const parseBoundedInt = (
-  value: unknown,
-  fallback: number,
-  min: number,
-  max: number,
-) => {
-  const raw =
-    typeof value === "number" ? value : Number(String(value ?? "").trim());
-  if (!Number.isFinite(raw)) return fallback;
-  const rounded = Math.floor(raw);
-  if (rounded < min) return min;
-  if (rounded > max) return max;
-  return rounded;
-};
-
-/* ── In-memory store (per-isolate fallback) ── */
-
 const CLEANUP_INTERVAL = 100;
-const stores = new Map<string, Map<string, { count: number; resetAt: number }>>();
+const stores = new Map<
+  string,
+  Map<string, { count: number; resetAt: number }>
+>();
 const counters = new Map<string, number>();
 
 function getStore(prefix: string) {
@@ -58,7 +43,9 @@ function getStore(prefix: string) {
   return store;
 }
 
-function cleanupExpiredEntries(store: Map<string, { count: number; resetAt: number }>) {
+function cleanupExpiredEntries(
+  store: Map<string, { count: number; resetAt: number }>
+) {
   const now = Date.now();
   for (const [ip, entry] of store) {
     if (entry.resetAt <= now) {
@@ -67,11 +54,9 @@ function cleanupExpiredEntries(store: Map<string, { count: number; resetAt: numb
   }
 }
 
-/* ── Core logic ── */
-
 function hitRateLimitInMemory(
   ip: string,
-  config: RateLimitConfig,
+  config: RateLimitConfig
 ): RateLimitResult {
   const store = getStore(config.kvPrefix);
   const counter = (counters.get(config.kvPrefix) ?? 0) + 1;
@@ -97,7 +82,7 @@ function hitRateLimitInMemory(
 async function hitRateLimitWithKv(
   ip: string,
   kv: KvNamespaceLike,
-  config: RateLimitConfig,
+  config: RateLimitConfig
 ): Promise<RateLimitResult> {
   const now = Date.now();
   const windowNo = Math.floor(now / config.windowMs);
@@ -115,16 +100,10 @@ async function hitRateLimitWithKv(
   return { limited: next > config.max, retryAfter };
 }
 
-/* ── Public API ── */
-
-/**
- * Check rate limit for the given IP.
- * Tries KV first, falls back to in-memory per-isolate store.
- */
 export async function hitRateLimit(
   ip: string,
   env: RateLimitEnv,
-  config: RateLimitConfig,
+  config: RateLimitConfig
 ): Promise<RateLimitResult> {
   const kv = env.RATE_LIMIT_KV;
   if (kv) {
@@ -138,35 +117,34 @@ export async function hitRateLimit(
   return hitRateLimitInMemory(ip, config);
 }
 
-/**
- * Build a RateLimitConfig from env vars + overrides.
- */
 export function buildRateLimitConfig(
   env: RateLimitEnv,
   overrides: {
     prefix: string;
     defaultWindowMs?: number;
     defaultMax?: number;
-  },
+  }
 ): RateLimitConfig {
-  const tier = String(env.TKC_ENV_TIER ?? "production").trim().toLowerCase();
+  const tier = String(env.TKC_ENV_TIER ?? "production")
+    .trim()
+    .toLowerCase();
   return {
     windowMs: parseBoundedInt(
-      undefined,
+      env.RATE_LIMIT_WINDOW_MS,
       overrides.defaultWindowMs ?? 60_000,
       60_000,
-      3_600_000,
+      3_600_000
     ),
-    max: parseBoundedInt(undefined, overrides.defaultMax ?? 60, 1, 1000),
-    kvPrefix: tier
-      ? `${overrides.prefix}:${tier}`
-      : overrides.prefix,
+    max: parseBoundedInt(
+      env.RATE_LIMIT_MAX,
+      overrides.defaultMax ?? 60,
+      1,
+      1000
+    ),
+    kvPrefix: tier ? `${overrides.prefix}:${tier}` : overrides.prefix,
   };
 }
 
-/**
- * Extract client IP from request headers.
- */
 export function getClientIp(request: Request): string {
   const cfIp = request.headers.get("CF-Connecting-IP");
   if (cfIp) return cfIp.trim();

@@ -1969,32 +1969,62 @@ function handleRegister_(payload) {
   try {
     var sh = getSheet_('ops_registrations');
 
-    // Duplicate nickname guard within same division + qualifierRegion
+    // Integrated duplicate guard
     var division = String(payload.division || '').trim();
     var divisionLower = division.toLowerCase();
     var newNick = String(payload.nickname || '').trim();
-    var newNickLower = newNick.toLowerCase();
     var newRegion = normalizeRegionKey_(String(payload.qualifierRegion || '').trim()) || '';
-    var needsRegion = divisionLower === 'arcade';
 
-    if (sh.getLastRow() > 1 && newNick) {
+    if (sh.getLastRow() > 1) {
       var allData = sh.getRange(1, 1, sh.getLastRow(), sh.getLastColumn()).getValues();
       var hdr = allData[0].map(function(h){ return String(h).trim(); });
       var iDiv = hdr.indexOf('division');
       var iNick = hdr.indexOf('nickname');
       var iRegion = hdr.indexOf('qualifierRegion');
       var iStatus = hdr.indexOf('status');
+      var iEmail = hdr.indexOf('email');
+      var iPhone = hdr.indexOf('phone');
+      var iDohirobaNo = hdr.indexOf('dohirobaNo');
 
-      if (iDiv >= 0 && iNick >= 0) {
-        for (var i = 1; i < allData.length; i++) {
-          var rowDiv = String(allData[i][iDiv] || '').trim().toLowerCase();
+      var newEmail = String(payload.email || '').trim().toLowerCase();
+      var newPhone = String(payload.phone || '').trim().toLowerCase();
+      var newDohirobaNo = String(payload.dohirobaNo || '').trim().toLowerCase();
+      var newNickLower = newNick.toLowerCase();
+      var needsRegion = divisionLower === 'arcade';
+
+      for (var i = 1; i < allData.length; i++) {
+        var rowStatus = iStatus >= 0 ? String(allData[i][iStatus] || '').trim().toLowerCase() : '';
+        if (rowStatus === 'cancelled') continue;
+
+        var rowDiv = iDiv >= 0 ? String(allData[i][iDiv] || '').trim().toLowerCase() : '';
+
+        if (newEmail && iEmail >= 0) {
+          var rowEmail = String(allData[i][iEmail] || '').trim().toLowerCase();
+          if (rowEmail && rowEmail === newEmail) {
+            return { ok: false, error: 'DUPLICATE_ENTRY' };
+          }
+        }
+
+        if (newPhone && iPhone >= 0) {
+          var rowPhone = String(allData[i][iPhone] || '').trim().toLowerCase();
+          if (rowPhone && rowPhone === newPhone) {
+            return { ok: false, error: 'DUPLICATE_ENTRY' };
+          }
+        }
+
+        if (divisionLower === 'arcade' && newDohirobaNo && iDohirobaNo >= 0) {
+          var rowDohirobaNo = String(allData[i][iDohirobaNo] || '').trim().toLowerCase();
+          if (rowDiv === 'arcade' && rowDohirobaNo && rowDohirobaNo === newDohirobaNo) {
+            return { ok: false, error: 'DUPLICATE_ENTRY' };
+          }
+        }
+
+        if (newNick && iDiv >= 0 && iNick >= 0) {
           var rowNick = String(allData[i][iNick] || '').trim();
           var rowNickLower = rowNick.toLowerCase();
           var rowRegion = iRegion >= 0
             ? (normalizeRegionKey_(String(allData[i][iRegion] || '').trim()) || '')
             : '';
-          var rowStatus = iStatus >= 0 ? String(allData[i][iStatus] || '').trim().toLowerCase() : '';
-          if (rowStatus === 'cancelled') continue;
 
           var sameDivision = rowDiv === divisionLower;
           var sameNickname = rowNickLower === newNickLower;

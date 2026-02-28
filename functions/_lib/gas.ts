@@ -1,3 +1,5 @@
+import { parseBoundedInt } from "./number";
+
 export interface _Env {
   // Default GAS endpoint (legacy + fallback)
   GAS_WEBAPP_URL?: string; // e.g. https://script.google.com/macros/s/{DEPLOYMENT_ID}/exec
@@ -67,20 +69,6 @@ const pickFirst = (...values: Array<string | undefined>) => {
   return "";
 };
 
-const parseBoundedInt = (
-  value: unknown,
-  fallback: number,
-  min: number,
-  max: number
-) => {
-  const raw = typeof value === "number" ? value : Number(String(value ?? "").trim());
-  if (!Number.isFinite(raw)) return fallback;
-  const rounded = Math.floor(raw);
-  if (rounded < min) return min;
-  if (rounded > max) return max;
-  return rounded;
-};
-
 export function resolveDeploymentTier(env: _Env): DeploymentTier {
   const raw = String(env.TKC_ENV_TIER ?? "")
     .trim()
@@ -109,6 +97,23 @@ export function resolveGasWebAppUrl(env: _Env) {
     );
   }
   return pickFirst(env.GAS_WEBAPP_URL_PRODUCTION, env.GAS_WEBAPP_URL);
+}
+
+export function resolveGasNetworkConfig(env: _Env, action: GasAction) {
+  const timeoutMs = parseBoundedInt(
+    env.GAS_FETCH_TIMEOUT_MS,
+    DEFAULT_FETCH_TIMEOUT_MS,
+    MIN_FETCH_TIMEOUT_MS,
+    MAX_FETCH_TIMEOUT_MS
+  );
+  const readRetries = parseBoundedInt(
+    env.GAS_FETCH_RETRIES,
+    DEFAULT_READ_RETRIES,
+    0,
+    MAX_READ_RETRIES
+  );
+  const maxRetries = RETRYABLE_READ_ACTIONS.has(action) ? readRetries : 0;
+  return { timeoutMs, readRetries, maxRetries };
 }
 
 async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
@@ -160,19 +165,7 @@ export async function callGas(env: _Env, action: GasAction, params?: Record<stri
   const apiKey = env.GAS_API_KEY?.trim();
   if (!apiKey) throw new Error("Missing env.GAS_API_KEY");
 
-  const timeoutMs = parseBoundedInt(
-    env.GAS_FETCH_TIMEOUT_MS,
-    DEFAULT_FETCH_TIMEOUT_MS,
-    MIN_FETCH_TIMEOUT_MS,
-    MAX_FETCH_TIMEOUT_MS
-  );
-  const readRetries = parseBoundedInt(
-    env.GAS_FETCH_RETRIES,
-    DEFAULT_READ_RETRIES,
-    0,
-    MAX_READ_RETRIES
-  );
-  const maxRetries = RETRYABLE_READ_ACTIONS.has(action) ? readRetries : 0;
+  const { timeoutMs, maxRetries } = resolveGasNetworkConfig(env, action);
 
   const body = JSON.stringify({
     apiKey,

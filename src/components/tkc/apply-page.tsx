@@ -656,7 +656,9 @@ export function ApplyPage() {
       const rawMessage =
         error instanceof Error ? error.message : '신청 중 오류가 발생했습니다.'
       const message =
-        rawMessage === 'Turnstile verification required'
+        rawMessage === 'DUPLICATE_ENTRY'
+          ? '신청 정보를 확인해 주세요. 이미 접수된 내용이 포함되어 있을 수 있습니다.'
+          : rawMessage === 'Turnstile verification required'
           ? '보안 인증이 필요합니다. 인증을 완료한 뒤 다시 시도해주세요.'
           : rawMessage === 'Turnstile verification failed'
             ? '보안 인증 검증에 실패했습니다. 인증을 다시 진행해주세요.'
@@ -763,7 +765,7 @@ export function ApplyPage() {
                   {/* ═══ SECTION 1: 부문 선택 ═══ */}
                   <SectionLabel
                     title='부문 선택'
-                    desc='참가할 부문을 선택해 주세요.'
+                    desc='참가할 부문을 선택해 주세요. 1인 1부문만 신청 가능합니다.'
                   />
 
                   <FormField

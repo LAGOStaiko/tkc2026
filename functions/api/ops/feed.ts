@@ -1,4 +1,4 @@
-import { ok, serverError } from "../../_lib/response";
+import { ok, serverError, withNoStore } from "../../_lib/response";
 import { callGasJson } from "../../_lib/gas";
 import { requireOpsAuth } from "../../_lib/ops-auth";
 
@@ -8,6 +8,7 @@ const CACHE_HEADERS = {
 };
 
 export const onRequestGet = async ({ request, env }) => {
+  const noStoreInit = withNoStore();
   try {
     const authErr = requireOpsAuth(env, request);
     if (authErr) return authErr;
@@ -21,6 +22,6 @@ export const onRequestGet = async ({ request, env }) => {
     const gas = await callGasJson(env, "opsFeed", params);
     return ok({ data: gas.data }, { headers: CACHE_HEADERS });
   } catch (err) {
-    return serverError(err);
+    return serverError(err, noStoreInit);
   }
 };

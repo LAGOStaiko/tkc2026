@@ -2,7 +2,7 @@
 import { FadeIn } from '@/components/tkc/guide-shared'
 import { HomeSectionHead } from './home-section-head'
 
-const HOME_YOUTUBE_ID = '8G2rhLcUQAA'
+const HOME_YOUTUBE_ID = '474k7-hcyTk'
 const HOME_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${HOME_YOUTUBE_ID}?rel=0&modestbranding=1`
 const YT_THUMB = `https://i.ytimg.com/vi/${HOME_YOUTUBE_ID}/hqdefault.jpg`
 

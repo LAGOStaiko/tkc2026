@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { badRequest, ok, serverError } from "../../_lib/response";
+import { badRequest, ok, serverError, withNoStore } from "../../_lib/response";
 import { callGasJson } from "../../_lib/gas";
 import { requireOpsAuth } from "../../_lib/ops-auth";
 
@@ -19,6 +19,7 @@ const exportSchema = z.object({
 });
 
 export const onRequestPost = async ({ request, env }) => {
+  const noStoreInit = withNoStore();
   try {
     const authError = requireOpsAuth(env, request);
     if (authError) return authError;
@@ -26,7 +27,11 @@ export const onRequestPost = async ({ request, env }) => {
     const body = (await request.json().catch(() => ({}))) as unknown;
     const parsed = exportSchema.safeParse(body);
     if (!parsed.success) {
-      return badRequest(parsed.error.issues[0]?.message ?? "Invalid payload");
+      return badRequest(
+        parsed.error.issues[0]?.message ?? "Invalid payload",
+        undefined,
+        noStoreInit
+      );
     }
 
     const payload = {
@@ -36,8 +41,8 @@ export const onRequestPost = async ({ request, env }) => {
     };
 
     const gas = await callGasJson(env, "opsExport", {}, payload);
-    return ok({ data: gas.data });
+    return ok({ data: gas.data }, noStoreInit);
   } catch (err) {
-    return serverError(err);
+    return serverError(err, noStoreInit);
   }
 };
