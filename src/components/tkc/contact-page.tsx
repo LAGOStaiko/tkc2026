@@ -144,7 +144,9 @@ export function ContactPage() {
   const [openFaq, setOpenFaq] = useState<string | null>(null)
 
   const contactEmail = siteData?.contactEmail ?? ''
-  const kakaoChannelUrl = sanitizeUrl(siteData?.kakaoChannelUrl)
+  const kakaoChannelUrl = sanitizeUrl(
+    siteData?.kakaoChannelUrl || 'http://pf.kakao.com/_PncxgG'
+  )
   const emailHref = contactEmail ? sanitizeUrl(`mailto:${contactEmail}`) : ''
 
   useEffect(() => {
