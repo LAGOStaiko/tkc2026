@@ -1,0 +1,113 @@
+
+> shadcn-admin@2.2.1 build C:\Users\LAGOS\OneDrive\문서\GitHub\tkc2026
+> tsc -b && vite build
+
+[36mvite v7.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 3959 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                                 [39m[1m[2m  2.09 kB[22m[1m[22m[2m │ gzip:   0.83 kB[22m
+[2mdist/[22m[35massets/index-C_rfacQT.css                  [39m[1m[2m174.99 kB[22m[1m[22m[2m │ gzip:  27.34 kB[22m
+[2mdist/[22m[36massets/500-Br6iRKno.js                     [39m[1m[2m  0.07 kB[22m[1m[22m[2m │ gzip:   0.09 kB[22m
+[2mdist/[22m[36massets/404-BqKBl-sS.js                     [39m[1m[2m  0.07 kB[22m[1m[22m[2m │ gzip:   0.09 kB[22m
+[2mdist/[22m[36massets/403--h6DFxrO.js                     [39m[1m[2m  0.11 kB[22m[1m[22m[2m │ gzip:   0.12 kB[22m
+[2mdist/[22m[36massets/503-BzPQmkZY.js                     [39m[1m[2m  0.11 kB[22m[1m[22m[2m │ gzip:   0.12 kB[22m
+[2mdist/[22m[36massets/401-DDhqsYe7.js                     [39m[1m[2m  0.12 kB[22m[1m[22m[2m │ gzip:   0.12 kB[22m
+[2mdist/[22m[36massets/check-CAHLTk2k.js                   [39m[1m[2m  0.12 kB[22m[1m[22m[2m │ gzip:   0.14 kB[22m
+[2mdist/[22m[36massets/chevron-down-BEC1Vs9r.js            [39m[1m[2m  0.13 kB[22m[1m[22m[2m │ gzip:   0.14 kB[22m
+[2mdist/[22m[36massets/useLocation-BxXEovKd.js             [39m[1m[2m  0.13 kB[22m[1m[22m[2m │ gzip:   0.13 kB[22m
+[2mdist/[22m[36massets/plus-DMN5QiD5.js                    [39m[1m[2m  0.15 kB[22m[1m[22m[2m │ gzip:   0.15 kB[22m
+[2mdist/[22m[36massets/menu--IYGH5CP.js                    [39m[1m[2m  0.19 kB[22m[1m[22m[2m │ gzip:   0.16 kB[22m
+[2mdist/[22m[36massets/index-BrfrfGEA.js                   [39m[1m[2m  0.23 kB[22m[1m[22m[2m │ gzip:   0.17 kB[22m
+[2mdist/[22m[36massets/download-CjZtP5Du.js                [39m[1m[2m  0.23 kB[22m[1m[22m[2m │ gzip:   0.19 kB[22m
+[2mdist/[22m[36massets/arcade-songs-BcHIasXy.js            [39m[1m[2m  0.28 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+[2mdist/[22m[36massets/send-C8QC9-ON.js                    [39m[1m[2m  0.29 kB[22m[1m[22m[2m │ gzip:   0.23 kB[22m
+[2mdist/[22m[36massets/main-DaBNcX11.js                    [39m[1m[2m  0.31 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+[2mdist/[22m[36massets/glass-card-CaX4M11r.js              [39m[1m[2m  0.31 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+[2mdist/[22m[36massets/show-submitted-data-DTa3pna2.js     [39m[1m[2m  0.31 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+[2mdist/[22m[36massets/index-5wXzYCmq.js                   [39m[1m[2m  0.38 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/sanitize-url-BhMDBTWd.js            [39m[1m[2m  0.39 kB[22m[1m[22m[2m │ gzip:   0.22 kB[22m
+[2mdist/[22m[36massets/index-D-tSkfaZ.js                   [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+[2mdist/[22m[36massets/index-HKRgLF3_.js                   [39m[1m[2m  0.46 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+[2mdist/[22m[36massets/level-badge-CmDLQKd7.js             [39m[1m[2m  0.54 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+[2mdist/[22m[36massets/index-Dr-FNiKY.js                   [39m[1m[2m  0.54 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+[2mdist/[22m[36massets/content-section-8IMfNmsb.js         [39m[1m[2m  0.58 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/textarea-COUcdPAa.js                [39m[1m[2m  0.62 kB[22m[1m[22m[2m │ gzip:   0.38 kB[22m
+[2mdist/[22m[36massets/maintenance-error-DQDOnLUx.js       [39m[1m[2m  0.71 kB[22m[1m[22m[2m │ gzip:   0.39 kB[22m
+[2mdist/[22m[36massets/separator-BLhUbzS3.js               [39m[1m[2m  0.74 kB[22m[1m[22m[2m │ gzip:   0.40 kB[22m
+[2mdist/[22m[36massets/input-frJ3X9fN.js                   [39m[1m[2m  0.81 kB[22m[1m[22m[2m │ gzip:   0.44 kB[22m
+[2mdist/[22m[36massets/forbidden-B6_J8vrC.js               [39m[1m[2m  0.85 kB[22m[1m[22m[2m │ gzip:   0.46 kB[22m
+[2mdist/[22m[36massets/unauthorized-error-B-j9ImeL.js      [39m[1m[2m  0.86 kB[22m[1m[22m[2m │ gzip:   0.46 kB[22m
+[2mdist/[22m[36massets/card-DAxAJR5F.js                    [39m[1m[2m  0.89 kB[22m[1m[22m[2m │ gzip:   0.39 kB[22m
+[2mdist/[22m[36massets/radio-group-Li7Qm7i-.js             [39m[1m[2m  0.94 kB[22m[1m[22m[2m │ gzip:   0.49 kB[22m
+[2mdist/[22m[36massets/arcade-results-ranking-CWIw6Q8E.js  [39m[1m[2m  1.02 kB[22m[1m[22m[2m │ gzip:   0.57 kB[22m
+[2mdist/[22m[36massets/index-BZ0LBIyP.js                   [39m[1m[2m  1.06 kB[22m[1m[22m[2m │ gzip:   0.62 kB[22m
+[2mdist/[22m[36massets/badge-Wrsn61CL.js                   [39m[1m[2m  1.15 kB[22m[1m[22m[2m │ gzip:   0.56 kB[22m
+[2mdist/[22m[36massets/index-B5Oj8CYV.js                   [39m[1m[2m  1.20 kB[22m[1m[22m[2m │ gzip:   0.60 kB[22m
+[2mdist/[22m[36massets/_error-LdIeRDSB.js                  [39m[1m[2m  1.26 kB[22m[1m[22m[2m │ gzip:   0.63 kB[22m
+[2mdist/[22m[36massets/sign-in-BIQU71gz.js                 [39m[1m[2m  1.38 kB[22m[1m[22m[2m │ gzip:   0.69 kB[22m
+[2mdist/[22m[36massets/display-CoKB7_-j.js                 [39m[1m[2m  1.83 kB[22m[1m[22m[2m │ gzip:   0.90 kB[22m
+[2mdist/[22m[36massets/index-CuUTUkKv.js                   [39m[1m[2m  2.06 kB[22m[1m[22m[2m │ gzip:   0.92 kB[22m
+[2mdist/[22m[36massets/layout-C-rTTidS.js                  [39m[1m[2m  2.31 kB[22m[1m[22m[2m │ gzip:   1.01 kB[22m
+[2mdist/[22m[36massets/sheet-nM1pziXY.js                   [39m[1m[2m  2.51 kB[22m[1m[22m[2m │ gzip:   0.85 kB[22m
+[2mdist/[22m[36massets/route-D4O_8zjB.js                   [39m[1m[2m  3.21 kB[22m[1m[22m[2m │ gzip:   1.34 kB[22m
+[2mdist/[22m[36massets/index-Cvk4EPO3.js                   [39m[1m[2m  3.46 kB[22m[1m[22m[2m │ gzip:   1.57 kB[22m
+[2mdist/[22m[36massets/index-wRVuh1vj.js                   [39m[1m[2m  3.47 kB[22m[1m[22m[2m │ gzip:   1.49 kB[22m
+[2mdist/[22m[36massets/index-CBYPtEJ4.js                   [39m[1m[2m  3.55 kB[22m[1m[22m[2m │ gzip:   1.60 kB[22m
+[2mdist/[22m[36massets/tabs-wNtwX1KZ.js                    [39m[1m[2m  3.56 kB[22m[1m[22m[2m │ gzip:   1.51 kB[22m
+[2mdist/[22m[36massets/checkbox-Bc1r5_eL.js                [39m[1m[2m  4.20 kB[22m[1m[22m[2m │ gzip:   1.81 kB[22m
+[2mdist/[22m[36massets/index-D5j_6E-E.js                   [39m[1m[2m  4.38 kB[22m[1m[22m[2m │ gzip:   1.93 kB[22m
+[2mdist/[22m[36massets/appearance-DFb33YRz.js              [39m[1m[2m  4.39 kB[22m[1m[22m[2m │ gzip:   1.38 kB[22m
+[2mdist/[22m[36massets/songs-CQbhV8Ph.js                   [39m[1m[2m  4.41 kB[22m[1m[22m[2m │ gzip:   1.85 kB[22m
+[2mdist/[22m[36massets/route-BOewlYmy.js                   [39m[1m[2m  4.60 kB[22m[1m[22m[2m │ gzip:   1.90 kB[22m
+[2mdist/[22m[36massets/guide-shared-C6z6uojX.js            [39m[1m[2m  4.81 kB[22m[1m[22m[2m │ gzip:   1.66 kB[22m
+[2mdist/[22m[36massets/index-48ZxWboj.js                   [39m[1m[2m  5.34 kB[22m[1m[22m[2m │ gzip:   2.06 kB[22m
+[2mdist/[22m[36massets/popover-CTvu7I6b.js                 [39m[1m[2m  5.50 kB[22m[1m[22m[2m │ gzip:   1.96 kB[22m
+[2mdist/[22m[36massets/index-4zbiYTpD.js                   [39m[1m[2m  5.76 kB[22m[1m[22m[2m │ gzip:   2.20 kB[22m
+[2mdist/[22m[36massets/route-C4G9RAqK.js                   [39m[1m[2m  6.35 kB[22m[1m[22m[2m │ gzip:   2.20 kB[22m
+[2mdist/[22m[36massets/route-wqzMwds0.js                   [39m[1m[2m  6.50 kB[22m[1m[22m[2m │ gzip:   2.26 kB[22m
+[2mdist/[22m[36massets/arcade-results-archive-DUgWuJh4.js  [39m[1m[2m  6.65 kB[22m[1m[22m[2m │ gzip:   2.34 kB[22m
+[2mdist/[22m[36massets/results-CxgvlOyl.js                 [39m[1m[2m  6.93 kB[22m[1m[22m[2m │ gzip:   2.42 kB[22m
+[2mdist/[22m[36massets/finals-DX6iV2rd.js                  [39m[1m[2m  7.06 kB[22m[1m[22m[2m │ gzip:   2.30 kB[22m
+[2mdist/[22m[36massets/song-pool-DPli6Fsg.js               [39m[1m[2m  7.21 kB[22m[1m[22m[2m │ gzip:   2.22 kB[22m
+[2mdist/[22m[36massets/notifications-BoC_Pscz.js           [39m[1m[2m  7.32 kB[22m[1m[22m[2m │ gzip:   2.49 kB[22m
+[2mdist/[22m[36massets/archive-DARF0wdo.js                 [39m[1m[2m  9.07 kB[22m[1m[22m[2m │ gzip:   3.11 kB[22m
+[2mdist/[22m[36massets/arcade-broadcast-DBox3Dco.js        [39m[1m[2m 10.01 kB[22m[1m[22m[2m │ gzip:   2.92 kB[22m
+[2mdist/[22m[36massets/route-Bx2GtSEK.js                   [39m[1m[2m 11.13 kB[22m[1m[22m[2m │ gzip:   3.62 kB[22m
+[2mdist/[22m[36massets/react-icons.esm-DlYm9BA8.js         [39m[1m[2m 12.61 kB[22m[1m[22m[2m │ gzip:   3.36 kB[22m
+[2mdist/[22m[36massets/index-DYTNw1w1.js                   [39m[1m[2m 13.01 kB[22m[1m[22m[2m │ gzip:   4.36 kB[22m
+[2mdist/[22m[36massets/arcade-ops-POaQ6oJt.js              [39m[1m[2m 14.05 kB[22m[1m[22m[2m │ gzip:   3.70 kB[22m
+[2mdist/[22m[36massets/index-BPUrY8Ix.js                   [39m[1m[2m 14.26 kB[22m[1m[22m[2m │ gzip:   4.54 kB[22m
+[2mdist/[22m[36massets/index-CXhhaN4W.js                   [39m[1m[2m 16.26 kB[22m[1m[22m[2m │ gzip:   4.23 kB[22m
+[2mdist/[22m[36massets/command-B419OzY1.js                 [39m[1m[2m 16.93 kB[22m[1m[22m[2m │ gzip:   6.13 kB[22m
+[2mdist/[22m[36massets/index-BJm7HCwJ.js                   [39m[1m[2m 17.11 kB[22m[1m[22m[2m │ gzip:   5.46 kB[22m
+[2mdist/[22m[36massets/index-DbGyBt1D.js                   [39m[1m[2m 18.07 kB[22m[1m[22m[2m │ gzip:   5.52 kB[22m
+[2mdist/[22m[36massets/index-ByxmrfPz.js                   [39m[1m[2m 18.27 kB[22m[1m[22m[2m │ gzip:   5.65 kB[22m
+[2mdist/[22m[36massets/schedule-DwcI7GoW.js                [39m[1m[2m 19.18 kB[22m[1m[22m[2m │ gzip:   6.60 kB[22m
+[2mdist/[22m[36massets/format-Dx8HDyBA.js                  [39m[1m[2m 19.99 kB[22m[1m[22m[2m │ gzip:   5.74 kB[22m
+[2mdist/[22m[36massets/index-CmfXboQB.js                   [39m[1m[2m 20.34 kB[22m[1m[22m[2m │ gzip:   7.36 kB[22m
+[2mdist/[22m[36massets/contact-DtDpZnjb.js                 [39m[1m[2m 21.37 kB[22m[1m[22m[2m │ gzip:   6.39 kB[22m
+[2mdist/[22m[36massets/select-IrMMus5W.js                  [39m[1m[2m 21.58 kB[22m[1m[22m[2m │ gzip:   7.51 kB[22m
+[2mdist/[22m[36massets/apply-Cg94kgx4.js                   [39m[1m[2m 21.92 kB[22m[1m[22m[2m │ gzip:   5.90 kB[22m
+[2mdist/[22m[36massets/finals-DIouYScI.js                  [39m[1m[2m 23.05 kB[22m[1m[22m[2m │ gzip:   5.69 kB[22m
+[2mdist/[22m[36massets/_region-BVf32L0E.js                 [39m[1m[2m 23.52 kB[22m[1m[22m[2m │ gzip:   5.26 kB[22m
+[2mdist/[22m[36massets/index-0FLENcrI.js                   [39m[1m[2m 24.00 kB[22m[1m[22m[2m │ gzip:   7.06 kB[22m
+[2mdist/[22m[36massets/index-D7Pd9tYz.js                   [39m[1m[2m 24.54 kB[22m[1m[22m[2m │ gzip:   5.77 kB[22m
+[2mdist/[22m[36massets/theme-switch-uZSO-t6i.js            [39m[1m[2m 25.50 kB[22m[1m[22m[2m │ gzip:   5.89 kB[22m
+[2mdist/[22m[36massets/swiss-BVQZdPfv.js                   [39m[1m[2m 25.55 kB[22m[1m[22m[2m │ gzip:   6.37 kB[22m
+[2mdist/[22m[36massets/index-JUDlrEdZ.js                   [39m[1m[2m 26.54 kB[22m[1m[22m[2m │ gzip:  10.21 kB[22m
+[2mdist/[22m[36massets/finals-DYEaby_w.js                  [39m[1m[2m 27.29 kB[22m[1m[22m[2m │ gzip:   6.30 kB[22m
+[2mdist/[22m[36massets/arcade-control-CQSYuka3.js          [39m[1m[2m 33.54 kB[22m[1m[22m[2m │ gzip:   9.68 kB[22m
+[2mdist/[22m[36massets/form-BM3gxO2d.js                    [39m[1m[2m 35.70 kB[22m[1m[22m[2m │ gzip:  12.84 kB[22m
+[2mdist/[22m[36massets/account-CL-OQ3im.js                 [39m[1m[2m 54.32 kB[22m[1m[22m[2m │ gzip:  17.11 kB[22m
+[2mdist/[22m[36massets/sign-out-dialog-DTFf0-uK.js         [39m[1m[2m 74.50 kB[22m[1m[22m[2m │ gzip:  21.70 kB[22m
+[2mdist/[22m[36massets/index-VYN8fW_T.js                   [39m[1m[2m325.32 kB[22m[1m[22m[2m │ gzip:  96.58 kB[22m
+[2mdist/[22m[36massets/chunk-3WUZ46N3-CORyQwKp.js          [39m[1m[33m527.32 kB[39m[22m[2m │ gzip: 176.10 kB[22m
+[2mdist/[22m[36massets/index-Df70zmEK.js                   [39m[1m[33m698.05 kB[39m[22m[2m │ gzip: 200.90 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 10.13s[39m

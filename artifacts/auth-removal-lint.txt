@@ -1,0 +1,10 @@
+
+> shadcn-admin@2.2.1 lint C:\Users\LAGOS\OneDrive\문서\GitHub\tkc2026
+> eslint .
+
+
+C:\Users\LAGOS\OneDrive\문서\GitHub\tkc2026\src\main.tsx
+  89:10  warning  Fast refresh only works when a file has exports. Move your component(s) to a separate file  react-refresh/only-export-components
+
+✖ 1 problem (0 errors, 1 warning)
+

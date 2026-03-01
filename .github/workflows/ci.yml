@@ -1,4 +1,4 @@
-name: Continuous Integration
+﻿name: Continuous Integration
 
 on:
   push:
@@ -56,9 +56,9 @@ jobs:
           grep -q '<div id="root">' dist/index.html
           echo "All smoke checks passed."
 
-      # ── CSP 수동 검증 체크리스트 (배포 후 브라우저 콘솔 확인) ──
-      # 1. / 홈 — 영상 썸네일(i.ytimg.com) 로드, YouTube 임베드 재생
-      # 2. /apply — Turnstile CAPTCHA 위젯 정상 렌더링
-      # 3. /sign-in — Clerk 로그인 페이지 정상 로드
-      # 4. 콘솔에 CSP Report-Only 위반 로그 0건 확인
-      # 5. 위반 0건 확인 후 _headers에서 Report-Only → enforce 전환
+      # ?? CSP ?섎룞 寃利?泥댄겕由ъ뒪??(諛고룷 ??釉뚮씪?곗? 肄섏넄 ?뺤씤) ??
+      # 1. / ?????곸긽 ?몃꽕??i.ytimg.com) 濡쒕뱶, YouTube ?꾨쿋???ъ깮
+      # 2. /apply ??Turnstile CAPTCHA ?꾩젽 ?뺤긽 ?뚮뜑留?
+      # 3. /sign-in -- no external auth dependency page loads
+      # 4. 肄섏넄??CSP Report-Only ?꾨컲 濡쒓렇 0嫄??뺤씤
+      # 5. ?꾨컲 0嫄??뺤씤 ??_headers?먯꽌 Report-Only ??enforce ?꾪솚

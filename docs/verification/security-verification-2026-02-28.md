@@ -58,3 +58,52 @@
 ### Data handling rule
 
 - Never record keys, tokens, or any PII (name, phone, email, etc.) in this document.
+
+## Clerk removal audit (2026-03-01 KST)
+
+### Commands executed
+
+- `git grep -n -I` (legacy auth keywords + sign-in, sign-up path scan)
+- `git ls-files .tanstack/tmp`
+- `pnpm run lint`
+- `pnpm exec tsc -b --pretty false`
+- `pnpm run test`
+- `pnpm run build`
+
+### Findings
+
+- Legacy auth keyword references in tracked files: none after cleanup.
+- Sign-up path references in tracked files: none.
+- `/sign-in` references remain by design as an internal app route (no external auth provider).
+- No legacy auth route directory exists under `src/routes`.
+
+### .tanstack/tmp handling
+
+- `.tanstack/tmp` was tracked in git initially.
+- Applied: `git rm -r --cached .tanstack/tmp`.
+- Added `.tanstack/` to `.gitignore` to prevent re-tracking generated router artifacts.
+
+### CI and docs updates
+
+- Updated `.github/workflows/ci.yml` comment that previously mentioned Clerk login.
+- Updated docs/README/CHANGELOG text to remove Clerk-specific references from active guidance.
+
+### Verification evidence
+
+- Lint: PASS (0 errors, 1 warning in `src/main.tsx` fast-refresh rule)
+  Evidence: `artifacts/auth-removal-lint.txt`
+- TypeScript build check (`tsc -b`): PASS
+  Evidence: `artifacts/auth-removal-tsc.txt`
+- Tests: PASS (`2` files, `32` tests)
+  Evidence: `artifacts/auth-removal-test.txt`
+- Production build: PASS
+  Evidence: `artifacts/auth-removal-build.txt`
+
+### Clerk complete removal checklist
+
+- [x] Clerk package dependency removed from `package.json` and lockfile.
+- [x] Runtime/client imports from Clerk removed from app code.
+- [x] Server helper for Clerk auth removed.
+- [x] Legacy auth route references removed from tracked source files.
+- [x] Generated `.tanstack/tmp` artifacts untracked and ignored.
+- [x] CI/docs references updated to non-Clerk wording.

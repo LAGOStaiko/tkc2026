@@ -105,7 +105,7 @@
 
 ### Feat
 
-- **clerk**: add Clerk for auth and protected route (#146)
+- **auth**: add auth provider and protected route (#146)
 
 ### Fix
 
