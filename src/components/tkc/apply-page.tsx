@@ -746,21 +746,6 @@ export function ApplyPage() {
                 />
                 <input type='hidden' {...form.register('turnstileToken')} />
 
-                {/* Turnstile */}
-                {turnstileSiteKey ? (
-                  <div className='mb-6 space-y-2'>
-                    <div id='turnstile-anchor' ref={turnstileRef} />
-                    {turnstileError ? (
-                      <p className='text-xs text-[#e74c3c]'>{turnstileError}</p>
-                    ) : null}
-                    {turnstileFieldError ? (
-                      <p className='text-xs text-[#e74c3c]'>
-                        {turnstileFieldError}
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-
                 <fieldset disabled={isDisabled} className='space-y-0'>
                   {/* ═══ SECTION 1: 부문 선택 ═══ */}
                   <SectionLabel
@@ -1423,16 +1408,31 @@ export function ApplyPage() {
                   <span className='text-[#e74c3c]'>*</span> 표시는 필수 입력
                   항목입니다.
                 </div>
-                <button
-                  type='submit'
-                  disabled={isDisabled}
-                  className='w-full shrink-0 cursor-pointer rounded-[10px] bg-[#e74c3c] px-10 py-3.5 text-[16px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
-                  style={{
-                    boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
-                  }}
-                >
-                  {isBusy ? t('apply.submitting') : t('apply.submit')}
-                </button>
+                <div className='flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-end'>
+                  {turnstileSiteKey ? (
+                    <div className='space-y-2'>
+                      <div id='turnstile-anchor' ref={turnstileRef} />
+                      {turnstileError ? (
+                        <p className='text-xs text-[#e74c3c]'>{turnstileError}</p>
+                      ) : null}
+                      {turnstileFieldError ? (
+                        <p className='text-xs text-[#e74c3c]'>
+                          {turnstileFieldError}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  <button
+                    type='submit'
+                    disabled={isDisabled}
+                    className='w-full shrink-0 cursor-pointer rounded-[10px] bg-[#e74c3c] px-10 py-3.5 text-[16px] font-bold text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto'
+                    style={{
+                      boxShadow: '0 4px 24px rgba(231,76,60,0.25)',
+                    }}
+                  >
+                    {isBusy ? t('apply.submitting') : t('apply.submit')}
+                  </button>
+                </div>
               </div>
             </form>
           </Form>
