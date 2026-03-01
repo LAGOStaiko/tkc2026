@@ -40,6 +40,7 @@ declare global {
         element: HTMLElement,
         options: {
           sitekey: string
+          execution?: 'render' | 'execute'
           callback: (token: string) => void
           'expired-callback'?: () => void
           'error-callback'?: () => void
@@ -47,6 +48,7 @@ declare global {
       ) => string
       remove: (widgetId: string) => void
       reset?: (widgetId?: string) => void
+      execute?: (widgetId?: string) => void
     }
   }
 }
@@ -136,7 +138,7 @@ const formSchema = z
       .min(1, { message: v.nicknameRequired })
       .max(L.nickname)
       .regex(/^[가-힣ㄱ-ㅎㅏ-ㅣ\s]+$/, {
-        message: '한글만 입력 가능합니다.',
+        message: '동더 네임은 한글만 입력할 수 있습니다.',
       }),
     // Console only
     videoLink: z.string().max(L.videoLink).optional(),
@@ -144,7 +146,9 @@ const formSchema = z
     dohirobaNo: z
       .string()
       .max(L.dohirobaNo)
-      .regex(/^\d{12}$/, { message: '북번호는 12자리 숫자입니다.' })
+      .regex(/^\d{12}$/, {
+        message: '북번호는 숫자 12자리로 입력해 주세요. (예: 000012345678)',
+      })
       .optional()
       .or(z.literal('')),
     qualifierRegion: z.string().max(L.qualifierRegion).optional(),
@@ -399,9 +403,16 @@ export function ApplyPage() {
   const [receiptId, setReceiptId] = React.useState<string | null>(null)
   const turnstileRef = React.useRef<HTMLDivElement | null>(null)
   const turnstileWidgetId = React.useRef<string | null>(null)
+  const turnstilePromiseResolveRef = React.useRef<
+    ((token: string) => void) | null
+  >(null)
+  const turnstilePromiseRejectRef = React.useRef<((error: Error) => void) | null>(
+    null
+  )
   const [turnstileError, setTurnstileError] = React.useState<string | null>(
     null
   )
+  const [isExecutingTurnstile, setIsExecutingTurnstile] = React.useState(false)
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || undefined
 
   const [confirmOpen, setConfirmOpen] = React.useState(false)
@@ -436,10 +447,47 @@ export function ApplyPage() {
   const isConsole = division === 'console'
   const isArcade = division === 'arcade'
   const isSubmitting = registerMutation.isPending
-  const isBusy = isSubmitting || isDelayingSuccess
+  const isBusy = isSubmitting || isDelayingSuccess || isExecutingTurnstile
   const isCompleted = receiptId !== null
   const isDisabled = isBusy || isCompleted
   const turnstileFieldError = form.formState.errors.turnstileToken?.message
+
+  const clearTurnstilePromiseHandlers = React.useCallback(() => {
+    turnstilePromiseResolveRef.current = null
+    turnstilePromiseRejectRef.current = null
+  }, [])
+
+  const executeTurnstile = React.useCallback(async () => {
+    if (!turnstileSiteKey) return ''
+
+    const widgetId = turnstileWidgetId.current
+    if (!widgetId || !window.turnstile?.execute) {
+      throw new Error(
+        '보안 인증을 시작할 수 없습니다. 페이지를 새로고침 후 다시 시도해주세요.'
+      )
+    }
+
+    formRef.current.setValue('turnstileToken', '', {
+      shouldValidate: true,
+    })
+    formRef.current.clearErrors('turnstileToken')
+    setTurnstileError(null)
+    setIsExecutingTurnstile(true)
+
+    try {
+      const token = await new Promise<string>((resolve, reject) => {
+        turnstilePromiseResolveRef.current = resolve
+        turnstilePromiseRejectRef.current = reject
+
+        window.turnstile?.reset?.(widgetId)
+        window.turnstile?.execute?.(widgetId)
+      })
+      return token
+    } finally {
+      setIsExecutingTurnstile(false)
+      clearTurnstilePromiseHandlers()
+    }
+  }, [clearTurnstilePromiseHandlers, turnstileSiteKey])
 
   const getAvailableSongs = (currentIndex: number) => {
     const selected = [offlineSong1, offlineSong2, offlineSong3, offlineSong4]
@@ -492,25 +540,46 @@ export function ApplyPage() {
           turnstileRef.current,
           {
             sitekey: turnstileSiteKey,
+            execution: 'execute',
             callback: (token: string) => {
               formRef.current.setValue('turnstileToken', token, {
                 shouldValidate: true,
               })
               setTurnstileError(null)
+              if (turnstilePromiseResolveRef.current) {
+                turnstilePromiseResolveRef.current(token)
+                clearTurnstilePromiseHandlers()
+              }
             },
             'expired-callback': () => {
               formRef.current.setValue('turnstileToken', '', {
                 shouldValidate: true,
               })
               window.turnstile?.reset?.(turnstileWidgetId.current ?? undefined)
-              setTurnstileError('인증이 만료되었습니다. 다시 시도해주세요.')
+              setTurnstileError(
+                '보안 인증이 만료되었습니다. 신청 버튼을 다시 눌러 인증을 진행해 주세요.'
+              )
+              if (turnstilePromiseRejectRef.current) {
+                turnstilePromiseRejectRef.current(
+                  new Error('Turnstile verification failed')
+                )
+                clearTurnstilePromiseHandlers()
+              }
             },
             'error-callback': () => {
               formRef.current.setValue('turnstileToken', '', {
                 shouldValidate: true,
               })
               window.turnstile?.reset?.(turnstileWidgetId.current ?? undefined)
-              setTurnstileError('인증을 완료할 수 없습니다. 다시 시도해주세요.')
+              setTurnstileError(
+                '보안 인증에 실패했습니다. 신청 버튼을 다시 눌러 인증을 진행해 주세요. 계속 안 되면 페이지를 새로고침하거나, 광고 차단·VPN을 잠시 꺼 보세요.'
+              )
+              if (turnstilePromiseRejectRef.current) {
+                turnstilePromiseRejectRef.current(
+                  new Error('Turnstile verification failed')
+                )
+                clearTurnstilePromiseHandlers()
+              }
             },
           }
         )
@@ -535,7 +604,7 @@ export function ApplyPage() {
       script.onerror = () => {
         if (cancelled) return
         setTurnstileError(
-          '보안 인증 스크립트를 불러오지 못했습니다. 광고 차단기/네트워크를 확인해주세요.'
+          '보안 인증을 불러올 수 없습니다. 광고 차단이나 VPN을 사용 중이라면 잠시 끈 뒤 페이지를 새로고침해 주세요.'
         )
       }
       if (!existing) {
@@ -549,8 +618,14 @@ export function ApplyPage() {
         window.turnstile.remove(turnstileWidgetId.current)
         turnstileWidgetId.current = null
       }
+      if (turnstilePromiseRejectRef.current) {
+        turnstilePromiseRejectRef.current(
+          new Error('Turnstile verification cancelled')
+        )
+      }
+      clearTurnstilePromiseHandlers()
     }
-  }, [turnstileSiteKey])
+  }, [clearTurnstilePromiseHandlers, turnstileSiteKey])
 
   React.useEffect(() => {
     document.title = `${t('meta.siteName')} | ${t('apply.title')}`
@@ -594,18 +669,6 @@ export function ApplyPage() {
   }
 
   const onShowConfirm = (values: ApplyFormValues) => {
-    // Turnstile check before showing modal
-    if (turnstileSiteKey && !values.turnstileToken?.trim()) {
-      window.turnstile?.reset?.()
-      form.setError('turnstileToken', {
-        message: '보안 인증을 완료해주세요.',
-      })
-      scrollToTurnstile()
-      toast.error('보안 인증이 필요합니다.', {
-        description: '보안 인증을 완료한 뒤 다시 시도해주세요.',
-      })
-      return
-    }
     setModalSubmitError(null)
     setIsDelayingSuccess(false)
     setModalReceiptId(null)
@@ -616,10 +679,48 @@ export function ApplyPage() {
   const onSubmit = async (values: ApplyFormValues) => {
     setModalSubmitError(null)
 
+    let turnstileToken = values.turnstileToken?.trim() ?? ''
+    if (turnstileSiteKey) {
+      try {
+        turnstileToken = await executeTurnstile()
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : '보안 인증에 실패했습니다. 신청 버튼을 다시 눌러 인증을 진행해 주세요.'
+        form.setError('turnstileToken', {
+          message:
+            '보안 인증을 완료해 주세요. 신청 버튼을 누르면 인증이 자동으로 진행됩니다.',
+        })
+        scrollToTurnstile()
+        toast.error('보안 인증이 필요합니다.', {
+          description:
+            '신청 버튼을 누르면 보안 인증이 자동으로 진행됩니다. 화면 안내가 나오면 완료해 주세요.',
+        })
+        setModalSubmitError(message)
+        return
+      }
+      if (!turnstileToken) {
+        form.setError('turnstileToken', {
+          message:
+            '보안 인증을 완료해 주세요. 신청 버튼을 누르면 인증이 자동으로 진행됩니다.',
+        })
+        scrollToTurnstile()
+        toast.error('보안 인증이 필요합니다.', {
+          description:
+            '신청 버튼을 누르면 보안 인증이 자동으로 진행됩니다. 화면 안내가 나오면 완료해 주세요.',
+        })
+        setModalSubmitError(
+          '보안 인증이 필요합니다. 신청 버튼을 눌러 인증을 진행해 주세요.'
+        )
+        return
+      }
+    }
+
     const payload: RegisterPayload = {
       division: values.division,
       website: values.website,
-      turnstileToken: values.turnstileToken,
+      turnstileToken,
       name: values.name,
       phone: values.phone,
       email: values.email,
@@ -653,18 +754,10 @@ export function ApplyPage() {
       )
       setModalReceiptId(String(result?.receiptId ?? ''))
     } catch (error) {
-      const rawMessage =
-        error instanceof Error ? error.message : '신청 중 오류가 발생했습니다.'
       const message =
-        rawMessage === 'DUPLICATE_ENTRY'
-          ? '신청 정보를 확인해 주세요. 이미 접수된 내용이 포함되어 있을 수 있습니다.'
-          : rawMessage === 'Turnstile verification required'
-          ? '보안 인증이 필요합니다. 인증을 완료한 뒤 다시 시도해주세요.'
-          : rawMessage === 'Turnstile verification failed'
-            ? '보안 인증 검증에 실패했습니다. 인증을 다시 진행해주세요.'
-            : rawMessage === 'Request timed out'
-              ? '요청이 지연되고 있습니다. 잠시 후 다시 시도해주세요.'
-              : rawMessage
+        error instanceof Error
+          ? error.message
+          : '신청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요. 문제가 계속되면 @taikolabs (X) 또는 tkc@taikolabs.kr로 문의해 주세요.'
       setModalSubmitError(message)
     } finally {
       setIsDelayingSuccess(false)

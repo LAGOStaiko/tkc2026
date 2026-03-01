@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { toUserMessage } from './error-messages'
 
 const SITE_STALE_MS = 5 * 60 * 1000
 const CONTENT_STALE_MS = 5 * 60 * 1000
@@ -20,6 +21,7 @@ type PersistedCache<T> = {
 
 type ApiRequestOptions = {
   timeoutMs?: number
+  errorMapper?: (raw: string) => string
 }
 
 function isRateLimitedMessage(message: string) {
@@ -97,6 +99,9 @@ async function apiRequest<T>(
   init: RequestInit,
   options: ApiRequestOptions = {}
 ): Promise<T> {
+  const mapErrorMessage = (raw: string) =>
+    options.errorMapper ? options.errorMapper(raw) : raw
+
   const headers = new Headers(init.headers)
   if (!headers.has('Accept')) {
     headers.set('Accept', 'application/json')
@@ -115,27 +120,33 @@ async function apiRequest<T>(
     })
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
-      throw new Error('Request timed out')
+      throw new Error(mapErrorMessage('Request timed out'))
     }
     throw error
   } finally {
     window.clearTimeout(timeoutId)
   }
 
-  const payload = await parseResponse<T>(response)
+  let payload: ApiResponse<T> | null = null
+  try {
+    payload = await parseResponse<T>(response)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error ?? '')
+    throw new Error(mapErrorMessage(message || 'Request failed'))
+  }
 
   if (!response.ok) {
     const message =
       payload?.error ?? `${response.status} ${response.statusText}`.trim()
-    throw new Error(message || 'Request failed')
+    throw new Error(mapErrorMessage(message || 'Request failed'))
   }
 
   if (!payload) {
-    throw new Error('Empty response')
+    throw new Error(mapErrorMessage('Empty response'))
   }
 
   if (!payload.ok) {
-    throw new Error(payload.error ?? 'Request failed')
+    throw new Error(mapErrorMessage(payload.error ?? 'Request failed'))
   }
 
   return payload.data as T
@@ -145,14 +156,14 @@ function apiGet<T>(path: string) {
   return apiRequest<T>(path, { method: 'GET' })
 }
 
-function apiPost<T>(path: string, body: unknown) {
+function apiPost<T>(path: string, body: unknown, options: ApiRequestOptions = {}) {
   return apiRequest<T>(path, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
-  })
+  }, options)
 }
 
 export function useSite<T = unknown>() {
@@ -255,6 +266,7 @@ export function useSongPools<T = unknown>() {
 
 export function useRegister<T = unknown, TBody = unknown>() {
   return useMutation({
-    mutationFn: (body: TBody) => apiPost<T>('/api/register', body),
+    mutationFn: (body: TBody) =>
+      apiPost<T>('/api/register', body, { errorMapper: toUserMessage }),
   })
 }

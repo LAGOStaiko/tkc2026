@@ -55,12 +55,15 @@ export const ko = {
   'apply.subtitle': '대회 참가 신청 정보를 입력해 주세요.',
   'apply.title': '대회 신청',
   'apply.completed': '신청이 완료되었습니다.',
-  'apply.submitFailed': '신청에 실패했습니다. 다시 시도해 주세요.',
-  'apply.validation.consentRequired': '미성년자는 동의서 링크가 필요합니다.',
+  'apply.submitFailed':
+    '신청에 실패했습니다. 입력 내용을 확인한 뒤 다시 시도해 주세요. 문제가 계속되면 @taikolabs (X) 또는 tkc@taikolabs.kr로 문의해 주세요.',
+  'apply.validation.consentRequired':
+    '미성년자는 보호자 동의서 링크를 첨부해야 합니다.',
   'apply.validation.divisionRequired': '부문을 선택해 주세요.',
   'apply.validation.dohirobaNoRequired': '동더 광장 북번호를 입력해 주세요.',
   'apply.validation.emailRequired': '이메일을 입력해 주세요.',
-  'apply.validation.emailInvalid': '올바른 이메일 형식이 아닙니다.',
+  'apply.validation.emailInvalid':
+    '이메일 형식이 올바르지 않습니다. (예: example@gmail.com)',
   'apply.validation.namcoIdRequired': '남코 아이디를 입력해 주세요.',
   'apply.validation.nameRequired': '이름을 입력해 주세요.',
   'apply.validation.nicknameRequired': '동더 네임을 입력해 주세요.',
